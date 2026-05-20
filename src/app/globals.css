@@ -190,3 +190,68 @@ body {
 .reveal-delay-4 { animation-delay: 0.32s; }
 .reveal-delay-5 { animation-delay: 0.40s; }
 .reveal-delay-6 { animation-delay: 0.48s; }
+
+/* ===== Theme ospite: Marathon MTB 209 =====
+   Override scoped delle variabili DS dentro un wrapper .theme-209.
+   PROGETTO_MASTER §10.6: palette red/yellow, angoli vivi, Anton display.
+   NavBar e Footer restano in stile Triono (sono fuori dal wrapper). */
+.theme-209 {
+  /* Palette "navy" rimappata su red — i componenti DS che usano bg-navy-* e
+     text-navy-* dentro lo scope ereditano la palette ospite senza modifiche */
+  --color-navy-50:  #FEF2F2;
+  --color-navy-100: #FEE2E2;
+  --color-navy-200: #FECACA;
+  --color-navy-300: #FCA5A5;
+  --color-navy-400: #F87171;
+  --color-navy-500: #EF4444;
+  --color-navy-600: #DC2626;
+  --color-navy-700: #B91C1C;   /* PRIMARIO 209 */
+  --color-navy-800: #991B1B;
+  --color-navy-900: #7F1D1D;   /* deep 209 */
+  --color-navy-950: #5C1414;
+
+  /* Yellow accent "race" */
+  --color-sun-50:    #FFFBEB;
+  --color-sun-100:   #FEF3C7;
+  --color-sun-500:   #FACC15;
+  --color-sun-600:   #EAB308;
+  --color-sun-700:   #A16207;
+
+  /* Sharp corners */
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 2px;
+}
+
+/* Display font Anton solo per heading dentro lo scope 209 */
+.theme-209 h1,
+.theme-209 h2,
+.theme-209 h3,
+.theme-209 .theme-209-display {
+  font-family: var(--font-display), Impact, "Helvetica Neue", sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+/* Pattern overlay rimappato sul nuovo navy-900 (red) per consistenza visiva */
+.theme-209 .pattern-navy::after {
+  background: linear-gradient(to right,
+    rgba(127,29,29,0)    0%,
+    rgba(127,29,29,0)    30%,
+    rgba(127,29,29,0.55) 65%,
+    rgba(127,29,29,0.92) 90%,
+    rgba(127,29,29,1)    100%);
+}
+.theme-209 .pattern-light::after {
+  background: linear-gradient(to right,
+    rgba(254,242,242,0)    0%,
+    rgba(254,242,242,0)    30%,
+    rgba(254,242,242,0.55) 65%,
+    rgba(254,242,242,0.92) 90%,
+    rgba(254,242,242,1)    100%);
+}
