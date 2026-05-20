@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Anton } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+});
+
+// Display font usato dal theme ospite Marathon 209 (.theme-209)
+const anton = Anton({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -19,7 +26,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider afterSignOutUrl="/">
-      <html lang="it" className={`${inter.variable} h-full antialiased`}>
+      <html lang="it" className={`${inter.variable} ${anton.variable} h-full antialiased`}>
         <body className="min-h-full flex flex-col">{children}</body>
       </html>
     </ClerkProvider>
