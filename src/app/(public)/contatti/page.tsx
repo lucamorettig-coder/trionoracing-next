@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import { SectionHeader } from "@/components/ui/section-header";
+import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = { title: "Contatti — Triono Racing" };
+export const metadata: Metadata = {
+  title: "Contatti — Triono Racing",
+  alternates: { canonical: "/contatti" },
+};
 
 export default function ContattiPage() {
   return (
     <main className="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+      <BreadcrumbJsonLd items={[{ name: "Contatti", url: "/contatti" }]} />
       <SectionHeader
         eyebrow="In arrivo"
         title="Contatti"

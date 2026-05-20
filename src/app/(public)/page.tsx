@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: "Triono Racing — Scuola di Ciclismo a Terni",
     description:
       "Maestri federali, gruppi piccoli per età, ambiente sicuro. Iscrizioni aperte alla Scuola di Ciclismo Triono.",
-    url: "https://trionoracing.it",
+    url: "/",
     siteName: "Triono Racing",
     locale: "it_IT",
     type: "website",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
       },
     ],
   },
-  alternates: { canonical: "https://trionoracing.it/" },
+  alternates: { canonical: "/" },
 };
 
 export default function HomePage() {
