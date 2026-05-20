@@ -53,10 +53,9 @@ export function Footer({ onNewsletterSubmit }: FooterProps) {
               <FooterLink href="/gli-amatori-triono">Amatori &amp; Agonisti</FooterLink>
               <FooterLink href="/chi-siamo">Chi siamo</FooterLink>
             </FooterColumn>
-            <FooterColumn title="Eventi &amp; News">
+            <FooterColumn title="Eventi">
               <FooterLink href="/marathon-209">Marathon MTB 209</FooterLink>
-              <FooterLink href="/archivio-news-scuola">News Scuola</FooterLink>
-              <FooterLink href="/archivio-news-amatori">News Amatori</FooterLink>
+              <FooterLink href="/contatti">Contatti</FooterLink>
             </FooterColumn>
           </div>
 

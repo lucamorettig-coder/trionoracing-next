@@ -6,7 +6,7 @@ const publicLinks = [
   { label: "Amatori", href: "/gli-amatori-triono" },
   { label: "Chi siamo", href: "/chi-siamo" },
   { label: "Marathon 209", href: "/marathon-209", badge: "2026" },
-  { label: "News", href: "/archivio-news-scuola" },
+  { label: "Contatti", href: "/contatti" },
 ];
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
