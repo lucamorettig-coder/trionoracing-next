@@ -2,6 +2,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { Card, CardIcon, CardTitle, CardBody, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { HelmetIcon, WheelIcon, MedalIcon, CalendarDays, MapPin } from "@/components/ui/icons";
+import { PhotoPlaceholder } from "@/components/home/PhotoPlaceholder";
 
 export function SezioneScuola() {
   return (
@@ -37,6 +38,14 @@ export function SezioneScuola() {
             <CardBody>Lezioni, gite, eventi insieme agli amici. Crescere in bici dentro una comunità che li accoglie.</CardBody>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="mt-10 reveal">
+        <PhotoPlaceholder
+          aspect="video"
+          caption="Lezione di Scuola al Ciclodromo"
+          description="Bambini in fila durante un esercizio, maestro federale in primo piano che spiega. Casco visibile, luce diurna, ambiente protetto. Formato orizzontale 16:9."
+        />
       </div>
 
       <Card className="mt-10 reveal">

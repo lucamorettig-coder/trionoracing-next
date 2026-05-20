@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { HomeHero } from "@/components/home/HomeHero";
 import { SezioneScuola } from "@/components/home/SezioneScuola";
+import { ComeRaggiungerci } from "@/components/home/ComeRaggiungerci";
 import { SezioneAmatori } from "@/components/home/SezioneAmatori";
 import { SezioneMarathon } from "@/components/home/SezioneMarathon";
 import { CtaFinale } from "@/components/home/CtaFinale";
@@ -36,6 +37,7 @@ export default function HomePage() {
       <OrganizationJsonLd />
       <HomeHero />
       <SezioneScuola />
+      <ComeRaggiungerci />
       <SezioneAmatori />
       <SezioneMarathon />
       <CtaFinale />

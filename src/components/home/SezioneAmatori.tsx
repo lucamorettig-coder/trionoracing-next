@@ -1,5 +1,6 @@
 import { SectionHeader } from "@/components/ui/section-header";
 import { Card, CardContent, CardTitle, CardBody } from "@/components/ui/card";
+import { PhotoPlaceholder } from "@/components/home/PhotoPlaceholder";
 
 export function SezioneAmatori() {
   return (
@@ -37,6 +38,14 @@ export function SezioneAmatori() {
               </CardBody>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="mt-10 reveal reveal-delay-3">
+          <PhotoPlaceholder
+            aspect="wide"
+            caption="Squadra Triono Racing al traguardo"
+            description="Foto di gruppo del team amatori con maglia ufficiale, in occasione di una gara o di un raduno. Orientamento ultra-wide 21:9 per dare respiro panoramico."
+          />
         </div>
       </div>
     </section>

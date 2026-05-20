@@ -2,6 +2,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MountainIcon, MapPin, CalendarDays } from "@/components/ui/icons";
+import { PhotoPlaceholder } from "@/components/home/PhotoPlaceholder";
 
 export function SezioneMarathon() {
   return (
@@ -29,16 +30,12 @@ export function SezioneMarathon() {
         </div>
 
         <div className="lg:col-span-5 reveal reveal-delay-2">
-          <div className="aspect-[4/5] rounded-[var(--radius-2xl)] bg-navy-900 pattern-navy relative overflow-hidden">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center text-white/70 font-mono text-xs px-6 leading-relaxed">
-                /// /// /// /// /// /// ///<br />
-                PHOTO: MARATHON MTB 209<br />
-                4:5 · VERTICALE<br />
-                /// /// /// /// /// /// ///
-              </div>
-            </div>
-          </div>
+          <PhotoPlaceholder
+            aspect="portrait"
+            tone="dark"
+            caption="Marathon MTB 209 — partenza o tratto tecnico"
+            description="Atleti in MTB lungo il percorso 209, preferibilmente alla partenza ad Arrone o in un tratto panoramico/tecnico. Formato verticale 4:5 da affiancare al testo desktop."
+          />
         </div>
       </div>
     </section>
