@@ -48,17 +48,15 @@ export function Footer({ onNewsletterSubmit }: FooterProps) {
 
           {/* Links */}
           <div className="lg:col-span-5 grid grid-cols-2 gap-8">
-            <FooterColumn title="Squadra">
-              <FooterLink href="/scuola">Scuola di Ciclismo</FooterLink>
-              <FooterLink href="/amatori">Amatori &amp; Agonisti</FooterLink>
-              <FooterLink href="/maestri">Maestri</FooterLink>
-              <FooterLink href="/storia">Storia</FooterLink>
+            <FooterColumn title="L'associazione">
+              <FooterLink href="/la-scuola">Scuola di Ciclismo</FooterLink>
+              <FooterLink href="/gli-amatori-triono">Amatori &amp; Agonisti</FooterLink>
+              <FooterLink href="/chi-siamo">Chi siamo</FooterLink>
             </FooterColumn>
-            <FooterColumn title="Eventi">
-              <FooterLink href="/calendario">Calendario gare</FooterLink>
-              <FooterLink href="/209">Marathon MTB 209</FooterLink>
-              <FooterLink href="/news">News</FooterLink>
-              <FooterLink href="/galleria">Galleria</FooterLink>
+            <FooterColumn title="Eventi &amp; News">
+              <FooterLink href="/marathon-209">Marathon MTB 209</FooterLink>
+              <FooterLink href="/archivio-news-scuola">News Scuola</FooterLink>
+              <FooterLink href="/archivio-news-amatori">News Amatori</FooterLink>
             </FooterColumn>
           </div>
 
