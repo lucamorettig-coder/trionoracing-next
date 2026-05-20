@@ -5,15 +5,17 @@ export function SezioneAmatori() {
   return (
     <section className="bg-bg-soft py-24 lg:py-32">
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
-        <SectionHeader
-          eyebrow="La squadra"
-          title="Gli amatori Triono Racing."
-          subtitle="Una comunità di ciclisti adulti che condividono allenamenti, gare e l'orgoglio di una maglia. Rispetto reciproco, sportività, voglia di sfide vere."
-          cta={{ label: "Scopri la squadra", href: "/gli-amatori-triono" }}
-        />
+        <div className="reveal">
+          <SectionHeader
+            eyebrow="La squadra"
+            title="Gli amatori Triono Racing."
+            subtitle="Una comunità di ciclisti adulti che condividono allenamenti, gare e l'orgoglio di una maglia. Rispetto reciproco, sportività, voglia di sfide vere."
+            cta={{ label: "Scopri la squadra", href: "/gli-amatori-triono" }}
+          />
+        </div>
 
         <div className="mt-12 grid md:grid-cols-2 gap-5">
-          <Card variant="accent">
+          <Card variant="accent" className="reveal reveal-delay-1">
             <CardContent>
               <div className="text-sun-500 text-[12px] font-bold uppercase tracking-[0.15em] mb-3">
                 Agonisti
@@ -24,7 +26,7 @@ export function SezioneAmatori() {
               </CardBody>
             </CardContent>
           </Card>
-          <Card variant="accent">
+          <Card variant="accent" className="reveal reveal-delay-2">
             <CardContent>
               <div className="text-sun-500 text-[12px] font-bold uppercase tracking-[0.15em] mb-3">
                 Amatori

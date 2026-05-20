@@ -5,7 +5,7 @@ export function CtaFinale() {
   return (
     <section className="relative bg-navy-900 text-white overflow-hidden">
       <div className="absolute inset-0 pattern-navy" aria-hidden />
-      <div className="relative max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32 text-center">
+      <div className="relative max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32 text-center reveal">
         <SectionHeader
           eyebrow="Pronti a pedalare?"
           title={<span className="text-white">In bici. Insieme. Subito.</span>}

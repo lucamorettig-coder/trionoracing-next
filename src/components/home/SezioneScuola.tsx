@@ -6,29 +6,31 @@ import { HelmetIcon, WheelIcon, MedalIcon, CalendarDays, MapPin } from "@/compon
 export function SezioneScuola() {
   return (
     <section className="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
-      <SectionHeader
-        eyebrow="Scuola di Ciclismo"
-        title="Imparare in sella, in tutta sicurezza."
-        subtitle="Seguiamo la Carta dei Diritti del Bambino nello Sport (UNESCO, 1992). Ogni bambino ha il diritto di divertirsi, essere trattato con dignità e crescere al proprio ritmo."
-        cta={{ label: "Scopri di più sulla Scuola", href: "/la-scuola" }}
-      />
+      <div className="reveal">
+        <SectionHeader
+          eyebrow="Scuola di Ciclismo"
+          title="Imparare in sella, in tutta sicurezza."
+          subtitle="Seguiamo la Carta dei Diritti del Bambino nello Sport (UNESCO, 1992). Ogni bambino ha il diritto di divertirsi, essere trattato con dignità e crescere al proprio ritmo."
+          cta={{ label: "Scopri di più sulla Scuola", href: "/la-scuola" }}
+        />
+      </div>
 
       <div className="mt-12 grid md:grid-cols-3 gap-5">
-        <Card>
+        <Card className="reveal reveal-delay-1">
           <CardContent>
             <CardIcon><HelmetIcon /></CardIcon>
             <CardTitle>Sicurezza prima di tutto</CardTitle>
             <CardBody>Casco, gruppi piccoli, supervisione costante dei maestri federali. Ambiente protetto al ciclodromo.</CardBody>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="reveal reveal-delay-2">
           <CardContent>
             <CardIcon color="sky"><WheelIcon /></CardIcon>
             <CardTitle>Tecnica progressiva</CardTitle>
             <CardBody>Equilibrio, frenata, curva, condotta in gruppo. Programma adattato all&apos;età, a partire dai 5 anni.</CardBody>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="reveal reveal-delay-3">
           <CardContent>
             <CardIcon color="sun"><MedalIcon /></CardIcon>
             <CardTitle>Spirito di squadra</CardTitle>
@@ -37,7 +39,7 @@ export function SezioneScuola() {
         </Card>
       </div>
 
-      <Card className="mt-10">
+      <Card className="mt-10 reveal">
         <CardContent>
           <div className="grid md:grid-cols-2 gap-8">
             <div>

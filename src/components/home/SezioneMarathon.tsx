@@ -7,7 +7,7 @@ export function SezioneMarathon() {
   return (
     <section className="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
       <div className="grid lg:grid-cols-12 gap-10 items-center">
-        <div className="lg:col-span-7">
+        <div className="lg:col-span-7 reveal">
           <SectionHeader
             eyebrow="Marathon MTB 209 · 6ª edizione"
             title="L'evento di MTB che organizziamo dal 2021."
@@ -28,7 +28,7 @@ export function SezioneMarathon() {
           </div>
         </div>
 
-        <div className="lg:col-span-5">
+        <div className="lg:col-span-5 reveal reveal-delay-2">
           <div className="aspect-[4/5] rounded-[var(--radius-2xl)] bg-navy-900 pattern-navy relative overflow-hidden">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center text-white/70 font-mono text-xs px-6 leading-relaxed">
