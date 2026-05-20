@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Anton } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
 const inter = Inter({
@@ -16,7 +17,11 @@ const anton = Anton({
 });
 
 export const metadata: Metadata = {
-  title: "Triono Racing",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Triono Racing",
+    template: "%s · Triono Racing",
+  },
   description:
     "ASD CIEMME · Triono Racing — Scuola di ciclismo, squadra amatori, eventi MTB.",
 };
