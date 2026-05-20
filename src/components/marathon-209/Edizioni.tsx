@@ -1,12 +1,18 @@
 import { SectionHeader } from "@/components/ui/section-header";
 
+/**
+ * Timeline storica delle edizioni — statica.
+ *
+ * Numerazione coerente con il record Airtable edizione corrente (5ª 2026):
+ * 1ª 2021, 2ª 2022, 3ª 2023, 4ª 2024, 5ª 2026. L'anno 2025 NON viene
+ * conteggiato (edizione saltata — verifica con Luca, vedi PR description).
+ */
 const editions = [
-  { year: "2021", note: "Prima edizione — Arrone (TR)" },
-  { year: "2022", note: "Seconda edizione" },
-  { year: "2023", note: "Terza edizione" },
-  { year: "2024", note: "Quarta edizione" },
-  { year: "2025", note: "Quinta edizione" },
-  { year: "2026", note: "Sesta edizione — 28 giugno", highlight: true },
+  { year: "2021", note: "1ª edizione — Arrone (TR)" },
+  { year: "2022", note: "2ª edizione" },
+  { year: "2023", note: "3ª edizione" },
+  { year: "2024", note: "4ª edizione" },
+  { year: "2026", note: "5ª edizione — 28 giugno", highlight: true },
 ];
 
 export function Edizioni() {
@@ -16,8 +22,8 @@ export function Edizioni() {
         <div className="reveal">
           <SectionHeader
             eyebrow="Le edizioni"
-            title="6 EDIZIONI. UN&apos;UNICA STORIA."
-            subtitle="Dal 2021 al 2026: ogni edizione ha portato qualcosa di nuovo al tracciato e alla comunità. La sesta edizione torna ad Arrone, dove tutto è cominciato."
+            title="5 EDIZIONI. UN&apos;UNICA STORIA."
+            subtitle="Dal 2021 al 2026: ogni edizione ha portato qualcosa di nuovo al tracciato e alla comunità. La 5ª edizione torna ad Arrone, dove tutto è cominciato."
           />
         </div>
 
@@ -43,7 +49,7 @@ export function Edizioni() {
         </ol>
 
         <p className="mt-12 text-center text-sm text-ink-muted reveal">
-          Foto e classifiche delle edizioni passate in arrivo nella sezione archivio.
+          Foto e classifiche delle edizioni passate disponibili sul sito ufficiale.
         </p>
       </div>
     </section>

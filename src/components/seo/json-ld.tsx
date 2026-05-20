@@ -182,17 +182,44 @@ export function CourseJsonLd() {
 /**
  * SportsEvent schema per la Marathon MTB 209.
  * Sport: Mountain biking. organizer referenzia ASD CIEMME via @id.
+ * Riceve i dati edizione corrente (numero, data, claim, urlIscrizione, fotoHero, ...)
+ * dal getter Airtable. Se il consumer non passa una edizione, il componente
+ * ritorna null (no JSON-LD invalido).
  */
-export function EventJsonLd() {
-  const data = {
+interface EventEdizioneShape {
+  numero: number;
+  anno: number;
+  nome: string;
+  claim?: string;
+  descrizione?: string;
+  dataGara: string;
+  dataChiusura?: string;
+  statoIscrizioni: string;
+  urlIscrizione?: string;
+  fotoHero?: string;
+  ogImage?: string;
+}
+
+export function EventJsonLd({ edizione }: { edizione?: EventEdizioneShape }) {
+  if (!edizione) return null;
+
+  const isRegistrationOpen =
+    edizione.statoIscrizioni === "aperte" ||
+    edizione.statoIscrizioni === "early" ||
+    edizione.statoIscrizioni === "in chiusura";
+
+  const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "SportsEvent",
     "@id": absUrl("/marathon-209#event"),
-    name: "Marathon MTB 209 — 6° edizione",
+    name: edizione.nome
+      ? `Marathon MTB 209 — ${edizione.nome}`
+      : "Marathon MTB 209",
     description:
-      "Sesta edizione della MTB Marathon 209 organizzata da ASD CIEMME / Triono Racing. Tracciato di mountain bike marathon nelle montagne della Valnerina, partenza da Arrone (TR).",
+      edizione.descrizione ||
+      `Edizione ${edizione.numero} della MTB Marathon 209 organizzata da ASD CIEMME / Triono Racing.`,
     url: absUrl("/marathon-209"),
-    startDate: "2026-06-28",
+    startDate: edizione.dataGara,
     eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     sport: "Mountain biking",
@@ -208,8 +235,22 @@ export function EventJsonLd() {
         addressCountry: "IT",
       },
     },
-    image: [absUrl("/og/home.jpg")],
   };
+
+  const image = edizione.ogImage || edizione.fotoHero;
+  if (image) data.image = [image];
+
+  if (edizione.urlIscrizione) {
+    data.offers = {
+      "@type": "Offer",
+      url: edizione.urlIscrizione,
+      availability: isRegistrationOpen
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      ...(edizione.dataChiusura ? { validThrough: edizione.dataChiusura } : {}),
+    };
+  }
+
   return ldScript(data);
 }
 
