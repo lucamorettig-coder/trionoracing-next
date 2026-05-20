@@ -11,7 +11,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Triono Racing",
   description:
-    "A.S.D. Triono Racing — Scuola di ciclismo, squadra amatori, eventi MTB.",
+    "ASD CIEMME · Triono Racing — Scuola di ciclismo, squadra amatori, eventi MTB.",
 };
 
 export default function RootLayout({
