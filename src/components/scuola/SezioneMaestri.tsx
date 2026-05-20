@@ -1,5 +1,5 @@
+import Image from "next/image";
 import { SectionHeader } from "@/components/ui/section-header";
-import { PhotoPlaceholder } from "@/components/home/PhotoPlaceholder";
 import { Badge } from "@/components/ui/badge";
 
 export function SezioneMaestri() {
@@ -13,20 +13,20 @@ export function SezioneMaestri() {
         />
       </div>
 
-      <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className={`reveal reveal-delay-${i + 1}`}>
-            <PhotoPlaceholder
-              aspect="portrait"
-              caption={`Maestro ${i + 1}`}
-              description="Foto ritratto verticale, sfondo neutro o ciclodromo sfocato. Sotto: nome, qualifica FCI, breve bio (1 frase). Dataset completo arriva da CMS Airtable (Fase 6)."
-            />
-          </div>
-        ))}
+      <div className="mt-12 reveal">
+        <div className="relative aspect-video rounded-[var(--radius-2xl)] overflow-hidden shadow-[var(--shadow-md)]">
+          <Image
+            src="/photos/maestri/staff.jpg"
+            alt="Foto di gruppo dello staff della Scuola di Ciclismo Triono al ciclodromo"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1280px"
+          />
+        </div>
       </div>
 
-      <div className="mt-10 text-center reveal">
-        <Badge variant="info">Roster completo in arrivo — sync da CMS Airtable in Fase 6</Badge>
+      <div className="mt-8 text-center reveal">
+        <Badge variant="info">Ritratti individuali e bio di ogni maestro in arrivo — sync da CMS Airtable in Fase 6</Badge>
       </div>
     </section>
   );

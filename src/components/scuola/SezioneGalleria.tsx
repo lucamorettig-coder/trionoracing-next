@@ -1,11 +1,29 @@
+import Image from "next/image";
 import { SectionHeader } from "@/components/ui/section-header";
-import { PhotoPlaceholder } from "@/components/home/PhotoPlaceholder";
 
-const photos = [
-  { aspect: "video" as const, caption: "Inizio lezione al ciclodromo", description: "Bambini che si preparano in cerchio, casco indosso, maestro in piedi che dà indicazioni. Luce dorata di tardo pomeriggio." },
-  { aspect: "square" as const, caption: "Esercizio di equilibrio", description: "Primo piano di un bambino in equilibrio sulla bici tra i coni. Concentrazione visibile." },
-  { aspect: "square" as const, caption: "Discesa in MTB", description: "Gruppo in discesa lenta su pista sterrata, ordine di fila, controllo del mezzo." },
-  { aspect: "video" as const, caption: "Gruppo al traguardo simulato", description: "Bambini sorridenti dopo l'esercizio, maestro fa il high-five. Comunità e divertimento." },
+type Aspect = "video" | "square";
+
+const photos: Array<{ src: string; alt: string; aspect: Aspect }> = [
+  {
+    src: "/photos/scuola/inizio-lezione.jpg",
+    alt: "Bambini della Scuola Triono in fila al ciclodromo prima della lezione, caschi indossati, maglia ufficiale",
+    aspect: "video",
+  },
+  {
+    src: "/photos/scuola/esercizio-equilibrio.jpg",
+    alt: "Bambino della Scuola Triono in equilibrio sulla bici tra le delimitazioni del percorso, casco azzurro",
+    aspect: "square",
+  },
+  {
+    src: "/photos/scuola/discesa-mtb.jpg",
+    alt: "Giovane allievo Triono in discesa sulla pista sterrata, ora dorata, controllo della MTB",
+    aspect: "square",
+  },
+  {
+    src: "/photos/scuola/gruppo-traguardo.jpg",
+    alt: "Gruppo di bambini Triono in maglia ufficiale al traguardo, dopo l'esercizio, ambiente del ciclodromo",
+    aspect: "video",
+  },
 ];
 
 export function SezioneGalleria() {
@@ -16,14 +34,26 @@ export function SezioneGalleria() {
           <SectionHeader
             eyebrow="Le foto della Scuola"
             title="La scuola, attraverso le immagini."
-            subtitle="Le foto reali delle lezioni arriveranno appena la Scuola riprende a ciclo pieno. Intanto, ecco cosa vedrete."
+            subtitle="Momenti reali delle lezioni al Ciclodromo Renato Perona di Terni: bambini, maestri, divertimento e sicurezza."
           />
         </div>
 
         <div className="mt-12 grid sm:grid-cols-2 gap-5">
           {photos.map((p, i) => (
-            <div key={i} className={`reveal reveal-delay-${i + 1}`}>
-              <PhotoPlaceholder {...p} />
+            <div key={p.src} className={`reveal reveal-delay-${i + 1}`}>
+              <div
+                className={`relative ${
+                  p.aspect === "video" ? "aspect-video" : "aspect-square"
+                } rounded-[var(--radius-xl)] overflow-hidden shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-200`}
+              >
+                <Image
+                  src={p.src}
+                  alt={p.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 640px"
+                />
+              </div>
             </div>
           ))}
         </div>
