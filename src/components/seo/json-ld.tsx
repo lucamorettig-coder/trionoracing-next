@@ -7,8 +7,9 @@ export function OrganizationJsonLd() {
       {
         "@type": ["Organization", "SportsOrganization"],
         "@id": `${SITE_URL}/#organization`,
-        name: "A.S.D. CIEMME",
+        name: "ASD CIEMME",
         alternateName: "Triono Racing",
+        email: "info@trionoracing.it",
         url: SITE_URL,
         logo: `${SITE_URL}/assets/logo-triono-racing.png`,
         foundingDate: "2015",
@@ -24,7 +25,8 @@ export function OrganizationJsonLd() {
       {
         "@type": "LocalBusiness",
         "@id": `${SITE_URL}/#localbusiness`,
-        name: "Scuola di Ciclismo Triono — A.S.D. CIEMME",
+        name: "Scuola di Ciclismo Triono — ASD CIEMME",
+        email: "info@trionoracing.it",
         url: SITE_URL,
         logo: `${SITE_URL}/assets/logo-triono-racing.png`,
         image: `${SITE_URL}/og/home.jpg`,
@@ -34,11 +36,11 @@ export function OrganizationJsonLd() {
           addressRegion: "Umbria",
           addressCountry: "IT",
         },
-        // Ciclodromo Renato Perona, Terni (coords da verificare)
+        // Ciclodromo Renato Perona, Terni
         geo: {
           "@type": "GeoCoordinates",
-          latitude: 42.5634,
-          longitude: 12.6427,
+          latitude: 42.550632,
+          longitude: 12.636542,
         },
         areaServed: ["Terni", "Umbria"],
         priceRange: "€€",

@@ -4,9 +4,9 @@ export function HomeHero() {
   return (
     <Hero
       variant="pattern"
-      eyebrow="A.S.D. Triono Racing · dal 2015"
+      eyebrow="Triono Racing · dal 2015"
       title={<>In bici, sicuri,<br />insieme.</>}
-      subtitle="Una scuola di ciclismo per bambini dai 5 ai 12 anni, guidata da maestri federali. Strada e mountain bike, due volte a settimana, al Ciclodromo Renato Perona di Terni."
+      subtitle="Una scuola di ciclismo per bambini a partire da 5 anni di età, guidata da maestri federali. Strada e mountain bike, due volte a settimana, al Ciclodromo Renato Perona di Terni."
       primaryCta={{ label: "Iscrivi tuo figlio", href: "/contatti?motivo=scuola" }}
       secondaryCta={{ label: "Scopri la Scuola", href: "/la-scuola" }}
       stats={[

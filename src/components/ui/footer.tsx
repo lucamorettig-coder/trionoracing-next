@@ -36,8 +36,8 @@ export function Footer({ onNewsletterSubmit }: FooterProps) {
               style={{ filter: "brightness(0) invert(1)" }}
             />
             <p className="mt-5 text-white/70 text-sm max-w-[320px]">
-              A.S.D. Triono Racing — Scuola di ciclismo, squadra amatori e Marathon MTB
-              dal 2008.
+              ASD CIEMME · Triono Racing — Scuola di ciclismo, squadra amatori e Marathon MTB
+              dal 2015.
             </p>
             <div className="mt-6 flex gap-2">
               <SocialLink href="https://instagram.com/" label="Instagram"><Instagram className="w-5 h-5" /></SocialLink>
@@ -101,7 +101,7 @@ export function Footer({ onNewsletterSubmit }: FooterProps) {
         </div>
 
         <div className="mt-12 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs text-white/55">
-          <div>© {new Date().getFullYear()} A.S.D. Triono Racing · P.IVA 0123456789</div>
+          <div>© {new Date().getFullYear()} ASD CIEMME · Triono Racing · P.IVA TBD</div>
           <div className="flex gap-5">
             <Link href="/privacy" className="hover:text-white">Privacy</Link>
             <Link href="/cookie" className="hover:text-white">Cookie</Link>

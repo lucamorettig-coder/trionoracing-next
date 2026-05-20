@@ -9,7 +9,15 @@ export default function ContattiPage() {
       <SectionHeader
         eyebrow="In arrivo"
         title="Contatti"
-        subtitle="Pagina in costruzione. Nel frattempo scrivici a [email TBD] o vieni a trovarci martedì o giovedì dalle 17 alle 18:30 al Ciclodromo Renato Perona di Terni."
+        subtitle={
+          <>
+            Pagina in costruzione. Nel frattempo scrivici a{" "}
+            <a href="mailto:info@trionoracing.it" className="text-navy-700 underline underline-offset-4 hover:text-navy-900">
+              info@trionoracing.it
+            </a>{" "}
+            o vieni a trovarci martedì o giovedì dalle 17 alle 18:30 al Ciclodromo Renato Perona di Terni.
+          </>
+        }
       />
     </main>
   );

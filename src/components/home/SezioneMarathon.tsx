@@ -14,7 +14,7 @@ export function SezioneMarathon() {
             subtitle="Ogni anno ad Arrone (Terni), un percorso che celebra la resistenza, la tecnica e lo spirito di squadra del mountain biking. Aperta a tutti: atleti, amatori, appassionati."
           />
           <div className="mt-6 flex flex-wrap gap-3">
-            <Badge variant="warning"><CalendarDays /> 2026 · TBD</Badge>
+            <Badge variant="warning"><CalendarDays /> 28 giugno 2026</Badge>
             <Badge variant="info"><MapPin /> Arrone (TR)</Badge>
             <Badge variant="default"><MountainIcon /> MTB Marathon</Badge>
           </div>
