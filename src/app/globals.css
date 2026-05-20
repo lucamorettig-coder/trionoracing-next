@@ -1,0 +1,152 @@
+/**
+ * Triono Racing — Tailwind v4 theme tokens
+ *
+ * Importa questo file UNA VOLTA nel tuo globals.css (App Router).
+ *
+ *   @import "./theme.css";
+ *
+ * Oppure inline in globals.css; questo file è la fonte canonica dei token.
+ */
+
+@import "tailwindcss";
+
+@theme {
+  /* ============ NAVY (primario) ============ */
+  --color-navy-50:  #EEF1F8;
+  --color-navy-100: #D7DEED;
+  --color-navy-200: #AFBCDA;
+  --color-navy-300: #8298BF;
+  --color-navy-400: #5572A2;
+  --color-navy-500: #34528A;
+  --color-navy-600: #1F3D75;
+  --color-navy-700: #1F2D5A;   /* PRIMARIO brand */
+  --color-navy-800: #11215A;
+  --color-navy-900: #050E3F;   /* "deep" / hero premium */
+  --color-navy-950: #020730;
+
+  /* ============ SKY (secondario · blu chiaro) ============ */
+  --color-sky-50:   #EEF6FD;
+  --color-sky-100:  #D6EAFB;
+  --color-sky-200:  #ADD4F7;
+  --color-sky-300:  #7FB8EC;
+  --color-sky-400:  #5099DE;
+  --color-sky-500:  #3A82C8;
+  --color-sky-600:  #2A6BA9;
+  --color-sky-700:  #225589;
+  --color-sky-800:  #1B4470;
+  --color-sky-900:  #14335A;
+
+  /* ============ GRASS (success · verde) ============ */
+  --color-grass-50:  #F0F8EB;
+  --color-grass-100: #DAEFCD;
+  --color-grass-500: #5FAC36;
+  --color-grass-600: #4F932B;
+  --color-grass-700: #3F7522;
+
+  /* ============ EMBER (warning · arancione) ============ */
+  --color-ember-50:  #FDF4E5;
+  --color-ember-100: #FCE4BD;
+  --color-ember-500: #E09618;
+  --color-ember-600: #BC7E12;
+  --color-ember-700: #8E5F0E;
+
+  /* ============ FLAG (error · rosso) ============ */
+  --color-flag-50:   #FBEAEA;
+  --color-flag-100:  #F4C3C3;
+  --color-flag-500:  #C01818;
+  --color-flag-600:  #9D1414;
+  --color-flag-700:  #791010;
+
+  /* ============ SUN (accento Scuola · giallo) ============ */
+  --color-sun-50:    #FFFCE4;
+  --color-sun-100:   #FCF6AC;
+  --color-sun-500:   #EFE63A;
+  --color-sun-600:   #C3BB1E;
+  --color-sun-700:   #8C8615;
+
+  /* ============ NEUTRALI ============ */
+  --color-bg:        #FFFFFF;
+  --color-bg-soft:   #FAFBFD;
+  --color-bg-muted:  #F2F4F9;
+  --color-line:      #E4E7EF;
+  --color-line-soft: #EEF0F5;
+  --color-ink:       #14193A;
+  --color-ink-muted: #6B7388;
+
+  /* ============ RADIUS ============ */
+  --radius-xs:  4px;
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  20px;
+  --radius-2xl: 28px;
+  --radius-pill: 9999px;
+
+  /* ============ SHADOWS ============ */
+  --shadow-xs:   0 1px 2px rgba(20, 25, 58, 0.04);
+  --shadow-sm:   0 2px 6px rgba(20, 25, 58, 0.06), 0 1px 2px rgba(20, 25, 58, 0.04);
+  --shadow-md:   0 8px 20px rgba(20, 25, 58, 0.08), 0 2px 6px rgba(20, 25, 58, 0.04);
+  --shadow-lg:   0 20px 40px rgba(20, 25, 58, 0.10), 0 4px 12px rgba(20, 25, 58, 0.05);
+  --shadow-hero: 0 40px 80px rgba(5, 14, 63, 0.18);
+
+  /* ============ FONT FAMILIES ============ */
+  /* Cambia a 'Manrope' o 'Geist' dopo la scelta del cliente. Default: Inter. */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ===== Body defaults ===== */
+html, body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+}
+body {
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+/* ===== Brand pattern utilities =====
+   La firma geometrica del brand sfuma da sinistra (piena) verso destra
+   (trasparente), come nel fondo del logo Scuola. Implementato come pattern
+   SVG di sfondo + pseudo-elemento ::after che applica un gradient overlay
+   col colore del fondo. Il parent DEVE avere bg navy-900 (versione scura)
+   o bg-soft (versione chiara). Per il pattern senza sfumatura usa .pattern-full. */
+.pattern-navy, .pattern-light {
+  position: relative;
+  background-size: 240px 240px;
+  background-repeat: repeat;
+  background-color: transparent;
+}
+.pattern-navy  { background-image: url("/assets/pattern.svg"); }
+.pattern-light { background-image: url("/assets/pattern-light.svg"); }
+
+.pattern-navy::after, .pattern-light::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.pattern-navy::after {
+  background: linear-gradient(to right,
+    rgba(5,14,63,0)    0%,
+    rgba(5,14,63,0)    30%,
+    rgba(5,14,63,0.55) 65%,
+    rgba(5,14,63,0.92) 90%,
+    rgba(5,14,63,1)    100%);
+}
+.pattern-light::after {
+  background: linear-gradient(to right,
+    rgba(250,251,253,0)    0%,
+    rgba(250,251,253,0)    30%,
+    rgba(250,251,253,0.55) 65%,
+    rgba(250,251,253,0.92) 90%,
+    rgba(250,251,253,1)    100%);
+}
+/* Figli diretti di un pattern restano SOPRA la sfumatura ::after */
+.pattern-navy > *, .pattern-light > * {
+  position: relative;
+  z-index: 1;
+}
+.pattern-full::after { display: none !important; }
