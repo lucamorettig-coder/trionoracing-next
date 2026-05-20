@@ -10,7 +10,7 @@ const EMBED_URL = `https://www.google.com/maps?q=${LAT},${LNG}&z=16&output=embed
 
 export function ComeRaggiungerci() {
   return (
-    <section className="bg-bg-soft pattern-light py-24 lg:py-32">
+    <section id="come-raggiungerci" className="bg-bg-soft pattern-light py-24 lg:py-32 scroll-mt-20">
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
         <div className="reveal">
           <SectionHeader
