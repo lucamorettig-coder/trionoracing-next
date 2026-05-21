@@ -1,15 +1,23 @@
 import { SectionHeader } from "@/components/ui/section-header";
 import { Card, CardContent, CardTitle, CardBody, CardIcon } from "@/components/ui/card";
 import { MountainIcon, MedalIcon, BikeIcon } from "@/components/ui/icons";
+import type { Edizione209 } from "@/lib/airtable-209";
 
-export function CosaEla209() {
+interface Props {
+  edizione: Edizione209;
+}
+
+export function CosaEla209({ edizione }: Props) {
   return (
     <section className="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
       <div className="reveal">
         <SectionHeader
           eyebrow="Cosa è la 209"
           title="UNA MARATHON DI MTB. SU MONTAGNE VERE."
-          subtitle="Organizzata da Triono Racing dal 2021, la 209 è il nostro evento di mountain bike marathon. Tracciato esigente, terreno tecnico, dislivello che si fa sentire. Non è una passeggiata."
+          subtitle={
+            edizione.descrizione ||
+            "Organizzata da Triono Racing dal 2021, la 209 è il nostro evento di mountain bike marathon. Tracciato esigente, terreno tecnico, dislivello che si fa sentire."
+          }
         />
       </div>
 
