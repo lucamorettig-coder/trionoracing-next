@@ -88,7 +88,7 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
         {/* Desktop CTAs */}
         <div className="hidden lg:flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link href="/accedi">Accedi</Link>
+            <Link href="/portale/login">Accedi</Link>
           </Button>
           <Button asChild size="sm">
             <Link href="/iscrizioni">Iscrivi tuo figlio</Link>
@@ -161,7 +161,7 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
               size="lg"
               className="w-full text-white border-white/30 hover:bg-white/10"
             >
-              <Link href="/accedi" onClick={() => setOpen(false)}>Accedi</Link>
+              <Link href="/portale/login" onClick={() => setOpen(false)}>Accedi</Link>
             </Button>
           </div>
         </div>
