@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import Link from "next/link";
 import { SectionHeader } from "@/components/ui/section-header";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { ContactForm } from "@/components/contatti/ContactForm";
@@ -79,9 +80,9 @@ export default function ContattiPage() {
               </div>
               <p className="mt-4 text-sm text-ink-muted">
                 Vedi la mappa con indicazioni stradali nella sezione{" "}
-                <a href="/#come-raggiungerci" className="text-navy-700 underline underline-offset-2">
+                <Link href="/#come-raggiungerci" className="text-navy-700 underline underline-offset-2">
                   Come raggiungerci
-                </a>{" "}
+                </Link>{" "}
                 della home.
               </p>
             </div>
