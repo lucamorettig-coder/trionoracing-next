@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Button } from "@/components/ui/button";
 
@@ -17,7 +18,7 @@ export function CtaFinale() {
             <a href="/contatti?motivo=scuola">Iscrivi tuo figlio</a>
           </Button>
           <Button asChild size="lg" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:border-white">
-            <a href="/portale/login">Accedi all&apos;area genitori</a>
+            <Link href="/portale/login">Accedi all&apos;area genitori</Link>
           </Button>
         </div>
       </div>
