@@ -21,10 +21,10 @@ function readHashTab(): TabId {
 }
 
 interface Props {
-  children: (activeTab: TabId) => React.ReactNode;
+  tabs: Record<TabId, React.ReactNode>;
 }
 
-export default function ProfiloFiglioTabs({ children }: Props) {
+export default function ProfiloFiglioTabs({ tabs }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>(readHashTab);
 
   function handleTab(id: TabId) {
@@ -58,7 +58,7 @@ export default function ProfiloFiglioTabs({ children }: Props) {
 
       {/* Tab content */}
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8">
-        {children(activeTab)}
+        {tabs[activeTab]}
       </div>
     </div>
   );

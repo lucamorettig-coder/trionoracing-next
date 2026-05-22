@@ -72,34 +72,24 @@ export default async function ProfiloFiglioPage({ params, searchParams }: Props)
 
       <ProfiloFiglioHeader bambino={bambino} hasCert={hasCert} hasFoto={hasFoto} />
 
-      <ProfiloFiglioTabs>
-        {(activeTab) => {
-          switch (activeTab) {
-            case "anagrafica":
-              return <TabAnagrafica bambino={bambino} />;
-            case "certificato":
-              return <TabCertificato bambino={bambino} />;
-            case "foto":
-              return <TabFoto bambino={bambino} />;
-            case "iscrizioni":
-              return <TabIscrizioni bambino={bambino} iscrizioni={iscrizioni} />;
-            case "gare":
-              return <TabGare bambinoNome={bambino.fields.NOME_BAMBINO} />;
-            case "diario":
-              return (
-                <TabDiario
-                  bambinoId={bambinoId}
-                  bambinoNome={bambino.fields.NOME_BAMBINO}
-                  lezionInizialiMese={lezioni}
-                  annoIniziale={now.getFullYear()}
-                  meseIniziale={now.getMonth() + 1}
-                />
-              );
-            default:
-              return null;
-          }
+      <ProfiloFiglioTabs
+        tabs={{
+          anagrafica: <TabAnagrafica bambino={bambino} />,
+          certificato: <TabCertificato bambino={bambino} />,
+          foto: <TabFoto bambino={bambino} />,
+          iscrizioni: <TabIscrizioni bambino={bambino} iscrizioni={iscrizioni} />,
+          gare: <TabGare bambinoNome={bambino.fields.NOME_BAMBINO} />,
+          diario: (
+            <TabDiario
+              bambinoId={bambinoId}
+              bambinoNome={bambino.fields.NOME_BAMBINO}
+              lezionInizialiMese={lezioni}
+              annoIniziale={now.getFullYear()}
+              meseIniziale={now.getMonth() + 1}
+            />
+          ),
         }}
-      </ProfiloFiglioTabs>
+      />
     </div>
   );
 }
