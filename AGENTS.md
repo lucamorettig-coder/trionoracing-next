@@ -41,3 +41,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ### Deploy
 - Vercel collegato a GitHub (lucamorettig-coder/trionoracing-next).
 - Branch principale: main. Pattern: branch dedicato → PR → merge → deploy automatico.
+
+### Pattern appresi in EVO-002 (2026-05-21)
+
+- **Lazy sync in layout**: il webhook `user.created` non copre Google OAuth né sessioni pre-esistenti. Il layout `(portal)/layout.tsx` esegue un sync Airtable al primo accesso di ogni utente non ancora collegato — questo è il fallback canonico. Replicare in EVO future se si aggiungono record da creare al primo accesso.
+- **Hotfix NavBar pubblica**: quando si aggiunge o modifica il portale auth, verificare che i link "Accedi"/"Registrati" nella NavBar **pubblica** (`src/components/ui/navbar.tsx`) puntino a `/portale/login` e `/portale/registrati`. Aggiungere questo controllo allo smoke test post-deploy.
+- **Admin iniziali**: gli account ADMIN esistenti devono avere `publicMetadata.role = "ADMIN"` settato manualmente in Clerk Dashboard → Users → edit user → Public metadata. Il webhook lo setta solo per nuove registrazioni.

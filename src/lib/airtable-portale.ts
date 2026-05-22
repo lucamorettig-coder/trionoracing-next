@@ -1,10 +1,11 @@
 /**
- * Client Airtable per il portale Triono Racing (TABELLA_GENITORI e future tabelle).
+ * Client Airtable per il portale Triono Racing.
+ * Tabelle: TABELLA_GENITORI, TABELLA_BAMBINI, TABELLA_ISCRIZIONI, TABELLA_LEZIONI.
  *
  * Solo server-side. Usa fetch REST API Airtable senza SDK.
  * Env richieste: AIRTABLE_BASE_ID + AIRTABLE_TOKEN.
  *
- * Usa sempre stripReadOnlyFields() prima di ogni write per evitare 422
+ * Usa sempre strip*ReadOnlyFields() prima di ogni write per evitare 422
  * su campi formula/lookup. Field names in MAIUSCOLO_UNDERSCORE (Airtable legacy).
  */
 
@@ -150,4 +151,224 @@ export async function updateGenitoreAuthUserId(
     method: "PATCH",
     body: JSON.stringify({ fields: { AUTH_USER_ID: clerkUserId } }),
   });
+}
+
+/** Aggiorna dati anagrafici di un genitore. */
+export async function updateGenitore(
+  airtableId: string,
+  data: Partial<GenitoreCreateInput>,
+): Promise<Genitore> {
+  const res = await airtableFetch(`TABELLA_GENITORI/${airtableId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ fields: stripReadOnlyFields(data) }),
+  });
+  return res.json();
+}
+
+// ─── TABELLA_BAMBINI ────────────────────────────────────────────────────────
+
+/** Attachment Airtable (foto, certificato). */
+export interface AirtableAttachment {
+  id: string;
+  url: string;
+  filename: string;
+  size: number;
+  type: string;
+  thumbnails?: {
+    small?: { url: string; width: number; height: number };
+    large?: { url: string; width: number; height: number };
+    full?: { url: string; width: number; height: number };
+  };
+}
+
+export interface Bambino {
+  id: string;
+  createdTime?: string;
+  fields: {
+    NOME_BAMBINO: string;
+    COGNOME_BAMBINO: string;
+    DATA_NASCITA_BAMBINO: string;
+    LUOGO_NASCITA_BAMBINO?: string;
+    CODICE_FISCALE_BAMBINO?: string;
+    VIA_RESIDENZA_BAMBINO?: string;
+    CITTA_RESIDENZA_BAMBINO?: string;
+    TABELLA_GENITORI?: string[];
+    CERTIFICATO_MEDICO_FILE?: AirtableAttachment[];
+    CERTIFICATO_MEDICO_SCADENZA?: string;
+    CERTIFICATO_MEDICO_STATO?: string;
+    FOTO_BAMBINO?: AirtableAttachment[];
+    GENITORE_RECORD_ID_LOOKUP?: string[];
+    ID_BAMBINO?: string;
+  };
+}
+
+export type BambinoCreateInput = {
+  NOME_BAMBINO: string;
+  COGNOME_BAMBINO: string;
+  DATA_NASCITA_BAMBINO: string;
+  LUOGO_NASCITA_BAMBINO?: string;
+  CODICE_FISCALE_BAMBINO?: string;
+  VIA_RESIDENZA_BAMBINO?: string;
+  CITTA_RESIDENZA_BAMBINO?: string;
+  TABELLA_GENITORI: string[];
+};
+
+export type BambinoUpdateInput = {
+  NOME_BAMBINO?: string;
+  COGNOME_BAMBINO?: string;
+  DATA_NASCITA_BAMBINO?: string;
+  LUOGO_NASCITA_BAMBINO?: string;
+  CODICE_FISCALE_BAMBINO?: string;
+  VIA_RESIDENZA_BAMBINO?: string;
+  CITTA_RESIDENZA_BAMBINO?: string;
+};
+
+const BAMBINI_WRITABLE_FIELDS = new Set([
+  "NOME_BAMBINO",
+  "COGNOME_BAMBINO",
+  "DATA_NASCITA_BAMBINO",
+  "LUOGO_NASCITA_BAMBINO",
+  "CODICE_FISCALE_BAMBINO",
+  "VIA_RESIDENZA_BAMBINO",
+  "CITTA_RESIDENZA_BAMBINO",
+  "TABELLA_GENITORI",
+  "CERTIFICATO_MEDICO_FILE",
+  "CERTIFICATO_MEDICO_SCADENZA",
+  "FOTO_BAMBINO",
+]);
+
+export function stripBambinoReadOnlyFields<T extends object>(fields: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(fields).filter(([key]) => BAMBINI_WRITABLE_FIELDS.has(key)),
+  ) as Partial<T>;
+}
+
+/**
+ * Calcola la categoria FCI dall'anno di nascita.
+ * Anno di riferimento: anno solare corrente.
+ */
+export function calcCategoriaFCI(dataNascita: string): string {
+  const birthYear = parseInt(dataNascita.split("-")[0], 10);
+  const age = new Date().getFullYear() - birthYear;
+  if (age <= 6) return "G6";
+  if (age <= 8) return "G8";
+  if (age <= 10) return "G10";
+  if (age <= 12) return "G12";
+  if (age <= 14) return "Esordienti";
+  if (age <= 16) return "Allievi";
+  return "Juniores";
+}
+
+/** Lista bambini per genitore (tramite GENITORE_RECORD_ID_LOOKUP). */
+export async function getBambiniByGenitore(genitoreAirtableId: string): Promise<Bambino[]> {
+  const formula = encodeURIComponent(
+    `FIND("${genitoreAirtableId}",ARRAYJOIN({GENITORE_RECORD_ID_LOOKUP},","))>0`,
+  );
+  const res = await airtableFetch(`TABELLA_BAMBINI?filterByFormula=${formula}`);
+  const data: { records: Bambino[] } = await res.json();
+  return data.records;
+}
+
+/** Singolo bambino per ID. Ritorna null se non trovato. */
+export async function getBambinoById(id: string): Promise<Bambino | null> {
+  try {
+    const res = await airtableFetch(`TABELLA_BAMBINI/${id}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** Crea un nuovo bambino in TABELLA_BAMBINI. */
+export async function createBambino(data: BambinoCreateInput): Promise<Bambino> {
+  const res = await airtableFetch("TABELLA_BAMBINI", {
+    method: "POST",
+    body: JSON.stringify({ fields: stripBambinoReadOnlyFields(data) }),
+  });
+  return res.json();
+}
+
+/** Aggiorna anagrafica bambino. */
+export async function updateBambino(id: string, data: BambinoUpdateInput): Promise<Bambino> {
+  const res = await airtableFetch(`TABELLA_BAMBINI/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ fields: stripBambinoReadOnlyFields(data) }),
+  });
+  return res.json();
+}
+
+/** PATCH diretto su TABELLA_BAMBINI (per upload file — accetta campi attachment già formattati). */
+export async function airtablePatchBambino(
+  id: string,
+  fields: Record<string, unknown>,
+): Promise<void> {
+  await airtableFetch(`TABELLA_BAMBINI/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ fields }),
+  });
+}
+
+// ─── TABELLA_ISCRIZIONI (read-only per il portale genitore in EVO-003) ───────
+
+export interface Iscrizione {
+  id: string;
+  fields: {
+    STATO_ISCRIZIONE?: string;
+    DATA_ISCRIZIONE?: string;
+    "ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"?: number[];
+    "NOME_TARIFFA (from TABELLA_TARIFFE)"?: string[];
+    "IMPORTO_FINALE_ANNUO"?: number;
+    PRIVACY_MINORE?: boolean;
+    FLAG_REGOLAMENTO?: boolean;
+    TABELLA_BAMBINI?: string[];
+  };
+}
+
+/** Lista iscrizioni per bambino (read-only). */
+export async function getIscrizioniBambino(bambinoId: string): Promise<Iscrizione[]> {
+  const formula = encodeURIComponent(
+    `FIND("${bambinoId}",ARRAYJOIN({TABELLA_BAMBINI},","))>0`,
+  );
+  const res = await airtableFetch(`TABELLA_ISCRIZIONI?filterByFormula=${formula}&sort[0][field]=DATA_ISCRIZIONE&sort[0][direction]=desc`);
+  const data: { records: Iscrizione[] } = await res.json();
+  return data.records;
+}
+
+// ─── TABELLA_LEZIONI (read-only per tab Diario) ──────────────────────────────
+
+export interface Lezione {
+  id: string;
+  fields: {
+    DATA?: string;
+    ATTIVITA_SVOLTE?: string;
+    NOTE_ATTIVITA?: string;
+    TIPO_SESSIONE?: string;
+    PUBLISHED?: boolean;
+    MAESTRI_PRESENTI?: string[];
+    BAMBINI_PRESENTI?: string[];
+  };
+}
+
+/** Lista lezioni per bambino, filtrate per anno/mese. */
+export async function getLezioniBambino(
+  bambinoId: string,
+  anno?: number,
+  mese?: number,
+): Promise<Lezione[]> {
+  const conditions: string[] = [
+    `FIND("${bambinoId}",ARRAYJOIN({BAMBINI_PRESENTI},","))>0`,
+    `{PUBLISHED}=1`,
+  ];
+  if (anno && mese) {
+    conditions.push(`YEAR({DATA})=${anno}`);
+    conditions.push(`MONTH({DATA})=${mese}`);
+  } else if (anno) {
+    conditions.push(`YEAR({DATA})=${anno}`);
+  }
+  const formula = encodeURIComponent(`AND(${conditions.join(",")})`);
+  const res = await airtableFetch(
+    `TABELLA_LEZIONI?filterByFormula=${formula}&sort[0][field]=DATA&sort[0][direction]=desc`,
+  );
+  const data: { records: Lezione[] } = await res.json();
+  return data.records;
 }
