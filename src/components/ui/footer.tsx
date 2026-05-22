@@ -75,6 +75,7 @@ export function Footer({ onNewsletterSubmit }: FooterProps) {
                   setSubmitted(true);
                 }}
                 className="space-y-2"
+                suppressHydrationWarning
               >
                 <input
                   type="email"
@@ -84,6 +85,7 @@ export function Footer({ onNewsletterSubmit }: FooterProps) {
                   placeholder="tua@email.it"
                   className="w-full h-11 px-4 rounded-[var(--radius-md)] bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:border-sun-500 focus:ring-4 focus:ring-sun-500/20"
                   aria-label="Email per newsletter"
+                  suppressHydrationWarning
                 />
                 <Button
                   type="submit"

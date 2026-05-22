@@ -45,6 +45,7 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
   }, [open]);
 
   return (
+    <>
     <header
       className={cn(
         "sticky top-0 z-40 transition-[background,backdrop-filter,box-shadow] duration-200",
@@ -106,10 +107,12 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
           <Menu className="w-5 h-5" />
         </button>
       </div>
+    </header>
 
-      {/* Mobile drawer */}
-      {open && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-navy-900 text-white flex flex-col animate-in fade-in duration-200">
+    {/* Mobile drawer — fuori dall'<header sticky> per evitare quirks
+        di stacking context su iOS Safari (fixed dentro sticky). */}
+    {open && (
+      <div className="lg:hidden fixed inset-0 z-[100] bg-navy-900 text-white flex flex-col animate-in fade-in duration-200">
           <div className="px-4 h-20 flex items-center justify-between border-b border-white/10">
             <Image
               src="/assets/logo-triono-racing.png"
@@ -164,8 +167,8 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
               <Link href="/portale/login" onClick={() => setOpen(false)}>Accedi</Link>
             </Button>
           </div>
-        </div>
-      )}
-    </header>
+      </div>
+    )}
+    </>
   );
 }
