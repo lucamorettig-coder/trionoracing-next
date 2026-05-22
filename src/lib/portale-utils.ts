@@ -1,5 +1,51 @@
 import type { BadgeVariant } from "@/components/ui/badge";
 
+export interface StatoIscrizioneBadge {
+  variant: BadgeVariant;
+  label: string;
+}
+
+/**
+ * Mappa STATO_ISCRIZIONE (formula Airtable) → badge UI.
+ * Valori reali: COMPLETA | INCOMPLETA. Per coerenza UX usiamo etichette italiane comprensibili.
+ */
+export function statoIscrizioneBadge(stato?: string): StatoIscrizioneBadge {
+  const s = (stato ?? "").toUpperCase();
+  if (s === "COMPLETA") return { variant: "success", label: "Attiva" };
+  if (s === "INCOMPLETA") return { variant: "warning", label: "Da completare" };
+  return { variant: "neutral", label: "Bozza" };
+}
+
+export interface StatoTitoloBadge {
+  variant: BadgeVariant;
+  label: string;
+}
+
+/** Mappa STATO_TITOLO (formula) → badge UI. Valori: pagato | da_pagare | scaduto. */
+export function statoTitoloBadge(stato?: string): StatoTitoloBadge {
+  const s = (stato ?? "").toLowerCase();
+  if (s === "pagato") return { variant: "success", label: "Pagato" };
+  if (s === "scaduto") return { variant: "error", label: "Scaduto" };
+  return { variant: "neutral", label: "Da pagare" };
+}
+
+/** Formatta importo in € italiani (es. 350 → "€ 350,00"). */
+export function formatEUR(value: number): string {
+  return new Intl.NumberFormat("it-IT", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: value % 1 === 0 ? 0 : 2,
+  }).format(value);
+}
+
+/** Etichetta umana per quarter tariffa. */
+export function quarterLabel(quarter: "Q1" | "Q2" | "Q3"): string {
+  if (quarter === "Q1") return "Q1 · gennaio–aprile";
+  if (quarter === "Q2") return "Q2 · maggio–agosto";
+  return "Q3 · settembre–dicembre";
+}
+
+
 /** Calcola anni interi tra una data di nascita (YYYY-MM-DD) e oggi. */
 export function diffInYears(dataNascita: string): number {
   const birth = new Date(dataNascita);

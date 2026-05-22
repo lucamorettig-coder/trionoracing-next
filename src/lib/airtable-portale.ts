@@ -314,30 +314,383 @@ export async function airtablePatchBambino(
   });
 }
 
-// ─── TABELLA_ISCRIZIONI (read-only per il portale genitore in EVO-003) ───────
+// ─── TABELLA_ISCRIZIONI ─────────────────────────────────────────────────────
+
+export type Corso = "MTB" | "Strada";
 
 export interface Iscrizione {
   id: string;
+  createdTime?: string;
   fields: {
-    STATO_ISCRIZIONE?: string;
+    ID_ISCRIZIONE?: string;
+    STATO_ISCRIZIONE?: string; // formula: COMPLETA | INCOMPLETA
     DATA_ISCRIZIONE?: string;
-    "ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"?: number[];
-    "NOME_TARIFFA (from TABELLA_TARIFFE)"?: string[];
-    "IMPORTO_FINALE_ANNUO"?: number;
-    PRIVACY_MINORE?: boolean;
-    FLAG_REGOLAMENTO?: boolean;
+    CORSO?: Corso;
     TABELLA_BAMBINI?: string[];
+    TABELLA_GENITORI?: string[];
+    TABELLA_TARIFFE?: string[];
+    TITOLI_PAGAMENTO?: string[];
+    PRIMA_RATA_PAGATA?: boolean;
+    PRIVACY_MINORE?: boolean;
+    DATA_FIRMA_PRIVACY?: string;
+    FLAG_REGOLAMENTO?: boolean;
+    DATA_FIRMA_REGOLAMENTO?: string;
+    REGOLAMENTO_FIRMATO?: AirtableAttachment[];
+    MODULO_TRIONO?: AirtableAttachment[];
+    MODULO_TRIONO_STATO?: string;
+    MODULO_FCI?: AirtableAttachment[];
+    MODULO_FCI_STATO?: string;
+    TAGLIA_MAGLIA?: string;
+    TAGLIA_PANTALONCINO?: string;
+    TAGLIA_TUTA?: string;
+    TAGLIE_KIT_CONFERMATE?: boolean;
+    DATA_CONFERMA_TAGLIE?: string;
+    CATEGORIA_FCI?: string;
+    ORDINE_ISCRIZIONE_GENITORE?: number;
+    IMPORTO_FINALE_ANNUO?: number;
+    SCONTO_APPLICATO?: number;
+    MOTIVO_SCONTO?: string;
+    "ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"?: string[];
+    "NOME_TARIFFA (from TABELLA_TARIFFE)"?: string[];
+    "QUOTA_TOTALE_ANNO (from TABELLA_TARIFFE)"?: number[];
+    "IMPORTO_RATA (from TABELLA_TARIFFE)"?: number[];
+    "IMPORTO_ISCRIZIONE (from TABELLA_TARIFFE)"?: number[];
+    "SCONTO_FAMIGLIA_NUMEROSA (from TABELLA_TARIFFE)"?: number[];
+    "NUMERO_RATE (from TABELLA_TARIFFE)"?: number[];
+    "SCADENZA_RATE (from TABELLA_TARIFFE)"?: string[];
+    "NOME_BAMBINO (from TABELLA_BAMBINI)"?: string[];
+    "COGNOME_BAMBINO (from TABELLA_BAMBINI)"?: string[];
+    "FOTO_BAMBINO (from TABELLA_BAMBINI)"?: AirtableAttachment[];
+    "CERTIFICATO_MEDICO_STATO (from TABELLA_BAMBINI)"?: string[];
   };
 }
 
-/** Lista iscrizioni per bambino (read-only). */
+export interface IscrizioneCreateInput {
+  TABELLA_BAMBINI: string[];
+  TABELLA_GENITORI: string[];
+  TABELLA_TARIFFE: string[];
+  DATA_ISCRIZIONE: string;
+  CORSO?: Corso;
+  ORDINE_ISCRIZIONE_GENITORE?: number;
+}
+
+const ISCRIZIONI_WRITABLE_FIELDS = new Set([
+  "TABELLA_BAMBINI",
+  "TABELLA_GENITORI",
+  "TABELLA_TARIFFE",
+  "DATA_ISCRIZIONE",
+  "CORSO",
+  "PRIVACY_MINORE",
+  "DATA_FIRMA_PRIVACY",
+  "FLAG_REGOLAMENTO",
+  "DATA_FIRMA_REGOLAMENTO",
+  "REGOLAMENTO_FIRMATO",
+  "MODULO_TRIONO",
+  "MODULO_TRIONO_DATA_INVIO",
+  "MODULO_FCI",
+  "MODULO_FCI_DATA_INVIO",
+  "TAGLIA_MAGLIA",
+  "TAGLIA_PANTALONCINO",
+  "TAGLIA_TUTA",
+  "TAGLIE_KIT_CONFERMATE",
+  "DATA_CONFERMA_TAGLIE",
+  "PRIMA_RATA_PAGATA",
+  "ORDINE_ISCRIZIONE_GENITORE",
+]);
+
+export function stripIscrizioneReadOnlyFields<T extends object>(fields: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(fields).filter(([key]) => ISCRIZIONI_WRITABLE_FIELDS.has(key)),
+  ) as Partial<T>;
+}
+
+/** Lista iscrizioni per bambino. */
 export async function getIscrizioniBambino(bambinoId: string): Promise<Iscrizione[]> {
   const formula = encodeURIComponent(
     `FIND("${bambinoId}",ARRAYJOIN({TABELLA_BAMBINI},","))>0`,
   );
-  const res = await airtableFetch(`TABELLA_ISCRIZIONI?filterByFormula=${formula}&sort[0][field]=DATA_ISCRIZIONE&sort[0][direction]=desc`);
+  const res = await airtableFetch(
+    `TABELLA_ISCRIZIONI?filterByFormula=${formula}&sort[0][field]=DATA_ISCRIZIONE&sort[0][direction]=desc`,
+  );
   const data: { records: Iscrizione[] } = await res.json();
   return data.records;
+}
+
+/** Lista iscrizioni per genitore (ordinate per data desc). */
+export async function getIscrizioniByGenitore(genitoreId: string): Promise<Iscrizione[]> {
+  const formula = encodeURIComponent(
+    `FIND("${genitoreId}",ARRAYJOIN({TABELLA_GENITORI},","))>0`,
+  );
+  const res = await airtableFetch(
+    `TABELLA_ISCRIZIONI?filterByFormula=${formula}&sort[0][field]=DATA_ISCRIZIONE&sort[0][direction]=desc`,
+  );
+  const data: { records: Iscrizione[] } = await res.json();
+  return data.records;
+}
+
+/** Singola iscrizione per ID. Ritorna null se non trovata. */
+export async function getIscrizioneById(id: string): Promise<Iscrizione | null> {
+  try {
+    const res = await airtableFetch(`TABELLA_ISCRIZIONI/${id}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** Crea iscrizione + primo titolo "rata 1". Restituisce l'iscrizione creata (con id). */
+export async function createIscrizione(
+  data: IscrizioneCreateInput,
+  tariffa: Tariffa,
+  scontoFamiglia: boolean,
+): Promise<Iscrizione> {
+  const res = await airtableFetch("TABELLA_ISCRIZIONI", {
+    method: "POST",
+    body: JSON.stringify({ fields: stripIscrizioneReadOnlyFields(data) }),
+  });
+  const iscrizione: Iscrizione = await res.json();
+
+  // Crea titolo prima rata (rata #1 include la quota iscrizione)
+  const scadenzaRate = (tariffa.fields.SCADENZA_RATE || "").split(";").map((s) => s.trim()).filter(Boolean);
+  const primoMese = scadenzaRate[0] ?? "";
+  const anno = parseInt(tariffa.fields.ANNO_ISCRIZIONE ?? `${new Date().getFullYear()}`, 10);
+  const scadenza = computeDataScadenzaRata(primoMese, anno);
+  const sconto = scontoFamiglia ? tariffa.fields.SCONTO_FAMIGLIA_NUMEROSA ?? 0 : 0;
+
+  await airtableFetch("TITOLI_PAGAMENTO", {
+    method: "POST",
+    body: JSON.stringify({
+      fields: stripTitoloReadOnlyFields({
+        ISCRIZIONE: [iscrizione.id],
+        TIPO_TITOLO: "rata",
+        NUMERO_RATA: 1,
+        IMPORTO_RATA_BASE: tariffa.fields.IMPORTO_RATA,
+        IMPORTO_ISCRIZIONE: tariffa.fields.IMPORTO_ISCRIZIONE,
+        IMPORTO_SCONTO_APPLICATO: sconto,
+        DATA_EMISSIONE: new Date().toISOString().slice(0, 10),
+        DATA_SCADENZA_PAGAMENTO: scadenza,
+        SCADENZA_MESE: primoMese,
+      }),
+    }),
+  });
+
+  return iscrizione;
+}
+
+/** PATCH modulistica/taglie/stato su iscrizione (whitelist writable). */
+export async function updateIscrizioneModulistica(
+  id: string,
+  fields: Record<string, unknown>,
+): Promise<void> {
+  await airtableFetch(`TABELLA_ISCRIZIONI/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ fields: stripIscrizioneReadOnlyFields(fields) }),
+  });
+}
+
+/** PATCH diretto su TABELLA_ISCRIZIONI (per upload attachment già formattati). */
+export async function airtablePatchIscrizione(
+  id: string,
+  fields: Record<string, unknown>,
+): Promise<void> {
+  await airtableFetch(`TABELLA_ISCRIZIONI/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ fields }),
+  });
+}
+
+// ─── TABELLA_TARIFFE ────────────────────────────────────────────────────────
+
+export interface Tariffa {
+  id: string;
+  fields: {
+    ANNO_ISCRIZIONE: string;
+    NOME_TARIFFA: "Q1" | "Q2" | "Q3";
+    DESCRIZIONE_TARIFFA?: string;
+    QUOTA_TOTALE_ANNO: number;
+    NUMERO_RATE: number;
+    IMPORTO_RATA: number;
+    SCADENZA_RATE: string;
+    IMPORTO_KIT_SCUOLA?: number;
+    IMPORTO_ISCRIZIONE: number;
+    SCONTO_FAMIGLIA_NUMEROSA?: number;
+    ATTIVA?: boolean;
+    REGOLAMENTO?: AirtableAttachment[];
+  };
+}
+
+/**
+ * Quarter corrente dato anno+mese (1-12):
+ * Q1 = gen-apr, Q2 = mag-ago, Q3 = set-dic.
+ */
+export function getCurrentQuarter(mese?: number): "Q1" | "Q2" | "Q3" {
+  const m = mese ?? new Date().getMonth() + 1;
+  if (m <= 4) return "Q1";
+  if (m <= 8) return "Q2";
+  return "Q3";
+}
+
+/** Lista tariffe attive per anno. */
+export async function getTariffeVigenti(anno: number): Promise<Tariffa[]> {
+  const formula = encodeURIComponent(`AND({ANNO_ISCRIZIONE}="${anno}",{ATTIVA}=1)`);
+  const res = await airtableFetch(`TABELLA_TARIFFE?filterByFormula=${formula}`);
+  const data: { records: Tariffa[] } = await res.json();
+  return data.records;
+}
+
+/** Dato anno+mese ritorna la tariffa del quarter corrispondente (Q1/Q2/Q3) o null. */
+export async function getTariffa(anno: number, mese: number): Promise<Tariffa | null> {
+  const quarter = getCurrentQuarter(mese);
+  const tariffe = await getTariffeVigenti(anno);
+  return tariffe.find((t) => t.fields.NOME_TARIFFA === quarter) ?? null;
+}
+
+export interface CalcTariffaResult {
+  tariffa: Tariffa;
+  scontoFamiglia: boolean;
+  scontoImporto: number;
+  importoTotale: number;
+  ordineIscrizioneGenitore: number;
+  quarter: "Q1" | "Q2" | "Q3";
+  anno: number;
+}
+
+/**
+ * Calcola la tariffa applicabile per un'iscrizione.
+ * Sconto famiglia: applicato se il genitore ha già altre iscrizioni nello stesso anno.
+ */
+export async function calcTariffa(
+  genitoreId: string,
+  anno: number,
+  meseRiferimento?: number,
+): Promise<CalcTariffaResult | null> {
+  const mese = meseRiferimento ?? new Date().getMonth() + 1;
+  const tariffa = await getTariffa(anno, mese);
+  if (!tariffa) return null;
+
+  const iscrizioniGenitore = await getIscrizioniByGenitore(genitoreId);
+  const iscrizioniAnno = iscrizioniGenitore.filter((i) => {
+    const annoIscrizione = i.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0];
+    return annoIscrizione === `${anno}`;
+  });
+  const ordineIscrizioneGenitore = iscrizioniAnno.length + 1;
+  const scontoFamiglia = ordineIscrizioneGenitore > 1;
+  const scontoImporto = scontoFamiglia ? tariffa.fields.SCONTO_FAMIGLIA_NUMEROSA ?? 0 : 0;
+  const importoTotale = tariffa.fields.QUOTA_TOTALE_ANNO - scontoImporto;
+
+  return {
+    tariffa,
+    scontoFamiglia,
+    scontoImporto,
+    importoTotale,
+    ordineIscrizioneGenitore,
+    quarter: tariffa.fields.NOME_TARIFFA,
+    anno,
+  };
+}
+
+// ─── TITOLI_PAGAMENTO ───────────────────────────────────────────────────────
+
+export interface TitoloPagamento {
+  id: string;
+  createdTime?: string;
+  fields: {
+    CODICE_TITOLO?: string;
+    ISCRIZIONE?: string[];
+    TIPO_TITOLO?: string;
+    NUMERO_RATA?: number;
+    IMPORTO?: number; // formula
+    IMPORTO_RATA_BASE?: number;
+    IMPORTO_ISCRIZIONE?: number;
+    IMPORTO_SCONTO_APPLICATO?: number;
+    DATA_EMISSIONE?: string;
+    DATA_SCADENZA_PAGAMENTO?: string;
+    SCADENZA_MESE?: string;
+    STATO_TITOLO?: string; // formula: pagato | da_pagare | scaduto
+    PAGATO?: boolean;
+    DATA_PAGAMENTO?: string;
+    METODO_PAGAMENTO?: string;
+    PROVIDER_PAGAMENTO?: string;
+    METADATA_PAGAMENTO?: string;
+    CHECKOUT_ID?: string;
+    PAYMENT_INTENT_ID?: string;
+    ID_TRANSAZIONE?: string;
+    NOTE_INTERNE?: string;
+    LOCKED?: boolean;
+    "ANNO_ISCRIZIONE"?: string[];
+  };
+}
+
+const TITOLI_WRITABLE_FIELDS = new Set([
+  "ISCRIZIONE",
+  "TIPO_TITOLO",
+  "NUMERO_RATA",
+  "IMPORTO_RATA_BASE",
+  "IMPORTO_ISCRIZIONE",
+  "IMPORTO_SCONTO_APPLICATO",
+  "DATA_EMISSIONE",
+  "DATA_SCADENZA_PAGAMENTO",
+  "SCADENZA_MESE",
+  "PAGATO",
+  "DATA_PAGAMENTO",
+  "METODO_PAGAMENTO",
+  "PROVIDER_PAGAMENTO",
+  "METADATA_PAGAMENTO",
+  "CHECKOUT_ID",
+  "PAYMENT_INTENT_ID",
+  "ID_TRANSAZIONE",
+  "NOTE_INTERNE",
+]);
+
+export function stripTitoloReadOnlyFields<T extends object>(fields: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(fields).filter(([key]) => TITOLI_WRITABLE_FIELDS.has(key)),
+  ) as Partial<T>;
+}
+
+/** Lista titoli pagamento per iscrizione (ordinati per NUMERO_RATA crescente). */
+export async function getTitoliPagamento(iscrizioneId: string): Promise<TitoloPagamento[]> {
+  const formula = encodeURIComponent(`FIND("${iscrizioneId}",ARRAYJOIN({ISCRIZIONE},","))>0`);
+  const res = await airtableFetch(
+    `TITOLI_PAGAMENTO?filterByFormula=${formula}&sort[0][field]=NUMERO_RATA&sort[0][direction]=asc`,
+  );
+  const data: { records: TitoloPagamento[] } = await res.json();
+  return data.records;
+}
+
+/** Singolo titolo per ID. */
+export async function getTitoloById(id: string): Promise<TitoloPagamento | null> {
+  try {
+    const res = await airtableFetch(`TITOLI_PAGAMENTO/${id}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** PATCH titolo pagamento (whitelist). */
+export async function updateTitoloPagamento(
+  id: string,
+  fields: Record<string, unknown>,
+): Promise<void> {
+  await airtableFetch(`TITOLI_PAGAMENTO/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ fields: stripTitoloReadOnlyFields(fields) }),
+  });
+}
+
+const MESI_IT_TO_NUM: Record<string, number> = {
+  GENNAIO: 1, FEBBRAIO: 2, MARZO: 3, APRILE: 4, MAGGIO: 5, GIUGNO: 6,
+  LUGLIO: 7, AGOSTO: 8, SETTEMBRE: 9, OTTOBRE: 10, NOVEMBRE: 11, DICEMBRE: 12,
+};
+
+/** Calcola la data di scadenza pagamento (ultimo giorno del mese SCADENZA_MESE / ANNO). */
+function computeDataScadenzaRata(mese: string, anno: number): string | undefined {
+  const m = MESI_IT_TO_NUM[mese.toUpperCase().trim()];
+  if (!m) return undefined;
+  // Ultimo giorno del mese: new Date(anno, m, 0) restituisce l'ultimo giorno del mese m
+  const last = new Date(anno, m, 0);
+  return last.toISOString().slice(0, 10);
 }
 
 // ─── TABELLA_LEZIONI (read-only per tab Diario) ──────────────────────────────
