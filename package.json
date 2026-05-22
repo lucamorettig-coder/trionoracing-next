@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1052.0",
     "@clerk/nextjs": "^7.3.7",
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
@@ -17,6 +18,7 @@
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-easy-crop": "^5.5.7",
     "svix": "^1.94.0",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3"
