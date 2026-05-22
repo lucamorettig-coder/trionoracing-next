@@ -245,18 +245,24 @@ export function stripBambinoReadOnlyFields<T extends object>(fields: T): Partial
 
 /**
  * Calcola la categoria FCI dall'anno di nascita.
- * Anno di riferimento: anno solare corrente.
+ * Età = annoCorrente − annoNascita (anni "compiuti o da compiere nell'anno corrente").
+ * Ritorna null sotto i 7 anni o sopra i 18 (fuori categoria agonistica).
  */
-export function calcCategoriaFCI(dataNascita: string): string {
+export function calcCategoriaFCI(dataNascita: string): string | null {
   const birthYear = parseInt(dataNascita.split("-")[0], 10);
   const age = new Date().getFullYear() - birthYear;
-  if (age <= 6) return "G6";
-  if (age <= 8) return "G8";
-  if (age <= 10) return "G10";
-  if (age <= 12) return "G12";
-  if (age <= 14) return "Esordienti";
-  if (age <= 16) return "Allievi";
-  return "Juniores";
+  if (age === 7) return "G1";
+  if (age === 8) return "G2";
+  if (age === 9) return "G3";
+  if (age === 10) return "G4";
+  if (age === 11) return "G5";
+  if (age === 12) return "G6";
+  if (age === 13) return "Esordienti 1° anno";
+  if (age === 14) return "Esordienti 2° anno";
+  if (age === 15) return "Allievi 1° anno";
+  if (age === 16) return "Allievi 2° anno";
+  if (age === 17 || age === 18) return "Juniores";
+  return null;
 }
 
 /** Lista bambini per genitore (tramite GENITORE_RECORD_ID_LOOKUP). */
