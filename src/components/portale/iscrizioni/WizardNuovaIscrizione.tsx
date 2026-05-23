@@ -25,6 +25,7 @@ export interface TariffaInfo {
   anno: number;
   importoIscrizione: number;
   importoRata: number;
+  importoKit?: number;
   numeroRate: number;
   quotaTotaleAnno: number;
   scontoFamiglia: boolean;

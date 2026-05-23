@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Shirt } from "lucide-react";
 import type { Bambino } from "@/lib/airtable-portale";
 import { formatEUR, quarterLabel } from "@/lib/portale-utils";
 import type { TariffaInfo } from "../WizardNuovaIscrizione";
@@ -66,48 +66,73 @@ export default function StepRiepilogoTariffa({
           {error}
         </div>
       ) : tariffa ? (
-        <div className="bg-bg-soft border border-line rounded-[var(--radius-xl)] p-5">
-          <p className="text-xs uppercase tracking-wider text-ink-muted font-semibold mb-3">
-            Tariffa applicata
-          </p>
-          <div className="space-y-3">
-            <div className="flex justify-between items-baseline">
-              <span className="text-ink-muted text-sm">Anno</span>
-              <span className="text-ink font-semibold">{tariffa.anno}</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-ink-muted text-sm">Periodo</span>
-              <span className="text-ink font-semibold">{quarterLabel(tariffa.quarter)}</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-ink-muted text-sm">Quota iscrizione</span>
-              <span className="text-ink">{formatEUR(tariffa.importoIscrizione)}</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-ink-muted text-sm">
-                {tariffa.numeroRate} {tariffa.numeroRate === 1 ? "rata" : "rate"} ×{" "}
-                {formatEUR(tariffa.importoRata)}
-              </span>
-              <span className="text-ink">{formatEUR(tariffa.importoRata * tariffa.numeroRate)}</span>
-            </div>
-            {tariffa.scontoFamiglia && (
-              <div className="flex justify-between items-baseline text-grass-700">
-                <span className="text-sm">
-                  Sconto famiglia ({bambino.fields.NOME_BAMBINO} è il tuo {tariffa.ordineIscrizioneGenitore}° figlio iscritto)
-                </span>
-                <span className="font-semibold">− {formatEUR(tariffa.scontoImporto)}</span>
+        <div className="rounded-[var(--radius-xl)] overflow-hidden border border-line shadow-[var(--shadow-md)]">
+          {/* Zona 1 — Breakdown */}
+          <div className="bg-bg-soft p-5">
+            <p className="text-xs uppercase tracking-wider text-ink-muted font-semibold mb-3">
+              Tariffa applicata
+            </p>
+            <div className="space-y-3">
+              <div className="flex justify-between items-baseline">
+                <span className="text-ink-muted text-sm">Anno</span>
+                <span className="text-ink font-semibold">{tariffa.anno}</span>
               </div>
-            )}
-            <div className="pt-3 border-t border-line flex justify-between items-baseline">
-              <span className="text-ink font-bold">Totale</span>
-              <span className="text-2xl font-bold text-navy-700">
+              <div className="flex justify-between items-baseline">
+                <span className="text-ink-muted text-sm">Periodo</span>
+                <span className="text-ink font-semibold">{quarterLabel(tariffa.quarter)}</span>
+              </div>
+              <div className="flex justify-between items-baseline">
+                <span className="text-ink-muted text-sm">Quota iscrizione</span>
+                <span className="text-ink">{formatEUR(tariffa.importoIscrizione)}</span>
+              </div>
+              <div className="flex justify-between items-baseline">
+                <span className="text-ink-muted text-sm">
+                  {tariffa.numeroRate} {tariffa.numeroRate === 1 ? "rata" : "rate"} ×{" "}
+                  {formatEUR(tariffa.importoRata)}
+                </span>
+                <span className="text-ink">{formatEUR(tariffa.importoRata * tariffa.numeroRate)}</span>
+              </div>
+              {tariffa.scontoFamiglia && (
+                <div className="flex justify-between items-baseline text-grass-700">
+                  <span className="text-sm">
+                    Sconto famiglia ({bambino.fields.NOME_BAMBINO} è il tuo {tariffa.ordineIscrizioneGenitore}° figlio iscritto)
+                  </span>
+                  <span className="font-semibold">− {formatEUR(tariffa.scontoImporto)}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Zona 2 — Kit scuola (opzionale) */}
+          {typeof tariffa.importoKit === "number" && tariffa.importoKit > 0 && (
+            <div className="bg-sun-100 border-t border-line px-5 py-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Shirt className="w-4 h-4 text-ink shrink-0" aria-hidden />
+                  <span className="text-ink font-semibold">Kit scuola</span>
+                </div>
+                <span className="text-ink font-semibold">{formatEUR(tariffa.importoKit)}</span>
+              </div>
+              <p className="mt-1.5 text-xs text-ink-muted italic">
+                Obbligatorio · può non essere subito disponibile alla consegna
+              </p>
+            </div>
+          )}
+
+          {/* Zona 3 — Totale (banda navy) */}
+          <div className="bg-navy-900 text-white px-5 py-5">
+            <div className="flex justify-between items-baseline gap-3">
+              <span className="text-white/80 text-sm font-semibold uppercase tracking-wider">
+                Totale quota annuale
+              </span>
+              <span className="text-3xl font-bold text-sun-500">
                 {formatEUR(tariffa.importoTotale)}
               </span>
             </div>
+            <p className="mt-3 text-xs text-white/70 leading-relaxed">
+              Confermando creerai l&apos;iscrizione. La prima rata sarà generata automaticamente e potrai pagarla subito.
+            </p>
           </div>
-          <p className="mt-4 text-xs text-ink-muted leading-relaxed">
-            Confermando creerai l&apos;iscrizione. La prima rata sarà generata automaticamente e potrai pagarla subito.
-          </p>
         </div>
       ) : null}
     </div>

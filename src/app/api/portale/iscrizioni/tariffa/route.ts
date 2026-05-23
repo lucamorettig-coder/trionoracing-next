@@ -44,6 +44,7 @@ export async function GET(req: NextRequest) {
     anno: result.anno,
     importoIscrizione: result.tariffa.fields.IMPORTO_ISCRIZIONE,
     importoRata: result.tariffa.fields.IMPORTO_RATA,
+    importoKit: result.tariffa.fields.IMPORTO_KIT_SCUOLA,
     numeroRate: result.tariffa.fields.NUMERO_RATE,
     quotaTotaleAnno: result.tariffa.fields.QUOTA_TOTALE_ANNO,
     scontoFamiglia: result.scontoFamiglia,
