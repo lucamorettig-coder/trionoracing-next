@@ -22,7 +22,21 @@ export function Footer({ onNewsletterSubmit }: FooterProps) {
 
   return (
     <footer className="relative text-white bg-navy-900 overflow-hidden">
-      <div className="absolute inset-0 pattern-navy" aria-hidden />
+      {/* Immagine di sfondo: texture tessuto + pattern geometrico */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-cover bg-[position:center_bottom] bg-no-repeat"
+        style={{ backgroundImage: "url('/assets/footer-bg.jpg')" }}
+      />
+      {/* Overlay forte: texture discreta, leggibilità testi prioritaria */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(5,14,63,0.82) 0%, rgba(5,14,63,0.90) 60%, rgba(5,14,63,0.96) 100%)",
+        }}
+      />
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 pt-16 lg:pt-20 pb-8 relative">
         <div className="grid lg:grid-cols-12 gap-10">
           {/* Brand */}
