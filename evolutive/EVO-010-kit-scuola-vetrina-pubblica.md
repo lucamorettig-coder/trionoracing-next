@@ -3,8 +3,8 @@
 - **ID**: EVO-010
 - **Slug**: kit-scuola-vetrina-pubblica
 - **Data inizio**: 2026-05-23
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: pronta per implementazione
+- **Data fine**: 2026-05-23
+- **Stato**: completata
 - **Tipo**: nuova feature
 - **Area**: landing (sito pubblico — pagina `/la-scuola`)
 - **Priorità**: alta
@@ -146,11 +146,44 @@ Output atteso del ciclo:
 
 ## 8. Verifica e go-live
 
-_Da compilare in fase 8._
+- **URL produzione**: https://trionoracing-next.vercel.app/la-scuola (sezione Kit Scuola tra Filosofia e Maestri)
+- **Pull Request**: [#14](https://github.com/lucamorettig-coder/trionoracing-next/pull/14) — squash-merged
+- **Commit di merge**: `72119e1` su `main`
+- **Commit report verifica**: `662f4e2` (docs)
+- **Branch implementazione**: `evo-010-kit-scuola-vetrina` (cancellato dopo merge)
+- **Data go-live**: 2026-05-23
+- **Report verifica completo**: [`verifica.md`](EVO-010-kit-scuola-vetrina-pubblica/verifica.md)
+
+### Esito sintetico
+
+| Dimensione | Stato | Note |
+|------------|-------|------|
+| Design system | ✅ | Solo token v0.1 esistenti, nessuna deviazione |
+| Localizzazione (i18n) | n/a | Sito monolingua italiano |
+| SEO | ✅ | H2 corretto, alt da modulo condiviso, `next/image` con `object-contain`, Cloudinary trasformato via helper, no regressioni structured data |
+| Architettura | ✅ | Server component, naming coerente, asset condiviso pronto per riuso EVO-011 |
+| Fedeltà ai visual | ✅ | Layout asimmetrico riprodotto, easter egg `EVO-010 · KIT SCUOLA` correttamente pulito → `Kit Scuola 2026` |
+| Criteri di accettazione | ✅ | 12/13 spuntati; Lighthouse quantitativo non eseguito automaticamente (non bloccante) |
+| Smoke test dev | ✅ | Confermato da utente |
+| Smoke test produzione | ⚠️→✅ | Smoke test via `curl` (HTTP 200 + markup + 4 URL Cloudinary trasformate) confermato; smoke test browser produzione confermato dall'utente al consolidamento |
+| Qualità deploy | ✅ | Preview Vercel `Ready`, squash-merge, deploy auto success, branch sorgente cancellato |
+
+### Apprendimenti riusabili (riportati anche in AGENTS.md)
+
+1. **Pattern asset condiviso `src/lib/{feature}.ts`** — Tipo TypeScript + array `as const readonly` + helper di trasformazione URL (es. `cloudinaryOptimized(url, w)`). Mappa esplicita ai campi del backend (es. `CampoTagliaAirtable`). Sblocca riuso cross-componente senza duplicazione.
+2. **`next/image` per prodotti scontornati**: usare `fill` + `object-contain` (non `object-cover` che è per foto in contesto come `SezioneGalleria`). Padding interno generoso (`p-8 lg:p-10`) per dare aria attorno al capo.
+3. **Cloudinary in `images.remotePatterns`**: dichiarare `pathname: "/duezeronove/**"` (scope sul cloud-name specifico, non `/**`) per limitare il superficie attaccabile.
+4. **Easter egg da Claude Design vanno puliti**: Claude Design può inserire dettagli "meta" (es. ID evolutiva) nei mockup. Documentarli nel `visual/README.md` come "NON portare in produzione" e verificare in fase di verify.
+5. **`verify-implementation` skill availability**: la skill non è sempre disponibile nella sessione Claude Code. Il prompt deve dire "se disponibile, invoca; altrimenti produci report manuale seguendo la stessa struttura". Claude Code l'ha gestito correttamente in modo manuale in EVO-010 — pattern da replicare nei prompt futuri.
+6. **Lighthouse non in CI**: il progetto oggi non ha Lighthouse automatico in pipeline. Restano misurazioni manuali post-deploy. Eventuale future-task: integrare Lighthouse CI o Vercel Speed Insights.
 
 ---
 
 ## Log fasi
+
+### [2026-05-23] Fase 8 — Consolidamento completato — EVO-010 chiusa
+
+Implementazione mergiata in `main` (commit `72119e1`, PR #14), in produzione su `https://trionoracing-next.vercel.app/la-scuola`. Verifica APPROVATA in tutte le 7 dimensioni (DS / i18n n/a / SEO / Architettura / Fedeltà visual / Criteri / Qualità deploy). 6 apprendimenti estratti e portati su `AGENTS.md` (sezione "Pattern appresi in EVO-010"). EVO-011 sbloccata: il file `src/lib/kit-scuola.ts` è ora su `main` e disponibile per essere consumato dal `TabTaglie` portale. Lo stato EVO-009 ombrello resta `ombrello` finché EVO-011 non sarà completata. `memory.md` e `PROGETTO_MASTER.md` aggiornati.
 
 ### [2026-05-23] Fase 7 — Prompt Claude Code generato + visual approvato
 

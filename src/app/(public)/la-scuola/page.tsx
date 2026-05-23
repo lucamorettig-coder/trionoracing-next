@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ScuolaHero } from "@/components/scuola/ScuolaHero";
 import { SezioneCorsi } from "@/components/scuola/SezioneCorsi";
 import { SezioneFilosofia } from "@/components/scuola/SezioneFilosofia";
+import { SezioneKitScuola } from "@/components/scuola/SezioneKitScuola";
 import { SezioneMaestri } from "@/components/scuola/SezioneMaestri";
 import { SezioneGalleria } from "@/components/scuola/SezioneGalleria";
 import { CtaScuola } from "@/components/scuola/CtaScuola";
@@ -31,6 +32,7 @@ export default function LaScuolaPage() {
       <ScuolaHero />
       <SezioneCorsi />
       <SezioneFilosofia />
+      <SezioneKitScuola />
       <SezioneMaestri />
       <SezioneGalleria />
       <CtaScuola />

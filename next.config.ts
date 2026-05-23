@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
         hostname: "v5.airtableusercontent.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/duezeronove/**",
+      },
     ],
   },
 };
