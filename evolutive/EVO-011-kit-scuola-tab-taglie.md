@@ -4,7 +4,7 @@
 - **Slug**: kit-scuola-tab-taglie
 - **Data inizio**: 2026-05-23
 - **Data fine**: _da compilare a chiusura_
-- **Stato**: in pianificazione (bloccata da EVO-010 + ciclo EVO-004)
+- **Stato**: in pianificazione (sbloccata da EVO-010 ✅ il 2026-05-23 — resta da coordinare con il branch `evo-004-portale-iscrizioni`)
 - **Tipo**: arricchimento visivo (modifica feature esistente)
 - **Area**: area autenticata (`/portale/iscrizioni/[id]` — tab "Taglie")
 - **Priorità**: media (segue il ciclo di EVO-004)

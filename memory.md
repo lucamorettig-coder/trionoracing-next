@@ -15,8 +15,9 @@
 | EVO-007 | portale-admin | F3.6 — Area admin (dashboard + 11 sotto-pagine) | — | — | in pianificazione | — | [link](evolutive/EVO-007-portale-admin.md) |
 | EVO-008 | migrazione-clerk | F3.7 — Migrazione utenti Supabase → Clerk | — | — | in pianificazione | — | [link](evolutive/EVO-008-migrazione-clerk.md) |
 | EVO-009 | kit-scuola | Kit Scuola — vetrina pubblica /la-scuola + immagini nel size picker portale (ombrello) | 2026-05-23 | — | ombrello | — | [link](evolutive/EVO-009-kit-scuola.md) |
-| EVO-010 | kit-scuola-vetrina-pubblica | Kit Scuola — sezione editoriale su /la-scuola + asset condiviso | 2026-05-23 | — | pronta per implementazione | — | [link](evolutive/EVO-010-kit-scuola-vetrina-pubblica.md) |
-| EVO-011 | kit-scuola-tab-taglie | Kit Scuola — immagini nel TabTaglie del portale (bloccata da EVO-010) | 2026-05-23 | — | in pianificazione | — | [link](evolutive/EVO-011-kit-scuola-tab-taglie.md) |
+| EVO-010 | kit-scuola-vetrina-pubblica | Kit Scuola — sezione editoriale su /la-scuola + asset condiviso | 2026-05-23 | 2026-05-23 | completata | https://trionoracing-next.vercel.app/la-scuola | [link](evolutive/EVO-010-kit-scuola-vetrina-pubblica.md) |
+| EVO-011 | kit-scuola-tab-taglie | Kit Scuola — immagini nel TabTaglie del portale (sbloccata da EVO-010 ✅, in pausa per EVO-012) | 2026-05-23 | — | in pianificazione | — | [link](evolutive/EVO-011-kit-scuola-tab-taglie.md) |
+| EVO-012 | ds-photo-bg-colorate | DS — utility `.photo-bg-{color}` per card colorate + uniformazione 8 card navy | 2026-05-23 | — | pronta per implementazione | — | [link](evolutive/EVO-012-ds-photo-bg-colorate.md) |
 
 ## Stati possibili
 
@@ -37,3 +38,6 @@ Fase 1 (8 pagine statiche) completata. Censimento as-is, UX completa (32 mockup)
 
 **2026-05-22 — EVO-003 completata**
 Area genitore core live. Dashboard personalizzata, gestione figli (CRUD + 6 tab con profilo), upload certificato medico e foto su R2, profilo genitore. Nuovi moduli: `src/lib/r2.ts` (client S3/R2), `src/lib/portale-utils.ts` (helper comuni). 5 hotfix post-implementazione principali (FCI mapping, fallbackRedirectUrl Clerk, drawer mobile, suppressHydration footer). Prossima: EVO-004 (iscrizioni + SumUp).
+
+**2026-05-23 — EVO-010 completata (in parallelo a F3, parte di ombrello EVO-009)**
+Nuova sezione "Kit Scuola" live su `/la-scuola` tra Filosofia e Maestri. Layout editoriale asimmetrico con 4 capi del kit (maglia, salopette, felpa, pantalone in felpa) + card navy manifesto. Nuovo asset condiviso `src/lib/kit-scuola.ts` (tipo `CapoKit` + array `as const readonly` + helper `cloudinaryOptimized` per trasformazioni URL). Nuovo hostname `res.cloudinary.com/duezeronove/**` in `next.config.ts`. PR #14 squash-merged (commit `72119e1`). Verifica APPROVATA su tutte le 7 dimensioni. 8 nuovi pattern in AGENTS.md (sezione "EVO-010"), tra cui: asset condiviso cross-deliverable, `next/image fill object-contain` per prodotti scontornati, scope ristretto su `images.remotePatterns`, gestione easter egg Claude Design, fallback report verifica quando skill `verify-implementation` non è caricata in sessione. **Sblocca EVO-011** (immagini in `TabTaglie` portale, parte di EVO-009 ombrello). Stato EVO-009 ombrello resta `ombrello` finché EVO-011 non sarà chiusa.
