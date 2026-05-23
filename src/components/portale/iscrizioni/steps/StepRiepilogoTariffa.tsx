@@ -60,6 +60,7 @@ export default function StepRiepilogoTariffa({
         total={total}
         title="Tariffa applicata"
         description="Verifica l'importo calcolato in base al periodo dell'anno. Cliccando Continua creerai l'iscrizione e potrai sempre tornare per completare i prossimi step."
+        accent="indigo"
       />
 
       {/* Card tariffa */}

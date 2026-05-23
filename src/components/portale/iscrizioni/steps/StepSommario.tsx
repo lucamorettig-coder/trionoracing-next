@@ -59,6 +59,7 @@ export default function StepSommario({
         total={total}
         title="Sommario iscrizione"
         description="Controlla il riepilogo dell'iscrizione, il piano rate e l'importo totale. Da qui puoi procedere al pagamento della prima rata."
+        accent="sun"
       />
 
       <div className="space-y-5">

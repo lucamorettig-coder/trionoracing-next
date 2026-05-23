@@ -27,6 +27,7 @@ export default function StepVerificaRequisiti({ step, total, bambino }: Props) {
         total={total}
         title="Verifica requisiti"
         description={`Per iscrivere ${f.NOME_BAMBINO} servono certificato medico valido e una sua foto. Se mancano, puoi caricarli dal profilo del bambino e tornare qui.`}
+        accent="sky"
       />
 
       <div className="space-y-3">

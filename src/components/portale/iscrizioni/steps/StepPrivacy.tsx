@@ -57,6 +57,7 @@ export default function StepPrivacy({ step, total, iscrizione, onSigned }: Props
         total={total}
         title="Privacy minore"
         description="Leggi l'informativa privacy e firma il consenso al trattamento dei dati personali del minore. La firma è digitale: ti basta accettare e cliccare Firma."
+        accent="grass"
       />
 
       {alreadySigned && (

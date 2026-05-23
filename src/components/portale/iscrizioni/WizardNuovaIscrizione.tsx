@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type {
   Bambino,
@@ -142,17 +142,18 @@ export default function WizardNuovaIscrizione({
         });
         const data = await res.json();
         if (!res.ok) {
-          // 409: già esiste un'iscrizione → offri di riprenderla
+          // 409: già esiste un'iscrizione → riprendila (full reload per stato pulito)
           if (res.status === 409 && data.iscrizioneId) {
-            router.push(`/portale/iscrizioni/nuova?iscrizione=${data.iscrizioneId}`);
+            window.location.href = `/portale/iscrizioni/nuova?iscrizione=${data.iscrizioneId}`;
             return;
           }
           setError(data.error ?? "Errore durante la creazione.");
           setCreating(false);
           return;
         }
-        // Redirect a /nuova?iscrizione=<id> per caricare la nuova iscrizione + titoli via SSR
-        router.push(`/portale/iscrizioni/nuova?iscrizione=${data.id}`);
+        // Full reload: la nuova iscrizione + titoli vanno caricati via SSR e il
+        // wizard deve remountare con initialIscrizione popolato.
+        window.location.href = `/portale/iscrizioni/nuova?iscrizione=${data.id}`;
         return;
       } catch {
         setError("Errore di rete. Riprova.");
@@ -218,7 +219,19 @@ export default function WizardNuovaIscrizione({
             iscrizione={iscrizione}
             regolamentoUrl={tariffa?.regolamentoUrl ?? null}
             regolamentoFilename={tariffa?.regolamentoFilename ?? null}
-            onUploaded={() => router.refresh()}
+            onUploaded={({ url, filename }) => {
+              setIscrizione({
+                ...iscrizione,
+                fields: {
+                  ...iscrizione.fields,
+                  FLAG_REGOLAMENTO: true,
+                  REGOLAMENTO_FIRMATO: [
+                    { id: "", url, filename, size: 0, type: "" },
+                  ],
+                  DATA_FIRMA_REGOLAMENTO: new Date().toISOString().slice(0, 10),
+                },
+              });
+            }}
           />
         )}
         {step === 6 && iscrizione && bambino && tariffa && (
@@ -244,7 +257,8 @@ export default function WizardNuovaIscrizione({
         <div className="flex items-center gap-3">
           {showBack ? (
             <Button variant="ghost" size="md" onClick={back} disabled={creating}>
-              ← Indietro
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Indietro
             </Button>
           ) : (
             <Link
@@ -276,9 +290,15 @@ export default function WizardNuovaIscrizione({
                 <Loader2 className="w-4 h-4 animate-spin" /> Creazione…
               </>
             ) : step === 3 && !iscrizione ? (
-              "Crea iscrizione e continua"
+              <>
+                Crea iscrizione e continua
+                <ArrowRight className="w-3.5 h-3.5" />
+              </>
             ) : (
-              "Continua"
+              <>
+                Continua
+                <ArrowRight className="w-3.5 h-3.5" />
+              </>
             )}
           </Button>
         ) : null}
