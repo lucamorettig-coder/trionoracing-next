@@ -28,7 +28,7 @@ const photos: Array<{ src: string; alt: string; aspect: Aspect }> = [
 
 export function SezioneGalleria() {
   return (
-    <section className="bg-bg-soft py-24 lg:py-32">
+    <section className="bg-bg-soft pattern-light py-24 lg:py-32">
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
         <div className="reveal">
           <SectionHeader

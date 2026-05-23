@@ -113,14 +113,23 @@ body {
    SVG di sfondo + pseudo-elemento ::after che applica un gradient overlay
    col colore del fondo. Il parent DEVE avere bg navy-900 (versione scura)
    o bg-soft (versione chiara). Per il pattern senza sfumatura usa .pattern-full. */
-.pattern-navy, .pattern-light {
+/* Pattern navy: SVG geometrico tile + overlay scuro radial+verticale */
+.pattern-navy {
   position: relative;
+  background-color: transparent;
+  background-image: url("/assets/pattern.svg");
   background-size: 240px 240px;
   background-repeat: repeat;
-  background-color: transparent;
 }
-.pattern-navy  { background-image: url("/assets/pattern.svg"); }
-.pattern-light { background-image: url("/assets/pattern-light.svg"); }
+/* Pattern light: foto bitmap (tessuto + pattern) cover + overlay forte chiaro */
+.pattern-light {
+  position: relative;
+  background-color: transparent;
+  background-image: url("/assets/footer-bg-white.jpg");
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
 
 .pattern-navy::after, .pattern-light::after {
   content: "";
@@ -139,12 +148,10 @@ body {
       rgba(5,14,63,0.85) 100%);
 }
 .pattern-light::after {
-  background: linear-gradient(to right,
-    rgba(250,251,253,0)    0%,
-    rgba(250,251,253,0)    30%,
-    rgba(250,251,253,0.55) 65%,
-    rgba(250,251,253,0.92) 90%,
-    rgba(250,251,253,1)    100%);
+  background: linear-gradient(180deg,
+    rgba(250,251,253,0.82) 0%,
+    rgba(250,251,253,0.90) 60%,
+    rgba(250,251,253,0.96) 100%);
 }
 /* Figli diretti di un pattern restano SOPRA la sfumatura ::after */
 .pattern-navy > *, .pattern-light > * {
@@ -252,10 +259,8 @@ body {
       rgba(127,29,29,0.85) 100%);
 }
 .theme-209 .pattern-light::after {
-  background: linear-gradient(to right,
-    rgba(254,242,242,0)    0%,
-    rgba(254,242,242,0)    30%,
-    rgba(254,242,242,0.55) 65%,
-    rgba(254,242,242,0.92) 90%,
-    rgba(254,242,242,1)    100%);
+  background: linear-gradient(180deg,
+    rgba(254,242,242,0.82) 0%,
+    rgba(254,242,242,0.90) 60%,
+    rgba(254,242,242,0.96) 100%);
 }
