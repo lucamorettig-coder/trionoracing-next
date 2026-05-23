@@ -17,11 +17,11 @@ const TITOLO_LABEL: Record<string, string> = {
 };
 
 export default function TabPagamenti({ iscrizione, titoli }: Props) {
-  const incassato = titoli
+  const pagato = titoli
     .filter((t) => t.fields.STATO_TITOLO === "pagato")
     .reduce((sum, t) => sum + (t.fields.IMPORTO ?? 0), 0);
   const totale = titoli.reduce((sum, t) => sum + (t.fields.IMPORTO ?? 0), 0);
-  const daPagare = totale - incassato;
+  const daPagare = totale - pagato;
 
   if (titoli.length === 0) {
     return (
@@ -78,7 +78,7 @@ export default function TabPagamenti({ iscrizione, titoli }: Props) {
       </div>
 
       <div className="flex justify-between text-sm">
-        <span className="text-ink-muted">Incassato: <span className="font-semibold text-ink">{formatEUR(incassato)}</span></span>
+        <span className="text-ink-muted">Pagato: <span className="font-semibold text-ink">{formatEUR(pagato)}</span></span>
         <span className="text-ink-muted">Da pagare: <span className="font-semibold text-ink">{formatEUR(daPagare)}</span></span>
       </div>
     </div>
