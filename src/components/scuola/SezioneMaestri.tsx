@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { SectionHeader } from "@/components/ui/section-header";
-import { Badge } from "@/components/ui/badge";
 
 export function SezioneMaestri() {
   return (
@@ -25,9 +24,6 @@ export function SezioneMaestri() {
         </div>
       </div>
 
-      <div className="mt-8 text-center reveal">
-        <Badge variant="info">Ritratti individuali e bio di ogni maestro in arrivo — sync da CMS Airtable in Fase 6</Badge>
-      </div>
     </section>
   );
 }
