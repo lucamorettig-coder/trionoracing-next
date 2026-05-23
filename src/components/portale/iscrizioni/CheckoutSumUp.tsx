@@ -42,11 +42,18 @@ export default function CheckoutSumUp({
   annoIscrizione,
 }: Props) {
   const router = useRouter();
-  const [scriptReady, setScriptReady] = useState(false);
+  // Se lo script SumUp è già stato caricato in una visita precedente
+  // (back/forward, BFCache, ecc.) Next.js Script NON ri-triggera onLoad
+  // → leggo window.SumUpCard come initial state per evitare blocchi.
+  const [scriptReady, setScriptReady] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return !!window.SumUpCard;
+  });
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mounting, setMounting] = useState(true);
   const [verifying, setVerifying] = useState(false);
+  const [slowLoading, setSlowLoading] = useState(false);
   const widgetRef = useRef<{ unmount: () => void } | null>(null);
   const verifyingRef = useRef(false);
 
@@ -80,6 +87,13 @@ export default function CheckoutSumUp({
     };
   }, [titoloId]);
 
+  // Timeout di sicurezza: se dopo 8s il widget non si è montato, suggerisci ricarica.
+  useEffect(() => {
+    if (!mounting) return;
+    const t = setTimeout(() => setSlowLoading(true), 8000);
+    return () => clearTimeout(t);
+  }, [mounting]);
+
   const callVerify = useCallback(async () => {
     if (verifyingRef.current || !checkoutId) return;
     verifyingRef.current = true;
@@ -109,21 +123,34 @@ export default function CheckoutSumUp({
     if (!scriptReady || !checkoutId || !window.SumUpCard) return;
     if (widgetRef.current) return;
 
-    const widget = window.SumUpCard.mount({
-      id: "sumup-card",
-      checkoutId,
-      locale: "it-IT",
-      showFooter: false,
-      onResponse: (type, body) => {
-        if (type === "success" || (type === "sent" && body?.status === "PAID")) {
-          callVerify();
-        } else if (type === "error" || type === "fail" || type === "invalid") {
-          setError(body?.detail || body?.message || "Pagamento non riuscito. Riprova.");
-        }
-      },
-    });
-    widgetRef.current = widget;
-    setMounting(false);
+    let widget: { unmount: () => void } | null = null;
+    try {
+      widget = window.SumUpCard.mount({
+        id: "sumup-card",
+        checkoutId,
+        locale: "it-IT",
+        showFooter: false,
+        onResponse: (type, body) => {
+          if (type === "success" || (type === "sent" && body?.status === "PAID")) {
+            callVerify();
+          } else if (type === "error" || type === "fail" || type === "invalid") {
+            setError(body?.detail || body?.message || "Pagamento non riuscito. Riprova.");
+          }
+        },
+      });
+      widgetRef.current = widget;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setMounting(false);
+    } catch (err) {
+      console.error("[SumUp widget] mount error:", err);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setError(
+        "Impossibile caricare il widget di pagamento. Ricarica la pagina e riprova.",
+      );
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setMounting(false);
+      return;
+    }
 
     return () => {
       try {
@@ -172,20 +199,44 @@ export default function CheckoutSumUp({
       </div>
 
       {error && (
-        <div className="mb-4 p-4 rounded-[var(--radius-lg)] border border-flag-200 bg-flag-50 flex items-start gap-2">
+        <div className="mb-4 p-4 rounded-[var(--radius-lg)] border border-flag-200 bg-flag-50 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-flag-700 shrink-0" />
-          <p className="text-sm text-flag-700">{error}</p>
+          <div className="flex-1">
+            <p className="text-sm text-flag-700">{error}</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.location.reload()}
+              className="mt-3"
+            >
+              Ricarica e riprova
+            </Button>
+          </div>
         </div>
       )}
 
       {/* SumUp widget mount point */}
       <div className="bg-white border border-line rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] p-5 min-h-[420px] relative">
         {(mounting || verifying) && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-[var(--radius-xl)] z-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/80 rounded-[var(--radius-xl)] z-10 px-6 text-center">
             <div className="flex items-center gap-2 text-ink-muted">
               <Loader2 className="w-5 h-5 animate-spin" />
               {verifying ? "Verifica pagamento…" : "Caricamento widget…"}
             </div>
+            {slowLoading && !verifying && (
+              <>
+                <p className="text-xs text-ink-muted max-w-sm">
+                  Il widget ci sta mettendo più del previsto. Può succedere se sei tornato indietro durante un pagamento in corso.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.reload()}
+                >
+                  Ricarica e riprova
+                </Button>
+              </>
+            )}
           </div>
         )}
         <div id="sumup-card" />
