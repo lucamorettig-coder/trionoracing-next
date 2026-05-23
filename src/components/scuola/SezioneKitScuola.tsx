@@ -83,21 +83,8 @@ export function SezioneKitScuola() {
               />
             </div>
 
-            <div className="reveal reveal-delay-3 relative overflow-hidden rounded-[var(--radius-xl)] bg-navy-900 text-white">
-              <div
-                aria-hidden
-                className="absolute inset-0 bg-cover bg-[position:center_bottom] bg-no-repeat"
-                style={{ backgroundImage: "url('/assets/footer-bg.jpg')" }}
-              />
-              <div
-                aria-hidden
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(180deg, rgba(5,14,63,0.82) 0%, rgba(5,14,63,0.90) 60%, rgba(5,14,63,0.96) 100%)",
-                }}
-              />
-              <div className="relative z-10 p-8 lg:p-10">
+            <div className="reveal reveal-delay-3 photo-bg-navy rounded-[var(--radius-xl)] text-white">
+              <div className="p-8 lg:p-10">
                 <p className="text-xs font-semibold uppercase tracking-wider text-sky-300">
                   — Il senso del kit
                 </p>

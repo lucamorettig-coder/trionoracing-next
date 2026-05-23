@@ -59,9 +59,9 @@ export function MarathonHero({ edizione }: Props) {
               blurDataURL={HERO_BLUR_PLACEHOLDER}
             />
           </div>
-          {/* scrim per leggibilità del testo */}
+          {/* scrim per leggibilità del testo — leggero per non coprire l'immagine */}
           <div
-            className="absolute inset-0 bg-gradient-to-r from-navy-900/85 via-navy-900/55 to-navy-900/30"
+            className="absolute inset-0 bg-gradient-to-r from-navy-900/65 via-navy-900/30 to-transparent"
             aria-hidden
           />
         </>

@@ -88,7 +88,7 @@ export function InfoPratiche({ info }: Props) {
                 key={it.id}
                 className={`reveal reveal-delay-${(i % 6) + 1} relative overflow-hidden p-6 lg:p-8 border-2 ${
                   isHighlight
-                    ? "bg-navy-900 pattern-navy text-white border-sun-500"
+                    ? "photo-bg-navy text-white border-sun-500"
                     : "bg-white text-ink border-navy-100"
                 }`}
               >

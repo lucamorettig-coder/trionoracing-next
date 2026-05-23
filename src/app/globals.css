@@ -219,6 +219,48 @@ body {
     rgba(5,14,63,0.55) 100%);
 }
 
+/* ===== Photo BG navy =====
+   Sfondo "house style" usato in footer, card manifesto, card highlight 209.
+   Immagine bitmap (tessuto + pattern) + overlay forte verticale (82→96%).
+   Sotto .theme-209 l'overlay diventa red per coerenza con il tema ospite.
+   Pattern usage:
+     <div class="photo-bg-navy text-white">
+       ...contenuto sopra l'overlay grazie a > * { z-index: 1 }...
+     </div>
+*/
+.photo-bg-navy {
+  position: relative;
+  overflow: hidden;
+  background-color: #050E3F;
+  background-image: url("/assets/footer-bg.jpg");
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+.photo-bg-navy::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    rgba(5,14,63,0.82) 0%,
+    rgba(5,14,63,0.90) 60%,
+    rgba(5,14,63,0.96) 100%);
+}
+.photo-bg-navy > * {
+  position: relative;
+  z-index: 1;
+}
+.theme-209 .photo-bg-navy {
+  background-color: #7F1D1D;
+}
+.theme-209 .photo-bg-navy::after {
+  background: linear-gradient(180deg,
+    rgba(127,29,29,0.82) 0%,
+    rgba(127,29,29,0.90) 60%,
+    rgba(127,29,29,0.96) 100%);
+}
+
 /* ===== Reveal on scroll =====
    Animazione one-shot di entrata: fade + slide-up.
    Browser moderni (Chromium 115+): driven dallo scroll via animation-timeline: view(),
