@@ -199,6 +199,8 @@ export interface Bambino {
     FOTO_BAMBINO?: AirtableAttachment[];
     GENITORE_RECORD_ID_LOOKUP?: string[];
     ID_BAMBINO?: string;
+    TABELLA_ISCRIZIONI?: string[];
+    TABELLA_LEZIONI?: string[];
   };
 }
 
@@ -404,22 +406,49 @@ export function stripIscrizioneReadOnlyFields<T extends object>(fields: T): Part
   ) as Partial<T>;
 }
 
-/** Lista iscrizioni per bambino. */
-export async function getIscrizioniBambino(bambinoId: string): Promise<Iscrizione[]> {
-  const formula = encodeURIComponent(
-    `FIND("${bambinoId}",ARRAYJOIN({TABELLA_BAMBINI},","))>0`,
-  );
-  const res = await airtableFetch(
-    `TABELLA_ISCRIZIONI?filterByFormula=${formula}&sort[0][field]=DATA_ISCRIZIONE&sort[0][direction]=desc`,
-  );
-  const data: { records: Iscrizione[] } = await res.json();
+/**
+ * Batch fetch di record per ID. Usa `OR(RECORD_ID()=...)` per filtrare.
+ * Restituisce array vuoto se ids vuoto. Nessun sort: l'ordine non è garantito
+ * — il chiamante deve riordinare se necessario.
+ */
+async function fetchRecordsByIds<T>(
+  tablePath: string,
+  ids: string[],
+): Promise<T[]> {
+  if (ids.length === 0) return [];
+  const conditions = ids.map((id) => `RECORD_ID()="${id}"`).join(",");
+  const formula = encodeURIComponent(`OR(${conditions})`);
+  const res = await airtableFetch(`${tablePath}?filterByFormula=${formula}`);
+  const data: { records: T[] } = await res.json();
   return data.records;
 }
 
-/** Lista iscrizioni per genitore (ordinate per data desc). */
+/**
+ * Lista iscrizioni per bambino.
+ * Legge gli ID linkati direttamente dal record bambino (TABELLA_ISCRIZIONI è
+ * un linked record che restituisce gli IDs nel field value) ed esegue il
+ * batch fetch. Evita il bug di ARRAYJOIN su linked record in filterByFormula
+ * (che restituirebbe i valori del primary field, non gli ID).
+ */
+export async function getIscrizioniBambino(bambinoId: string): Promise<Iscrizione[]> {
+  const bambino = await getBambinoById(bambinoId);
+  if (!bambino) return [];
+  const ids = bambino.fields.TABELLA_ISCRIZIONI ?? [];
+  const iscrizioni = await fetchRecordsByIds<Iscrizione>("TABELLA_ISCRIZIONI", ids);
+  return iscrizioni.sort((a, b) =>
+    (b.fields.DATA_ISCRIZIONE ?? "").localeCompare(a.fields.DATA_ISCRIZIONE ?? ""),
+  );
+}
+
+/**
+ * Lista iscrizioni per genitore (ordinate per data desc).
+ * Usa il lookup GENITORE_RECORD_ID_LOOKUP (multipleLookupValues che pulla
+ * il RECORD_ID dal genitore linkato) perché ARRAYJOIN su {TABELLA_GENITORI}
+ * restituirebbe i valori del primary field (formula ID_GENITORE), non gli ID.
+ */
 export async function getIscrizioniByGenitore(genitoreId: string): Promise<Iscrizione[]> {
   const formula = encodeURIComponent(
-    `FIND("${genitoreId}",ARRAYJOIN({TABELLA_GENITORI},","))>0`,
+    `FIND("${genitoreId}",ARRAYJOIN({GENITORE_RECORD_ID_LOOKUP},","))>0`,
   );
   const res = await airtableFetch(
     `TABELLA_ISCRIZIONI?filterByFormula=${formula}&sort[0][field]=DATA_ISCRIZIONE&sort[0][direction]=desc`,
@@ -648,14 +677,17 @@ export function stripTitoloReadOnlyFields<T extends object>(fields: T): Partial<
   ) as Partial<T>;
 }
 
-/** Lista titoli pagamento per iscrizione (ordinati per NUMERO_RATA crescente). */
+/**
+ * Lista titoli pagamento per iscrizione (ordinati per NUMERO_RATA crescente).
+ * Legge gli ID dei titoli linkati direttamente dal record iscrizione ed esegue
+ * batch fetch. Evita il bug di ARRAYJOIN su linked record in filterByFormula.
+ */
 export async function getTitoliPagamento(iscrizioneId: string): Promise<TitoloPagamento[]> {
-  const formula = encodeURIComponent(`FIND("${iscrizioneId}",ARRAYJOIN({ISCRIZIONE},","))>0`);
-  const res = await airtableFetch(
-    `TITOLI_PAGAMENTO?filterByFormula=${formula}&sort[0][field]=NUMERO_RATA&sort[0][direction]=asc`,
-  );
-  const data: { records: TitoloPagamento[] } = await res.json();
-  return data.records;
+  const iscrizione = await getIscrizioneById(iscrizioneId);
+  if (!iscrizione) return [];
+  const ids = iscrizione.fields.TITOLI_PAGAMENTO ?? [];
+  const titoli = await fetchRecordsByIds<TitoloPagamento>("TITOLI_PAGAMENTO", ids);
+  return titoli.sort((a, b) => (a.fields.NUMERO_RATA ?? 0) - (b.fields.NUMERO_RATA ?? 0));
 }
 
 /** Singolo titolo per ID. */
@@ -708,14 +740,24 @@ export interface Lezione {
   };
 }
 
-/** Lista lezioni per bambino, filtrate per anno/mese. */
+/**
+ * Lista lezioni per bambino, filtrate per anno/mese.
+ * Legge gli ID delle lezioni linkate direttamente dal record bambino
+ * (TABELLA_LEZIONI è un linked record). Evita il bug ARRAYJOIN su
+ * linked record che restituirebbe il primary field invece dei record IDs.
+ */
 export async function getLezioniBambino(
   bambinoId: string,
   anno?: number,
   mese?: number,
 ): Promise<Lezione[]> {
+  const bambino = await getBambinoById(bambinoId);
+  if (!bambino) return [];
+  const lezioniIds = bambino.fields.TABELLA_LEZIONI ?? [];
+  if (lezioniIds.length === 0) return [];
+
   const conditions: string[] = [
-    `FIND("${bambinoId}",ARRAYJOIN({BAMBINI_PRESENTI},","))>0`,
+    `OR(${lezioniIds.map((id) => `RECORD_ID()="${id}"`).join(",")})`,
     `{PUBLISHED}=1`,
   ];
   if (anno && mese) {
