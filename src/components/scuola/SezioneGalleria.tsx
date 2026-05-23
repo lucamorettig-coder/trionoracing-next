@@ -42,9 +42,9 @@ export function SezioneGalleria() {
           {photos.map((p, i) => (
             <div key={p.src} className={`reveal reveal-delay-${i + 1}`}>
               <div
-                className={`relative ${
+                className={`photo-house relative ${
                   p.aspect === "video" ? "aspect-video" : "aspect-square"
-                } rounded-[var(--radius-xl)] overflow-hidden shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-200`}
+                } rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-200`}
               >
                 <Image
                   src={p.src}

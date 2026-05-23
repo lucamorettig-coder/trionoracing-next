@@ -41,7 +41,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     return (
       <div ref={ref} className={cn(cardVariants({ variant }), className)} {...props}>
         {variant === "feature" && image && (
-          <div className="aspect-[16/10] overflow-hidden bg-bg-muted">
+          <div className="photo-house aspect-[16/10] bg-bg-muted">
             <img src={image} alt={imageAlt} className="w-full h-full object-cover" />
           </div>
         )}

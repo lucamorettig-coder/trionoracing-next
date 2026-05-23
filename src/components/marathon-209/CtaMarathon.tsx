@@ -77,16 +77,18 @@ export function CtaMarathon({ edizione }: Props) {
     <section className="relative bg-navy-900 text-white overflow-hidden">
       {edizione.fotoCtaFinale ? (
         <>
-          <Image
-            src={edizione.fotoCtaFinale}
-            alt={edizione.fotoCtaFinaleAlt ?? "Marathon MTB 209"}
-            fill
-            className="object-cover"
-            sizes="100vw"
-            quality={70}
-            placeholder="blur"
-            blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MCAyMiI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMUYyRDVBIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDUwRTNGIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjIyIiBmaWxsPSJ1cmwoI2cpIi8+PC9zdmc+"
-          />
+          <div className="absolute inset-0 photo-house photo-house--on-navy">
+            <Image
+              src={edizione.fotoCtaFinale}
+              alt={edizione.fotoCtaFinaleAlt ?? "Marathon MTB 209"}
+              fill
+              className="object-cover"
+              sizes="100vw"
+              quality={70}
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MCAyMiI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMUYyRDVBIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDUwRTNGIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjIyIiBmaWxsPSJ1cmwoI2cpIi8+PC9zdmc+"
+            />
+          </div>
           <div
             className="absolute inset-0 bg-gradient-to-b from-navy-900/85 via-navy-900/70 to-navy-900/90"
             aria-hidden

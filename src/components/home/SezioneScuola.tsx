@@ -41,7 +41,7 @@ export function SezioneScuola() {
       </div>
 
       <div className="mt-10 reveal">
-        <div className="relative aspect-video rounded-[var(--radius-2xl)] overflow-hidden shadow-[var(--shadow-md)]">
+        <div className="photo-house relative aspect-video rounded-[var(--radius-2xl)] shadow-[var(--shadow-md)]">
           <Image
             src="/photos/scuola/lezione-ciclodromo.jpg"
             alt="Gruppo di bambini della Scuola Triono al ciclodromo, in maglia ufficiale, paesaggio collinare al tramonto"

@@ -51,7 +51,7 @@ export function NewsCard({
       )}
     >
       <Link href={href} className="block">
-        <div className="aspect-[4/3] overflow-hidden bg-bg-muted">
+        <div className="photo-house aspect-[4/3] bg-bg-muted">
           <Image
             src={cover}
             alt={coverAlt}

@@ -160,6 +160,65 @@ body {
 }
 .pattern-full::after { display: none !important; }
 
+/* ===== Photo "house style" =====
+   Wrappa qualsiasi <img>/<Image> contenuto in un elemento .photo-house per
+   applicare il trattamento foto Triono: filtro saturate/contrast/brightness
+   sull'immagine, overlay multiply caldo leggero, fade radial chiaro dall'angolo
+   alto-sinistra per dare profondità.
+
+   Varianti:
+   - .photo-house--on-navy: inverte il fade radial usando navy (per hero/cta
+     scuri dove il colore di "uscita" è navy, non bg-soft).
+   - .photo-house--portrait: saturate 0.78 (ritratti, evita di sgrigiare i volti).
+   - .photo-house--bold: saturate 0.85 (news/uscite con colori importanti).
+
+   NON applicare alle foto profilo dei bambini in portale genitore — quelle
+   restano fedeli al colore originale (il genitore deve riconoscere suo figlio). */
+.photo-house {
+  position: relative;
+  overflow: hidden;
+}
+.photo-house img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.7) contrast(0.94) brightness(1.03);
+}
+.photo-house--portrait img {
+  filter: saturate(0.78) contrast(0.94) brightness(1.03);
+}
+.photo-house--bold img {
+  filter: saturate(0.85) contrast(0.94) brightness(1.03);
+}
+.photo-house::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(155deg,
+    rgba(250,251,253,0.18) 0%,
+    rgba(31,45,90,0.06)    65%,
+    rgba(31,45,90,0.14)    100%);
+  mix-blend-mode: multiply;
+  z-index: 1;
+}
+.photo-house::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(130% 130% at 35% 30%,
+    transparent 60%,
+    rgba(250,251,253,0.55) 100%);
+  z-index: 2;
+}
+.photo-house--on-navy::before {
+  background: radial-gradient(130% 130% at 35% 30%,
+    transparent 60%,
+    rgba(5,14,63,0.55) 100%);
+}
+
 /* ===== Reveal on scroll =====
    Animazione one-shot di entrata: fade + slide-up.
    Browser moderni (Chromium 115+): driven dallo scroll via animation-timeline: view(),
