@@ -2,6 +2,8 @@
  * Client Cloudflare R2 (S3-compatibile) per upload file.
  * Env richieste: CF_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY,
  *                R2_BUCKET_NAME, R2_PUBLIC_URL
+ * Opzionale: R2_JURISDICTION=eu|fedramp (per bucket jurisdiction-bound).
+ *            Triono Racing usa "eu" → endpoint {account}.eu.r2.cloudflarestorage.com.
  */
 
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
@@ -10,12 +12,14 @@ function getClient(): S3Client {
   const accountId = process.env.CF_ACCOUNT_ID;
   const accessKeyId = process.env.R2_ACCESS_KEY_ID;
   const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
+  const jurisdiction = process.env.R2_JURISDICTION?.trim();
   if (!accountId || !accessKeyId || !secretAccessKey) {
     throw new Error("[r2] CF_ACCOUNT_ID, R2_ACCESS_KEY_ID o R2_SECRET_ACCESS_KEY non configurati");
   }
+  const jurisdictionPart = jurisdiction ? `.${jurisdiction}` : "";
   return new S3Client({
     region: "auto",
-    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+    endpoint: `https://${accountId}${jurisdictionPart}.r2.cloudflarestorage.com`,
     credentials: { accessKeyId, secretAccessKey },
   });
 }
