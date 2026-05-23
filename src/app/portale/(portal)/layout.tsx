@@ -31,9 +31,14 @@ export default async function PortaleLayout({
 }
 
 async function syncGenitore(clerkUserId: string): Promise<void> {
-  // Fast path: already synced
+  // Fast path: già linkato in Airtable. Verifichiamo comunque che il ruolo
+  // Clerk publicMetadata sia allineato al RUOLO Airtable (l'utente potrebbe
+  // essere stato promosso/declassato, o si è passati a un base diverso).
   const existing = await getGenitoreByClerkId(clerkUserId);
-  if (existing) return;
+  if (existing) {
+    await syncClerkRole(clerkUserId, existing.fields.RUOLO ?? "GENITORE");
+    return;
+  }
 
   const user = await currentUser();
   if (!user) return;
@@ -58,10 +63,21 @@ async function syncGenitore(clerkUserId: string): Promise<void> {
     });
   }
 
+  await syncClerkRole(clerkUserId, ruolo);
+  console.log("[portale-layout] sync:", email, "→ ruolo:", ruolo);
+}
+
+/**
+ * Aggiorna Clerk publicMetadata.role se diverso dal ruolo Airtable.
+ * Evita scritture inutili (e quindi invalidazione della sessione) quando già allineato.
+ */
+async function syncClerkRole(clerkUserId: string, ruolo: Ruolo): Promise<void> {
   const client = await clerkClient();
+  const user = await client.users.getUser(clerkUserId);
+  const currentRole = user.publicMetadata?.role;
+  if (currentRole === ruolo) return;
   await client.users.updateUserMetadata(clerkUserId, {
     publicMetadata: { role: ruolo },
   });
-
-  console.log("[portale-layout] sync:", email, "→ ruolo:", ruolo);
+  console.log("[portale-layout] clerk role sync:", clerkUserId, currentRole, "→", ruolo);
 }

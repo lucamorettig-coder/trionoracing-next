@@ -42,8 +42,15 @@ export default function TabCertificato({ bambino }: Props) {
         body: formData,
       });
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Errore durante il caricamento.");
+        const raw = await res.text();
+        let msg = `HTTP ${res.status}`;
+        try {
+          const parsed = JSON.parse(raw);
+          msg = parsed.error ?? msg;
+        } catch {
+          if (raw) msg = raw.slice(0, 200);
+        }
+        throw new Error(msg);
       }
       setSuccess(true);
       setCertFile(null);

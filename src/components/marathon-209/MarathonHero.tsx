@@ -27,6 +27,13 @@ function statoBadge(stato: StatoIscrizioni): { label: string; className: string 
 
 const SITO_UFFICIALE = "https://www.duezeronove.it";
 
+// Placeholder SVG navy gradient (~190 char base64). Mostrato sfocato dietro
+// l'<Image> hero finché l'originale non è caricato — evita il "pop" da navy
+// pieno a foto e migliora la UX percepita, specialmente in dev mode dove
+// Next.js non ottimizza le immagini remote Airtable (5-8 MB serviti as-is).
+const HERO_BLUR_PLACEHOLDER =
+  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MCAyMiI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMUYyRDVBIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDUwRTNGIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjIyIiBmaWxsPSJ1cmwoI2cpIi8+PC9zdmc+";
+
 function inscriptionOpen(stato: StatoIscrizioni): boolean {
   return stato === "aperte" || stato === "early" || stato === "in chiusura";
 }
@@ -39,14 +46,19 @@ export function MarathonHero({ edizione }: Props) {
     <section className="relative bg-navy-900 text-white overflow-hidden">
       {edizione.fotoHero ? (
         <>
-          <Image
-            src={edizione.fotoHero}
-            alt={edizione.fotoHeroAlt ?? "Marathon MTB 209"}
-            fill
-            className="object-cover"
-            sizes="100vw"
-            priority
-          />
+          <div className="absolute inset-0 photo-house photo-house--on-navy">
+            <Image
+              src={edizione.fotoHero}
+              alt={edizione.fotoHeroAlt ?? "Marathon MTB 209"}
+              fill
+              className="object-cover"
+              sizes="100vw"
+              priority
+              quality={70}
+              placeholder="blur"
+              blurDataURL={HERO_BLUR_PLACEHOLDER}
+            />
+          </div>
           {/* scrim per leggibilità del testo */}
           <div
             className="absolute inset-0 bg-gradient-to-r from-navy-900/85 via-navy-900/55 to-navy-900/30"

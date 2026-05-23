@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { SectionHeader } from "@/components/ui/section-header";
-import { Badge } from "@/components/ui/badge";
 
 export function SezioneMaestri() {
   return (
@@ -14,7 +13,7 @@ export function SezioneMaestri() {
       </div>
 
       <div className="mt-12 reveal">
-        <div className="relative aspect-video rounded-[var(--radius-2xl)] overflow-hidden shadow-[var(--shadow-md)]">
+        <div className="photo-house photo-house--portrait relative aspect-video rounded-[var(--radius-2xl)] shadow-[var(--shadow-md)]">
           <Image
             src="/photos/maestri/staff.jpg"
             alt="Foto di gruppo dello staff della Scuola di Ciclismo Triono al ciclodromo"
@@ -25,9 +24,6 @@ export function SezioneMaestri() {
         </div>
       </div>
 
-      <div className="mt-8 text-center reveal">
-        <Badge variant="info">Ritratti individuali e bio di ogni maestro in arrivo — sync da CMS Airtable in Fase 6</Badge>
-      </div>
     </section>
   );
 }

@@ -28,7 +28,7 @@ const photos: Array<{ src: string; alt: string; aspect: Aspect }> = [
 
 export function SezioneGalleria() {
   return (
-    <section className="bg-bg-soft py-24 lg:py-32">
+    <section className="bg-bg-soft pattern-light py-24 lg:py-32">
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
         <div className="reveal">
           <SectionHeader
@@ -42,9 +42,9 @@ export function SezioneGalleria() {
           {photos.map((p, i) => (
             <div key={p.src} className={`reveal reveal-delay-${i + 1}`}>
               <div
-                className={`relative ${
+                className={`photo-house relative ${
                   p.aspect === "video" ? "aspect-video" : "aspect-square"
-                } rounded-[var(--radius-xl)] overflow-hidden shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-200`}
+                } rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-200`}
               >
                 <Image
                   src={p.src}

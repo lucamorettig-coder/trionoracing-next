@@ -2,14 +2,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Bambino, Iscrizione } from "@/lib/airtable-portale";
-
-const STATO_BADGE: Record<string, { label: string; variant: "neutral" | "warning" | "info" | "success" | "default" }> = {
-  bozza: { label: "Bozza", variant: "neutral" },
-  in_completamento: { label: "In completamento", variant: "warning" },
-  pronta: { label: "Pronta", variant: "default" },
-  attiva: { label: "Attiva", variant: "success" },
-  chiusa: { label: "Chiusa", variant: "neutral" },
-};
+import { statoIscrizioneBadge, formatEUR } from "@/lib/portale-utils";
 
 interface Props {
   bambino: Bambino;
@@ -52,8 +45,8 @@ export default function TabIscrizioni({ bambino, iscrizioni }: Props) {
           {iscrizioni.map((isc) => {
             const anno = isc.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0];
             const nomeCorso = isc.fields["NOME_TARIFFA (from TABELLA_TARIFFE)"]?.[0];
-            const stato = isc.fields.STATO_ISCRIZIONE ?? "bozza";
-            const badgeInfo = STATO_BADGE[stato] ?? { label: stato, variant: "neutral" as const };
+            const importo = isc.fields.IMPORTO_FINALE_ANNUO;
+            const badgeInfo = statoIscrizioneBadge(isc.fields.STATO_ISCRIZIONE);
             return (
               <div key={isc.id} className="flex items-center gap-4 px-5 py-4">
                 <div className="flex-1 min-w-0">
@@ -61,8 +54,11 @@ export default function TabIscrizioni({ bambino, iscrizioni }: Props) {
                     {anno ? `Anno ${anno}` : "Iscrizione"}
                     {nomeCorso && <span className="ml-1.5 text-ink-muted font-normal">· {nomeCorso}</span>}
                   </p>
-                  <div className="mt-1">
+                  <div className="mt-1 flex items-center gap-2 flex-wrap">
                     <Badge variant={badgeInfo.variant} size="sm">{badgeInfo.label}</Badge>
+                    {typeof importo === "number" && (
+                      <span className="text-xs text-ink-muted">{formatEUR(importo)}</span>
+                    )}
                   </div>
                 </div>
                 <Button asChild variant="ghost" size="sm">
