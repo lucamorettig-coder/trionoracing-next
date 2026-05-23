@@ -605,11 +605,16 @@ export interface CalcTariffaResult {
 /**
  * Calcola la tariffa applicabile per un'iscrizione.
  * Sconto famiglia: applicato se il genitore ha già altre iscrizioni nello stesso anno.
+ *
+ * `bambinoId` (opzionale) è il bambino che si sta iscrivendo: le sue eventuali
+ * iscrizioni esistenti (anche bozze) vengono escluse dal conteggio per evitare
+ * di contare due volte lo stesso figlio (es. resume di una bozza).
  */
 export async function calcTariffa(
   genitoreId: string,
   anno: number,
   meseRiferimento?: number,
+  bambinoId?: string,
 ): Promise<CalcTariffaResult | null> {
   const mese = meseRiferimento ?? new Date().getMonth() + 1;
   const tariffa = await getTariffa(anno, mese);
@@ -620,7 +625,13 @@ export async function calcTariffa(
     const annoIscrizione = i.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0];
     return annoIscrizione === `${anno}`;
   });
-  const ordineIscrizioneGenitore = iscrizioniAnno.length + 1;
+  const altriBambini = new Set<string>();
+  for (const i of iscrizioniAnno) {
+    for (const bid of i.fields.TABELLA_BAMBINI ?? []) {
+      if (bid !== bambinoId) altriBambini.add(bid);
+    }
+  }
+  const ordineIscrizioneGenitore = altriBambini.size + 1;
   const scontoFamiglia = ordineIscrizioneGenitore > 1;
   const scontoImporto = scontoFamiglia ? tariffa.fields.SCONTO_FAMIGLIA_NUMEROSA ?? 0 : 0;
   const importoTotale = tariffa.fields.QUOTA_TOTALE_ANNO - scontoImporto;

@@ -56,5 +56,5 @@ export async function POST(
     DATA_FIRMA_REGOLAMENTO: new Date().toISOString().slice(0, 10),
   });
 
-  return NextResponse.json({ url: r2Url });
+  return NextResponse.json({ url: r2Url, filename: file.name });
 }

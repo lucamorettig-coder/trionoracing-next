@@ -54,9 +54,10 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
       redirect(`/portale/iscrizioni/${iscrizione.id}`);
     }
 
+    const resumeBambinoId = iscrizione.fields.TABELLA_BAMBINI?.[0];
     const [titoli, tariffaResult] = await Promise.all([
       getTitoliPagamento(iscrizione.id),
-      calcTariffa(genitore.id, annoCorrente),
+      calcTariffa(genitore.id, annoCorrente, undefined, resumeBambinoId),
     ]);
     const tariffaInfo = tariffaResult ? toTariffaInfo(tariffaResult) : null;
 

@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const result = await calcTariffa(genitore.id, anno);
+  const result = await calcTariffa(genitore.id, anno, undefined, bambinoId);
   if (!result) {
     return NextResponse.json(
       { error: "Nessuna tariffa attiva per l'anno richiesto" },

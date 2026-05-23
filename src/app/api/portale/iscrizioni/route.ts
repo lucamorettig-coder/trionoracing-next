@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const calcResult = await calcTariffa(genitore.id, anno);
+  const calcResult = await calcTariffa(genitore.id, anno, undefined, bambinoId);
   if (!calcResult) {
     return NextResponse.json(
       { error: "Nessuna tariffa attiva per l'anno richiesto. Contatta la segreteria." },
