@@ -128,7 +128,7 @@ export default function StepRiepilogoTariffa({
           )}
 
           {/* Zona 3 — Totale (banda navy) */}
-          <div className="bg-navy-900 text-white px-5 py-5">
+          <div className="relative overflow-hidden bg-navy-900 pattern-navy text-white px-5 py-5">
             <div className="flex justify-between items-baseline gap-3">
               <span className="text-white/80 text-sm font-semibold uppercase tracking-wider">
                 Totale quota annuale

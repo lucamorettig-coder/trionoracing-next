@@ -112,8 +112,9 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
     {/* Mobile drawer — fuori dall'<header sticky> per evitare quirks
         di stacking context su iOS Safari (fixed dentro sticky). */}
     {open && (
-      <div className="lg:hidden fixed inset-0 z-[100] bg-navy-900 text-white flex flex-col animate-in fade-in duration-200">
-          <div className="px-4 h-20 flex items-center justify-between border-b border-white/10">
+      <div className="lg:hidden fixed inset-0 z-[100] bg-navy-900 text-white flex flex-col animate-in fade-in duration-200 overflow-hidden">
+          <div className="absolute inset-0 pattern-navy" aria-hidden />
+          <div className="relative z-10 px-4 h-20 flex items-center justify-between border-b border-white/10">
             <Image
               src="/assets/logo-triono-racing.png"
               alt="Triono Racing"
@@ -131,7 +132,7 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
               <X className="w-5 h-5" />
             </button>
           </div>
-          <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+          <nav className="relative z-10 flex-1 overflow-y-auto p-4 space-y-1">
             {links?.map((l) => (
               <Link
                 key={l.href}
@@ -148,7 +149,7 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
               </Link>
             ))}
           </nav>
-          <div className="p-4 space-y-2 border-t border-white/10">
+          <div className="relative z-10 p-4 space-y-2 border-t border-white/10">
             <Button
               asChild
               size="lg"

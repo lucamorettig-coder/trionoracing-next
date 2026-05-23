@@ -15,27 +15,11 @@ export default function StepperWizard({ steps, currentStep }: Props) {
 
   return (
     <section
-      className="relative rounded-[var(--radius-xl)] overflow-hidden bg-navy-900 px-6 sm:px-7 pt-10 sm:pt-12 pb-8 sm:pb-9 shadow-[var(--shadow-md)] max-w-[980px] mx-auto"
+      className="relative rounded-[var(--radius-xl)] overflow-hidden bg-navy-900 pattern-navy px-6 sm:px-7 pt-10 sm:pt-12 pb-8 sm:pb-9 shadow-[var(--shadow-md)] max-w-[980px] mx-auto"
       aria-label="Wizard iscrizione"
     >
-      {/* Pattern backdrop */}
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[url('/assets/pattern.svg')] bg-repeat opacity-45 pointer-events-none"
-        style={{ backgroundSize: "380px 380px" }}
-      />
-      {/* Overlay scuro radial + verticale per contrasto */}
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(circle at 50% 0%, rgba(5,14,63,0) 0%, rgba(5,14,63,0.55) 50%, rgba(5,14,63,0.92) 100%), linear-gradient(180deg, rgba(5,14,63,0.4) 0%, rgba(5,14,63,0.85) 100%)",
-        }}
-      />
-
       {/* Chip "Step X di N · Label" */}
-      <div className="relative z-10 flex justify-center mb-5">
+      <div className="flex justify-center mb-5">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.08] border border-white/[0.18] font-mono text-[11px] tracking-[0.08em] uppercase font-semibold text-white/75">
           <span
             aria-hidden
@@ -47,7 +31,7 @@ export default function StepperWizard({ steps, currentStep }: Props) {
       </div>
 
       {/* Stepper row */}
-      <div className="relative z-10">
+      <div>
         <ol className="flex items-start justify-between gap-0">
           {steps.map((stepLabel, i) => {
             const idx = i + 1;
