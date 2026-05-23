@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export function CtaFinale() {
   return (
-    <section className="relative bg-navy-900 text-white overflow-hidden">
-      <div className="absolute inset-0 pattern-navy" aria-hidden />
+    <section className="relative photo-bg-navy text-white overflow-hidden">
       <div className="relative max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32 text-center reveal">
         <SectionHeader
           eyebrow="Pronti a pedalare?"

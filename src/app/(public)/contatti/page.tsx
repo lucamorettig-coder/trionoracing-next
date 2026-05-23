@@ -39,21 +39,19 @@ export default function ContattiPage() {
 
           {/* Colonna info contatto */}
           <aside className="lg:col-span-5 reveal reveal-delay-2 space-y-5">
-            <div className="bg-navy-900 text-white pattern-navy relative overflow-hidden rounded-[var(--radius-2xl)] p-6 lg:p-8">
-              <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] text-sun-500 mb-3">
-                  <Mail className="w-4 h-4" /> Scrivici subito
-                </div>
-                <a
-                  href="mailto:info@trionoracing.it"
-                  className="text-2xl font-bold leading-tight hover:underline underline-offset-4"
-                >
-                  info@trionoracing.it
-                </a>
-                <p className="mt-3 text-sm text-white/70">
-                  Per richieste urgenti o se preferisci scriverci direttamente.
-                </p>
+            <div className="photo-bg-navy text-white rounded-[var(--radius-2xl)] p-6 lg:p-8">
+              <div className="inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] text-sun-500 mb-3">
+                <Mail className="w-4 h-4" /> Scrivici subito
               </div>
+              <a
+                href="mailto:info@trionoracing.it"
+                className="text-2xl font-bold leading-tight hover:underline underline-offset-4"
+              >
+                info@trionoracing.it
+              </a>
+              <p className="mt-3 text-sm text-white/70">
+                Per richieste urgenti o se preferisci scriverci direttamente.
+              </p>
             </div>
 
             <div className="bg-white border border-navy-100 rounded-[var(--radius-2xl)] p-6 lg:p-8">
