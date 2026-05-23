@@ -43,15 +43,35 @@ export async function POST(
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const safeName = encodeURIComponent(file.name || "certificato");
+  // Sanitize filename per R2/Airtable: solo ASCII, no spazi, no %-encoding nella key
+  const safeName = (file.name || "certificato")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-zA-Z0-9._-]/g, "_");
   const key = `certificati/${bambinoId}/${Date.now()}-${safeName}`;
 
-  const r2Url = await uploadToR2(key, buffer, file.type);
+  let r2Url: string;
+  try {
+    r2Url = await uploadToR2(key, buffer, file.type);
+  } catch (err) {
+    console.error("[api/portale/bambini/[id]/certificato] R2 upload error:", err);
+    const msg = err instanceof Error ? err.message : "Errore upload file";
+    return NextResponse.json({ error: `Upload R2 fallito: ${msg}` }, { status: 500 });
+  }
 
-  await airtablePatchBambino(bambinoId, {
-    CERTIFICATO_MEDICO_FILE: [{ url: r2Url }],
-    CERTIFICATO_MEDICO_SCADENZA: dataScadenza,
-  });
+  try {
+    await airtablePatchBambino(bambinoId, {
+      CERTIFICATO_MEDICO_FILE: [{ url: r2Url, filename: safeName }],
+      CERTIFICATO_MEDICO_SCADENZA: dataScadenza,
+    });
+  } catch (err) {
+    console.error("[api/portale/bambini/[id]/certificato] Airtable patch error:", err);
+    const msg = err instanceof Error ? err.message : "Errore Airtable";
+    return NextResponse.json(
+      { error: `Salvataggio Airtable fallito: ${msg}`, r2Url },
+      { status: 500 },
+    );
+  }
 
   return NextResponse.json({ url: r2Url, dataScadenza });
 }
