@@ -83,14 +83,29 @@ export function SezioneKitScuola() {
               />
             </div>
 
-            <div className="reveal reveal-delay-3 rounded-[var(--radius-xl)] bg-navy-900 p-8 text-white lg:p-10">
-              <p className="text-xs font-semibold uppercase tracking-wider text-sky-300">
-                — Il senso del kit
-              </p>
-              <p className="mt-4 text-xl font-semibold leading-snug lg:text-2xl">
-                Quando indossi i colori del team,{" "}
-                <span className="text-sun-500">sei già parte</span> di Triono.
-              </p>
+            <div className="reveal reveal-delay-3 relative overflow-hidden rounded-[var(--radius-xl)] bg-navy-900 text-white">
+              <div
+                aria-hidden
+                className="absolute inset-0 bg-cover bg-[position:center_bottom] bg-no-repeat"
+                style={{ backgroundImage: "url('/assets/footer-bg.jpg')" }}
+              />
+              <div
+                aria-hidden
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(5,14,63,0.82) 0%, rgba(5,14,63,0.90) 60%, rgba(5,14,63,0.96) 100%)",
+                }}
+              />
+              <div className="relative z-10 p-8 lg:p-10">
+                <p className="text-xs font-semibold uppercase tracking-wider text-sky-300">
+                  — Il senso del kit
+                </p>
+                <p className="mt-4 text-xl font-semibold leading-snug lg:text-2xl">
+                  Quando indossi i colori del team,{" "}
+                  <span className="text-sun-500">sei già parte</span> di Triono.
+                </p>
+              </div>
             </div>
           </div>
 
