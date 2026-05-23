@@ -5,8 +5,11 @@ import { Loader2, Shirt } from "lucide-react";
 import type { Bambino } from "@/lib/airtable-portale";
 import { formatEUR, quarterLabel } from "@/lib/portale-utils";
 import type { TariffaInfo } from "../WizardNuovaIscrizione";
+import StepHeader from "../StepHeader";
 
 interface Props {
+  step: number;
+  total: number;
   bambino: Bambino;
   anno: number;
   tariffa: TariffaInfo | null;
@@ -14,6 +17,8 @@ interface Props {
 }
 
 export default function StepRiepilogoTariffa({
+  step,
+  total,
   bambino,
   anno,
   tariffa,
@@ -50,10 +55,12 @@ export default function StepRiepilogoTariffa({
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-ink mb-2">Riepilogo tariffa</h2>
-      <p className="text-ink-muted text-sm mb-6">
-        Verifica l&apos;importo calcolato in base al periodo dell&apos;anno.
-      </p>
+      <StepHeader
+        step={step}
+        total={total}
+        title="Tariffa applicata"
+        description="Verifica l'importo calcolato in base al periodo dell'anno. Cliccando Continua creerai l'iscrizione e potrai sempre tornare per completare i prossimi step."
+      />
 
       {/* Card tariffa */}
       {loading ? (

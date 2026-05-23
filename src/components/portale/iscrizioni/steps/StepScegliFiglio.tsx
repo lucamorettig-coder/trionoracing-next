@@ -2,20 +2,25 @@ import Image from "next/image";
 import { Check } from "lucide-react";
 import type { Bambino } from "@/lib/airtable-portale";
 import { diffInYears } from "@/lib/portale-utils";
+import StepHeader from "../StepHeader";
 
 interface Props {
+  step: number;
+  total: number;
   bambini: Bambino[];
   selectedId: string | null;
   onSelect: (id: string) => void;
 }
 
-export default function StepScegliFiglio({ bambini, selectedId, onSelect }: Props) {
+export default function StepScegliFiglio({ step, total, bambini, selectedId, onSelect }: Props) {
   return (
     <div>
-      <h2 className="text-xl font-bold text-ink mb-2">Per chi è l&apos;iscrizione?</h2>
-      <p className="text-ink-muted text-sm mb-6">
-        Seleziona il figlio che vuoi iscrivere alla scuola.
-      </p>
+      <StepHeader
+        step={step}
+        total={total}
+        title="Per chi è l'iscrizione?"
+        description="Seleziona il figlio che vuoi iscrivere alla scuola. Se hai più figli, il wizard ti guiderà solo per quello scelto."
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {bambini.map((b) => {

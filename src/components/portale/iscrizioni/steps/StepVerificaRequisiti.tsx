@@ -4,12 +4,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Bambino } from "@/lib/airtable-portale";
 import { certBadgeVariant } from "@/lib/portale-utils";
+import StepHeader from "../StepHeader";
 
 interface Props {
+  step: number;
+  total: number;
   bambino: Bambino;
 }
 
-export default function StepVerificaRequisiti({ bambino }: Props) {
+export default function StepVerificaRequisiti({ step, total, bambino }: Props) {
   const f = bambino.fields;
   const hasCert =
     !!f.CERTIFICATO_MEDICO_FILE?.length && f.CERTIFICATO_MEDICO_STATO !== "SCADUTO";
@@ -19,10 +22,12 @@ export default function StepVerificaRequisiti({ bambino }: Props) {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-ink mb-2">Verifica requisiti</h2>
-      <p className="text-ink-muted text-sm mb-6">
-        Per iscrivere {f.NOME_BAMBINO} servono certificato medico valido e una sua foto.
-      </p>
+      <StepHeader
+        step={step}
+        total={total}
+        title="Verifica requisiti"
+        description={`Per iscrivere ${f.NOME_BAMBINO} servono certificato medico valido e una sua foto. Se mancano, puoi caricarli dal profilo del bambino e tornare qui.`}
+      />
 
       <div className="space-y-3">
         {/* Certificato */}

@@ -53,5 +53,7 @@ export async function GET(req: NextRequest) {
     ordineIscrizioneGenitore: result.ordineIscrizioneGenitore,
     descrizione: result.tariffa.fields.DESCRIZIONE_TARIFFA,
     scadenzaRate: result.tariffa.fields.SCADENZA_RATE,
+    regolamentoUrl: result.tariffa.fields.REGOLAMENTO?.[0]?.url ?? null,
+    regolamentoFilename: result.tariffa.fields.REGOLAMENTO?.[0]?.filename ?? null,
   });
 }

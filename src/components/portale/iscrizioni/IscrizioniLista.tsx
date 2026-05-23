@@ -92,11 +92,16 @@ export default function IscrizioniLista({ iscrizioni, bambini, annoFilter, figli
             const quarter = isc.fields["NOME_TARIFFA (from TABELLA_TARIFFE)"]?.[0];
             const importo = isc.fields.IMPORTO_FINALE_ANNUO;
             const badge = statoIscrizioneBadge(isc.fields.STATO_ISCRIZIONE);
+            const isDraft = isc.fields.STATO_ISCRIZIONE === "INCOMPLETA";
+            const targetHref = isDraft
+              ? `/portale/iscrizioni/nuova?iscrizione=${isc.id}`
+              : `/portale/iscrizioni/${isc.id}`;
+            const ctaLabel = isDraft ? "Riprendi →" : "Apri →";
 
             return (
               <Link
                 key={isc.id}
-                href={`/portale/iscrizioni/${isc.id}`}
+                href={targetHref}
                 className="group bg-white border border-line rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] p-5 hover:shadow-[var(--shadow-md)] hover:border-navy-200 transition-all"
               >
                 <div className="flex items-start gap-4">
@@ -132,7 +137,7 @@ export default function IscrizioniLista({ iscrizioni, bambini, annoFilter, figli
                 </div>
                 <div className="mt-4 pt-4 border-t border-line flex justify-end">
                   <Button variant="ghost" size="sm" className="pointer-events-none group-hover:text-navy-900">
-                    Apri →
+                    {ctaLabel}
                   </Button>
                 </div>
               </Link>

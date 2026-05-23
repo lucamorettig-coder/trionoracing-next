@@ -467,6 +467,24 @@ export async function getIscrizioneById(id: string): Promise<Iscrizione | null> 
   }
 }
 
+/**
+ * Cerca un'iscrizione "in bozza" (STATO_ISCRIZIONE = INCOMPLETA) del genitore
+ * per l'anno indicato. Restituisce la prima trovata (ordinata da getIscrizioniByGenitore
+ * per data desc), o null.
+ */
+export async function getIscrizioneInBozzaPerGenitore(
+  genitoreId: string,
+  anno: number,
+): Promise<Iscrizione | null> {
+  const iscrizioni = await getIscrizioniByGenitore(genitoreId);
+  return (
+    iscrizioni.find((i) => {
+      const a = i.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0];
+      return a === `${anno}` && i.fields.STATO_ISCRIZIONE === "INCOMPLETA";
+    }) ?? null
+  );
+}
+
 /** Crea iscrizione + primo titolo "rata 1". Restituisce l'iscrizione creata (con id). */
 export async function createIscrizione(
   data: IscrizioneCreateInput,
