@@ -31,7 +31,6 @@ interface Props {
   importo: number;
   bambinoNome: string;
   annoIscrizione: string;
-  corso?: string;
 }
 
 export default function CheckoutSumUp({
@@ -41,7 +40,6 @@ export default function CheckoutSumUp({
   importo,
   bambinoNome,
   annoIscrizione,
-  corso,
 }: Props) {
   const router = useRouter();
   const [scriptReady, setScriptReady] = useState(false);
@@ -160,7 +158,7 @@ export default function CheckoutSumUp({
         <div className="flex justify-between text-sm">
           <span className="text-ink-muted">Iscrizione</span>
           <span className="text-ink font-semibold text-right">
-            {bambinoNome} · {annoIscrizione}{corso ? ` · ${corso}` : ""}
+            {bambinoNome} · {annoIscrizione}
           </span>
         </div>
         <div className="flex justify-between text-sm">

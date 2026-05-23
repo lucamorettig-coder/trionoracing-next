@@ -54,7 +54,6 @@ export default async function CheckoutPage({ params, searchParams }: PageProps) 
       importo={titolo.fields.IMPORTO ?? 0}
       bambinoNome={`${bambino.fields.NOME_BAMBINO} ${bambino.fields.COGNOME_BAMBINO}`}
       annoIscrizione={iscrizione.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0] ?? ""}
-      corso={iscrizione.fields.CORSO}
     />
   );
 }

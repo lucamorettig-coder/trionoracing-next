@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import type { Bambino, Corso } from "@/lib/airtable-portale";
+import type { Bambino } from "@/lib/airtable-portale";
 import StepperWizard from "./StepperWizard";
 import StepScegliFiglio from "./steps/StepScegliFiglio";
 import StepVerificaRequisiti from "./steps/StepVerificaRequisiti";
@@ -46,7 +46,6 @@ export default function WizardNuovaIscrizione({ bambini, bambinoIniziale, anno }
 
   const [step, setStep] = useState<number>(preselected ? 2 : 1);
   const [bambinoId, setBambinoId] = useState<string | null>(preselected);
-  const [corso, setCorso] = useState<Corso | null>(null);
   const [tariffa, setTariffa] = useState<TariffaInfo | null>(null);
   const [accettato, setAccettato] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -73,7 +72,7 @@ export default function WizardNuovaIscrizione({ bambini, bambinoIniziale, anno }
       const res = await fetch("/api/portale/iscrizioni", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bambinoId, anno, corso }),
+        body: JSON.stringify({ bambinoId, anno }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -106,16 +105,13 @@ export default function WizardNuovaIscrizione({ bambini, bambinoIniziale, anno }
           <StepRiepilogoTariffa
             bambino={bambino}
             anno={anno}
-            corso={corso}
             tariffa={tariffa}
-            onCorsoChange={setCorso}
             onTariffaLoaded={setTariffa}
           />
         )}
         {step === 4 && bambino && tariffa && (
           <StepConferma
             bambino={bambino}
-            corso={corso}
             tariffa={tariffa}
             accettato={accettato}
             onAccettatoChange={setAccettato}
@@ -148,7 +144,7 @@ export default function WizardNuovaIscrizione({ bambini, bambinoIniziale, anno }
             disabled={
               (step === 1 && !bambinoId) ||
               (step === 2 && !canProceedRequisiti(bambino)) ||
-              (step === 3 && (!corso || !tariffa))
+              (step === 3 && !tariffa)
             }
           >
             Continua

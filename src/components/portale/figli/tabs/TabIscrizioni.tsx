@@ -45,7 +45,6 @@ export default function TabIscrizioni({ bambino, iscrizioni }: Props) {
           {iscrizioni.map((isc) => {
             const anno = isc.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0];
             const nomeCorso = isc.fields["NOME_TARIFFA (from TABELLA_TARIFFE)"]?.[0];
-            const corso = isc.fields.CORSO;
             const importo = isc.fields.IMPORTO_FINALE_ANNUO;
             const badgeInfo = statoIscrizioneBadge(isc.fields.STATO_ISCRIZIONE);
             return (
@@ -53,7 +52,6 @@ export default function TabIscrizioni({ bambino, iscrizioni }: Props) {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-ink">
                     {anno ? `Anno ${anno}` : "Iscrizione"}
-                    {corso && <span className="ml-1.5 text-ink-muted font-normal">· {corso}</span>}
                     {nomeCorso && <span className="ml-1.5 text-ink-muted font-normal">· {nomeCorso}</span>}
                   </p>
                   <div className="mt-1 flex items-center gap-2 flex-wrap">

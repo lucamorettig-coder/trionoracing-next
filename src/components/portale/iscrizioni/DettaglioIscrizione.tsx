@@ -41,7 +41,6 @@ export default function DettaglioIscrizione({
   const fields = iscrizione.fields;
   const anno = fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0] ?? "—";
   const quarter = fields["NOME_TARIFFA (from TABELLA_TARIFFE)"]?.[0];
-  const corso = fields.CORSO;
   const importo = fields.IMPORTO_FINALE_ANNUO;
   const badge = statoIscrizioneBadge(fields.STATO_ISCRIZIONE);
   const fotoUrl = bambino.fields.FOTO_BAMBINO?.[0]?.thumbnails?.small?.url;
@@ -99,7 +98,6 @@ export default function DettaglioIscrizione({
             </h1>
             <p className="text-sm text-ink-muted mt-0.5">
               Iscrizione {anno}
-              {corso && <> · {corso}</>}
               {quarter && <> · {quarter}</>}
             </p>
           </div>

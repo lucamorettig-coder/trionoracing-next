@@ -2,25 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import type { Bambino, Corso } from "@/lib/airtable-portale";
+import type { Bambino } from "@/lib/airtable-portale";
 import { formatEUR, quarterLabel } from "@/lib/portale-utils";
 import type { TariffaInfo } from "../WizardNuovaIscrizione";
 
 interface Props {
   bambino: Bambino;
   anno: number;
-  corso: Corso | null;
   tariffa: TariffaInfo | null;
-  onCorsoChange: (c: Corso) => void;
   onTariffaLoaded: (t: TariffaInfo) => void;
 }
 
 export default function StepRiepilogoTariffa({
   bambino,
   anno,
-  corso,
   tariffa,
-  onCorsoChange,
   onTariffaLoaded,
 }: Props) {
   const [loading, setLoading] = useState(!tariffa);
@@ -56,29 +52,8 @@ export default function StepRiepilogoTariffa({
     <div>
       <h2 className="text-xl font-bold text-ink mb-2">Riepilogo tariffa</h2>
       <p className="text-ink-muted text-sm mb-6">
-        Scegli il corso e verifica l&apos;importo calcolato in base al periodo dell&apos;anno.
+        Verifica l&apos;importo calcolato in base al periodo dell&apos;anno.
       </p>
-
-      {/* Scelta corso */}
-      <div className="mb-6">
-        <label className="block text-sm font-semibold text-ink mb-2">Corso</label>
-        <div className="grid grid-cols-2 gap-3">
-          {(["MTB", "Strada"] as const).map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => onCorsoChange(c)}
-              className={`px-4 py-3 rounded-[var(--radius-lg)] border-2 font-semibold transition-colors ${
-                corso === c
-                  ? "border-navy-700 bg-navy-50 text-navy-700"
-                  : "border-line bg-white text-ink hover:border-navy-200"
-              }`}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* Card tariffa */}
       {loading ? (

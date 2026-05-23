@@ -90,7 +90,6 @@ export default function IscrizioniLista({ iscrizioni, bambini, annoFilter, figli
             const cognome = isc.fields["COGNOME_BAMBINO (from TABELLA_BAMBINI)"]?.[0] ?? bambino?.fields.COGNOME_BAMBINO ?? "";
             const annoIsc = isc.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0] ?? "—";
             const quarter = isc.fields["NOME_TARIFFA (from TABELLA_TARIFFE)"]?.[0];
-            const corso = isc.fields.CORSO;
             const importo = isc.fields.IMPORTO_FINALE_ANNUO;
             const badge = statoIscrizioneBadge(isc.fields.STATO_ISCRIZIONE);
 
@@ -121,7 +120,6 @@ export default function IscrizioniLista({ iscrizioni, bambini, annoFilter, figli
                     </p>
                     <p className="text-sm text-ink-muted mt-0.5">
                       Iscrizione {annoIsc}
-                      {corso && <> · {corso}</>}
                       {quarter && <> · {quarter}</>}
                     </p>
                     <div className="mt-2 flex items-center justify-between gap-2">

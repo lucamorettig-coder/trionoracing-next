@@ -1,11 +1,10 @@
 import { AlertCircle } from "lucide-react";
-import type { Bambino, Corso } from "@/lib/airtable-portale";
+import type { Bambino } from "@/lib/airtable-portale";
 import { formatEUR, quarterLabel } from "@/lib/portale-utils";
 import type { TariffaInfo } from "../WizardNuovaIscrizione";
 
 interface Props {
   bambino: Bambino;
-  corso: Corso | null;
   tariffa: TariffaInfo;
   accettato: boolean;
   onAccettatoChange: (v: boolean) => void;
@@ -15,7 +14,6 @@ interface Props {
 
 export default function StepConferma({
   bambino,
-  corso,
   tariffa,
   accettato,
   onAccettatoChange,
@@ -31,7 +29,6 @@ export default function StepConferma({
 
       <div className="bg-bg-soft border border-line rounded-[var(--radius-xl)] p-5 space-y-3 mb-6">
         <Row label="Figlio" value={`${bambino.fields.NOME_BAMBINO} ${bambino.fields.COGNOME_BAMBINO}`} />
-        {corso && <Row label="Corso" value={corso} />}
         <Row label="Anno" value={`${tariffa.anno}`} />
         <Row label="Periodo" value={quarterLabel(tariffa.quarter)} />
         <div className="pt-3 border-t border-line flex justify-between items-baseline">
