@@ -46,19 +46,17 @@ export function MarathonHero({ edizione }: Props) {
     <section className="relative bg-navy-900 text-white overflow-hidden">
       {edizione.fotoHero ? (
         <>
-          <div className="absolute inset-0 photo-house photo-house--on-navy">
-            <Image
-              src={edizione.fotoHero}
-              alt={edizione.fotoHeroAlt ?? "Marathon MTB 209"}
-              fill
-              className="object-cover"
-              sizes="100vw"
-              priority
-              quality={70}
-              placeholder="blur"
-              blurDataURL={HERO_BLUR_PLACEHOLDER}
-            />
-          </div>
+          <Image
+            src={edizione.fotoHero}
+            alt={edizione.fotoHeroAlt ?? "Marathon MTB 209"}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+            quality={70}
+            placeholder="blur"
+            blurDataURL={HERO_BLUR_PLACEHOLDER}
+          />
           {/* scrim per leggibilità del testo — leggero per non coprire l'immagine */}
           <div
             className="absolute inset-0 bg-gradient-to-r from-navy-900/65 via-navy-900/30 to-transparent"
