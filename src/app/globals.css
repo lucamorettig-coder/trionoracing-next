@@ -261,6 +261,90 @@ body {
     rgba(127,29,29,0.96) 100%);
 }
 
+/* ===== Photo BG colorate (sun/sky/grass/flag/ember) =====
+   Scaffold del DS: stessa logica di .photo-bg-navy ma con asset
+   footer-bg-white.jpg + overlay del colore della card al 82-96%.
+   Per i colori chiari (sun, ember) l'overlay è leggermente più opaco
+   (88-98%) per evitare desaturazione.
+   Pattern usage:
+     <div class="photo-bg-sky text-white rounded-[var(--radius-xl)]">
+       ...contenuto sopra l'overlay...
+     </div>
+   Aggiunto in EVO-012 (2026-05-23). Nessuna card non-navy lo usa al
+   momento di creazione — scaffold preventivo. */
+.photo-bg-sun,
+.photo-bg-sky,
+.photo-bg-grass,
+.photo-bg-flag,
+.photo-bg-ember {
+  position: relative;
+  overflow: hidden;
+  background-image: url("/assets/footer-bg-white.jpg");
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+
+.photo-bg-sun::after,
+.photo-bg-sky::after,
+.photo-bg-grass::after,
+.photo-bg-flag::after,
+.photo-bg-ember::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.photo-bg-sun       { background-color: #EFE63A; }
+.photo-bg-sun::after {
+  background: linear-gradient(180deg,
+    rgba(239,230,58,0.88) 0%,
+    rgba(239,230,58,0.94) 60%,
+    rgba(239,230,58,0.98) 100%);
+}
+
+.photo-bg-sky       { background-color: #3A82C8; }
+.photo-bg-sky::after {
+  background: linear-gradient(180deg,
+    rgba(58,130,200,0.82) 0%,
+    rgba(58,130,200,0.90) 60%,
+    rgba(58,130,200,0.96) 100%);
+}
+
+.photo-bg-grass       { background-color: #5FAC36; }
+.photo-bg-grass::after {
+  background: linear-gradient(180deg,
+    rgba(95,172,54,0.82) 0%,
+    rgba(95,172,54,0.90) 60%,
+    rgba(95,172,54,0.96) 100%);
+}
+
+.photo-bg-flag       { background-color: #C01818; }
+.photo-bg-flag::after {
+  background: linear-gradient(180deg,
+    rgba(192,24,24,0.82) 0%,
+    rgba(192,24,24,0.90) 60%,
+    rgba(192,24,24,0.96) 100%);
+}
+
+.photo-bg-ember       { background-color: #E09618; }
+.photo-bg-ember::after {
+  background: linear-gradient(180deg,
+    rgba(224,150,24,0.88) 0%,
+    rgba(224,150,24,0.94) 60%,
+    rgba(224,150,24,0.98) 100%);
+}
+
+.photo-bg-sun > *,
+.photo-bg-sky > *,
+.photo-bg-grass > *,
+.photo-bg-flag > *,
+.photo-bg-ember > * {
+  position: relative;
+  z-index: 1;
+}
+
 /* ===== Reveal on scroll =====
    Animazione one-shot di entrata: fade + slide-up.
    Browser moderni (Chromium 115+): driven dallo scroll via animation-timeline: view(),
