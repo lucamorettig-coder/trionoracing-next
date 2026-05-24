@@ -3,8 +3,8 @@
 - **ID**: EVO-014
 - **Slug**: portale-ux-stato-iscrizioni
 - **Data inizio**: 2026-05-24
-- **Data fine**: —
-- **Stato**: in implementazione
+- **Data fine**: 2026-05-24
+- **Stato**: completata
 - **Tipo**: UX refactor + bug fix
 - **Area**: area autenticata (`/portale` — GENITORE)
 - **Priorità**: alta
@@ -199,7 +199,40 @@ Impatto visivo: nullo (`TabPagamenti` già normalizza "Prima rata" quando `NUMER
 
 ## 8. Verifica e go-live
 
-*(da completare post-merge)*
+- **URL produzione**: https://trionoracing-next.vercel.app/portale
+- **Pull Request**: #20 — https://github.com/lucamorettig-coder/trionoracing-next/pull/20
+- **Commit di merge**: `a73d11f9553fc422b196469da0e163f9b7d99035`
+- **Deploy production Vercel**: `dpl_DhqXwmfD1NL6RD6PC9ua4WLLQ361` (READY)
+- **Data go-live**: 2026-05-24
+- **Report verifica**: non eseguito automaticamente (skill `verify-implementation` non caricata in sessione Claude Code). Verifica effettuata via smoke test guidato dall'utente in dev + smoke test post-deploy in produzione.
+
+### Esito sintetico
+
+| Dimensione | Stato | Note |
+|------------|-------|------|
+| Design system | ✅ | Tile colorata applica palette grass/ember/sky + sun pill come da decisione Claude Design. Niente nuovi token DS. |
+| Localizzazione (i18n) | ✅ n/a | Progetto solo italiano. |
+| SEO | ✅ n/a | Area autenticata `/portale/*`. |
+| Architettura | ✅ | RSC + Client split rispettato; helper `getStatoIscrizioneAnnoCorrente` e `buildScadenze` in `portale-utils.ts`; `markPrimaRataPagata` in `airtable-portale.ts`. |
+| Fedeltà ai visual | ✅ | Implementazione coerente con HTML standalone Claude Design (4 artboard). |
+| Criteri di accettazione | ✅ | Tutti i 19 task del prompt portati a termine. |
+| Smoke test dev | ✅ | Utente ha confermato i 4 casi (figli con stati misti, tutti iscritti, wizard scegli figlio, lista iscrizioni). |
+| Smoke test produzione | ✅ | Dashboard live confermata dall'utente; bug "undefinedª rata" rilevato → parcheggiato in EVO-015. |
+| Qualità deploy | ✅ | Vercel deploy READY, branch cancellato, nessun rollback necessario. |
+
+### Scostamenti accettati / parcheggiati
+
+- **Bug "undefinedª rata"** rilevato in smoke test post-merge sulla sezione "Prossime scadenze" della dashboard: i titoli pagamento creati da Make.com (rate successive alla prima) non popolano `NUMERO_RATA`, e il template render mostra letterale "undefined". Decisione utente: NON fixare in EVO-014, affrontare in EVO-015 con refactor architetturale (nuovo campo `DESCRIZIONE` su `TITOLI_PAGAMENTO` come label primaria, smettere di dipendere da NUMERO_RATA in UI). Make.com NON va modificato per popolare NUMERO_RATA — il fix corretto è cambiare come si etichettano i titoli.
+
+### Apprendimenti riusabili (riportati anche in AGENTS.md)
+
+Vedi sezione "Pattern appresi in EVO-014 (2026-05-24)" in `AGENTS.md`.
+
+### Azioni manuali post-merge richieste (in carico all'utente)
+
+1. Backfill `PRIMA_RATA_PAGATA = true` su iscrizioni storiche con prima rata già pagata (Airtable bulk edit, guida nella sezione 7 di questa scheda)
+2. Migrazione `TIPO_TITOLO` "rata" → "prima_rata" su titoli storici con `NUMERO_RATA = 1` (Airtable bulk edit, guida nella sezione 7)
+3. Modifica scenari Make.com PROD (`4086727`) e DEV (`5141784`) per aggiungere update `PRIMA_RATA_PAGATA` (istruzioni nella sezione 7)
 
 ---
 
@@ -209,6 +242,7 @@ Impatto visivo: nullo (`TabPagamenti` già normalizza "Prima rata" quando `NUMER
 - **EVO-003** — area genitore core (dipendenza ✅)
 - **EVO-004** — iscrizioni e pagamenti (dipendenza ✅)
 - **EVO-013** — pagina pagamenti (dipendenza ✅)
+- **EVO-015** — titoli-descrizione: campo `DESCRIZIONE` come label primaria + fix "undefinedª rata" (spawnata dal bug rilevato in smoke test EVO-014) → [scheda evolutiva](EVO-015-titoli-descrizione.md)
 
 ---
 
@@ -217,3 +251,7 @@ Impatto visivo: nullo (`TabPagamenti` già normalizza "Prima rata" quando `NUMER
 ### [2026-05-24] Kick-off EVO-014
 
 Sessione avviata. File evolutiva creato. Visual HTML standalone già nel repo. Branch `evo-014-portale-ux-stato-iscrizioni` creato. Implementazione in corso.
+
+### [2026-05-24] Fase 8 — Chiusura post-merge
+
+EVO-014 mergeata (PR #20, commit `a73d11f`) e live in produzione. Documentazione consolidata: scheda evolutiva aggiornata a stato `completata`, `memory.md` aggiornato, sezione "Pattern appresi in EVO-014" aggiunta a `AGENTS.md`. Bug "undefinedª rata" parcheggiato in EVO-015 (brief già pronto). Azioni manuali post-merge (backfill Airtable + modifica Make.com) lasciate all'utente con guide nella sezione 7.
