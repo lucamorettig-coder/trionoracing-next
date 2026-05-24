@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
     checkout_reference: checkoutReference,
     description: "Pagamento iscrizione Triono Racing",
     merchant_code: merchantCode,
-    ...(returnUrl ? { return_url: returnUrl } : {}),
+    ...(returnUrl ? { return_url: `${returnUrl}?ref=${encodeURIComponent(checkoutReference)}` } : {}),
   };
 
   const sumupRes = await fetch("https://api.sumup.com/v0.1/checkouts", {
