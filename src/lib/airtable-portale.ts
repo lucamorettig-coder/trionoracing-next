@@ -958,20 +958,29 @@ export async function getMaestroByEmail(email: string): Promise<Maestro | null> 
 }
 
 /**
- * Cerca un maestro per record id del genitore linkato (campo UTENTE).
- * Ritorna null se nessun maestro è ancora linkato a quel genitore.
+ * Cerca il maestro associato a un genitore esistente.
+ *
+ * Workaround del bug noto: `ARRAYJOIN({UTENTE},",")` su un campo
+ * multipleRecordLinks restituisce il primary field del record linkato
+ * (formula `ID_GENITORE`, es. "GEN-LM-1981-117R"), non il record ID.
+ * Quindi un `FIND("recXXX", ARRAYJOIN({UTENTE},","))` non matcha mai.
+ *
+ * Strategia: leggi il genitore per ottenere l'email → cerca il maestro
+ * per email → verifica che il record genitore sia effettivamente in UTENTE.
+ * Ritorna null se non collegato (caso "Account maestro non collegato").
  */
 export async function getMaestroByGenitoreId(
   genitoreRecordId: string,
 ): Promise<Maestro | null> {
-  const formula = encodeURIComponent(
-    `FIND("${genitoreRecordId}",ARRAYJOIN({UTENTE},","))>0`,
-  );
-  const res = await airtableFetch(
-    `TABELLA_MAESTRI?filterByFormula=${formula}&maxRecords=1`,
-  );
-  const data: { records: Maestro[] } = await res.json();
-  return data.records[0] ?? null;
+  const res = await airtableFetch(`TABELLA_GENITORI/${genitoreRecordId}`);
+  const genitore: Genitore = await res.json();
+  const email = genitore.fields.EMAIL_GENITORE;
+  if (!email) return null;
+  const maestro = await getMaestroByEmail(email);
+  if (!maestro) return null;
+  const utenteIds = maestro.fields.UTENTE ?? [];
+  if (!utenteIds.includes(genitoreRecordId)) return null;
+  return maestro;
 }
 
 /** Linka un maestro a un genitore esistente (popola UTENTE). Idempotente. */
