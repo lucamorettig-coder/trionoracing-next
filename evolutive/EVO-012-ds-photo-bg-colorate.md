@@ -3,8 +3,8 @@
 - **ID**: EVO-012
 - **Slug**: ds-photo-bg-colorate
 - **Data inizio**: 2026-05-23
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: in pianificazione
+- **Data fine**: 2026-05-24
+- **Stato**: completata
 - **Tipo**: aggiornamento Design System (refactoring trasversale + scaffold)
 - **Area**: cross-cutting — `globals.css` (DS) + 8 file di componenti (sito pubblico + portale)
 - **Priorità**: alta (blocca EVO-011, che riusa pattern di card portale)
@@ -204,7 +204,35 @@ Vedi [`EVO-012-ds-photo-bg-colorate/prompt-claude-code.md`](EVO-012-ds-photo-bg-
 
 ## 8. Verifica e go-live
 
-_Da compilare in fase 8 dopo che Claude Code ha completato l'intero ciclo._
+### Esito
+
+✅ Mergiata in main il 2026-05-24, PR #15 squash-merged (commit `cde0230`) + hotfix marathon (commit `58ecc09`). Deploy automatico Vercel andato a buon fine.
+
+### Output prodotti
+
+- **CSS**: 5 nuove utility `.photo-bg-{sun,sky,grass,flag,ember}` in `src/app/globals.css` + `.photo-bg-navy` confermata.
+- **Componenti uniformati (8)**: `home/CtaFinale.tsx`, `scuola/CtaScuola.tsx`, `marathon-209/CtaMarathon.tsx`, `marathon-209/MarathonHero.tsx`, `(public)/marathon-209/page.tsx` (intro), `portale/iscrizioni/StepperWizard.tsx`, `portale/dashboard/DashboardGenitore.tsx` (era bg-navy-700, ora navy-900 — accettato), `(public)/contatti/page.tsx` (sidebar info).
+- **Docs**: sezione "Pattern appresi in EVO-012 (2026-05-23)" in `AGENTS.md` con 5 pattern.
+
+### Verifica per dimensione
+
+| Dimensione | Esito | Note |
+|------------|-------|------|
+| Design system | ✅ | Evoluzione interna coerente con v0.1, scaffold completo per 6 colori |
+| Architettura | ✅ | Solo CSS + classi, zero impatto runtime/API/dato |
+| Coerenza visiva | ✅ | Tutte le 8 card navy ora condividono il pattern photo-bg "premium" |
+| Tema 209 | ✅ | Override esistente `.theme-209 .photo-bg-navy` funziona, MarathonHero diventa red automaticamente |
+| i18n | n/a | Nessuna stringa |
+| SEO | n/a | Estetica server-render, nessun impatto metadata |
+| Performance | ✅ | Bitmap già esistenti in `public/assets/`, nessun nuovo asset |
+
+### Hotfix post-merge
+
+Commit `58ecc09`: correzione su sezione marathon (regolazione opacità overlay o adjacent fix — verificare diff se serve dettaglio).
+
+### Sblocca
+
+- **EVO-011** (kit-scuola-tab-taglie) sbloccata: il TabTaglie del portale può ora valutare se beneficiare di `.photo-bg-{color}` (probabilmente no perché card piccola/funzionale, da decidere nello scope EVO-011).
 
 ---
 
@@ -227,3 +255,20 @@ _Da compilare in fase 8 dopo che Claude Code ha completato l'intero ciclo._
 - Soluzione: singola PR da main, 3 macro-task (utility CSS, migrazione 8 card, docs)
 - Coerenza: tutto ✅, è evoluzione interna al DS, nessun impatto SEO/i18n
 - Fase 6 skippata con motivazione (riferimento visivo = card Kit Scuola già live)
+
+### [2026-05-23] Fase 7 — Prompt Claude Code generato
+
+Prompt completo prodotto, scope coeso (3 macro-task: utility CSS, migrazione 8 card, docs). Singola PR da main, niente split.
+
+### [2026-05-24] Fase 8 — Implementazione + merge + go-live
+
+- Branch: `feat/ds-photo-bg-colorate` (o equivalente)
+- PR #15: squash-merged, commit `cde0230`
+- Hotfix successivo: commit `58ecc09` (sezione marathon)
+- Deploy Vercel: ✅ auto-deploy su main
+- Verifica visiva: superata su tutte le 8 card migrate
+- AGENTS.md: sezione "Pattern appresi in EVO-012 (2026-05-23)" già scritta contestualmente al merge (5 pattern)
+
+### [2026-05-24] Fase chiusura — PR docs
+
+Branch `docs/evo-012-close`: aggiornamento `memory.md` riga + cronologia narrativa, scheda EVO-012 sezioni header/8/log fasi 7-8. AGENTS.md già completo, non toccato.
