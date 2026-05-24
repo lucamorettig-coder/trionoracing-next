@@ -32,6 +32,7 @@ export interface Genitore {
     FLAG_PRIVACY: boolean;
     AUTH_USER_ID?: string;
     RUOLO?: Ruolo;
+    TABELLA_BAMBINI?: string[];
   };
 }
 
@@ -789,20 +790,124 @@ function computeDataScadenzaRata(mese: string, anno: number): string | undefined
   return last.toISOString().slice(0, 10);
 }
 
-// ─── TABELLA_LEZIONI (read-only per tab Diario) ──────────────────────────────
+// ─── TABELLA_LEZIONI + TABELLA_MAESTRI (EVO-006) ─────────────────────────────
+
+export const TIPO_SESSIONE_VALUES = [
+  "Lezione MTB Ciclodromo",
+  "Lezione BDC Ciclodromo",
+  "Gara Giovanissimi",
+] as const;
+export type TipoSessione = (typeof TIPO_SESSIONE_VALUES)[number];
+
+export const ATTIVITA_SVOLTE_VALUES = [
+  "Tecnica di base",
+  "Gestione curve",
+  "Frenata e discesa",
+  "Equilibrio e coordinazione",
+  "Lavoro in salita",
+  "Resistenza e condizionamento",
+  "Tattica di gara",
+  "Uscita su strada",
+  "Simulazione dinamiche di gara",
+  "Abilità fuori strada",
+] as const;
+export type AttivitaSvolta = (typeof ATTIVITA_SVOLTE_VALUES)[number];
+
+export const MAESTRO_QUALIFICHE = [
+  "TI2 - Tecnico Istruttore",
+  "AT1 - Assistente Tecnico",
+] as const;
+export type MaestroQualifica = (typeof MAESTRO_QUALIFICHE)[number];
+
+export const DISCIPLINE_VALUES = ["MTB", "BDC"] as const;
+export type Disciplina = (typeof DISCIPLINE_VALUES)[number];
 
 export interface Lezione {
   id: string;
+  createdTime?: string;
   fields: {
+    ID_LEZIONE?: string;
     DATA?: string;
-    ATTIVITA_SVOLTE?: string;
+    TIPO_SESSIONE?: TipoSessione;
+    ATTIVITA_SVOLTE?: AttivitaSvolta[];
     NOTE_ATTIVITA?: string;
-    TIPO_SESSIONE?: string;
-    PUBLISHED?: boolean;
-    MAESTRI_PRESENTI?: string[];
+    NOTE_INTERNE?: string;
     BAMBINI_PRESENTI?: string[];
+    MAESTRI_PRESENTI?: string[];
+    MAESTRO_COMPILATORE?: string[];
+    GARA?: string[];
+    PUBLISHED?: boolean;
+    DATA_COMPILAZIONE?: string;
+    progressivo?: number;
   };
 }
+
+export interface Maestro {
+  id: string;
+  createdTime?: string;
+  fields: {
+    NOME_MAESTRO: string;
+    COGNOME_MAESTRO: string;
+    EMAIL: string;
+    TELEFONO?: string;
+    CODICE_FCI?: string;
+    QUALIFICA?: MaestroQualifica;
+    DISCIPLINE?: Disciplina[];
+    FOTO?: string;
+    ATTIVO?: boolean;
+    PUBLISHED?: boolean;
+    NOTE?: string;
+    UTENTE?: string[];
+    AUTH_USER_ID?: string[];
+    LEZIONI_COME_MAESTRO?: string[];
+    LEZIONI_COME_COMPILATORE?: string[];
+    GARE_ACCOMPAGNATE?: string[];
+    "Gare Giovanili Umbria 2026"?: string[];
+  };
+}
+
+const LEZIONI_WRITABLE_FIELDS = new Set([
+  "DATA",
+  "TIPO_SESSIONE",
+  "ATTIVITA_SVOLTE",
+  "NOTE_ATTIVITA",
+  "NOTE_INTERNE",
+  "BAMBINI_PRESENTI",
+  "MAESTRI_PRESENTI",
+  "MAESTRO_COMPILATORE",
+  "GARA",
+  "PUBLISHED",
+  "DATA_COMPILAZIONE",
+]);
+
+export function stripLezioneReadOnlyFields<T extends object>(fields: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(fields).filter(([key]) => LEZIONI_WRITABLE_FIELDS.has(key)),
+  ) as Partial<T>;
+}
+
+const MAESTRI_WRITABLE_FIELDS = new Set([
+  "NOME_MAESTRO",
+  "COGNOME_MAESTRO",
+  "EMAIL",
+  "TELEFONO",
+  "CODICE_FCI",
+  "QUALIFICA",
+  "DISCIPLINE",
+  "FOTO",
+  "ATTIVO",
+  "PUBLISHED",
+  "NOTE",
+  "UTENTE",
+]);
+
+export function stripMaestroReadOnlyFields<T extends object>(fields: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(fields).filter(([key]) => MAESTRI_WRITABLE_FIELDS.has(key)),
+  ) as Partial<T>;
+}
+
+// ─── TABELLA_LEZIONI (legacy read-only per tab Diario genitore) ──────────────
 
 /**
  * Lista lezioni per bambino, filtrate per anno/mese.
@@ -836,6 +941,227 @@ export async function getLezioniBambino(
   );
   const data: { records: Lezione[] } = await res.json();
   return data.records;
+}
+
+// ─── TABELLA_MAESTRI (EVO-006) ───────────────────────────────────────────────
+
+/** Cerca un maestro per email (case-insensitive). Ritorna null se non trovato. */
+export async function getMaestroByEmail(email: string): Promise<Maestro | null> {
+  const formula = encodeURIComponent(
+    `LOWER({EMAIL})="${email.toLowerCase().replace(/"/g, '\\"')}"`,
+  );
+  const res = await airtableFetch(
+    `TABELLA_MAESTRI?filterByFormula=${formula}&maxRecords=1`,
+  );
+  const data: { records: Maestro[] } = await res.json();
+  return data.records[0] ?? null;
+}
+
+/**
+ * Cerca un maestro per record id del genitore linkato (campo UTENTE).
+ * Ritorna null se nessun maestro è ancora linkato a quel genitore.
+ */
+export async function getMaestroByGenitoreId(
+  genitoreRecordId: string,
+): Promise<Maestro | null> {
+  const formula = encodeURIComponent(
+    `FIND("${genitoreRecordId}",ARRAYJOIN({UTENTE},","))>0`,
+  );
+  const res = await airtableFetch(
+    `TABELLA_MAESTRI?filterByFormula=${formula}&maxRecords=1`,
+  );
+  const data: { records: Maestro[] } = await res.json();
+  return data.records[0] ?? null;
+}
+
+/** Linka un maestro a un genitore esistente (popola UTENTE). Idempotente. */
+export async function linkMaestroToGenitore(
+  maestroId: string,
+  genitoreId: string,
+): Promise<void> {
+  await airtableFetch(`TABELLA_MAESTRI/${maestroId}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      fields: stripMaestroReadOnlyFields({ UTENTE: [genitoreId] }),
+    }),
+  });
+}
+
+/** Lista maestri attivi (ATTIVO=true), ordinati per COGNOME_MAESTRO asc. */
+export async function getAllMaestriAttivi(): Promise<Maestro[]> {
+  const formula = encodeURIComponent(`{ATTIVO}=1`);
+  const res = await airtableFetch(
+    `TABELLA_MAESTRI?filterByFormula=${formula}&sort[0][field]=COGNOME_MAESTRO&sort[0][direction]=asc&pageSize=100`,
+  );
+  const data: { records: Maestro[] } = await res.json();
+  return data.records;
+}
+
+// ─── TABELLA_LEZIONI (EVO-006 — maestro CRUD) ────────────────────────────────
+
+/**
+ * Lista lezioni del maestro (come compilatore OR come co-maestro presente).
+ * Filtra per anno/mese se passati. Sort: DATA desc.
+ */
+export async function getLezioniByMaestro(
+  maestroId: string,
+  anno?: number,
+  mese?: number,
+): Promise<Lezione[]> {
+  const conditions: string[] = [
+    `OR(FIND("${maestroId}",ARRAYJOIN({MAESTRO_COMPILATORE},","))>0,FIND("${maestroId}",ARRAYJOIN({MAESTRI_PRESENTI},","))>0)`,
+  ];
+  if (anno && mese) {
+    conditions.push(`YEAR({DATA})=${anno}`);
+    conditions.push(`MONTH({DATA})=${mese}`);
+  } else if (anno) {
+    conditions.push(`YEAR({DATA})=${anno}`);
+  }
+  const formula = encodeURIComponent(`AND(${conditions.join(",")})`);
+  const res = await airtableFetch(
+    `TABELLA_LEZIONI?filterByFormula=${formula}&sort[0][field]=DATA&sort[0][direction]=desc&pageSize=100`,
+  );
+  const data: { records: Lezione[] } = await res.json();
+  return data.records;
+}
+
+/** Singola lezione per ID. Null se non trovata. */
+export async function getLezioneById(id: string): Promise<Lezione | null> {
+  try {
+    const res = await airtableFetch(`TABELLA_LEZIONI/${id}`);
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Crea una nuova lezione.
+ * Set automatici: MAESTRO_COMPILATORE = [maestroCompilatoreId],
+ * DATA_COMPILAZIONE = now (ISO), PUBLISHED = true.
+ * Validazione server-side: DATA <= oggi (no lezioni future).
+ */
+export async function createLezione(
+  input: Partial<Lezione["fields"]>,
+  maestroCompilatoreId: string,
+): Promise<Lezione> {
+  if (!input.DATA) throw new Error("Data lezione mancante");
+  const today = new Date().toISOString().slice(0, 10);
+  if (input.DATA > today) {
+    throw new Error("Non puoi registrare una lezione futura.");
+  }
+
+  const fields = {
+    ...input,
+    MAESTRO_COMPILATORE: [maestroCompilatoreId],
+    DATA_COMPILAZIONE: new Date().toISOString(),
+    PUBLISHED: true,
+  };
+
+  const res = await airtableFetch("TABELLA_LEZIONI", {
+    method: "POST",
+    body: JSON.stringify({ fields: stripLezioneReadOnlyFields(fields) }),
+  });
+  return res.json();
+}
+
+/**
+ * Aggiorna una lezione esistente con guard ownership + 30gg.
+ * Ownership: maestro deve essere in MAESTRO_COMPILATORE OR in MAESTRI_PRESENTI OR isAdmin.
+ * Guard 30gg: se non admin, la lezione deve essere ≤ 30gg fa.
+ */
+export async function updateLezione(
+  id: string,
+  patch: Partial<Lezione["fields"]>,
+  currentMaestroId: string,
+  isAdmin: boolean,
+): Promise<Lezione> {
+  const existing = await getLezioneById(id);
+  if (!existing) throw new Error("Lezione non trovata");
+
+  if (!isAdmin) {
+    const compilatori = existing.fields.MAESTRO_COMPILATORE ?? [];
+    const presenti = existing.fields.MAESTRI_PRESENTI ?? [];
+    const isOwner =
+      compilatori.includes(currentMaestroId) ||
+      presenti.includes(currentMaestroId);
+    if (!isOwner) {
+      throw new Error("Non sei autorizzato a modificare questa lezione.");
+    }
+
+    const dataLezione = existing.fields.DATA;
+    if (dataLezione) {
+      const diffMs = Date.now() - new Date(dataLezione).getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      if (diffDays > 30) {
+        throw new Error(
+          "Le lezioni di oltre 30 giorni si modificano solo dall'admin.",
+        );
+      }
+    }
+  }
+
+  const res = await airtableFetch(`TABELLA_LEZIONI/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ fields: stripLezioneReadOnlyFields(patch) }),
+  });
+  return res.json();
+}
+
+/**
+ * Lista bambini attivi (iscritti a un corso nell'anno corrente), opzionalmente
+ * filtrati per disciplina. Mapping disciplina → CORSO: BDC ↔ "Strada", MTB ↔ "MTB".
+ * Privacy view: il caller deve passare solo bambini al componente UI senza
+ * arricchire con campi genitore/pagamenti/certificati.
+ */
+export async function getBambiniAttiviPerDisciplina(
+  disciplina?: Disciplina,
+): Promise<Bambino[]> {
+  const anno = String(new Date().getFullYear());
+  const conditions = [
+    `{ANNO_ISCRIZIONE (from TABELLA_TARIFFE)}="${anno}"`,
+  ];
+  if (disciplina === "MTB") {
+    conditions.push(`{CORSO}="MTB"`);
+  } else if (disciplina === "BDC") {
+    conditions.push(`{CORSO}="Strada"`);
+  }
+  const formula = encodeURIComponent(`AND(${conditions.join(",")})`);
+  const res = await airtableFetch(
+    `TABELLA_ISCRIZIONI?filterByFormula=${formula}&pageSize=100`,
+  );
+  const data: { records: Iscrizione[] } = await res.json();
+  const bambiniIds = Array.from(
+    new Set(data.records.flatMap((i) => i.fields.TABELLA_BAMBINI ?? [])),
+  );
+  if (bambiniIds.length === 0) return [];
+  const bambini = await fetchRecordsByIds<Bambino>("TABELLA_BAMBINI", bambiniIds);
+  return bambini.sort((a, b) =>
+    (a.fields.COGNOME_BAMBINO ?? "").localeCompare(b.fields.COGNOME_BAMBINO ?? ""),
+  );
+}
+
+/**
+ * Gare assegnate al maestro filtrate per scope (future | past).
+ * Doppio campo legacy: 'Maestro Accompagnatore' OR 'TABELLA_MAESTRI'.
+ * Fallback safe: UNION dei risultati di entrambi i campi.
+ */
+export async function getGareAssegnateAlMaestro(
+  maestroId: string,
+  scope: "future" | "past",
+): Promise<Gara[]> {
+  const today = new Date().toISOString().slice(0, 10);
+  const dateCond =
+    scope === "future"
+      ? `DATETIME_DIFF({Data},"${today}",'days')>=0`
+      : `DATETIME_DIFF({Data},"${today}",'days')<0`;
+  const maestroCond = `OR(FIND("${maestroId}",ARRAYJOIN({Maestro Accompagnatore},","))>0,FIND("${maestroId}",ARRAYJOIN({TABELLA_MAESTRI},","))>0)`;
+  const formula = encodeURIComponent(`AND(${dateCond},${maestroCond})`);
+  const sortDir = scope === "future" ? "asc" : "desc";
+  const path = `${encodeURIComponent(GARE_TABLE)}?filterByFormula=${formula}&sort[0][field]=Data&sort[0][direction]=${sortDir}&pageSize=100`;
+  const res = await airtableFetch(path);
+  const data: { records: GaraRecord[] } = await res.json();
+  return data.records.map(mapGara);
 }
 
 // ─── GARE + ISCRIZIONI_GARE (EVO-005) ────────────────────────────────────────
