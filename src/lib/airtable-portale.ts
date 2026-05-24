@@ -509,7 +509,7 @@ export async function createIscrizione(
     body: JSON.stringify({
       fields: stripTitoloReadOnlyFields({
         ISCRIZIONE: [iscrizione.id],
-        TIPO_TITOLO: "rata",
+        TIPO_TITOLO: "prima_rata",
         NUMERO_RATA: 1,
         IMPORTO_RATA_BASE: tariffa.fields.IMPORTO_RATA,
         IMPORTO_ISCRIZIONE: tariffa.fields.IMPORTO_ISCRIZIONE,
@@ -522,6 +522,14 @@ export async function createIscrizione(
   });
 
   return iscrizione;
+}
+
+/** Setta PRIMA_RATA_PAGATA = true sull'iscrizione. Idempotente. */
+export async function markPrimaRataPagata(iscrizioneId: string): Promise<void> {
+  await airtableFetch(`TABELLA_ISCRIZIONI/${iscrizioneId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ fields: { PRIMA_RATA_PAGATA: true } }),
+  });
 }
 
 /** PATCH modulistica/taglie/stato su iscrizione (whitelist writable). */

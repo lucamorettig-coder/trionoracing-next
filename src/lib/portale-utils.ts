@@ -1,4 +1,5 @@
 import type { BadgeVariant } from "@/components/ui/badge";
+import type { Iscrizione } from "@/lib/airtable-portale";
 
 export interface StatoIscrizioneBadge {
   variant: BadgeVariant;
@@ -72,6 +73,32 @@ export function daysUntil(dateStr: string): number {
   target.setHours(0, 0, 0, 0);
   now.setHours(0, 0, 0, 0);
   return Math.round((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export type StatoIscrizione = 'iscritto' | 'da_completare' | 'non_iscritto';
+
+export interface StatoIscrizioneAnnoCorrenteResult {
+  stato: StatoIscrizione;
+  iscrizioneId?: string;
+}
+
+/**
+ * Deriva lo stato di iscrizione di un bambino per l'anno solare corrente.
+ * iscritto = iscrizione COMPLETA nell'anno; da_completare = esiste ma INCOMPLETA; non_iscritto = nessuna.
+ */
+export function getStatoIscrizioneAnnoCorrente(
+  bambinoId: string,
+  iscrizioni: Iscrizione[],
+): StatoIscrizioneAnnoCorrenteResult {
+  const anno = String(new Date().getFullYear());
+  const match = iscrizioni.find(
+    (i) =>
+      i.fields.TABELLA_BAMBINI?.includes(bambinoId) &&
+      i.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0] === anno,
+  );
+  if (!match) return { stato: 'non_iscritto' };
+  if (match.fields.STATO_ISCRIZIONE === "COMPLETA") return { stato: 'iscritto', iscrizioneId: match.id };
+  return { stato: 'da_completare', iscrizioneId: match.id };
 }
 
 export interface CertBadgeInfo {
