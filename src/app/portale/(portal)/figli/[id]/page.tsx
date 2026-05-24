@@ -7,6 +7,8 @@ import {
   getBambinoById,
   getIscrizioniBambino,
   getLezioniBambino,
+  getIscrizioniGareByBambino,
+  getGareFuture,
 } from "@/lib/airtable-portale";
 import ProfiloFiglioHeader from "@/components/portale/figli/ProfiloFiglioHeader";
 import ProfiloFiglioTabs from "@/components/portale/figli/ProfiloFiglioTabs";
@@ -43,9 +45,12 @@ export default async function ProfiloFiglioPage({ params, searchParams }: Props)
   if (!owned) notFound();
 
   const now = new Date();
-  const [iscrizioni, lezioni] = await Promise.all([
+  const today = now.toISOString().slice(0, 10);
+  const [iscrizioni, lezioni, iscrizioniGara, gareFuture] = await Promise.all([
     getIscrizioniBambino(bambinoId),
     getLezioniBambino(bambinoId, now.getFullYear(), now.getMonth() + 1),
+    getIscrizioniGareByBambino(bambinoId),
+    getGareFuture(today),
   ]);
 
   const hasCert =
@@ -78,7 +83,13 @@ export default async function ProfiloFiglioPage({ params, searchParams }: Props)
           certificato: <TabCertificato bambino={bambino} />,
           foto: <TabFoto bambino={bambino} />,
           iscrizioni: <TabIscrizioni bambino={bambino} iscrizioni={iscrizioni} />,
-          gare: <TabGare bambinoNome={bambino.fields.NOME_BAMBINO} />,
+          gare: (
+            <TabGare
+              bambino={bambino}
+              iscrizioniGara={iscrizioniGara}
+              gareFuture={gareFuture}
+            />
+          ),
           diario: (
             <TabDiario
               bambinoId={bambinoId}
