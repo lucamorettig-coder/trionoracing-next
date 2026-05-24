@@ -252,6 +252,40 @@ export function buildScadenze(
   return scadenze.sort((a, b) => a.giorni - b.giorni);
 }
 
+/**
+ * Compatibilità categoria FCI del bambino con la Classe della gara.
+ *
+ * Le due tassonomie non si sovrappongono direttamente:
+ * - Classe gara (singleSelect "Classe"): solo 2 valori — `GIOVANISSIMI`, `GIOCO CICLISMO`.
+ * - Categoria FCI bambino (formula in TABELLA_ISCRIZIONI): `G1..G6`, `Esordienti 1° anno`,
+ *   `Esordienti 2° anno`, `Allievi 1° anno`, `Allievi 2° anno`, `Juniores`.
+ *
+ * Mapping di gruppo (verificato con vocabolario Airtable PROD il 2026-05-24):
+ * - `GIOVANISSIMI` → tutte le categorie `G*` (G1..G6).
+ * - `GIOCO CICLISMO` → G1..G3 tipicamente (più ristretto; lo trattiamo come ⊂ GIOVANISSIMI
+ *   accettando G1..G6 — la compatibilità è "non bloccante" anche quando incerta).
+ * - Altre categorie (Esordienti, Allievi, Juniores) → al momento non hanno classi gara
+ *   dedicate in tabella, quindi non compatibili.
+ *
+ * Permissivo se manca info (null/undefined su uno dei due lati): ritorna true e l'UI
+ * non mostra il warning. La compatibilità è solo un suggerimento — la richiesta è
+ * sempre permessa (vedi scope EVO-005).
+ */
+export function categoriaCompatibile(
+  classeGara: string | null | undefined,
+  categoriaFciBambino: string | null | undefined,
+): boolean {
+  if (!classeGara || !categoriaFciBambino) return true;
+  const classe = classeGara.toUpperCase().trim();
+  const cat = categoriaFciBambino.toUpperCase().trim();
+  const isGiovaniss = /^G\d/.test(cat); // G1..G9
+  if (classe === "GIOVANISSIMI" || classe === "GIOCO CICLISMO") {
+    return isGiovaniss;
+  }
+  // Per classi gara non riconosciute, restiamo permissivi (no warning).
+  return true;
+}
+
 export interface CertBadgeInfo {
   variant: BadgeVariant;
   label: string;

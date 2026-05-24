@@ -12,6 +12,7 @@
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TOKEN = process.env.AIRTABLE_TOKEN;
 const API_BASE = "https://api.airtable.com/v0";
+const GARE_TABLE = process.env.AIRTABLE_TABLE_GARE ?? "Gare Giovanili Umbria 2026";
 
 export type Ruolo = "GENITORE" | "ISTRUTTORE" | "ADMIN";
 
@@ -201,6 +202,7 @@ export interface Bambino {
     ID_BAMBINO?: string;
     TABELLA_ISCRIZIONI?: string[];
     TABELLA_LEZIONI?: string[];
+    ISCRIZIONI_GARE?: string[];
   };
 }
 
@@ -834,4 +836,210 @@ export async function getLezioniBambino(
   );
   const data: { records: Lezione[] } = await res.json();
   return data.records;
+}
+
+// ─── GARE + ISCRIZIONI_GARE (EVO-005) ────────────────────────────────────────
+
+/**
+ * Stati possibili per un'iscrizione gara (singleSelect Airtable, ID_TABELLA tbl9LVcLXQCpLto4O).
+ * Vocabolario verificato via MCP get_table_schema il 2026-05-24.
+ */
+export const GARA_STATI_ISCRIZIONE = [
+  "Richiesta",
+  "Confermata",
+  "Rifiutata",
+  "Ritirata",
+] as const;
+export type StatoIscrizioneGara = (typeof GARA_STATI_ISCRIZIONE)[number];
+
+/**
+ * Classi gara reali su Airtable (singleSelect "Classe"). Solo 2 valori — più
+ * grossolano della categoria FCI del bambino (G1..G6, Esordienti, Juniores).
+ */
+export const GARA_CLASSI = ["GIOVANISSIMI", "GIOCO CICLISMO"] as const;
+export type GaraClasse = (typeof GARA_CLASSI)[number];
+
+export interface Gara {
+  id: string;
+  nomeGara: string;
+  /** ISO date YYYY-MM-DD (campo Airtable type=date) */
+  data: string;
+  luogo: string;
+  classe: string | null;
+  tipoGara: string | null;
+  idGaraFci: string | null;
+  linkFci: string | null;
+  note: string | null;
+  comitatoRegionale: string | null;
+  inEvidenza: boolean;
+  maestroAccompagnatoreIds: string[];
+}
+
+interface GaraRecord {
+  id: string;
+  fields: {
+    "Nome Gara"?: string;
+    Data?: string;
+    Luogo?: string;
+    Classe?: string;
+    "Tipo Gara"?: string;
+    "ID Gara FCI"?: string;
+    "Link FCI"?: string;
+    Note?: string;
+    COMITATO_REGIONALE?: string;
+    IN_EVIDENZA?: boolean;
+    "Maestro Accompagnatore"?: string[];
+  };
+}
+
+function mapGara(r: GaraRecord): Gara {
+  const f = r.fields;
+  return {
+    id: r.id,
+    nomeGara: f["Nome Gara"] ?? "",
+    data: f.Data ?? "",
+    luogo: f.Luogo ?? "",
+    classe: f.Classe ?? null,
+    tipoGara: f["Tipo Gara"] ?? null,
+    idGaraFci: f["ID Gara FCI"] ?? null,
+    linkFci: f["Link FCI"] ?? null,
+    note: f.Note ?? null,
+    comitatoRegionale: f.COMITATO_REGIONALE ?? null,
+    inEvidenza: f.IN_EVIDENZA === true,
+    maestroAccompagnatoreIds: f["Maestro Accompagnatore"] ?? [],
+  };
+}
+
+/** Lista gare future (Data >= today), ordinate per Data ascendente. */
+export async function getGareFuture(today: string): Promise<Gara[]> {
+  const formula = encodeURIComponent(`DATETIME_DIFF({Data},"${today}",'days')>=0`);
+  const path = `${encodeURIComponent(GARE_TABLE)}?filterByFormula=${formula}&sort[0][field]=Data&sort[0][direction]=asc&pageSize=100`;
+  const res = await airtableFetch(path);
+  const data: { records: GaraRecord[] } = await res.json();
+  return data.records.map(mapGara);
+}
+
+/** Singola gara per ID. Null se non trovata. */
+export async function getGaraById(garaId: string): Promise<Gara | null> {
+  try {
+    const res = await airtableFetch(`${encodeURIComponent(GARE_TABLE)}/${garaId}`);
+    const r: GaraRecord = await res.json();
+    return mapGara(r);
+  } catch {
+    return null;
+  }
+}
+
+export interface IscrizioneGara {
+  id: string;
+  garaId: string;
+  bambinoId: string;
+  genitoreId: string;
+  stato: StatoIscrizioneGara;
+  dataRichiesta: string | null;
+  dataConferma: string | null;
+  noteGenitore: string | null;
+}
+
+interface IscrizioneGaraRecord {
+  id: string;
+  fields: {
+    GARA?: string[];
+    BAMBINO?: string[];
+    GENITORE?: string[];
+    STATO?: string;
+    DATA_RICHIESTA?: string;
+    DATA_CONFERMA?: string;
+    NOTE_GENITORE?: string;
+  };
+}
+
+function mapIscrizioneGara(r: IscrizioneGaraRecord): IscrizioneGara {
+  const f = r.fields;
+  return {
+    id: r.id,
+    garaId: f.GARA?.[0] ?? "",
+    bambinoId: f.BAMBINO?.[0] ?? "",
+    genitoreId: f.GENITORE?.[0] ?? "",
+    stato: (f.STATO as StatoIscrizioneGara) ?? "Richiesta",
+    dataRichiesta: f.DATA_RICHIESTA ?? null,
+    dataConferma: f.DATA_CONFERMA ?? null,
+    noteGenitore: f.NOTE_GENITORE ?? null,
+  };
+}
+
+/**
+ * Iscrizioni gara per un bambino, ordinate per data richiesta desc.
+ * Legge gli ID dalle linked records del bambino (TABELLA_BAMBINI.ISCRIZIONI_GARE).
+ */
+export async function getIscrizioniGareByBambino(
+  bambinoId: string,
+): Promise<IscrizioneGara[]> {
+  const bambino = await getBambinoById(bambinoId);
+  if (!bambino) return [];
+  const ids = bambino.fields.ISCRIZIONI_GARE ?? [];
+  const records = await fetchRecordsByIds<IscrizioneGaraRecord>("ISCRIZIONI_GARE", ids);
+  return records
+    .map(mapIscrizioneGara)
+    .sort((a, b) => (b.dataRichiesta ?? "").localeCompare(a.dataRichiesta ?? ""));
+}
+
+/**
+ * Iscrizioni gara per un genitore (tutte, su tutti i figli). Pattern aggregatore
+ * EVO-013: batch fetch via linked record ids del genitore, no round-trip per ogni
+ * figlio.
+ */
+export async function getIscrizioniGareByGenitore(
+  genitoreId: string,
+): Promise<IscrizioneGara[]> {
+  const res = await airtableFetch(`TABELLA_GENITORI/${genitoreId}`);
+  const genitore: { fields: { ISCRIZIONI_GARE?: string[] } } = await res.json();
+  const ids = genitore.fields.ISCRIZIONI_GARE ?? [];
+  const records = await fetchRecordsByIds<IscrizioneGaraRecord>("ISCRIZIONI_GARE", ids);
+  return records
+    .map(mapIscrizioneGara)
+    .sort((a, b) => (b.dataRichiesta ?? "").localeCompare(a.dataRichiesta ?? ""));
+}
+
+export interface CreateIscrizioneGaraInput {
+  garaId: string;
+  bambinoId: string;
+  genitoreId: string;
+  noteGenitore?: string;
+}
+
+/**
+ * Crea una richiesta iscrizione gara. Difesa idempotente: se esiste già
+ * un'iscrizione (qualsiasi stato tranne `Rifiutata`/`Ritirata`) per quel
+ * bambino su quella gara, throwa con messaggio "Già iscritto".
+ */
+export async function createIscrizioneGara(
+  input: CreateIscrizioneGaraInput,
+): Promise<IscrizioneGara> {
+  const esistenti = await getIscrizioniGareByBambino(input.bambinoId);
+  const conflitto = esistenti.find(
+    (i) =>
+      i.garaId === input.garaId &&
+      i.stato !== "Rifiutata" &&
+      i.stato !== "Ritirata",
+  );
+  if (conflitto) {
+    throw new Error("Già iscritto");
+  }
+
+  const fields = {
+    GARA: [input.garaId],
+    BAMBINO: [input.bambinoId],
+    GENITORE: [input.genitoreId],
+    STATO: "Richiesta" satisfies StatoIscrizioneGara,
+    DATA_RICHIESTA: new Date().toISOString(),
+    ...(input.noteGenitore ? { NOTE_GENITORE: input.noteGenitore } : {}),
+  };
+
+  const res = await airtableFetch("ISCRIZIONI_GARE", {
+    method: "POST",
+    body: JSON.stringify({ fields }),
+  });
+  const r: IscrizioneGaraRecord = await res.json();
+  return mapIscrizioneGara(r);
 }
