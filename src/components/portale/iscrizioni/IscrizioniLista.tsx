@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { Bambino, Iscrizione } from "@/lib/airtable-portale";
 import { formatEUR, statoIscrizioneBadge } from "@/lib/portale-utils";
 
@@ -96,13 +95,15 @@ export default function IscrizioniLista({ iscrizioni, bambini, annoFilter, figli
             const targetHref = isDraft
               ? `/portale/iscrizioni/nuova?iscrizione=${isc.id}`
               : `/portale/iscrizioni/${isc.id}`;
-            const ctaLabel = isDraft ? "Riprendi →" : "Apri →";
+            const ctaLabel = isDraft ? "Riprendi iscrizione →" : "Vedi dettaglio →";
 
             return (
               <Link
                 key={isc.id}
                 href={targetHref}
-                className="group bg-white border border-line rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] p-5 hover:shadow-[var(--shadow-md)] hover:border-navy-200 transition-all"
+                className={`group bg-white border border-line rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] p-5 hover:shadow-[var(--shadow-md)] hover:border-navy-200 transition-all overflow-hidden relative ${
+                  isDraft ? "border-l-4 border-l-ember-500" : "border-l-4 border-l-grass-500"
+                }`}
               >
                 <div className="flex items-start gap-4">
                   {fotoUrl ? (
@@ -136,9 +137,15 @@ export default function IscrizioniLista({ iscrizioni, bambini, annoFilter, figli
                   </div>
                 </div>
                 <div className="mt-4 pt-4 border-t border-line flex justify-end">
-                  <Button variant="ghost" size="sm" className="pointer-events-none group-hover:text-navy-900">
-                    {ctaLabel}
-                  </Button>
+                  {isDraft ? (
+                    <span className="pointer-events-none inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-ember-50 text-ember-700 border border-ember-200">
+                      {ctaLabel}
+                    </span>
+                  ) : (
+                    <span className="pointer-events-none text-sm font-semibold text-navy-700 underline underline-offset-2 group-hover:text-navy-900">
+                      {ctaLabel}
+                    </span>
+                  )}
                 </div>
               </Link>
             );

@@ -1,43 +1,32 @@
 import Link from "next/link";
-import { AlertTriangle, Plus, CalendarDays, CreditCard, Trophy } from "lucide-react";
+import { Plus, CalendarDays, CreditCard, CheckCircle2, FileText, Stethoscope, Euro } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FiglioCard from "@/components/portale/figli/FiglioCard";
-import { daysUntil, formatDateIT } from "@/lib/portale-utils";
-import type { Genitore, Bambino } from "@/lib/airtable-portale";
-
-interface Alert {
-  bambinoNome: string;
-  bambinoId: string;
-  tipo: "cert_scaduto" | "cert_in_scadenza";
-  dataScadenza: string;
-  giorni: number;
-}
-
-function buildAlerts(bambini: Bambino[]): Alert[] {
-  const alerts: Alert[] = [];
-  for (const b of bambini) {
-    const scadenza = b.fields.CERTIFICATO_MEDICO_SCADENZA;
-    const stato = b.fields.CERTIFICATO_MEDICO_STATO;
-    if (!scadenza) continue;
-    const giorni = daysUntil(scadenza);
-    if (stato === "SCADUTO" || giorni < 0) {
-      alerts.push({ bambinoNome: b.fields.NOME_BAMBINO, bambinoId: b.id, tipo: "cert_scaduto", dataScadenza: scadenza, giorni });
-    } else if (giorni <= 30) {
-      alerts.push({ bambinoNome: b.fields.NOME_BAMBINO, bambinoId: b.id, tipo: "cert_in_scadenza", dataScadenza: scadenza, giorni });
-    }
-  }
-  return alerts.sort((a, b) => a.giorni - b.giorni).slice(0, 3);
-}
+import { formatDateIT, getStatoIscrizioneAnnoCorrente, buildScadenze } from "@/lib/portale-utils";
+import type { Genitore, Bambino, Iscrizione, TitoloPagamento } from "@/lib/airtable-portale";
 
 interface Props {
   genitore: Genitore;
   bambini: Bambino[];
+  iscrizioni: Iscrizione[];
+  titoli: TitoloPagamento[];
 }
 
-export default function DashboardGenitore({ genitore, bambini }: Props) {
+export default function DashboardGenitore({ genitore, bambini, iscrizioni, titoli }: Props) {
   const nome = genitore.fields.NOME_GENITORE;
-  const alerts = buildAlerts(bambini);
-  const scadenzeCount = alerts.length;
+  const anno = new Date().getFullYear();
+
+  const statiIscrizione = bambini.map((b) => ({
+    bambino: b,
+    ...getStatoIscrizioneAnnoCorrente(b.id, iscrizioni),
+  }));
+
+  const tuttiIscritti = bambini.length > 0 && statiIscrizione.every((s) => s.stato === 'iscritto');
+  const qualcunoDaIscrivere = statiIscrizione.some((s) => s.stato !== 'iscritto');
+
+  const scadenze = buildScadenze(bambini, titoli, iscrizioni);
+  const scadenzeCount = scadenze.length;
+  const scadenzeVisible = scadenze.slice(0, 5);
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -80,34 +69,6 @@ export default function DashboardGenitore({ genitore, bambini }: Props) {
       </section>
 
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12 space-y-10">
-        {/* Alert urgenti */}
-        {alerts.length > 0 && (
-          <section className="space-y-3">
-            {alerts.map((alert) => (
-              <div
-                key={`${alert.bambinoId}-${alert.tipo}`}
-                className={`flex items-start gap-3 rounded-[var(--radius-lg)] p-4 border ${
-                  alert.tipo === "cert_scaduto"
-                    ? "bg-flag-50 border-flag-200 text-flag-700"
-                    : "bg-ember-50 border-ember-200 text-ember-700"
-                }`}
-              >
-                <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm">
-                    {alert.tipo === "cert_scaduto"
-                      ? `Certificato di ${alert.bambinoNome} scaduto il ${formatDateIT(alert.dataScadenza)}`
-                      : `Certificato di ${alert.bambinoNome} in scadenza il ${formatDateIT(alert.dataScadenza)} (tra ${alert.giorni} giorni)`}
-                  </p>
-                </div>
-                <Button asChild variant="outline" size="sm" className="shrink-0 text-xs h-8 px-3">
-                  <Link href={`/portale/figli/${alert.bambinoId}#certificato`}>Carica nuovo</Link>
-                </Button>
-              </div>
-            ))}
-          </section>
-        )}
-
         {/* I miei figli */}
         {bambini.length > 0 && (
           <section>
@@ -118,10 +79,14 @@ export default function DashboardGenitore({ genitore, bambini }: Props) {
               </Button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {bambini.map((b) => (
-                <FiglioCard key={b.id} bambino={b} />
+              {statiIscrizione.map(({ bambino, stato, iscrizioneId }) => (
+                <FiglioCard
+                  key={bambino.id}
+                  bambino={bambino}
+                  statoIscrizione={stato}
+                  iscrizioneId={iscrizioneId}
+                />
               ))}
-              {/* Ghost card aggiungi */}
               <Link
                 href="/portale/figli/nuovo"
                 className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-line rounded-[var(--radius-xl)] p-8 text-ink-muted hover:border-navy-300 hover:text-navy-700 transition-colors min-h-[160px]"
@@ -134,28 +99,58 @@ export default function DashboardGenitore({ genitore, bambini }: Props) {
         )}
 
         {/* Prossime scadenze */}
-        {alerts.length > 0 && (
+        {scadenzeVisible.length > 0 && (
           <section>
             <h2 className="text-xl font-bold text-ink mb-4">Prossime scadenze</h2>
             <div className="bg-white border border-line rounded-[var(--radius-xl)] divide-y divide-line shadow-[var(--shadow-sm)]">
-              {alerts.map((alert) => (
-                <div key={`sc-${alert.bambinoId}-${alert.tipo}`} className="flex items-center gap-4 px-5 py-4">
-                  <CalendarDays className="w-5 h-5 text-ink-muted shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-ink truncate">
-                      Certificato di {alert.bambinoNome}
-                    </p>
-                    <p className="text-xs text-ink-muted">
-                      {alert.tipo === "cert_scaduto"
-                        ? `Scaduto il ${formatDateIT(alert.dataScadenza)}`
-                        : `Scade il ${formatDateIT(alert.dataScadenza)}`}
-                    </p>
+              {scadenzeVisible.map((s, idx) => {
+                const isScaduto = s.giorni < 0;
+                const isCert = s.kind === 'cert';
+                const iconBg = isScaduto ? 'bg-flag-100 text-flag-700' : 'bg-ember-100 text-ember-700';
+
+                const title = isCert
+                  ? `Certificato medico di ${s.bambinoNome}`
+                  : `${s.numeroRata}ª rata · ${s.bambinoNome}${s.importo !== undefined ? ` · €${s.importo}` : ''}`;
+
+                const subtitle = isScaduto
+                  ? isCert
+                    ? `Scaduto da ${Math.abs(s.giorni)} ${Math.abs(s.giorni) === 1 ? 'giorno' : 'giorni'} · blocco iscrizione ${anno}`
+                    : `Scaduto il ${formatDateIT(s.dataScadenza)}`
+                  : `Tra ${s.giorni} ${s.giorni === 1 ? 'giorno' : 'giorni'} · scadenza ${formatDateIT(s.dataScadenza)}`;
+
+                const ctaLabel = isCert ? 'Carica nuovo certificato →' : 'Paga con SumUp →';
+                const ctaHref = isCert
+                  ? `/portale/figli/${s.bambinoId}#certificato`
+                  : `/portale/iscrizioni/${s.iscrizioneId}/checkout?titolo=${s.titoloId}`;
+
+                return (
+                  <div key={idx} className="flex items-center gap-4 px-5 py-4">
+                    <div className={`w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center shrink-0 ${iconBg}`}>
+                      {isCert ? <Stethoscope className="w-5 h-5" /> : <Euro className="w-5 h-5" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-ink truncate">{title}</p>
+                      <p className="text-xs text-ink-muted">{subtitle}</p>
+                    </div>
+                    <Link
+                      href={ctaHref}
+                      className="text-sm font-semibold text-navy-700 hover:text-navy-900 shrink-0"
+                    >
+                      {ctaLabel}
+                    </Link>
                   </div>
-                  <Button asChild variant="ghost" size="sm" className="text-xs shrink-0">
-                    <Link href={`/portale/figli/${alert.bambinoId}#certificato`}>Carica nuovo</Link>
-                  </Button>
+                );
+              })}
+              {scadenzeCount > 5 && (
+                <div className="px-5 py-3">
+                  <Link
+                    href="/portale/iscrizioni?stato=da_pagare"
+                    className="text-sm font-semibold text-navy-700 underline underline-offset-2 hover:text-navy-900"
+                  >
+                    Vedi tutte le scadenze ({scadenzeCount}) →
+                  </Link>
                 </div>
-              ))}
+              )}
             </div>
           </section>
         )}
@@ -163,29 +158,43 @@ export default function DashboardGenitore({ genitore, bambini }: Props) {
         {/* Quick actions */}
         <section>
           <h2 className="text-xl font-bold text-ink mb-4">Azioni rapide</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className={`grid grid-cols-1 gap-4 ${qualcunoDaIscrivere ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+            {qualcunoDaIscrivere && (
+              <Link
+                href="/portale/iscrizioni/nuova"
+                className="flex items-center gap-3 bg-navy-700 text-white rounded-[var(--radius-xl)] px-5 py-4 font-semibold hover:bg-navy-900 transition-colors shadow-[var(--shadow-sm)]"
+              >
+                <Plus className="w-5 h-5 shrink-0" />
+                Nuova iscrizione
+              </Link>
+            )}
             <Link
-              href="/portale/iscrizioni/nuova"
-              className="flex items-center gap-3 bg-navy-700 text-white rounded-[var(--radius-xl)] px-5 py-4 font-semibold hover:bg-navy-900 transition-colors shadow-[var(--shadow-sm)]"
+              href="/portale/iscrizioni"
+              className="flex items-center gap-3 bg-white border border-line text-ink rounded-[var(--radius-xl)] px-5 py-4 font-semibold hover:border-navy-300 transition-colors shadow-[var(--shadow-sm)]"
             >
-              <Plus className="w-5 h-5 shrink-0" />
-              Nuova iscrizione
+              <FileText className="w-5 h-5 shrink-0 text-ink-muted" />
+              Iscrizioni
             </Link>
             <Link
               href="/portale/pagamenti"
               className="flex items-center gap-3 bg-white border border-line text-ink rounded-[var(--radius-xl)] px-5 py-4 font-semibold hover:border-navy-300 transition-colors shadow-[var(--shadow-sm)]"
             >
               <CreditCard className="w-5 h-5 shrink-0 text-ink-muted" />
-              Vedi pagamenti
-            </Link>
-            <Link
-              href="/portale/gare"
-              className="flex items-center gap-3 bg-white border border-line text-ink rounded-[var(--radius-xl)] px-5 py-4 font-semibold hover:border-navy-300 transition-colors shadow-[var(--shadow-sm)]"
-            >
-              <Trophy className="w-5 h-5 shrink-0 text-ink-muted" />
-              Calendario gare
+              Pagamenti
             </Link>
           </div>
+
+          {tuttiIscritti && (
+            <div className="mt-8 p-4 lg:p-5 rounded-[var(--radius-lg)] border border-grass-100 bg-grass-50 flex items-center gap-4">
+              <div className="w-11 h-11 rounded-[var(--radius-md)] bg-grass-500 text-white flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-grass-700 text-sm">Tutti i tuoi figli sono iscritti per il {anno}</p>
+                <p className="text-xs text-grass-700/80 mt-0.5">Puoi gestire pagamenti e modulistica dalle sezioni dedicate.</p>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </div>

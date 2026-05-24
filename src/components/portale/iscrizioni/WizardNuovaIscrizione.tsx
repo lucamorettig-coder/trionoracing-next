@@ -56,6 +56,8 @@ interface Props {
   initialTitoli?: TitoloPagamento[];
   /** Tariffa pre-caricata (solo in resume mode, evita fetch ridondante). */
   initialTariffa?: TariffaInfo | null;
+  /** Mappa bambinoId → iscrizioneId per bambini già iscritti nell'anno corrente. */
+  bambiniIscrittiAnno?: Map<string, string>;
 }
 
 function computeResumeStep(iscrizione: Iscrizione): number {
@@ -75,16 +77,22 @@ export default function WizardNuovaIscrizione({
   initialIscrizione = null,
   initialTitoli = [],
   initialTariffa = null,
+  bambiniIscrittiAnno,
 }: Props) {
   const router = useRouter();
 
+  // Bambini selezionabili (non già iscritti per l'anno corrente)
+  const bambiniSelezionabili = bambiniIscrittiAnno
+    ? bambini.filter((b) => !bambiniIscrittiAnno.has(b.id))
+    : bambini;
+  const onlyOne = bambiniSelezionabili.length === 1;
+
   // Resume mode: iscrizione già creata, vai allo step corretto + bambino pre-derivato
   const resumeBambinoId = initialIscrizione?.fields.TABELLA_BAMBINI?.[0] ?? null;
-  const onlyOne = bambini.length === 1;
   const preselected = resumeBambinoId
     ?? (onlyOne
-      ? bambini[0].id
-      : bambinoIniziale && bambini.find((b) => b.id === bambinoIniziale)
+      ? bambiniSelezionabili[0].id
+      : bambinoIniziale && bambini.find((b) => b.id === bambinoIniziale) && !bambiniIscrittiAnno?.has(bambinoIniziale)
         ? bambinoIniziale
         : null);
 
@@ -129,6 +137,12 @@ export default function WizardNuovaIscrizione({
 
   async function goNext() {
     setError(null);
+
+    // Step 1: blocca se il bambino selezionato è già iscritto per l'anno corrente
+    if (step === 1 && bambinoId && bambiniIscrittiAnno?.has(bambinoId)) {
+      setError("Questo figlio è già iscritto per l'anno corrente.");
+      return;
+    }
 
     // Step 3 → 4 = CREATE iscrizione
     if (step === 3 && !iscrizione) {
@@ -180,6 +194,7 @@ export default function WizardNuovaIscrizione({
             bambini={bambini}
             selectedId={bambinoId}
             onSelect={setBambinoId}
+            bambiniIscrittiAnno={bambiniIscrittiAnno}
           />
         )}
         {step === 2 && bambino && (
@@ -283,7 +298,7 @@ export default function WizardNuovaIscrizione({
             variant="primary"
             size="md"
             onClick={goNext}
-            disabled={isNextDisabled({ step, bambinoId, bambino, tariffa, iscrizione, creating })}
+            disabled={isNextDisabled({ step, bambinoId, bambino, tariffa, iscrizione, creating, bambiniIscrittiAnno })}
           >
             {creating ? (
               <>
@@ -314,10 +329,11 @@ function isNextDisabled(args: {
   tariffa: TariffaInfo | null;
   iscrizione: Iscrizione | null;
   creating: boolean;
+  bambiniIscrittiAnno?: Map<string, string>;
 }): boolean {
-  const { step, bambinoId, bambino, tariffa, iscrizione, creating } = args;
+  const { step, bambinoId, bambino, tariffa, iscrizione, creating, bambiniIscrittiAnno } = args;
   if (creating) return true;
-  if (step === 1) return !bambinoId;
+  if (step === 1) return !bambinoId || !!(bambinoId && bambiniIscrittiAnno?.has(bambinoId));
   if (step === 2) return !canProceedRequisiti(bambino);
   if (step === 3) return !tariffa;
   if (step === 4) return !iscrizione?.fields.PRIVACY_MINORE;

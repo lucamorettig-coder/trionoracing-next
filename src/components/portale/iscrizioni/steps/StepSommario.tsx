@@ -126,7 +126,7 @@ export default function StepSommario({
         <section className="bg-white border border-line rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] overflow-hidden">
           <div className="px-5 py-3 border-b border-line bg-bg-soft">
             <p className="text-xs uppercase tracking-wider text-ink-muted font-semibold">
-              Piano rate
+              Pagamenti
             </p>
           </div>
           {titoli.length === 0 ? (

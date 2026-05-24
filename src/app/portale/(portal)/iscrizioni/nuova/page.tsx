@@ -7,9 +7,11 @@ import {
   getBambiniByGenitore,
   getIscrizioneById,
   getIscrizioneInBozzaPerGenitore,
+  getIscrizioniByGenitore,
   getTitoliPagamento,
   calcTariffa,
 } from "@/lib/airtable-portale";
+import { getStatoIscrizioneAnnoCorrente } from "@/lib/portale-utils";
 import { Button } from "@/components/ui/button";
 import WizardNuovaIscrizione, {
   type TariffaInfo,
@@ -27,8 +29,22 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
   if (!genitore) redirect("/portale/login");
 
   const sp = await searchParams;
-  const bambini = await getBambiniByGenitore(genitore.id);
   const annoCorrente = new Date().getFullYear();
+
+  const [bambini, iscrizioni] = await Promise.all([
+    getBambiniByGenitore(genitore.id),
+    getIscrizioniByGenitore(genitore.id),
+  ]);
+
+  // Mappa bambinoId → iscrizioneId per bambini già iscritti nell'anno corrente
+  const bambiniIscrittiAnno = new Map<string, string>(
+    bambini
+      .map((b) => {
+        const r = getStatoIscrizioneAnnoCorrente(b.id, iscrizioni);
+        return r.stato === 'iscritto' && r.iscrizioneId ? [b.id, r.iscrizioneId] as [string, string] : null;
+      })
+      .filter((x): x is [string, string] => x !== null),
+  );
 
   if (bambini.length === 0) {
     return (
@@ -69,6 +85,7 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
           initialIscrizione={iscrizione}
           initialTitoli={titoli}
           initialTariffa={tariffaInfo}
+          bambiniIscrittiAnno={bambiniIscrittiAnno}
         />
       </Layout>
     );
@@ -100,6 +117,7 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
           bambini={bambini}
           bambinoIniziale={sp.bambino}
           anno={annoCorrente}
+          bambiniIscrittiAnno={bambiniIscrittiAnno}
         />
       </Layout>
     );
@@ -111,6 +129,7 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
         bambini={bambini}
         bambinoIniziale={sp.bambino}
         anno={annoCorrente}
+        bambiniIscrittiAnno={bambiniIscrittiAnno}
       />
     </Layout>
   );
