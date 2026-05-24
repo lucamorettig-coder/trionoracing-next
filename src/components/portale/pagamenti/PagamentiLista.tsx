@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import TitoloLabel from "@/components/portale/pagamenti/TitoloLabel";
 import type { Iscrizione, TitoloPagamento } from "@/lib/airtable-portale";
 import { formatEUR, formatDateIT, statoTitoloBadge } from "@/lib/portale-utils";
 
@@ -10,25 +11,11 @@ interface Props {
   iscrizioniById: Record<string, Iscrizione>;
 }
 
-const TITOLO_LABEL: Record<string, string> = {
-  rata: "Rata",
-  prima_rata: "Prima rata",
-  rata_successiva: "Rata",
-  saldo: "Saldo",
-};
-
 const STATO_ORDER: Record<string, number> = {
   scaduto: 0,
   da_pagare: 1,
   pagato: 2,
 };
-
-function titoloLabel(t: TitoloPagamento): string {
-  const f = t.fields;
-  if (f.NUMERO_RATA === 1) return "Prima rata";
-  const tipo = TITOLO_LABEL[f.TIPO_TITOLO ?? "rata"] ?? "Rata";
-  return `${tipo} ${f.NUMERO_RATA ?? ""}`.trim();
-}
 
 export default function PagamentiLista({ titoli, iscrizioniById }: Props) {
   const sorted = [...titoli].sort((a, b) => {
@@ -75,12 +62,12 @@ export default function PagamentiLista({ titoli, iscrizioniById }: Props) {
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-ink">
-                {titoloLabel(t)}
+              <div className="flex items-center gap-2 flex-wrap">
+                <TitoloLabel titolo={t} />
                 {typeof f.IMPORTO === "number" && (
-                  <span className="ml-2 text-ink-muted font-normal">{formatEUR(f.IMPORTO)}</span>
+                  <span className="ml-1 text-ink-muted font-normal">{formatEUR(f.IMPORTO)}</span>
                 )}
-              </p>
+              </div>
               {(nome || annoIsc) && (
                 <p className="text-xs text-ink-muted mt-0.5">
                   {nome} {cognome}

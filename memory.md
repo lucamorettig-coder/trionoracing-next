@@ -20,7 +20,7 @@
 | EVO-012 | ds-photo-bg-colorate | DS — utility `.photo-bg-{color}` per card colorate + uniformazione 8 card navy | 2026-05-23 | — | pronta per implementazione | — | [link](evolutive/EVO-012-ds-photo-bg-colorate.md) |
 | EVO-013 | portale-pagina-pagamenti | Pagina trasversale `/portale/pagamenti` (nata dal QA EVO-004 hotfix #17) | 2026-05-24 | 2026-05-24 | completata | https://trionoracing-next.vercel.app/portale/pagamenti | [link](evolutive/EVO-013-portale-pagina-pagamenti.md) |
 | EVO-014 | portale-ux-stato-iscrizioni | Portale UX: stato iscrizione figli + Azioni Rapide condizionali + 5 bug fix | 2026-05-24 | 2026-05-24 | completata | https://trionoracing-next.vercel.app/portale | [link](evolutive/EVO-014-portale-ux-stato-iscrizioni.md) |
-| EVO-015 | titoli-descrizione | Titoli pagamento: campo DESCRIZIONE come label primaria + fix "undefinedª rata" | — | — | in pianificazione | — | [link](evolutive/EVO-015-titoli-descrizione.md) |
+| EVO-015 | titoli-descrizione | Titoli pagamento: campo DESCRIZIONE come label primaria + fix "undefinedª rata" | 2026-05-24 | — | pronta per implementazione | — | [link](evolutive/EVO-015-titoli-descrizione.md) |
 
 ## Stati possibili
 
