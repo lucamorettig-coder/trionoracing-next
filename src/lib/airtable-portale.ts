@@ -503,6 +503,7 @@ export async function createIscrizione(
   const anno = parseInt(tariffa.fields.ANNO_ISCRIZIONE ?? `${new Date().getFullYear()}`, 10);
   const scadenza = computeDataScadenzaRata(primoMese, anno);
   const sconto = scontoFamiglia ? tariffa.fields.SCONTO_FAMIGLIA_NUMEROSA ?? 0 : 0;
+  const descrizionePrimaRata = `Quota iscrizione + 1ª rata ${anno}`;
 
   await airtableFetch("TITOLI_PAGAMENTO", {
     method: "POST",
@@ -511,6 +512,7 @@ export async function createIscrizione(
         ISCRIZIONE: [iscrizione.id],
         TIPO_TITOLO: "prima_rata",
         NUMERO_RATA: 1,
+        DESCRIZIONE: descrizionePrimaRata,
         IMPORTO_RATA_BASE: tariffa.fields.IMPORTO_RATA,
         IMPORTO_ISCRIZIONE: tariffa.fields.IMPORTO_ISCRIZIONE,
         IMPORTO_SCONTO_APPLICATO: sconto,
@@ -682,6 +684,7 @@ export interface TitoloPagamento {
     PAYMENT_INTENT_ID?: string;
     ID_TRANSAZIONE?: string;
     NOTE_INTERNE?: string;
+    DESCRIZIONE?: string;
     LOCKED?: boolean;
     "ANNO_ISCRIZIONE"?: string[];
   };
@@ -706,6 +709,7 @@ const TITOLI_WRITABLE_FIELDS = new Set([
   "PAYMENT_INTENT_ID",
   "ID_TRANSAZIONE",
   "NOTE_INTERNE",
+  "DESCRIZIONE",
 ]);
 
 export function stripTitoloReadOnlyFields<T extends object>(fields: T): Partial<T> {
