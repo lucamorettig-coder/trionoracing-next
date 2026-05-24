@@ -1011,27 +1011,44 @@ export async function getAllMaestriAttivi(): Promise<Maestro[]> {
 /**
  * Lista lezioni del maestro (come compilatore OR come co-maestro presente).
  * Filtra per anno/mese se passati. Sort: DATA desc.
+ *
+ * Strategia: leggi gli ID delle lezioni direttamente dai campi linked-record
+ * inverse di TABELLA_MAESTRI (LEZIONI_COME_MAESTRO + LEZIONI_COME_COMPILATORE)
+ * e fai batch fetch. Evita il bug ARRAYJOIN su {MAESTRO_COMPILATORE}/{MAESTRI_PRESENTI}
+ * (il primary field di TABELLA_MAESTRI è NOME_MAESTRO, non l'ID).
  */
 export async function getLezioniByMaestro(
   maestroId: string,
   anno?: number,
   mese?: number,
 ): Promise<Lezione[]> {
-  const conditions: string[] = [
-    `OR(FIND("${maestroId}",ARRAYJOIN({MAESTRO_COMPILATORE},","))>0,FIND("${maestroId}",ARRAYJOIN({MAESTRI_PRESENTI},","))>0)`,
-  ];
-  if (anno && mese) {
-    conditions.push(`YEAR({DATA})=${anno}`);
-    conditions.push(`MONTH({DATA})=${mese}`);
-  } else if (anno) {
-    conditions.push(`YEAR({DATA})=${anno}`);
-  }
-  const formula = encodeURIComponent(`AND(${conditions.join(",")})`);
-  const res = await airtableFetch(
-    `TABELLA_LEZIONI?filterByFormula=${formula}&sort[0][field]=DATA&sort[0][direction]=desc&pageSize=100`,
+  const res = await airtableFetch(`TABELLA_MAESTRI/${maestroId}`);
+  const maestro: Maestro = await res.json();
+  const ids = Array.from(
+    new Set([
+      ...(maestro.fields.LEZIONI_COME_COMPILATORE ?? []),
+      ...(maestro.fields.LEZIONI_COME_MAESTRO ?? []),
+    ]),
   );
-  const data: { records: Lezione[] } = await res.json();
-  return data.records;
+  if (ids.length === 0) return [];
+
+  const lezioni = await fetchRecordsByIds<Lezione>("TABELLA_LEZIONI", ids);
+  const filtered = lezioni.filter((l) => {
+    const data = l.fields.DATA;
+    if (!data) return false;
+    if (anno !== undefined) {
+      const y = parseInt(data.slice(0, 4), 10);
+      if (y !== anno) return false;
+    }
+    if (mese !== undefined) {
+      const m = parseInt(data.slice(5, 7), 10);
+      if (m !== mese) return false;
+    }
+    return true;
+  });
+  return filtered.sort((a, b) =>
+    (b.fields.DATA ?? "").localeCompare(a.fields.DATA ?? ""),
+  );
 }
 
 /** Singola lezione per ID. Null se non trovata. */
@@ -1152,25 +1169,38 @@ export async function getBambiniAttiviPerDisciplina(
 
 /**
  * Gare assegnate al maestro filtrate per scope (future | past).
- * Doppio campo legacy: 'Maestro Accompagnatore' OR 'TABELLA_MAESTRI'.
- * Fallback safe: UNION dei risultati di entrambi i campi.
+ *
+ * Strategia: usa l'inverse relationship sui campi di TABELLA_MAESTRI
+ * (GARE_ACCOMPAGNATE + 'Gare Giovanili Umbria 2026') per ottenere gli ID
+ * delle gare assegnate, poi batch fetch sulla tabella gare e filtra per data.
+ * Evita il bug ARRAYJOIN su linked records ({Maestro Accompagnatore}/{TABELLA_MAESTRI}
+ * che restituirebbero il primary field NOME_MAESTRO invece dei record IDs).
  */
 export async function getGareAssegnateAlMaestro(
   maestroId: string,
   scope: "future" | "past",
 ): Promise<Gara[]> {
+  const res = await airtableFetch(`TABELLA_MAESTRI/${maestroId}`);
+  const maestro: Maestro = await res.json();
+  const ids = Array.from(
+    new Set([
+      ...(maestro.fields.GARE_ACCOMPAGNATE ?? []),
+      ...(maestro.fields["Gare Giovanili Umbria 2026"] ?? []),
+    ]),
+  );
+  if (ids.length === 0) return [];
+
+  const records = await fetchRecordsByIds<GaraRecord>(
+    encodeURIComponent(GARE_TABLE),
+    ids,
+  );
   const today = new Date().toISOString().slice(0, 10);
-  const dateCond =
-    scope === "future"
-      ? `DATETIME_DIFF({Data},"${today}",'days')>=0`
-      : `DATETIME_DIFF({Data},"${today}",'days')<0`;
-  const maestroCond = `OR(FIND("${maestroId}",ARRAYJOIN({Maestro Accompagnatore},","))>0,FIND("${maestroId}",ARRAYJOIN({TABELLA_MAESTRI},","))>0)`;
-  const formula = encodeURIComponent(`AND(${dateCond},${maestroCond})`);
-  const sortDir = scope === "future" ? "asc" : "desc";
-  const path = `${encodeURIComponent(GARE_TABLE)}?filterByFormula=${formula}&sort[0][field]=Data&sort[0][direction]=${sortDir}&pageSize=100`;
-  const res = await airtableFetch(path);
-  const data: { records: GaraRecord[] } = await res.json();
-  return data.records.map(mapGara);
+  const gare = records
+    .map(mapGara)
+    .filter((g) => (scope === "future" ? g.data >= today : g.data < today));
+  return gare.sort((a, b) =>
+    scope === "future" ? a.data.localeCompare(b.data) : b.data.localeCompare(a.data),
+  );
 }
 
 // ─── GARE + ISCRIZIONI_GARE (EVO-005) ────────────────────────────────────────
