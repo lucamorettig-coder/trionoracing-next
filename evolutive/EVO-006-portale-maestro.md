@@ -3,8 +3,8 @@
 - **ID**: EVO-006
 - **Slug**: portale-maestro
 - **Data inizio**: 2026-05-24
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: pronta per implementazione
+- **Data fine**: 2026-05-24
+- **Stato**: completata
 - **Tipo**: Nuova feature
 - **Area**: Area autenticata (cross-cutting middleware + nuove route `/portale/lezioni/*`, `/portale/gare-assegnate/*` + dashboard ruolo-aware)
 - **Priorità**: Alta (continuazione naturale Fase 3 dopo EVO-005, propedeutico a EVO-007 admin che riusa le stesse tabelle/viste)
@@ -335,7 +335,43 @@ Già documentato in AGENTS.md §Deploy: Vercel collegato a GitHub `lucamorettig-
 
 ## 8. Verifica e go-live
 
-_Da compilare in Fase 8._
+**Merge**: PR [#28](https://github.com/lucamorettig-coder/trionoracing-next/pull/28) squash su `main` 2026-05-24 (commit `5cd3293`). Deploy Vercel automatico a `https://trionoracing-next.vercel.app/portale/lezioni`.
+
+### Iter implementativo
+
+5 commit progressivi sul branch `feat/portale-maestro`, poi squash:
+
+1. `84273cd` schema Airtable (NOTE_INTERNE, DISCIPLINE) + tipi/costanti + 9 funzioni client + 4 helper portale-utils.
+2. `5352ba6` feature completa: lazy sync layout, Server Actions, 8 componenti UI, 4 pagine route, dashboard ruolo-aware, NavBar dual ruolo.
+3. `c281c2b` **fix #1**: `getMaestroByGenitoreId` ridisegnata via email match — bug noto ARRAYJOIN su linked records (primary field `ID_GENITORE` invece del record ID). Sintomo: utente con UTENTE già popolato vedeva sempre "Account maestro non collegato".
+4. `ba86f8d` **fix #2**: `getLezioniByMaestro` + `getGareAssegnateAlMaestro` via inverse relationship (`LEZIONI_COME_COMPILATORE` + `LEZIONI_COME_MAESTRO` + `GARE_ACCOMPAGNATE`). Bug analogo (primary field `NOME_MAESTRO`). Sintomo: 16 lezioni reali su Airtable, lista sempre vuota.
+5. `60511de` cleanup banner "Lezione in sola lettura": rimossa riga "Contatta admin@trionoracing.it" su richiesta utente.
+6. `634594e` `CardGaraAssegnata` non clickable: la pagina `/portale/gare/[id]` di EVO-005 è per il flusso genitore e fa `notFound()` su gare passate → 404 per maestro. Vista dettaglio gara per maestro parcheggiata (EVO-007 / evolutiva dedicata).
+
+### Quality gate
+
+- ✅ `npx tsc --noEmit` — 0 errori
+- ✅ `npm run lint` — 0 errori (8 warning pre-esistenti)
+- ✅ `npm run build` — 38 pagine, 4 nuove route maestro
+
+### Smoke test dev (validato dall'utente)
+
+- ✅ Login maestro `luca.moretti@icloud.com` (ISTRUTTORE) → lazy sync OK, `TABELLA_MAESTRI.UTENTE` popolato.
+- ✅ Dashboard `/portale` mostra hero "Come Maestro · Ciao Luca" + dual ruolo concatenato con dashboard genitore sotto.
+- ✅ NavBar dual ruolo (Home, I miei figli, Iscrizioni, Pagamenti, Le mie lezioni, Gare assegnate, Profilo).
+- ✅ `/portale/lezioni` lista 16 lezioni reali raggruppate per mese.
+- ✅ `/portale/gare-assegnate` toggle future/passate funzionante.
+- ✅ Banner "Lezione in sola lettura" mostrato per lezioni > 30gg (lato non-admin).
+
+### Lavori rinviati a successive evolutive
+
+- **Dettaglio gara per maestro** (lista bambini iscritti + note operative + accompagnatori): scope EVO-007 admin o evolutiva dedicata. Per ora `CardGaraAssegnata` mostra solo info senza click.
+- **Filtro UI disciplina nel form M-3**: dipende dal backfill `TABELLA_MAESTRI.DISCIPLINE` (azione manuale post-merge utente). Fino al backfill `BambiniSelector` mostra tutti i bambini attivi senza filtro.
+
+### Azioni manuali residue (utente)
+
+1. **Backfill `DISCIPLINE`** sui 9 record `TABELLA_MAESTRI` esistenti (MTB / BDC / entrambi).
+2. **Test login degli altri 8 maestri**: validare il lazy sync via email match. Se fallisce, verificare che `TABELLA_MAESTRI.EMAIL` coincida con l'email Clerk dell'utente.
 
 ---
 
@@ -350,6 +386,14 @@ _Da compilare in Fase 8._
 ---
 
 ## Log fasi
+
+### [2026-05-24] Fase 8 — Verifica e go-live completata
+
+PR #28 squash-merged su `main` (commit `5cd3293`). Deploy Vercel automatico. Smoke test dev validato dall'utente (login maestro reale + dashboard + lista lezioni con 16 record + gare assegnate). 4 fix incrementali applicati durante l'iter di test: (1) `getMaestroByGenitoreId` via email match per workaround bug ARRAYJOIN su linked records; (2) `getLezioniByMaestro` + `getGareAssegnateAlMaestro` via inverse relationship sullo stesso bug; (3) cleanup riga "Contatta admin" dal banner sola lettura; (4) `CardGaraAssegnata` non clickable per evitare 404 sulla pagina dettaglio gara EVO-005 (pensata per genitore, `notFound()` su gare passate). Stato → completata.
+
+### [2026-05-24] Fase 7 — Implementazione completata
+
+Branch `feat/portale-maestro` con 2 commit principali (schema/types/client + feature completa) eseguito secondo prompt. Schema Airtable applicato via MCP: `TABELLA_LEZIONI.NOTE_INTERNE` (fldiaPKG90fqAQELF) + `TABELLA_MAESTRI.DISCIPLINE` (fldee2BiQMWkhXomI). Quality gate 0 errori. PR #28 aperta con body strutturato.
 
 ### [2026-05-24] Fase 0 — Bootstrap completata
 
