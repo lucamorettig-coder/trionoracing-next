@@ -134,7 +134,17 @@ export default function CheckoutSumUp({
           if (type === "success" || (type === "sent" && body?.status === "PAID")) {
             callVerify();
           } else if (type === "error" || type === "fail" || type === "invalid") {
-            setError(body?.detail || body?.message || "Pagamento non riuscito. Riprova.");
+            // Checkout già pagato in precedenza (METADATA non aggiornato) → verifica
+            if (
+              body?.error_code === "CONFLICT" ||
+              (typeof body?.message === "string" && body.message.includes("already been processed"))
+            ) {
+              callVerify();
+              return;
+            }
+            const raw = body?.detail || body?.message;
+            const isMeaningful = raw && typeof raw === "string" && !raw.includes("undefined");
+            setError(isMeaningful ? raw : "Pagamento non riuscito. Riprova.");
           }
         },
       });
