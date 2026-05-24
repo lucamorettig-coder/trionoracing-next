@@ -3,8 +3,10 @@
 - **ID**: EVO-015
 - **Slug**: titoli-descrizione
 - **Data inizio**: 2026-05-24
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: pronta per implementazione
+- **Data fine**: 2026-05-24
+- **Stato**: completata
+- **URL produzione**: https://trionoracing-next.vercel.app/portale
+- **PR**: [#23](https://github.com/lucamorettig-coder/trionoracing-next/pull/23) · merge commit `3f0c3f3`
 - **Tipo**: refactor architetturale dati + bug fix
 - **Area**: cross-cutting — Airtable schema · portale genitore (lista pagamenti, dettaglio iscrizione, dashboard prossime scadenze, wizard sommario) · Make.com scenari
 - **Priorità**: media — non blocca, ma rimuove un bug visibile in produzione ("undefinedª rata") e migliora la chiarezza UI generale dei titoli
@@ -261,3 +263,44 @@ Nota: il bug "undefinedª rata" è già risolto da codice (commit `0593cc4`) —
 - **Mai template inline `${value ?? ""}` su trailing space**: `${"Rata "}${value ?? ""}` produce `"Rata "` con trailing space se value è undefined. Mai. Usare helper che ritornano stringa già pulita.
 - **Mai `${undefined}ª rata`**: identico al sopra ma per ordinali. JSON parsing safe — chiunque legga il render in produzione vede `"undefinedª rata"` letterale.
 - **Make.com può non popolare campi calcolati**: quando uno scenario Make.com non riesce a popolare in modo affidabile un campo (es. progressivo numerico), non insistere a forzarlo via workaround. Ripensare lo schema dati per non dipendere da quel campo (DESCRIZIONE come label primaria > NUMERO_RATA come label primaria).
+
+---
+
+## 8. Verifica e go-live
+
+### Esito
+
+✅ Mergiata in `main` il 2026-05-24, PR [#23](https://github.com/lucamorettig-coder/trionoracing-next/pull/23) squash-merged (commit `3f0c3f3`). Deploy automatico Vercel andato a buon fine.
+
+### Output prodotti
+
+- **Schema Airtable**: nuovo campo `DESCRIZIONE` (`fldZo3jHmAn0VZGeP`) su `TITOLI_PAGAMENTO`, creato via MCP. Label umana primaria del titolo. Popolato da `createIscrizione()` per la prima rata + da scenario Make.com per le rate mensili.
+- **Helper puro**: `titoloLabel(t) → { primary, secondary, secondaryVariant }` in `src/lib/portale-utils.ts`.
+- **Componente Server**: `<TitoloLabel />` in `src/components/portale/pagamenti/` (riusabile).
+- **Refactor 5 consumer**: TabPagamenti, PagamentiLista, StepSommario, DashboardGenitore, checkout/page — eliminate mappe locali duplicate e template inline fragili.
+- **Bug fix mirato**: `DashboardGenitore.tsx:113` ora usa `s.titoloLabel ?? 'Pagamento'` invece di `${s.numeroRata}ª rata` (eliminato il rendering "undefinedª rata · …").
+
+### Verifica per dimensione
+
+| Dimensione | Esito | Note |
+|---|---|---|
+| Design system | ✅ | Riusa `Badge` esistenti; nessun nuovo token. |
+| Architettura | ✅ | Helper puro + Server Component coerenti con pattern portale (EVO-013/014). |
+| Funzionalità | ✅ | Bug "undefinedª rata" eliminato; tipi sconosciuti gestiti con fallback "Pagamento". |
+| Make.com | ✅ | Scenario DEV `5141682` aggiornato in sessione (SearchRecords filtrato + Array Aggregator + mapping `NUMERO_RATA` e `DESCRIZIONE`). PROD `4746166` in carico utente. |
+
+### Azioni manuali residue (utente)
+
+- Replica modifiche scenario Make.com su PROD `4746166` (in carico utente)
+- Backfill manuale `DESCRIZIONE` su titoli storici Airtable PROD (non bloccante: UI ha fallback "Pagamento" robusto)
+
+### Sblocca / collegate
+
+- Bug "undefinedª rata" risolto definitivamente
+- Pattern `DESCRIZIONE` come label primaria riutilizzabile in future tabelle con campi opzionali inaffidabili
+
+---
+
+### [2026-05-24] Fase chiusura — PR docs di backfill
+
+Branch `docs/evo-015-close-backfill`: aggiornamento `memory.md` riga (stato/data fine/URL) + scheda EVO-015 header e sezione 8 + `AGENTS.md` sezione "Pattern appresi in EVO-015". Backfill necessario perché lo stash docs originale è stato droppato per errore durante la sessione EVO-005 — codice e Make.com DEV erano già live regolarmente.
