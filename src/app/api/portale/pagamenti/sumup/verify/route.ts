@@ -5,6 +5,7 @@ import {
   getTitoloById,
   getIscrizioneById,
   updateTitoloPagamento,
+  markPrimaRataPagata,
 } from "@/lib/airtable-portale";
 
 /**
@@ -107,6 +108,16 @@ export async function POST(req: NextRequest) {
     ID_TRANSAZIONE: transactionCode,
     METADATA_PAGAMENTO: JSON.stringify(meta),
   });
+
+  // Sync PRIMA_RATA_PAGATA sull'iscrizione collegata (solo per la prima rata)
+  if (titolo.fields.NUMERO_RATA === 1) {
+    try {
+      await markPrimaRataPagata(iscrizioneId);
+      console.log(`[sumup/verify] PRIMA_RATA_PAGATA synced on iscrizione ${iscrizioneId}`);
+    } catch (e) {
+      console.warn(`[sumup/verify] markPrimaRataPagata failed for ${iscrizioneId}:`, e);
+    }
+  }
 
   return NextResponse.json({ paid: true, status: "PAID", transactionCode });
 }

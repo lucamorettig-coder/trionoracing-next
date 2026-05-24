@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   getTitoloById,
   updateTitoloPagamento,
+  markPrimaRataPagata,
 } from "@/lib/airtable-portale";
 
 /**
@@ -60,6 +61,16 @@ export async function POST(req: NextRequest) {
       updated_at: now,
     }),
   });
+
+  // Sync PRIMA_RATA_PAGATA sull'iscrizione collegata (solo per la prima rata)
+  const iscrizioneId = titolo.fields.ISCRIZIONE?.[0];
+  if (titolo.fields.NUMERO_RATA === 1 && iscrizioneId) {
+    try {
+      await markPrimaRataPagata(iscrizioneId);
+    } catch (e) {
+      console.warn(`[sumup/webhook] markPrimaRataPagata failed for ${iscrizioneId}:`, e);
+    }
+  }
 
   return NextResponse.json({ ok: true });
 }
