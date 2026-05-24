@@ -46,6 +46,80 @@ export function quarterLabel(quarter: "Q1" | "Q2" | "Q3"): string {
   return "Q3 · settembre–dicembre";
 }
 
+/**
+ * Mappa SCADENZA_MESE Airtable (MAIUSCOLO) → nome mese in italiano lowercase.
+ * Controparte client-side di MESI_IT_TO_NUM in airtable-portale.ts:772 (che mappa
+ * verso il numero del mese). Tenere allineate se si aggiungono varianti.
+ */
+const MESI_IT_LABEL: Record<string, string> = {
+  GENNAIO: "gennaio",
+  FEBBRAIO: "febbraio",
+  MARZO: "marzo",
+  APRILE: "aprile",
+  MAGGIO: "maggio",
+  GIUGNO: "giugno",
+  LUGLIO: "luglio",
+  AGOSTO: "agosto",
+  SETTEMBRE: "settembre",
+  OTTOBRE: "ottobre",
+  NOVEMBRE: "novembre",
+  DICEMBRE: "dicembre",
+};
+
+export function meseITLabel(scadenzaMese?: string): string {
+  if (!scadenzaMese) return "—";
+  return MESI_IT_LABEL[scadenzaMese.toUpperCase()] ?? scadenzaMese.toLowerCase();
+}
+
+export interface TitoloLabelInfo {
+  primary: string;
+  secondary: string;
+  secondaryVariant: BadgeVariant;
+}
+
+/**
+ * Calcola la label di un titolo pagamento.
+ * primary: DESCRIZIONE se popolata > fallback robusto basato su TIPO_TITOLO + SCADENZA_MESE.
+ * secondary + secondaryVariant: badge tipo (prima_rata→info, saldo→warning, default→neutral).
+ *
+ * Non dipende da NUMERO_RATA: i titoli creati da Make.com (scenario 4746166) non lo popolano,
+ * e questa è la ragione per cui DESCRIZIONE è la label primaria post-EVO-015.
+ */
+export function titoloLabel(titolo: TitoloPagamento): TitoloLabelInfo {
+  const f = titolo.fields;
+  const tipo = f.TIPO_TITOLO ?? "rata";
+
+  const descrizione = f.DESCRIZIONE?.trim();
+  let primary: string;
+  if (descrizione) {
+    primary = descrizione;
+  } else if (tipo === "prima_rata") {
+    primary = "Prima rata";
+  } else if (tipo === "saldo") {
+    primary = "Saldo";
+  } else if (f.SCADENZA_MESE) {
+    const anno = f.DATA_SCADENZA_PAGAMENTO?.slice(0, 4) ?? new Date().getFullYear().toString();
+    primary = `Rata di ${meseITLabel(f.SCADENZA_MESE)} ${anno}`;
+  } else {
+    primary = "Pagamento";
+  }
+
+  let secondary: string;
+  let secondaryVariant: BadgeVariant;
+  if (tipo === "prima_rata") {
+    secondary = "Prima rata";
+    secondaryVariant = "info";
+  } else if (tipo === "saldo") {
+    secondary = "Saldo";
+    secondaryVariant = "warning";
+  } else {
+    secondary = "Rata";
+    secondaryVariant = "neutral";
+  }
+
+  return { primary, secondary, secondaryVariant };
+}
+
 
 /** Calcola anni interi tra una data di nascita (YYYY-MM-DD) e oggi. */
 export function diffInYears(dataNascita: string): number {
@@ -111,6 +185,9 @@ export type Scadenza = {
   titoloId?: string;
   iscrizioneId?: string;
   importo?: number;
+  /** Label umana del titolo (primary di titoloLabel). Popolata da buildScadenze. */
+  titoloLabel?: string;
+  /** @deprecated post-EVO-015 non più usato in UI — sostituito da titoloLabel. Mantenuto per backward compat. */
   numeroRata?: number;
 };
 
@@ -167,6 +244,7 @@ export function buildScadenze(
       titoloId: t.id,
       iscrizioneId,
       importo: t.fields.IMPORTO ?? t.fields.IMPORTO_RATA_BASE,
+      titoloLabel: titoloLabel(t).primary,
       numeroRata: t.fields.NUMERO_RATA,
     });
   }
