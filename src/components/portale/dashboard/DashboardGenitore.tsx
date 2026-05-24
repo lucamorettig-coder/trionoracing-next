@@ -1,18 +1,36 @@
 import Link from "next/link";
-import { Plus, CalendarDays, CreditCard, CheckCircle2, FileText, Stethoscope, Euro } from "lucide-react";
+import { Plus, CreditCard, CheckCircle2, FileText, Stethoscope, Euro, Trophy, ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import FiglioCard from "@/components/portale/figli/FiglioCard";
 import { formatDateIT, getStatoIscrizioneAnnoCorrente, buildScadenze } from "@/lib/portale-utils";
-import type { Genitore, Bambino, Iscrizione, TitoloPagamento } from "@/lib/airtable-portale";
+import { statoIscrizioneGaraBadge } from "@/components/portale/gare/gara-utils";
+import type {
+  Genitore,
+  Bambino,
+  Iscrizione,
+  TitoloPagamento,
+  IscrizioneGara,
+  Gara,
+} from "@/lib/airtable-portale";
 
 interface Props {
   genitore: Genitore;
   bambini: Bambino[];
   iscrizioni: Iscrizione[];
   titoli: TitoloPagamento[];
+  iscrizioniGara?: IscrizioneGara[];
+  gareFuture?: Gara[];
 }
 
-export default function DashboardGenitore({ genitore, bambini, iscrizioni, titoli }: Props) {
+export default function DashboardGenitore({
+  genitore,
+  bambini,
+  iscrizioni,
+  titoli,
+  iscrizioniGara = [],
+  gareFuture = [],
+}: Props) {
   const nome = genitore.fields.NOME_GENITORE;
   const anno = new Date().getFullYear();
 
@@ -27,6 +45,14 @@ export default function DashboardGenitore({ genitore, bambini, iscrizioni, titol
   const scadenze = buildScadenze(bambini, titoli, iscrizioni);
   const scadenzeCount = scadenze.length;
   const scadenzeVisible = scadenze.slice(0, 5);
+
+  // Richieste gare attive (non rifiutate/ritirate) su gare ancora future
+  const garaById = Object.fromEntries(gareFuture.map((g) => [g.id, g]));
+  const bambinoById = Object.fromEntries(bambini.map((b) => [b.id, b]));
+  const garaRichiesteAttive = iscrizioniGara.filter(
+    (i) => garaById[i.garaId] && i.stato !== "Rifiutata" && i.stato !== "Ritirata",
+  );
+  const garaRichiesteVisible = garaRichiesteAttive.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -155,10 +181,65 @@ export default function DashboardGenitore({ genitore, bambini, iscrizioni, titol
           </section>
         )}
 
+        {/* Le tue gare — richieste attive */}
+        {garaRichiesteAttive.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-ink inline-flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-navy-700" />
+                Le tue gare
+                <span className="text-[12px] font-mono text-ink-muted">({garaRichiesteAttive.length})</span>
+              </h2>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/portale/gare">Calendario gare</Link>
+              </Button>
+            </div>
+            <div className="bg-white border border-line rounded-[var(--radius-xl)] divide-y divide-line shadow-[var(--shadow-sm)]">
+              {garaRichiesteVisible.map((isc) => {
+                const gara = garaById[isc.garaId]!;
+                const bambino = bambinoById[isc.bambinoId];
+                const nome = bambino?.fields.NOME_BAMBINO ?? "Figlio";
+                const badge = statoIscrizioneGaraBadge(isc.stato, nome);
+                return (
+                  <Link
+                    key={isc.id}
+                    href={`/portale/gare/${gara.id}`}
+                    className="flex items-center gap-3 px-5 py-4 hover:bg-bg-soft transition-colors"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-ink truncate">{gara.nomeGara}</p>
+                      <p className="text-xs text-ink-muted mt-0.5 inline-flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
+                          {gara.luogo}
+                        </span>
+                        <span aria-hidden>·</span>
+                        <span>{formatDateIT(gara.data)}</span>
+                      </p>
+                    </div>
+                    <Badge variant={badge.variant}>{badge.label}</Badge>
+                    <ArrowRight className="w-4 h-4 text-ink-muted shrink-0" />
+                  </Link>
+                );
+              })}
+              {garaRichiesteAttive.length > garaRichiesteVisible.length && (
+                <div className="px-5 py-3">
+                  <Link
+                    href="/portale/gare"
+                    className="text-sm font-semibold text-navy-700 underline underline-offset-2 hover:text-navy-900"
+                  >
+                    Vedi tutte ({garaRichiesteAttive.length}) →
+                  </Link>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
         {/* Quick actions */}
         <section>
           <h2 className="text-xl font-bold text-ink mb-4">Azioni rapide</h2>
-          <div className={`grid grid-cols-1 gap-4 ${qualcunoDaIscrivere ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+          <div className={`grid grid-cols-1 gap-4 ${qualcunoDaIscrivere ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-3"}`}>
             {qualcunoDaIscrivere && (
               <Link
                 href="/portale/iscrizioni/nuova"
@@ -181,6 +262,18 @@ export default function DashboardGenitore({ genitore, bambini, iscrizioni, titol
             >
               <CreditCard className="w-5 h-5 shrink-0 text-ink-muted" />
               Pagamenti
+            </Link>
+            <Link
+              href="/portale/gare"
+              className="flex items-center gap-3 bg-white border border-line text-ink rounded-[var(--radius-xl)] px-5 py-4 font-semibold hover:border-navy-300 transition-colors shadow-[var(--shadow-sm)]"
+            >
+              <Trophy className="w-5 h-5 shrink-0 text-ink-muted" />
+              Calendario gare
+              {gareFuture.length > 0 && (
+                <span className="ml-auto text-[11px] font-mono uppercase text-ink-muted">
+                  {gareFuture.length}
+                </span>
+              )}
             </Link>
           </div>
 

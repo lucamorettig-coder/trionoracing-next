@@ -68,6 +68,25 @@ export default async function GarePage() {
         Gare giovanili a cui i tuoi figli possono partecipare. Sezione &quot;In evidenza&quot; = gare ufficiali della scuola.
       </p>
 
+      {richiesteAttive.length > 0 && (
+        <section className="mt-6">
+          <h2 className="text-base font-bold text-ink mb-3.5 inline-flex items-center gap-2">
+            Le tue richieste
+            <span className="text-[12px] font-mono text-ink-muted">({richiesteAttive.length})</span>
+          </h2>
+          <div className="space-y-2">
+            {richiesteAttive.map((isc) => (
+              <CardIscrizioneGara
+                key={isc.id}
+                iscrizione={isc}
+                gara={garaById[isc.garaId]!}
+                bambino={bambinoById[isc.bambinoId]}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       {spotlight && (
         <Spotlight
           nome={spotlight.nomeGara}
@@ -85,22 +104,6 @@ export default async function GarePage() {
         bambini={bambini}
         iscrizioniGenitore={iscrizioniGenitore}
       />
-
-      {richiesteAttive.length > 0 && (
-        <section className="mt-12">
-          <h2 className="text-base font-bold text-ink mb-3.5">Le tue richieste</h2>
-          <div className="space-y-2">
-            {richiesteAttive.map((isc) => (
-              <CardIscrizioneGara
-                key={isc.id}
-                iscrizione={isc}
-                gara={garaById[isc.garaId]!}
-                bambino={bambinoById[isc.bambinoId]}
-              />
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 }

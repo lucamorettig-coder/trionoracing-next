@@ -14,12 +14,31 @@ interface Props {
 }
 
 const ALL = "tutte";
+const PAGE_SIZE = 5;
+
+/** Chiave YYYY-MM del mese in corso (timezone locale). */
+function currentMonthKey(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
 
 export default function FiltriGare({ gare, bambini, iscrizioniGenitore }: Props) {
-  const [mese, setMese] = useState<string>(ALL);
-  const [regione, setRegione] = useState<string>(ALL);
+  // Prefiltri: se ci sono gare nel mese corrente, parto da quello; senno mostro tutto.
+  // Regione: prefiltro Umbria se almeno una gara è in Umbria.
+  const initialMese = useMemo(() => {
+    const key = currentMonthKey();
+    return gare.some((g) => meseAnnoKey(g.data) === key) ? key : ALL;
+  }, [gare]);
+  const initialRegione = useMemo(
+    () => (gare.some((g) => g.comitatoRegionale === "Umbria") ? "Umbria" : ALL),
+    [gare],
+  );
+
+  const [mese, setMese] = useState<string>(initialMese);
+  const [regione, setRegione] = useState<string>(initialRegione);
   const [tipo, setTipo] = useState<string>(ALL);
   const [soloCompatibili, setSoloCompatibili] = useState(false);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const mesiOptions = useMemo(() => {
     const set = new Map<string, string>();
@@ -74,7 +93,17 @@ export default function FiltriGare({ gare, bambini, iscrizioniGenitore }: Props)
     }));
   }, [filtrate]);
 
-  const filtriAttivi = mese !== ALL || regione !== ALL || tipo !== ALL || soloCompatibili;
+  const filtriAttivi =
+    mese !== initialMese || regione !== initialRegione || tipo !== ALL || soloCompatibili;
+
+  const toggleExpand = (key: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   return (
     <>
@@ -105,14 +134,14 @@ export default function FiltriGare({ gare, bambini, iscrizioniGenitore }: Props)
           <button
             type="button"
             onClick={() => {
-              setMese(ALL);
-              setRegione(ALL);
+              setMese(initialMese);
+              setRegione(initialRegione);
               setTipo(ALL);
               setSoloCompatibili(false);
             }}
             className="text-[12.5px] font-semibold text-sky-600 hover:text-navy-700 ml-1"
           >
-            Pulisci filtri
+            Ripristina filtri
           </button>
         )}
 
@@ -123,29 +152,59 @@ export default function FiltriGare({ gare, bambini, iscrizioniGenitore }: Props)
 
       {filtrate.length === 0 ? (
         <div className="text-center py-12 bg-white border border-line rounded-[var(--radius-xl)] mt-8">
-          <p className="text-ink-muted">Nessuna gara corrisponde ai filtri.</p>
+          <p className="text-ink-muted mb-3">Nessuna gara corrisponde ai filtri.</p>
+          <button
+            type="button"
+            onClick={() => {
+              setMese(ALL);
+              setRegione(ALL);
+              setTipo(ALL);
+              setSoloCompatibili(false);
+            }}
+            className="text-[13px] font-semibold text-sky-600 hover:text-navy-700"
+          >
+            Mostra tutte le gare
+          </button>
         </div>
       ) : (
-        grouped.map((g) => (
-          <section key={g.key} className="mt-8">
-            <div className="flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.1em] text-ink-muted mb-3.5">
-              <span>
-                {g.label} · {g.list.length} {g.list.length === 1 ? "gara" : "gare"}
-              </span>
-              <span className="flex-1 h-px bg-line" aria-hidden />
-            </div>
-            <div className="space-y-3">
-              {g.list.map((gara) => (
-                <CardGara
-                  key={gara.id}
-                  gara={gara}
-                  bambini={bambini}
-                  iscrizioniGenitore={iscrizioniGenitore}
-                />
-              ))}
-            </div>
-          </section>
-        ))
+        grouped.map((g) => {
+          const isExpanded = expanded.has(g.key);
+          const visible = isExpanded ? g.list : g.list.slice(0, PAGE_SIZE);
+          const hidden = g.list.length - visible.length;
+          return (
+            <section key={g.key} className="mt-8">
+              <div className="flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.1em] text-ink-muted mb-3.5">
+                <span>
+                  {g.label} · {g.list.length} {g.list.length === 1 ? "gara" : "gare"}
+                </span>
+                <span className="flex-1 h-px bg-line" aria-hidden />
+              </div>
+              <div className="space-y-3">
+                {visible.map((gara) => (
+                  <CardGara
+                    key={gara.id}
+                    gara={gara}
+                    bambini={bambini}
+                    iscrizioniGenitore={iscrizioniGenitore}
+                  />
+                ))}
+              </div>
+              {(hidden > 0 || isExpanded) && g.list.length > PAGE_SIZE && (
+                <div className="mt-3 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => toggleExpand(g.key)}
+                    className="text-[13px] font-semibold text-sky-600 hover:text-navy-700 px-4 py-2"
+                  >
+                    {isExpanded
+                      ? "Mostra meno"
+                      : `Visualizza tutte (${g.list.length})`}
+                  </button>
+                </div>
+              )}
+            </section>
+          );
+        })
       )}
     </>
   );

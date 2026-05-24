@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import type { Bambino, Gara, IscrizioneGara } from "@/lib/airtable-portale";
 import { calcCategoriaFCI } from "@/lib/airtable-portale";
 import { categoriaCompatibile } from "@/lib/portale-utils";
-import { MESI_IT_SHORT, parseISODate, statoIscrizioneGaraBadge, iscrizioniAttiveSuGara } from "./gara-utils";
+import { MESI_IT_SHORT, parseISODate, statoIscrizioneGaraBadge, iscrizioniAttiveSuGara, tipoGaraStyle } from "./gara-utils";
 
 interface Props {
   gara: Gara;
@@ -31,6 +31,8 @@ export default function CardGara({ gara, bambini, iscrizioniGenitore }: Props) {
     categoriaCompatibile(gara.classe, calcCategoriaFCI(b.fields.DATA_NASCITA_BAMBINO)),
   );
   const nessunCompatibile = bambini.length > 0 && compatibili.length === 0;
+
+  const tipoStyle = tipoGaraStyle(gara.tipoGara);
 
   return (
     <Link
@@ -61,9 +63,18 @@ export default function CardGara({ gara, bambini, iscrizioniGenitore }: Props) {
       </div>
 
       <div className="flex-1 min-w-0">
-        <h3 className="text-base lg:text-lg font-bold text-ink leading-snug">
-          {gara.nomeGara}
-        </h3>
+        <div className="flex items-start gap-2 flex-wrap">
+          <h3 className="text-base lg:text-lg font-bold text-ink leading-snug flex-1 min-w-0">
+            {gara.nomeGara}
+          </h3>
+          {tipoStyle && (
+            <span
+              className={`inline-flex items-center px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-bold uppercase tracking-wide ${tipoStyle.bg} ${tipoStyle.text} flex-shrink-0`}
+            >
+              {gara.tipoGara}
+            </span>
+          )}
+        </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-ink-muted mt-1.5">
           <span className="inline-flex items-center gap-1">
             <MapPin className="w-3 h-3" />
@@ -77,12 +88,6 @@ export default function CardGara({ gara, bambini, iscrizioniGenitore }: Props) {
                 <Users className="w-3 h-3" />
                 {gara.classe}
               </span>
-            </>
-          )}
-          {gara.tipoGara && (
-            <>
-              <span aria-hidden>·</span>
-              <span>{gara.tipoGara}</span>
             </>
           )}
         </div>
