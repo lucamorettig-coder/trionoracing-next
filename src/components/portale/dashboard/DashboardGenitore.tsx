@@ -42,7 +42,7 @@ export default function DashboardGenitore({ genitore, bambini }: Props) {
   return (
     <div className="min-h-screen bg-bg-soft">
       {/* Hero */}
-      <section className="bg-navy-700 pattern-navy text-white">
+      <section className="photo-bg-navy text-white">
         <div className="relative max-w-[1280px] mx-auto px-6 lg:px-10 py-10 lg:py-14">
           {bambini.length === 0 ? (
             <>

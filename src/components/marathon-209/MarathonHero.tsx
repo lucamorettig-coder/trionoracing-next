@@ -43,7 +43,7 @@ export function MarathonHero({ edizione }: Props) {
   const canRegister = inscriptionOpen(edizione.statoIscrizioni);
 
   return (
-    <section className="relative bg-navy-900 text-white overflow-hidden">
+    <section className="relative photo-bg-navy text-white overflow-hidden">
       {edizione.fotoHero ? (
         <>
           <Image

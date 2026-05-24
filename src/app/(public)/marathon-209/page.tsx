@@ -60,8 +60,7 @@ export default async function Marathon209Page() {
     return (
       <main className="theme-209">
         <BreadcrumbJsonLd items={[{ name: "Marathon 209", url: "/marathon-209" }]} />
-        <section className="relative bg-navy-900 text-white overflow-hidden">
-          <div className="absolute inset-0 pattern-navy" aria-hidden />
+        <section className="relative photo-bg-navy text-white overflow-hidden">
           <div className="relative max-w-[960px] mx-auto px-6 lg:px-10 py-32 lg:py-48 text-center">
             <h1 className="text-[clamp(2.5rem,6vw,5rem)] text-white leading-[0.9]">
               MARATHON MTB 209

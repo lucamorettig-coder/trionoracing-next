@@ -15,7 +15,7 @@ export default function StepperWizard({ steps, currentStep }: Props) {
 
   return (
     <section
-      className="relative rounded-[var(--radius-xl)] overflow-hidden bg-navy-900 pattern-navy px-6 sm:px-7 pt-10 sm:pt-12 pb-8 sm:pb-9 shadow-[var(--shadow-md)] max-w-[980px] mx-auto"
+      className="relative rounded-[var(--radius-xl)] overflow-hidden photo-bg-navy text-white px-6 sm:px-7 pt-10 sm:pt-12 pb-8 sm:pb-9 shadow-[var(--shadow-md)] max-w-[980px] mx-auto"
       aria-label="Wizard iscrizione"
     >
       {/* Chip "Step X di N · Label" */}
