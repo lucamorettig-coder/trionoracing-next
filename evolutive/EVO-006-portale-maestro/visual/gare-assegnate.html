@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gare assegnate · Portale Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+.page-head { margin-bottom: 18px; }
+.page-h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; }
+.page-sub { font-size: 14px; color: var(--ink-muted); margin: 0; max-width: 540px; }
+
+.toggle-tabs {
+  display: inline-flex;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 4px;
+  margin-top: 14px;
+  gap: 4px;
+}
+.toggle-tab {
+  font: inherit; font-size: 13px; font-weight: 600;
+  background: transparent; border: none;
+  padding: 8px 16px;
+  border-radius: var(--r-sm);
+  color: var(--ink-muted);
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.toggle-tab.active { background: var(--navy-700); color: #fff; }
+.toggle-tab .count {
+  font-family: var(--f-mono); font-size: 11px;
+  background: rgba(255,255,255,0.18);
+  padding: 1px 6px; border-radius: 4px;
+}
+.toggle-tab:not(.active) .count { background: var(--bg-muted); color: var(--ink); }
+
+/* GARA CARD */
+.gara-card {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  padding: 18px; margin-bottom: 12px;
+  display: flex; gap: 16px;
+  align-items: flex-start;
+  text-decoration: none; color: inherit;
+  box-shadow: var(--sh-xs);
+  transition: all .2s;
+}
+.gara-card:hover { box-shadow: var(--sh-sm); border-color: var(--navy-200); }
+.gara-card.past { opacity: 0.7; }
+
+.gara-date {
+  width: 64px; flex-shrink: 0; text-align: center;
+  background: var(--bg-soft); border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 10px 6px; line-height: 1.1;
+}
+.gara-date .day { font-size: 24px; font-weight: 800; color: var(--navy-700); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.gara-date .mon { font-size: 11px; font-family: var(--f-mono); text-transform: uppercase; color: var(--ink-muted); margin-top: 2px; font-weight: 700; letter-spacing: 0.06em; }
+.gara-card.featured .gara-date { background: var(--sun-500); border-color: var(--sun-500); }
+.gara-card.featured .gara-date .day { color: var(--navy-900); }
+.gara-card.featured .gara-date .mon { color: var(--navy-900); opacity: 0.7; }
+
+.gara-body { flex: 1; min-width: 0; }
+.gara-title { font-size: 16px; font-weight: 700; margin: 0; line-height: 1.25; letter-spacing: -0.005em; }
+.gara-meta {
+  font-size: 12.5px; color: var(--ink-muted);
+  margin-top: 4px;
+  display: flex; gap: 4px 10px; flex-wrap: wrap; align-items: center;
+}
+.gara-meta .ico { display: inline-flex; align-items: center; gap: 4px; }
+
+.team-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: var(--bg-soft);
+  border-radius: var(--r-md);
+  font-size: 12.5px;
+}
+.team-row .label {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.team-row .avatars { display: flex; gap: -2px; }
+.team-row .avatar { width: 24px; height: 24px; font-size: 10px; border: 1.5px solid #fff; margin-left: -4px; }
+.team-row .avatar:first-child { margin-left: 0; }
+.team-row .names { color: var(--ink); font-weight: 500; }
+
+.bambini-iscritti-callout {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--navy-50);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  color: var(--ink);
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer;
+}
+.bambini-iscritti-callout:hover { background: var(--navy-100); }
+.bambini-iscritti-callout .num {
+  background: var(--navy-700); color: #fff;
+  font-weight: 700; font-size: 12px;
+  padding: 2px 8px; border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.bambini-iscritti-callout .arr { margin-left: auto; color: var(--ink-muted); }
+
+.gara-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; gap: 10px; flex-wrap: wrap; }
+.gara-foot-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.gara-foot-action {
+  font-size: 13px; font-weight: 600;
+  color: var(--navy-700); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+.month-h {
+  font-family: var(--f-mono);
+  font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-muted);
+  margin: 28px 0 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.month-h::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+@container page (min-width: 900px) {
+  .page-h1 { font-size: 32px; }
+  .gara-card { padding: 22px; gap: 20px; }
+  .gara-date { width: 84px; padding: 14px 8px; }
+  .gara-date .day { font-size: 32px; }
+  .gara-title { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="page" style="background:var(--bg-soft)">
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" style="text-decoration:none;color:inherit">
+        <div class="nav-logo-mark">T</div>
+        <div><div class="nav-logo-text">Triono Racing</div><div class="nav-logo-sub">Maestri</div></div>
+      </a>
+      <nav class="nav-links">
+        <a href="#" class="nav-link">Home</a>
+        <a href="#" class="nav-link">Le mie lezioni</a>
+        <a href="#" class="nav-link active">Gare assegnate</a>
+        <a href="#" class="nav-link">Profilo</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <button class="nav-iconbtn nav-iconbtn-burger"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+        <a href="#" style="text-decoration:none;display:inline-flex"><span class="avatar avatar-sm" style="background:var(--ember-500);color:#fff">AM</span></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb">
+    <a href="#">Home</a><span class="sep">/</span>
+    <span class="current">Gare assegnate</span>
+  </div>
+
+  <div class="page-inner">
+
+    <div class="page-head">
+      <h1 class="page-h1">Gare assegnate</h1>
+      <p class="page-sub">Le gare in cui sei accompagnatore della squadra. Vedi i bambini iscritti confermati e prepara il check-in.</p>
+      <div class="toggle-tabs">
+        <button class="toggle-tab active">
+          <i data-lucide="calendar" style="width:14px;height:14px"></i>
+          Future <span class="count">2</span>
+        </button>
+        <button class="toggle-tab">
+          <i data-lucide="history" style="width:14px;height:14px"></i>
+          Passate <span class="count">6</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- GIUGNO 2026 -->
+    <div class="month-h">Giugno 2026</div>
+
+    <a href="#" class="gara-card featured">
+      <div class="gara-date">
+        <div class="day">14</div>
+        <div class="mon">GIU</div>
+      </div>
+      <div class="gara-body">
+        <h3 class="gara-title">Trofeo Le Grazie · MTB Giovaniss.</h3>
+        <div class="gara-meta">
+          <span class="ico"><i data-lucide="map-pin" style="width:12px;height:12px"></i>Parco Le Grazie · Terni</span>
+          <span class="sep">·</span>
+          <span class="ico"><i data-lucide="clock" style="width:12px;height:12px"></i>09:00 ritrovo</span>
+          <span class="sep">·</span>
+          <span class="ico"><i data-lucide="bike" style="width:12px;height:12px"></i>MTB</span>
+        </div>
+
+        <div class="team-row">
+          <span class="label">Maestri</span>
+          <div class="avatars">
+            <span class="avatar" style="background:var(--ember-500);color:#fff">AM</span>
+            <span class="avatar" style="background:var(--sky-500);color:#fff">MC</span>
+          </div>
+          <span class="names">Tu + Marta Conti</span>
+        </div>
+
+        <div class="bambini-iscritti-callout">
+          <i data-lucide="users" style="width:18px;height:18px;color:var(--navy-700)"></i>
+          <span><strong>9 bambini</strong> iscritti confermati su 12 richieste</span>
+          <span class="num">9</span>
+          <i data-lucide="chevron-right" class="arr" style="width:16px;height:16px"></i>
+        </div>
+
+        <div class="gara-foot">
+          <div class="gara-foot-badges">
+            <span class="badge badge-sun"><i data-lucide="star" style="width:11px;height:11px"></i>In evidenza · gara scuola</span>
+            <span class="badge badge-info">In programma · -23 giorni</span>
+          </div>
+          <span class="gara-foot-action">Vedi dettagli<i data-lucide="arrow-right" style="width:14px;height:14px"></i></span>
+        </div>
+      </div>
+    </a>
+
+    <a href="#" class="gara-card">
+      <div class="gara-date">
+        <div class="day">28</div>
+        <div class="mon">GIU</div>
+      </div>
+      <div class="gara-body">
+        <h3 class="gara-title">Trofeo Cesi · MTB e BDC</h3>
+        <div class="gara-meta">
+          <span class="ico"><i data-lucide="map-pin" style="width:12px;height:12px"></i>Cesi (TR)</span>
+          <span class="sep">·</span>
+          <span class="ico"><i data-lucide="clock" style="width:12px;height:12px"></i>09:00 ritrovo</span>
+          <span class="sep">·</span>
+          <span class="ico"><i data-lucide="bike" style="width:12px;height:12px"></i>MTB + BDC</span>
+        </div>
+
+        <div class="team-row">
+          <span class="label">Maestri</span>
+          <div class="avatars">
+            <span class="avatar" style="background:var(--ember-500);color:#fff">AM</span>
+          </div>
+          <span class="names">Solo tu · <a href="#" style="color:var(--sky-600);text-decoration:none;font-weight:600">aggiungi co-maestro?</a></span>
+        </div>
+
+        <div class="bambini-iscritti-callout">
+          <i data-lucide="users" style="width:18px;height:18px;color:var(--navy-700)"></i>
+          <span><strong>4 bambini</strong> iscritti confermati · 2 richieste in attesa</span>
+          <span class="num">4</span>
+          <i data-lucide="chevron-right" class="arr" style="width:16px;height:16px"></i>
+        </div>
+
+        <div class="gara-foot">
+          <div class="gara-foot-badges">
+            <span class="badge badge-info">In programma · -37 giorni</span>
+            <span class="badge badge-warning">2 richieste da approvare admin</span>
+          </div>
+          <span class="gara-foot-action">Vedi dettagli<i data-lucide="arrow-right" style="width:14px;height:14px"></i></span>
+        </div>
+      </div>
+    </a>
+
+    <!-- ARCHIVIO (preview) -->
+    <div class="month-h" style="margin-top:40px">Passate · 6 gare nel 2026</div>
+
+    <a href="#" class="gara-card past">
+      <div class="gara-date">
+        <div class="day">28</div>
+        <div class="mon">APR</div>
+      </div>
+      <div class="gara-body">
+        <h3 class="gara-title">Cronoscalata Stroncone · BDC</h3>
+        <div class="gara-meta">
+          <span class="ico"><i data-lucide="map-pin" style="width:12px;height:12px"></i>Stroncone (TR)</span>
+          <span class="sep">·</span>
+          <span class="ico"><i data-lucide="bike" style="width:12px;height:12px"></i>BDC</span>
+        </div>
+
+        <div class="bambini-iscritti-callout" style="background:var(--bg-muted)">
+          <i data-lucide="users" style="width:18px;height:18px;color:var(--ink-muted)"></i>
+          <span><strong>6 bambini</strong> hanno gareggiato</span>
+          <span class="num" style="background:var(--ink-muted)">6</span>
+          <i data-lucide="chevron-right" class="arr" style="width:16px;height:16px"></i>
+        </div>
+
+        <div class="gara-foot">
+          <div class="gara-foot-badges">
+            <span class="badge badge-neutral"><i data-lucide="check" style="width:11px;height:11px"></i>Conclusa · 28 apr 2026</span>
+            <span class="badge badge-success">Risultati pubblicati</span>
+          </div>
+          <span class="gara-foot-action">Vedi risultati<i data-lucide="arrow-right" style="width:14px;height:14px"></i></span>
+        </div>
+      </div>
+    </a>
+
+    <a href="#" style="display:block;text-align:center;font-size:13px;font-weight:600;color:var(--sky-600);text-decoration:none;padding:16px 0">
+      Vedi tutte le 6 gare passate del 2026 →
+    </a>
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;background:var(--sun-500);color:var(--navy-900);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px">T</div>
+          <div><div class="footer-brand-name">Triono Racing</div></div>
+        </div>
+      </div>
+      <div class="footer-col"><div class="footer-col-title">Maestro</div><ul><li><a href="#">Lezioni</a></li><li><a href="#">Gare</a></li></ul></div>
+      <div class="footer-col"><div class="footer-col-title">Supporto</div><ul><li><a href="#">Contatti</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>ASD CIEMME</span><span>© 2026</span></div>
+  </footer>
+
+</div>
+</template>
+
+<script src="../shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['Mockup Portale', 'Maestro', 'Gare assegnate'],
+    title: 'Gare assegnate maestro',
+    route: '/portale/gare-assegnate',
+    statusBarTheme: 'dark',
+    desktopScale: 0.6,
+    stateLegend: { tag: 'Stato', items: [{ ref: 1, text: 'Toggle Future attivo · 2 gare in programma · 1 conclusa in preview' }] },
+    annotations: [
+      { ref: 1, text: '<strong>Toggle Future / Passate</strong>: segmented control con count inline. Future è default. Cambiando filtro la lista si filtra in-page.' },
+      { ref: 2, text: '<strong>Card gara assegnata</strong>: variante della card gare-lista del genitore, ma con 2 callout aggiuntive (team maestri + bambini iscritti confermati). Date-tile colorato sun per gare in evidenza scuola.' },
+      { ref: 3, text: '<strong>Team row</strong>: pattern label mono + avatar stack + names. Se solo il maestro è assegnato, CTA inline «aggiungi co-maestro?» per richiedere supporto.' },
+      { ref: 4, text: '<strong>Bambini iscritti callout</strong>: navy-50 con icona users + count grande pillola. Mostra confermati vs in-attesa-approvazione. Click apre la pagina admin gara per vedere la lista nominativa (anche per maestri, scope decision UX_DETTAGLIO_MAESTRO M-5).' },
+      { ref: 5, text: '<strong>Warning admin pending</strong>: badge ember se ci sono richieste in attesa di approvazione admin. Il maestro vede ma non può approvare — è prerogativa admin.' },
+      { ref: 6, text: '<strong>Gare passate</strong>: opacity ridotta + badge neutral «Conclusa» + grass «Risultati pubblicati» se presenti. CTA cambia in «Vedi risultati».' },
+      { ref: 7, text: '<strong>Empty state</strong> (non mostrato): «Non sei assegnato a gare future» + illustration + CTA «Vedi tutte le gare» che porta a /portale/gare (pagina pubblica genitore).' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>

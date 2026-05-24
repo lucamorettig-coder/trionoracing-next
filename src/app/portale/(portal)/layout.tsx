@@ -3,6 +3,9 @@ import PortaleNavBar from "@/components/portale/PortaleNavBar";
 import {
   getGenitoreByClerkId,
   getGenitoreByEmail,
+  getMaestroByEmail,
+  getMaestroByGenitoreId,
+  linkMaestroToGenitore,
   createGenitore,
   updateGenitoreAuthUserId,
   type Ruolo,
@@ -36,7 +39,14 @@ async function syncGenitore(clerkUserId: string): Promise<void> {
   // essere stato promosso/declassato, o si è passati a un base diverso).
   const existing = await getGenitoreByClerkId(clerkUserId);
   if (existing) {
-    await syncClerkRole(clerkUserId, existing.fields.RUOLO ?? "GENITORE");
+    const ruoloExisting = existing.fields.RUOLO ?? "GENITORE";
+    await syncClerkRole(clerkUserId, ruoloExisting);
+    if (ruoloExisting === "ISTRUTTORE") {
+      const email = existing.fields.EMAIL_GENITORE;
+      if (email) {
+        await syncMaestroLinkedToGenitore(existing.id, email);
+      }
+    }
     return;
   }
 
@@ -45,15 +55,17 @@ async function syncGenitore(clerkUserId: string): Promise<void> {
 
   const email = user.emailAddresses[0]?.emailAddress ?? "";
   let ruolo: Ruolo = "GENITORE";
+  let genitoreRecordId: string | undefined;
 
   const byEmail = await getGenitoreByEmail(email);
   if (byEmail) {
     // Email già in Airtable (pre-registrata o registrata via email/pwd) ma senza AUTH_USER_ID
     await updateGenitoreAuthUserId(byEmail.id, clerkUserId);
     ruolo = byEmail.fields.RUOLO ?? "GENITORE";
+    genitoreRecordId = byEmail.id;
   } else {
     // Nuovo utente (es. Google OAuth con email non registrata)
-    await createGenitore({
+    const created = await createGenitore({
       NOME_GENITORE: user.firstName ?? "",
       COGNOME_GENITORE: user.lastName ?? "",
       EMAIL_GENITORE: email,
@@ -61,10 +73,42 @@ async function syncGenitore(clerkUserId: string): Promise<void> {
       RUOLO: "GENITORE",
       FLAG_PRIVACY: false,
     });
+    genitoreRecordId = created.id;
   }
 
   await syncClerkRole(clerkUserId, ruolo);
+  if (ruolo === "ISTRUTTORE" && genitoreRecordId) {
+    await syncMaestroLinkedToGenitore(genitoreRecordId, email);
+  }
   console.log("[portale-layout] sync:", email, "→ ruolo:", ruolo);
+}
+
+/**
+ * Lazy sync EVO-006: linka il record TABELLA_MAESTRI corrispondente
+ * (via email match) al genitore esistente, se non già linkato.
+ * Non bloccante: se l'email non risulta in TABELLA_MAESTRI, logga warning
+ * e la dashboard mostra banner "Account maestro non collegato".
+ */
+async function syncMaestroLinkedToGenitore(
+  genitoreRecordId: string,
+  email: string,
+): Promise<void> {
+  try {
+    const existing = await getMaestroByGenitoreId(genitoreRecordId);
+    if (existing) return;
+
+    const byEmail = await getMaestroByEmail(email);
+    if (!byEmail) {
+      console.warn(
+        `[portale-layout] ISTRUTTORE ${email} non trovato in TABELLA_MAESTRI — contattare admin`,
+      );
+      return;
+    }
+    await linkMaestroToGenitore(byEmail.id, genitoreRecordId);
+    console.log("[portale-layout] maestro linked:", email, "→", byEmail.id);
+  } catch (err) {
+    console.warn("[portale-layout] maestro sync failed (non-blocking):", err);
+  }
 }
 
 /**

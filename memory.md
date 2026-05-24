@@ -11,7 +11,7 @@
 | EVO-003 | portale-genitore-core | F3.2 — Area genitore core (dashboard + figli + cert + foto) | 2026-05-22 | 2026-05-22 | completata | https://trionoracing-next.vercel.app/portale | [link](evolutive/EVO-003-portale-genitore-core.md) |
 | EVO-004 | portale-iscrizioni | F3.3 — Iscrizioni e pagamenti (wizard + modulistica + SumUp) | 2026-05-22 | 2026-05-22 | completata | https://trionoracing-next.vercel.app/portale/iscrizioni | [link](evolutive/EVO-004-portale-iscrizioni.md) |
 | EVO-005 | portale-gare-genitore | F3.4 — Calendario gare genitore | 2026-05-24 | 2026-05-24 | completata | https://trionoracing-next.vercel.app/portale/gare | [link](evolutive/EVO-005-portale-gare-genitore.md) |
-| EVO-006 | portale-maestro | F3.5 — Area maestro (lezioni + gare assegnate) | — | — | in pianificazione | — | [link](evolutive/EVO-006-portale-maestro.md) |
+| EVO-006 | portale-maestro | F3.5 — Area maestro (lezioni + gare assegnate) | 2026-05-24 | — | pronta per implementazione | — | [link](evolutive/EVO-006-portale-maestro.md) |
 | EVO-007 | portale-admin | F3.6 — Area admin (dashboard + 11 sotto-pagine) | — | — | in pianificazione | — | [link](evolutive/EVO-007-portale-admin.md) |
 | EVO-008 | migrazione-clerk | F3.7 — Migrazione utenti Supabase → Clerk | — | — | in pianificazione | — | [link](evolutive/EVO-008-migrazione-clerk.md) |
 | EVO-009 | kit-scuola | Kit Scuola — vetrina pubblica /la-scuola + immagini nel size picker portale (ombrello) | 2026-05-23 | — | ombrello | — | [link](evolutive/EVO-009-kit-scuola.md) |

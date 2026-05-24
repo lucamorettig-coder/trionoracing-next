@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Le mie lezioni · Portale Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+.page-head { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
+.page-head-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.page-h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; }
+.page-sub { font-size: 14px; color: var(--ink-muted); margin: 0; }
+
+.filters-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.f-select {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 8px 12px;
+  font-size: 13px; font-weight: 500; color: var(--ink); cursor: pointer;
+  font-family: inherit;
+}
+.f-select.active { border-color: var(--navy-700); background: var(--navy-50); }
+.f-select .label { color: var(--ink-muted); font-size: 11.5px; }
+.f-select .value { font-weight: 600; }
+
+.month-h {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 14px; margin: 28px 0 14px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+.month-h .title {
+  font-family: var(--f-mono);
+  font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--navy-700);
+  font-weight: 700;
+}
+.month-h .stats {
+  font-family: var(--f-mono);
+  font-size: 11px; color: var(--ink-muted);
+  letter-spacing: 0.04em;
+}
+
+.lez-card {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  padding: 16px; margin-bottom: 10px;
+  display: flex; gap: 14px;
+  text-decoration: none; color: inherit;
+  box-shadow: var(--sh-xs);
+  transition: all .18s;
+}
+.lez-card:hover { box-shadow: var(--sh-sm); border-color: var(--navy-200); }
+
+.lez-date-tile {
+  width: 64px; flex-shrink: 0; text-align: center;
+  background: var(--bg-soft); border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 10px 6px;
+}
+.lez-date-tile .day { font-size: 22px; font-weight: 800; color: var(--navy-700); line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.lez-date-tile .dow {
+  font-size: 9px; font-family: var(--f-mono);
+  text-transform: uppercase; color: var(--ink-muted);
+  margin-top: 4px; font-weight: 700; letter-spacing: 0.06em;
+}
+.lez-date-tile.mtb { background: var(--grass-50); border-color: var(--grass-100); }
+.lez-date-tile.mtb .day { color: var(--grass-700); }
+.lez-date-tile.bdc { background: var(--sky-50); border-color: var(--sky-100); }
+.lez-date-tile.bdc .day { color: var(--sky-700); }
+
+.lez-body { flex: 1; min-width: 0; }
+.lez-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.lez-arg { font-size: 16px; font-weight: 700; color: var(--ink); margin: 0; line-height: 1.25; letter-spacing: -0.005em; }
+.lez-time { font-size: 12px; color: var(--ink-muted); font-family: var(--f-mono); flex-shrink: 0; }
+.lez-meta {
+  font-size: 12.5px; color: var(--ink-muted);
+  margin-top: 4px;
+  display: flex; gap: 4px 10px; flex-wrap: wrap; align-items: center;
+}
+.lez-meta .ico { display: inline-flex; align-items: center; gap: 4px; }
+.lez-pubnotes {
+  font-size: 13px; color: var(--ink);
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--bg-soft);
+  border-radius: var(--r-md);
+  border-left: 3px solid var(--sun-500);
+  line-height: 1.45;
+}
+.lez-pubnotes-label {
+  font-family: var(--f-mono); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink-muted); margin-bottom: 3px;
+}
+.lez-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 10px;
+  gap: 10px; flex-wrap: wrap;
+}
+.lez-foot-presenze {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 13px; color: var(--ink);
+}
+.lez-foot-presenze .num {
+  background: var(--navy-700); color: #fff;
+  font-weight: 700; font-size: 12px;
+  padding: 1px 8px; border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.lez-foot-action {
+  font-size: 13px; font-weight: 600;
+  color: var(--sky-600); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+@container page (min-width: 900px) {
+  .page-head { flex-direction: row; align-items: flex-end; justify-content: space-between; }
+  .page-h1 { font-size: 32px; }
+  .lez-card { padding: 22px; gap: 18px; }
+  .lez-date-tile { width: 80px; padding: 14px 8px; }
+  .lez-date-tile .day { font-size: 28px; }
+  .lez-arg { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="page" style="background:var(--bg-soft)">
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" style="text-decoration:none;color:inherit">
+        <div class="nav-logo-mark">T</div>
+        <div><div class="nav-logo-text">Triono Racing</div><div class="nav-logo-sub">Maestri</div></div>
+      </a>
+      <nav class="nav-links">
+        <a href="#" class="nav-link">Home</a>
+        <a href="#" class="nav-link active">Le mie lezioni</a>
+        <a href="#" class="nav-link">Gare assegnate</a>
+        <a href="#" class="nav-link">Profilo</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <button class="nav-iconbtn nav-iconbtn-burger"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+        <a href="#" style="text-decoration:none;display:inline-flex"><span class="avatar avatar-sm" style="background:var(--ember-500);color:#fff">AM</span></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb">
+    <a href="#">Home</a><span class="sep">/</span>
+    <span class="current">Le mie lezioni</span>
+  </div>
+
+  <div class="page-inner">
+
+    <div class="page-head">
+      <div>
+        <div class="page-head-top" style="margin-bottom:12px">
+          <div>
+            <h1 class="page-h1">Le mie lezioni</h1>
+            <p class="page-sub">Storico delle lezioni che hai tenuto o a cui hai partecipato come co-maestro.</p>
+          </div>
+        </div>
+        <div class="filters-row">
+          <button class="f-select active">
+            <span class="label">Anno</span><span class="value">2026</span>
+            <i data-lucide="chevron-down" style="width:13px;height:13px;color:var(--ink-muted)"></i>
+          </button>
+          <button class="f-select">
+            <span class="label">Disciplina</span><span class="value">Tutte</span>
+            <i data-lucide="chevron-down" style="width:13px;height:13px;color:var(--ink-muted)"></i>
+          </button>
+          <button class="f-select">
+            <span class="label">Filtro</span><span class="value">Solo mie · 8</span>
+            <i data-lucide="chevron-down" style="width:13px;height:13px;color:var(--ink-muted)"></i>
+          </button>
+        </div>
+      </div>
+      <a href="lezioni-nuova.html" class="btn btn-primary btn-sm" style="white-space:nowrap;align-self:flex-start">
+        <i data-lucide="plus" style="width:16px;height:16px"></i>
+        Nuova lezione
+      </a>
+    </div>
+
+    <!-- MAGGIO 2026 -->
+    <div class="month-h">
+      <span class="title">Maggio 2026 · 8 lezioni</span>
+      <span class="stats">67 presenze totali · media 8,4 / lezione</span>
+    </div>
+
+    <a href="lezioni-dettaglio.html" class="lez-card">
+      <div class="lez-date-tile mtb">
+        <div class="day">16</div>
+        <div class="dow">GIO</div>
+      </div>
+      <div class="lez-body">
+        <div class="lez-top">
+          <h3 class="lez-arg">Curva veloce in salita</h3>
+          <span class="lez-time">17:00 → 18:30</span>
+        </div>
+        <div class="lez-meta">
+          <span class="ico"><i data-lucide="bike" style="width:11px;height:11px"></i>MTB · Parco Le Grazie</span>
+          <span class="sep">·</span>
+          <span class="ico"><i data-lucide="user-check" style="width:11px;height:11px"></i>tu + Marta</span>
+        </div>
+        <div class="lez-pubnotes">
+          <div class="lez-pubnotes-label">Note pubbliche</div>
+          «Lezione su curva veloce su sterrato in salita. Marco e Sofia hanno gestito benissimo i tornanti tecnici. Bravissimi tutti, alla prossima!»
+        </div>
+        <div class="lez-foot">
+          <div class="lez-foot-presenze">
+            <i data-lucide="users" style="width:14px;height:14px;color:var(--ink-muted)"></i>
+            <span class="num">9</span>
+            <span>bambini presenti</span>
+          </div>
+          <span class="lez-foot-action">Apri / modifica<i data-lucide="arrow-right" style="width:13px;height:13px"></i></span>
+        </div>
+      </div>
+    </a>
+
+    <a href="lezioni-dettaglio.html" class="lez-card">
+      <div class="lez-date-tile bdc">
+        <div class="day">14</div>
+        <div class="dow">MAR</div>
+      </div>
+      <div class="lez-body">
+        <div class="lez-top">
+          <h3 class="lez-arg">Cambio marce in scioltezza</h3>
+          <span class="lez-time">17:00 → 18:30</span>
+        </div>
+        <div class="lez-meta">
+          <span class="ico"><i data-lucide="bike" style="width:11px;height:11px"></i>BDC · Pista Cesi</span>
+          <span class="sep">·</span>
+          <span class="ico"><i data-lucide="user" style="width:11px;height:11px"></i>solo tu</span>
+        </div>
+        <div class="lez-foot">
+          <div class="lez-foot-presenze">
+            <i data-lucide="users" style="width:14px;height:14px;color:var(--ink-muted)"></i>
+            <span class="num">7</span>
+            <span>bambini presenti</span>
+          </div>
+          <span class="lez-foot-action">Apri / modifica<i data-lucide="arrow-right" style="width:13px;height:13px"></i></span>
+        </div>
+      </div>
+    </a>
+
+    <a href="lezioni-dettaglio.html" class="lez-card">
+      <div class="lez-date-tile mtb">
+        <div class="day">09</div>
+        <div class="dow">GIO</div>
+      </div>
+      <div class="lez-body">
+        <div class="lez-top">
+          <h3 class="lez-arg">Equilibrio in sella · slalom tra coni</h3>
+          <span class="lez-time">17:00 → 18:30</span>
+        </div>
+        <div class="lez-meta">
+          <span class="ico"><i data-lucide="bike" style="width:11px;height:11px"></i>MTB · Parco Le Grazie</span>
+          <span class="sep">·</span>
+          <span class="ico"><i data-lucide="user-check" style="width:11px;height:11px"></i>tu + Marta</span>
+        </div>
+        <div class="lez-pubnotes">
+          <div class="lez-pubnotes-label">Note pubbliche</div>
+          «Slalom tra coni e gimkana base. Bambini ottimi, soprattutto le giovaniss. G3-G4.»
+        </div>
+        <div class="lez-foot">
+          <div class="lez-foot-presenze">
+            <i data-lucide="users" style="width:14px;height:14px;color:var(--ink-muted)"></i>
+            <span class="num">11</span>
+            <span>bambini presenti</span>
+          </div>
+          <span class="lez-foot-action">Apri / modifica<i data-lucide="arrow-right" style="width:13px;height:13px"></i></span>
+        </div>
+      </div>
+    </a>
+
+    <a href="lezioni-dettaglio.html" class="lez-card">
+      <div class="lez-date-tile bdc">
+        <div class="day">07</div>
+        <div class="dow">MAR</div>
+      </div>
+      <div class="lez-body">
+        <div class="lez-top">
+          <h3 class="lez-arg">Postura e respirazione · base</h3>
+          <span class="lez-time">17:00 → 18:30</span>
+        </div>
+        <div class="lez-meta">
+          <span class="ico"><i data-lucide="bike" style="width:11px;height:11px"></i>BDC · Pista Cesi</span>
+          <span class="sep">·</span>
+          <span class="ico"><i data-lucide="user" style="width:11px;height:11px"></i>solo tu</span>
+        </div>
+        <div class="lez-foot">
+          <div class="lez-foot-presenze">
+            <i data-lucide="users" style="width:14px;height:14px;color:var(--ink-muted)"></i>
+            <span class="num">6</span>
+            <span>bambini presenti</span>
+          </div>
+          <span class="lez-foot-action">Apri / modifica<i data-lucide="arrow-right" style="width:13px;height:13px"></i></span>
+        </div>
+      </div>
+    </a>
+
+    <a href="lezioni-dettaglio.html" class="lez-card">
+      <div class="lez-date-tile mtb">
+        <div class="day">02</div>
+        <div class="dow">GIO</div>
+      </div>
+      <div class="lez-body">
+        <div class="lez-top">
+          <h3 class="lez-arg">Frenata anticipata · uscita lago</h3>
+          <span class="lez-time">17:00 → 18:30</span>
+        </div>
+        <div class="lez-meta">
+          <span class="ico"><i data-lucide="bike" style="width:11px;height:11px"></i>MTB · Parco Le Grazie</span>
+          <span class="sep">·</span>
+          <span class="ico"><i data-lucide="user-check" style="width:11px;height:11px"></i>tu + Marta</span>
+        </div>
+        <div class="lez-foot">
+          <div class="lez-foot-presenze">
+            <i data-lucide="users" style="width:14px;height:14px;color:var(--ink-muted)"></i>
+            <span class="num">10</span>
+            <span>bambini presenti</span>
+          </div>
+          <span class="lez-foot-action">Apri / modifica<i data-lucide="arrow-right" style="width:13px;height:13px"></i></span>
+        </div>
+      </div>
+    </a>
+
+    <!-- APRILE 2026 -->
+    <div class="month-h">
+      <span class="title">Aprile 2026 · 7 lezioni</span>
+      <span class="stats">58 presenze totali · media 8,3 / lezione</span>
+    </div>
+
+    <a href="lezioni-dettaglio.html" class="lez-card">
+      <div class="lez-date-tile mtb">
+        <div class="day">25</div>
+        <div class="dow">GIO</div>
+      </div>
+      <div class="lez-body">
+        <div class="lez-top">
+          <h3 class="lez-arg">Discese tecniche · single-track</h3>
+          <span class="lez-time">17:00 → 18:30</span>
+        </div>
+        <div class="lez-meta">
+          <span class="ico"><i data-lucide="bike" style="width:11px;height:11px"></i>MTB · Parco Le Grazie</span>
+          <span class="sep">·</span>
+          <span class="ico"><i data-lucide="user-check" style="width:11px;height:11px"></i>tu + Marta</span>
+        </div>
+        <div class="lez-foot">
+          <div class="lez-foot-presenze">
+            <i data-lucide="users" style="width:14px;height:14px;color:var(--ink-muted)"></i>
+            <span class="num">8</span>
+            <span>bambini presenti</span>
+          </div>
+          <span class="lez-foot-action">Apri / modifica<i data-lucide="arrow-right" style="width:13px;height:13px"></i></span>
+        </div>
+      </div>
+    </a>
+
+    <a href="lezioni-dettaglio.html" class="lez-card" style="opacity:0.7">
+      <div class="lez-date-tile bdc">
+        <div class="day">23</div>
+        <div class="dow">MAR</div>
+      </div>
+      <div class="lez-body">
+        <div class="lez-top">
+          <h3 class="lez-arg">Salite ripetute · resistenza base</h3>
+          <span class="lez-time">17:00 → 18:30</span>
+        </div>
+        <div class="lez-meta">
+          <span class="ico"><i data-lucide="bike" style="width:11px;height:11px"></i>BDC · Pista Cesi</span>
+          <span class="sep">·</span>
+          <span class="ico"><i data-lucide="user" style="width:11px;height:11px"></i>solo tu</span>
+          <span class="sep">·</span>
+          <span class="ico" style="color:var(--ember-700);font-weight:600"><i data-lucide="lock" style="width:11px;height:11px"></i>oltre 30gg · solo admin modifica</span>
+        </div>
+        <div class="lez-foot">
+          <div class="lez-foot-presenze">
+            <i data-lucide="users" style="width:14px;height:14px;color:var(--ink-muted)"></i>
+            <span class="num">5</span>
+            <span>bambini presenti</span>
+          </div>
+          <span class="lez-foot-action" style="color:var(--ink-muted)">Sola lettura<i data-lucide="lock" style="width:11px;height:11px"></i></span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;background:var(--sun-500);color:var(--navy-900);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px">T</div>
+          <div><div class="footer-brand-name">Triono Racing</div></div>
+        </div>
+      </div>
+      <div class="footer-col"><div class="footer-col-title">Maestro</div><ul><li><a href="#">Lezioni</a></li><li><a href="#">Gare</a></li></ul></div>
+      <div class="footer-col"><div class="footer-col-title">Supporto</div><ul><li><a href="#">Contatti</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>ASD CIEMME</span><span>© 2026</span></div>
+  </footer>
+
+</div>
+</template>
+
+<script src="../shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['Mockup Portale', 'Maestro', 'Le mie lezioni'],
+    title: 'Storico lezioni maestro',
+    route: '/portale/lezioni',
+    statusBarTheme: 'dark',
+    desktopScale: 0.6,
+    stateLegend: { tag: 'Stato', items: [{ ref: 1, text: 'Storico 2 mesi · 7 card visibili · ultima oltre 30gg in sola lettura' }] },
+    annotations: [
+      { ref: 1, text: '<strong>Group by month</strong>: divider con titolo mono + stats laterali (totale presenze + media). Pattern condiviso con gare-lista e diario lezioni.' },
+      { ref: 2, text: '<strong>Date tile colorato per disciplina</strong>: grass (MTB · giovedì) / sky (BDC · martedì). Letterng DOW (giorno settimana) in mono uppercase. Riprende le 2 sezioni del wizard iscrizione.' },
+      { ref: 3, text: '<strong>Argomento in evidenza</strong> come titolo della card (DS §10.7 NUOVO). \u00c8 il dato che il maestro digita PRIMA dei nomi bambini.' },
+      { ref: 4, text: '<strong>Note pubbliche</strong>: callout sun-bordered se presenti. Mostrate in lista per dare immediato senso del contenuto al maestro. Sostituiscono lo \u00ablorem ipsum diario\u00bb dell\'As-Is.' },
+      { ref: 5, text: '<strong>Conteggio presenze</strong>: pillola navy con numero grande. Visivamente il dato più importante in lista (oltre l\'argomento). Tap apre dettaglio.' },
+      { ref: 6, text: '<strong>Lezione oltre 30gg</strong> (ultima card): opacity ridotta + badge inline «solo admin modifica» con icona lock + CTA muted «Sola lettura». Da decisione UX §1.' },
+      { ref: 7, text: '<strong>Co-maestri inline</strong>: «tu + Marta» / «solo tu». Le lezioni di Marta in cui tu sei tagged compaiono anche qui.' },
+      { ref: 8, text: '<strong>Filtri</strong>: anno + disciplina + filtro mio/co-maestri. Niente filtro mese: la lista è già groupata per mese.' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>
