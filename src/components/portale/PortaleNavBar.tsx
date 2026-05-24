@@ -27,6 +27,7 @@ function getLinksForRole(role: string): NavLink[] {
         { label: "Home", href: "/portale" },
         { label: "I miei figli", href: "/portale/figli" },
         { label: "Iscrizioni", href: "/portale/iscrizioni" },
+        { label: "Pagamenti", href: "/portale/pagamenti" },
         { label: "Gare", href: "/portale/gare" },
         { label: "Profilo", href: "/portale/profilo" },
       ];
