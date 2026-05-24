@@ -9,7 +9,7 @@
 | EVO-001 | portale-f3 | Portale F3 — Portale genitori/maestro/admin (ombrello) | 2026-05-21 | — | ombrello | — | [link](evolutive/EVO-001-portale-f3.md) |
 | EVO-002 | portale-infra | F3.1 — Setup infra portale (Clerk ruolo-aware + NavBar + webhook) | 2026-05-21 | 2026-05-21 | completata | https://trionoracing-next.vercel.app/portale | [link](evolutive/EVO-002-portale-infra.md) |
 | EVO-003 | portale-genitore-core | F3.2 — Area genitore core (dashboard + figli + cert + foto) | 2026-05-22 | 2026-05-22 | completata | https://trionoracing-next.vercel.app/portale | [link](evolutive/EVO-003-portale-genitore-core.md) |
-| EVO-004 | portale-iscrizioni | F3.3 — Iscrizioni e pagamenti (wizard + modulistica + SumUp) | 2026-05-22 | — | pronta per implementazione | — | [link](evolutive/EVO-004-portale-iscrizioni.md) |
+| EVO-004 | portale-iscrizioni | F3.3 — Iscrizioni e pagamenti (wizard + modulistica + SumUp) | 2026-05-22 | 2026-05-22 | completata | https://trionoracing-next.vercel.app/portale/iscrizioni | [link](evolutive/EVO-004-portale-iscrizioni.md) |
 | EVO-005 | portale-gare-genitore | F3.4 — Calendario gare genitore | — | — | in pianificazione | — | [link](evolutive/EVO-005-portale-gare-genitore.md) |
 | EVO-006 | portale-maestro | F3.5 — Area maestro (lezioni + gare assegnate) | — | — | in pianificazione | — | [link](evolutive/EVO-006-portale-maestro.md) |
 | EVO-007 | portale-admin | F3.6 — Area admin (dashboard + 11 sotto-pagine) | — | — | in pianificazione | — | [link](evolutive/EVO-007-portale-admin.md) |
@@ -18,6 +18,7 @@
 | EVO-010 | kit-scuola-vetrina-pubblica | Kit Scuola — sezione editoriale su /la-scuola + asset condiviso | 2026-05-23 | 2026-05-23 | completata | https://trionoracing-next.vercel.app/la-scuola | [link](evolutive/EVO-010-kit-scuola-vetrina-pubblica.md) |
 | EVO-011 | kit-scuola-tab-taglie | Kit Scuola — immagini nel TabTaglie del portale (sbloccata da EVO-010 ✅, in pausa per EVO-012) | 2026-05-23 | — | in pianificazione | — | [link](evolutive/EVO-011-kit-scuola-tab-taglie.md) |
 | EVO-012 | ds-photo-bg-colorate | DS — utility `.photo-bg-{color}` per card colorate + uniformazione 8 card navy | 2026-05-23 | — | pronta per implementazione | — | [link](evolutive/EVO-012-ds-photo-bg-colorate.md) |
+| EVO-013 | portale-pagina-pagamenti | Pagina trasversale `/portale/pagamenti` (nata dal QA EVO-004 hotfix #17) | 2026-05-24 | 2026-05-24 | completata | https://trionoracing-next.vercel.app/portale/pagamenti | [link](evolutive/EVO-013-portale-pagina-pagamenti.md) |
 
 ## Stati possibili
 
@@ -41,3 +42,6 @@ Area genitore core live. Dashboard personalizzata, gestione figli (CRUD + 6 tab 
 
 **2026-05-23 — EVO-010 completata (in parallelo a F3, parte di ombrello EVO-009)**
 Nuova sezione "Kit Scuola" live su `/la-scuola` tra Filosofia e Maestri. Layout editoriale asimmetrico con 4 capi del kit (maglia, salopette, felpa, pantalone in felpa) + card navy manifesto. Nuovo asset condiviso `src/lib/kit-scuola.ts` (tipo `CapoKit` + array `as const readonly` + helper `cloudinaryOptimized` per trasformazioni URL). Nuovo hostname `res.cloudinary.com/duezeronove/**` in `next.config.ts`. PR #14 squash-merged (commit `72119e1`). Verifica APPROVATA su tutte le 7 dimensioni. 8 nuovi pattern in AGENTS.md (sezione "EVO-010"), tra cui: asset condiviso cross-deliverable, `next/image fill object-contain` per prodotti scontornati, scope ristretto su `images.remotePatterns`, gestione easter egg Claude Design, fallback report verifica quando skill `verify-implementation` non è caricata in sessione. **Sblocca EVO-011** (immagini in `TabTaglie` portale, parte di EVO-009 ombrello). Stato EVO-009 ombrello resta `ombrello` finché EVO-011 non sarà chiusa.
+
+**2026-05-24 — Hotfix EVO-004 #17 + spawn EVO-013**
+Individuata regressione di EVO-004: il payload `POST /v0.1/checkouts` SumUp non passava `return_url`, disabilitando la notification per-checkout verso Make.com e quindi il fallback "browser chiuso prima del verify". Fix in PR #17 (`fix/sumup-return-url-makecom`, commit `6c0365c`) che reintroduce `return_url` via env `MAKE_SUMUP_RETURN_URL` con spread condizionale e warning non bloccante se assente. Durante il QA della #17 si è notato che il bottone "Vedi pagamenti" sulla dashboard genitore portava a `/portale/iscrizioni` con label fuorviante (non a una vera vetrina pagamenti) — spawnata EVO-013 in parallelo come PR #18 (`feat/portale-pagina-pagamenti`, commit `fa69f67`) con nuova pagina trasversale `/portale/pagamenti`. Merge in ordine #17 → #18, env Vercel `MAKE_SUMUP_RETURN_URL` configurata in production e preview, EVO-004 chiusa (D-17 risolta), EVO-013 chiusa contestualmente.
