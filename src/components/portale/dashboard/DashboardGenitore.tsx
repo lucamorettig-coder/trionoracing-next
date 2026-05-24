@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { AlertTriangle, Plus, CalendarDays, CreditCard, Trophy } from "lucide-react";
+import { AlertTriangle, Plus, CalendarDays, CreditCard, CheckCircle2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FiglioCard from "@/components/portale/figli/FiglioCard";
-import { daysUntil, formatDateIT } from "@/lib/portale-utils";
-import type { Genitore, Bambino } from "@/lib/airtable-portale";
+import { daysUntil, formatDateIT, getStatoIscrizioneAnnoCorrente } from "@/lib/portale-utils";
+import type { Genitore, Bambino, Iscrizione } from "@/lib/airtable-portale";
 
 interface Alert {
   bambinoNome: string;
@@ -32,12 +32,23 @@ function buildAlerts(bambini: Bambino[]): Alert[] {
 interface Props {
   genitore: Genitore;
   bambini: Bambino[];
+  iscrizioni: Iscrizione[];
 }
 
-export default function DashboardGenitore({ genitore, bambini }: Props) {
+export default function DashboardGenitore({ genitore, bambini, iscrizioni }: Props) {
   const nome = genitore.fields.NOME_GENITORE;
   const alerts = buildAlerts(bambini);
   const scadenzeCount = alerts.length;
+  const anno = new Date().getFullYear();
+
+  // Calcola stato iscrizione per ogni bambino
+  const statiIscrizione = bambini.map((b) => ({
+    bambino: b,
+    ...getStatoIscrizioneAnnoCorrente(b.id, iscrizioni),
+  }));
+
+  const tuttiIscritti = bambini.length > 0 && statiIscrizione.every((s) => s.stato === 'iscritto');
+  const qualcunoDaIscrivere = statiIscrizione.some((s) => s.stato !== 'iscritto');
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -118,8 +129,13 @@ export default function DashboardGenitore({ genitore, bambini }: Props) {
               </Button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {bambini.map((b) => (
-                <FiglioCard key={b.id} bambino={b} />
+              {statiIscrizione.map(({ bambino, stato, iscrizioneId }) => (
+                <FiglioCard
+                  key={bambino.id}
+                  bambino={bambino}
+                  statoIscrizione={stato}
+                  iscrizioneId={iscrizioneId}
+                />
               ))}
               {/* Ghost card aggiungi */}
               <Link
@@ -163,29 +179,44 @@ export default function DashboardGenitore({ genitore, bambini }: Props) {
         {/* Quick actions */}
         <section>
           <h2 className="text-xl font-bold text-ink mb-4">Azioni rapide</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className={`grid grid-cols-1 gap-4 ${qualcunoDaIscrivere ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+            {qualcunoDaIscrivere && (
+              <Link
+                href="/portale/iscrizioni/nuova"
+                className="flex items-center gap-3 bg-navy-700 text-white rounded-[var(--radius-xl)] px-5 py-4 font-semibold hover:bg-navy-900 transition-colors shadow-[var(--shadow-sm)]"
+              >
+                <Plus className="w-5 h-5 shrink-0" />
+                Nuova iscrizione
+              </Link>
+            )}
             <Link
-              href="/portale/iscrizioni/nuova"
-              className="flex items-center gap-3 bg-navy-700 text-white rounded-[var(--radius-xl)] px-5 py-4 font-semibold hover:bg-navy-900 transition-colors shadow-[var(--shadow-sm)]"
+              href="/portale/iscrizioni"
+              className="flex items-center gap-3 bg-white border border-line text-ink rounded-[var(--radius-xl)] px-5 py-4 font-semibold hover:border-navy-300 transition-colors shadow-[var(--shadow-sm)]"
             >
-              <Plus className="w-5 h-5 shrink-0" />
-              Nuova iscrizione
+              <FileText className="w-5 h-5 shrink-0 text-ink-muted" />
+              Iscrizioni
             </Link>
             <Link
               href="/portale/pagamenti"
               className="flex items-center gap-3 bg-white border border-line text-ink rounded-[var(--radius-xl)] px-5 py-4 font-semibold hover:border-navy-300 transition-colors shadow-[var(--shadow-sm)]"
             >
               <CreditCard className="w-5 h-5 shrink-0 text-ink-muted" />
-              Vedi pagamenti
-            </Link>
-            <Link
-              href="/portale/gare"
-              className="flex items-center gap-3 bg-white border border-line text-ink rounded-[var(--radius-xl)] px-5 py-4 font-semibold hover:border-navy-300 transition-colors shadow-[var(--shadow-sm)]"
-            >
-              <Trophy className="w-5 h-5 shrink-0 text-ink-muted" />
-              Calendario gare
+              Pagamenti
             </Link>
           </div>
+
+          {/* Banner reassurance — tutti i figli iscritti */}
+          {tuttiIscritti && (
+            <div className="mt-8 p-4 lg:p-5 rounded-[var(--radius-lg)] border border-grass-100 bg-grass-50 flex items-center gap-4">
+              <div className="w-11 h-11 rounded-[var(--radius-md)] bg-grass-500 text-white flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-grass-700 text-sm">Tutti i tuoi figli sono iscritti per il {anno}</p>
+                <p className="text-xs text-grass-700/80 mt-0.5">Puoi gestire pagamenti e modulistica dalle sezioni dedicate.</p>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </div>

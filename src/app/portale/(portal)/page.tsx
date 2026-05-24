@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getGenitoreByClerkId, getBambiniByGenitore } from "@/lib/airtable-portale";
+import { getGenitoreByClerkId, getBambiniByGenitore, getIscrizioniByGenitore } from "@/lib/airtable-portale";
 import DashboardGenitore from "@/components/portale/dashboard/DashboardGenitore";
 
 export default async function PortalePage() {
@@ -15,7 +15,10 @@ export default async function PortalePage() {
   const genitore = await getGenitoreByClerkId(userId);
   if (!genitore) redirect("/portale/login");
 
-  const bambini = await getBambiniByGenitore(genitore.id);
+  const [bambini, iscrizioni] = await Promise.all([
+    getBambiniByGenitore(genitore.id),
+    getIscrizioniByGenitore(genitore.id),
+  ]);
 
-  return <DashboardGenitore genitore={genitore} bambini={bambini} />;
+  return <DashboardGenitore genitore={genitore} bambini={bambini} iscrizioni={iscrizioni} />;
 }
