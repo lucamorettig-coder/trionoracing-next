@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import TitoloLabel from "@/components/portale/pagamenti/TitoloLabel";
 import type { Iscrizione, TitoloPagamento } from "@/lib/airtable-portale";
 import { formatEUR, formatDateIT, statoTitoloBadge } from "@/lib/portale-utils";
 
@@ -8,13 +9,6 @@ interface Props {
   iscrizione: Iscrizione;
   titoli: TitoloPagamento[];
 }
-
-const TITOLO_LABEL: Record<string, string> = {
-  rata: "Rata",
-  prima_rata: "Prima rata",
-  rata_successiva: "Rata",
-  saldo: "Saldo",
-};
 
 export default function TabPagamenti({ iscrizione, titoli }: Props) {
   const pagato = titoli
@@ -37,19 +31,17 @@ export default function TabPagamenti({ iscrizione, titoli }: Props) {
         {titoli.map((t) => {
           const f = t.fields;
           const stato = statoTitoloBadge(f.STATO_TITOLO);
-          const tipoLabel = TITOLO_LABEL[f.TIPO_TITOLO ?? "rata"] ?? "Rata";
-          const titolo = f.NUMERO_RATA === 1 ? "Prima rata" : `${tipoLabel} ${f.NUMERO_RATA ?? ""}`.trim();
           const pagato = f.STATO_TITOLO === "pagato";
 
           return (
             <div key={t.id} className="flex items-center gap-4 px-5 py-4 flex-wrap">
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-ink">
-                  {titolo}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <TitoloLabel titolo={t} />
                   {typeof f.IMPORTO === "number" && (
-                    <span className="ml-2 text-ink-muted font-normal">{formatEUR(f.IMPORTO)}</span>
+                    <span className="ml-1 text-ink-muted font-normal">{formatEUR(f.IMPORTO)}</span>
                   )}
-                </p>
+                </div>
                 <div className="flex items-center gap-3 mt-1 flex-wrap">
                   <Badge variant={stato.variant} size="sm">{stato.label}</Badge>
                   {f.DATA_SCADENZA_PAGAMENTO && !pagato && (

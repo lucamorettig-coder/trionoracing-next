@@ -6,6 +6,7 @@ import {
   getBambinoById,
   getTitoloById,
 } from "@/lib/airtable-portale";
+import { titoloLabel } from "@/lib/portale-utils";
 import CheckoutSumUp from "@/components/portale/iscrizioni/CheckoutSumUp";
 
 interface PageProps {
@@ -46,11 +47,7 @@ export default async function CheckoutPage({ params, searchParams }: PageProps) 
     <CheckoutSumUp
       iscrizioneId={id}
       titoloId={titoloId}
-      titoloTipo={
-        titolo.fields.NUMERO_RATA === 1
-          ? "Prima rata"
-          : `Rata ${titolo.fields.NUMERO_RATA ?? ""}`.trim()
-      }
+      titoloTipo={titoloLabel(titolo).primary}
       importo={titolo.fields.IMPORTO ?? 0}
       bambinoNome={`${bambino.fields.NOME_BAMBINO} ${bambino.fields.COGNOME_BAMBINO}`}
       annoIscrizione={iscrizione.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0] ?? ""}

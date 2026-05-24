@@ -110,7 +110,7 @@ export default function DashboardGenitore({ genitore, bambini, iscrizioni, titol
 
                 const title = isCert
                   ? `Certificato medico di ${s.bambinoNome}`
-                  : `${s.numeroRata}ª rata · ${s.bambinoNome}${s.importo !== undefined ? ` · €${s.importo}` : ''}`;
+                  : `${s.titoloLabel ?? 'Pagamento'} · ${s.bambinoNome}${s.importo !== undefined ? ` · €${s.importo}` : ''}`;
 
                 const subtitle = isScaduto
                   ? isCert

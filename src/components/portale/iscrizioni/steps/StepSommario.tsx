@@ -4,8 +4,9 @@ import Link from "next/link";
 import { CheckCircle2, Circle, Shirt } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import TitoloLabel from "@/components/portale/pagamenti/TitoloLabel";
 import type { Bambino, Iscrizione, TitoloPagamento } from "@/lib/airtable-portale";
-import { formatEUR, quarterLabel, statoTitoloBadge } from "@/lib/portale-utils";
+import { formatEUR, meseITLabel, quarterLabel, statoTitoloBadge } from "@/lib/portale-utils";
 import StepHeader from "../StepHeader";
 import type { TariffaInfo } from "../WizardNuovaIscrizione";
 
@@ -17,21 +18,6 @@ interface Props {
   tariffa: TariffaInfo;
   titoli: TitoloPagamento[];
 }
-
-const MESI_LABEL: Record<string, string> = {
-  GENNAIO: "gennaio",
-  FEBBRAIO: "febbraio",
-  MARZO: "marzo",
-  APRILE: "aprile",
-  MAGGIO: "maggio",
-  GIUGNO: "giugno",
-  LUGLIO: "luglio",
-  AGOSTO: "agosto",
-  SETTEMBRE: "settembre",
-  OTTOBRE: "ottobre",
-  NOVEMBRE: "novembre",
-  DICEMBRE: "dicembre",
-};
 
 export default function StepSommario({
   step,
@@ -134,16 +120,13 @@ export default function StepSommario({
           ) : (
             <ul className="divide-y divide-line">
               {titoli.map((t) => {
-                const tipo = t.fields.NUMERO_RATA === 1 ? "Prima rata" : `Rata ${t.fields.NUMERO_RATA ?? ""}`;
-                const meseLabel = t.fields.SCADENZA_MESE
-                  ? MESI_LABEL[t.fields.SCADENZA_MESE.toUpperCase()] ?? t.fields.SCADENZA_MESE.toLowerCase()
-                  : "—";
+                const meseLabel = meseITLabel(t.fields.SCADENZA_MESE);
                 const stato = statoTitoloBadge(t.fields.STATO_TITOLO);
                 const importo = t.fields.IMPORTO ?? 0;
                 return (
                   <li key={t.id} className="flex items-center gap-3 px-5 py-3 flex-wrap">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-ink">{tipo.trim()}</p>
+                      <TitoloLabel titolo={t} showSecondary={false} primaryClassName="text-sm" />
                       <p className="text-xs text-ink-muted capitalize mt-0.5">
                         scadenza {meseLabel}
                       </p>
