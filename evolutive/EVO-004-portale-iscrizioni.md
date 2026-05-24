@@ -3,8 +3,8 @@
 - **ID**: EVO-004
 - **Slug**: portale-iscrizioni
 - **Data inizio**: 2026-05-22
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: pronta per implementazione
+- **Data fine**: 2026-05-22
+- **Stato**: completata
 - **Tipo**: nuova feature
 - **Area**: area autenticata (`/portale` — GENITORE)
 - **Priorità**: alta
@@ -268,3 +268,11 @@ _Da compilare in fase 8 dopo che Claude Code ha completato l'intero ciclo._
 ### [2026-05-22] Fasi 0-7 — Pianificazione + prompt generato
 
 Analisi as-is completata. WBS definita (8 task macro). Verifica coerenza OK. Prompt Claude Code generato. Stato: pronta per implementazione.
+
+### [2026-05-24] Hotfix post-merge #17 + spawn EVO-013
+
+**Regressione individuata**: il payload `POST /v0.1/checkouts` SumUp non passava `return_url`, disabilitando la notification per-checkout verso Make.com. Il fallback "browser chiuso prima del verify" non funzionava sul nuovo portale, solo il path happy.
+
+**Fix**: PR #17 (`fix/sumup-return-url-makecom`, commit `6c0365c`) — aggiunto `return_url` al payload via env `MAKE_SUMUP_RETURN_URL` con spread condizionale e warning non bloccante se assente. Env configurata su Vercel production + preview (D-17 chiusa).
+
+**Spawn EVO-013**: durante il QA della #17 si è notato che il bottone "Vedi pagamenti" sulla dashboard genitore portava a `/portale/iscrizioni` con label fuorviante (non a una vera vetrina pagamenti). È nata EVO-013 in parallelo come PR #18 con pagina `/portale/pagamenti` trasversale. Pattern: il QA di un fix può rivelare gap UI non bug-related → spawn evolutiva separata, non gonfiare il branch del fix.
