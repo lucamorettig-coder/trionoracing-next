@@ -1,5 +1,5 @@
 import type { BadgeVariant } from "@/components/ui/badge";
-import type { Iscrizione } from "@/lib/airtable-portale";
+import type { Bambino, Iscrizione, TitoloPagamento } from "@/lib/airtable-portale";
 
 export interface StatoIscrizioneBadge {
   variant: BadgeVariant;
@@ -99,6 +99,79 @@ export function getStatoIscrizioneAnnoCorrente(
   if (!match) return { stato: 'non_iscritto' };
   if (match.fields.STATO_ISCRIZIONE === "COMPLETA") return { stato: 'iscritto', iscrizioneId: match.id };
   return { stato: 'da_completare', iscrizioneId: match.id };
+}
+
+export type Scadenza = {
+  kind: 'cert' | 'rata';
+  bambinoId: string;
+  bambinoNome: string;
+  giorni: number;
+  dataScadenza: string;
+  certStato?: 'SCADUTO' | 'IN_SCADENZA' | 'VALIDO';
+  titoloId?: string;
+  iscrizioneId?: string;
+  importo?: number;
+  numeroRata?: number;
+};
+
+/**
+ * Aggrega in lista unica le scadenze urgenti (cert medico + rate non pagate)
+ * con giorni ≤ 30 oppure già scaduti. Ordinate per giorni crescente (scaduti prima).
+ */
+export function buildScadenze(
+  bambini: Bambino[],
+  titoli: TitoloPagamento[],
+  iscrizioni: Iscrizione[],
+): Scadenza[] {
+  const scadenze: Scadenza[] = [];
+
+  for (const b of bambini) {
+    const scadenza = b.fields.CERTIFICATO_MEDICO_SCADENZA;
+    const stato = b.fields.CERTIFICATO_MEDICO_STATO;
+    if (!scadenza) continue;
+    const giorni = daysUntil(scadenza);
+    if (stato === 'SCADUTO' || giorni < 0 || giorni <= 30) {
+      scadenze.push({
+        kind: 'cert',
+        bambinoId: b.id,
+        bambinoNome: b.fields.NOME_BAMBINO,
+        giorni,
+        dataScadenza: scadenza,
+        certStato: (stato as 'SCADUTO' | 'IN_SCADENZA' | 'VALIDO') ?? (giorni < 0 ? 'SCADUTO' : 'IN_SCADENZA'),
+      });
+    }
+  }
+
+  const iscrizioniById = Object.fromEntries(iscrizioni.map((i) => [i.id, i]));
+  const bambiniById = Object.fromEntries(bambini.map((b) => [b.id, b]));
+
+  for (const t of titoli) {
+    if (t.fields.STATO_TITOLO === 'pagato') continue;
+    const scadenza = t.fields.DATA_SCADENZA_PAGAMENTO;
+    if (!scadenza) continue;
+    const giorni = daysUntil(scadenza);
+    if (giorni > 30) continue;
+
+    const iscrizioneId = t.fields.ISCRIZIONE?.[0];
+    const iscrizione = iscrizioneId ? iscrizioniById[iscrizioneId] : undefined;
+    const bambinoId = iscrizione?.fields.TABELLA_BAMBINI?.[0];
+    const bambino = bambinoId ? bambiniById[bambinoId] : undefined;
+    if (!bambino) continue;
+
+    scadenze.push({
+      kind: 'rata',
+      bambinoId: bambino.id,
+      bambinoNome: bambino.fields.NOME_BAMBINO,
+      giorni,
+      dataScadenza: scadenza,
+      titoloId: t.id,
+      iscrizioneId,
+      importo: t.fields.IMPORTO ?? t.fields.IMPORTO_RATA_BASE,
+      numeroRata: t.fields.NUMERO_RATA,
+    });
+  }
+
+  return scadenze.sort((a, b) => a.giorni - b.giorni);
 }
 
 export interface CertBadgeInfo {
