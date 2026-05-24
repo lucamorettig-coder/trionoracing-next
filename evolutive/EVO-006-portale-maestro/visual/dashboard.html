@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dashboard Maestro · Portale Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+/* HERO maestro */
+.m-hero {
+  background: var(--navy-900); color: #fff;
+  position: relative; overflow: hidden;
+}
+.m-hero-pattern {
+  position: absolute; inset: 0;
+  background-image: url('../assets/pattern.svg');
+  background-size: 220px 220px; background-repeat: repeat;
+  opacity: 0.55;
+}
+.m-hero-pattern::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(5,14,63,0) 0%, rgba(5,14,63,0.55) 60%, rgba(5,14,63,0.95) 100%);
+}
+.m-hero-inner { position: relative; z-index: 1; padding: 24px 16px 28px; }
+.m-hero-eyebrow {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--sun-500);
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-bottom: 8px;
+}
+.m-hero-h {
+  font-size: 28px; font-weight: 700; letter-spacing: -0.02em;
+  line-height: 1.05; margin: 0 0 12px;
+}
+.m-hero-sub {
+  font-size: 15px; color: rgba(255,255,255,.75);
+  margin: 0; line-height: 1.5; max-width: 520px;
+}
+.m-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 18px; }
+.m-stat {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: var(--r-md);
+  padding: 10px 12px;
+}
+.m-stat .v { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.01em; line-height: 1; }
+.m-stat .l { font-size: 10.5px; font-family: var(--f-mono); text-transform: uppercase; letter-spacing: 0.04em; color: rgba(255,255,255,.55); margin-top: 4px; }
+
+/* Oggi card */
+.today-card {
+  background: linear-gradient(135deg, var(--sun-500), #FFCD2C);
+  border-radius: var(--r-xl);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.today-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('../assets/pattern.svg');
+  background-size: 160px 160px;
+  opacity: 0.1;
+}
+.today-card > * { position: relative; z-index: 1; }
+.today-icon {
+  width: 52px; height: 52px;
+  background: var(--navy-900); color: var(--sun-500);
+  border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.today-body { flex: 1; min-width: 0; }
+.today-title { font-size: 17px; font-weight: 700; color: var(--navy-900); margin: 0; line-height: 1.2; letter-spacing: -0.015em; }
+.today-sub { font-size: 13px; color: var(--navy-900); opacity: 0.75; margin-top: 3px; }
+
+/* Lezione row in storico */
+.lez-row {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 14px;
+  display: flex; gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  text-decoration: none; color: inherit;
+}
+.lez-row:hover { border-color: var(--navy-200); box-shadow: var(--sh-xs); }
+.lez-date {
+  text-align: center;
+  width: 48px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--line-soft);
+  padding-right: 12px;
+}
+.lez-date .d { font-size: 18px; font-weight: 700; color: var(--navy-700); line-height: 1; }
+.lez-date .m { font-size: 10px; font-family: var(--f-mono); text-transform: uppercase; color: var(--ink-muted); margin-top: 3px; }
+.lez-body { flex: 1; min-width: 0; }
+.lez-arg { font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: -0.005em; line-height: 1.25; }
+.lez-meta { font-size: 12.5px; color: var(--ink-muted); margin-top: 3px; display: flex; gap: 4px 10px; flex-wrap: wrap; align-items: center; }
+.lez-meta .ico { display: inline-flex; align-items: center; gap: 4px; }
+
+/* Gara assegnata row */
+.gara-row {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 14px;
+  margin-bottom: 8px;
+  display: flex; align-items: flex-start; gap: 12px;
+  text-decoration: none; color: inherit;
+}
+.gara-row:hover { border-color: var(--navy-200); box-shadow: var(--sh-xs); }
+.gara-row .date-tile {
+  background: var(--bg-soft); border: 1px solid var(--line);
+  border-radius: 8px;
+  width: 48px; padding: 8px 4px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.gara-row .date-tile.featured { background: var(--sun-500); border-color: var(--sun-500); }
+.gara-row .date-tile .d { font-size: 18px; font-weight: 800; color: var(--navy-700); line-height: 1; }
+.gara-row .date-tile.featured .d { color: var(--navy-900); }
+.gara-row .date-tile .m { font-size: 9.5px; font-family: var(--f-mono); text-transform: uppercase; color: var(--ink-muted); margin-top: 3px; font-weight: 700; }
+.gara-row .body { flex: 1; min-width: 0; }
+.gara-row .title { font-size: 14px; font-weight: 700; color: var(--ink); }
+.gara-row .meta { font-size: 12px; color: var(--ink-muted); margin-top: 2px; display: flex; gap: 4px 10px; flex-wrap: wrap; }
+
+/* Quick actions */
+.qa-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.qa-card {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--r-lg); padding: 16px;
+  display: flex; align-items: center; gap: 14px;
+  text-decoration: none; color: var(--ink);
+  transition: all .18s;
+}
+.qa-card:hover { border-color: var(--navy-700); box-shadow: var(--sh-sm); }
+.qa-card-icon {
+  width: 44px; height: 44px;
+  background: var(--navy-700); color: #fff;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.qa-card.primary .qa-card-icon { background: var(--sun-500); color: var(--navy-900); }
+.qa-card-body { flex: 1; min-width: 0; }
+.qa-card-title { font-size: 14.5px; font-weight: 700; line-height: 1.2; }
+.qa-card-sub { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; }
+
+@container page (min-width: 900px) {
+  .m-hero-inner { padding: 56px 40px 64px; }
+  .m-hero-h { font-size: 44px; letter-spacing: -0.025em; }
+  .m-hero-sub { font-size: 17px; }
+  .m-stats { grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 28px; max-width: 720px; }
+  .m-stat { padding: 18px 20px; border-radius: var(--r-lg); }
+  .m-stat .v { font-size: 30px; }
+  .today-card { padding: 24px 28px; }
+  .today-icon { width: 64px; height: 64px; }
+  .today-title { font-size: 22px; }
+  .qa-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .dash-cols { display: grid; grid-template-columns: 1fr 360px; gap: 28px; }
+}
+.dash-cols { display: block; }
+</style>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="page" style="background:var(--bg-soft)">
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" style="text-decoration:none;color:inherit">
+        <div class="nav-logo-mark">T</div>
+        <div><div class="nav-logo-text">Triono Racing</div><div class="nav-logo-sub">Maestri</div></div>
+      </a>
+      <nav class="nav-links">
+        <a href="#" class="nav-link active">Home</a>
+        <a href="#" class="nav-link">Le mie lezioni</a>
+        <a href="#" class="nav-link">Gare assegnate</a>
+        <a href="#" class="nav-link">Profilo</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <button class="nav-iconbtn nav-iconbtn-burger"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+        <a href="#" style="text-decoration:none;display:inline-flex"><span class="avatar avatar-sm" style="background:var(--ember-500);color:#fff">AM</span></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="m-hero">
+    <div class="m-hero-pattern"></div>
+    <div class="m-hero-inner">
+      <div class="m-hero-eyebrow">
+        <i data-lucide="award" style="width:14px;height:14px"></i>
+        Maestro · MTB + BDC
+      </div>
+      <h1 class="m-hero-h">Ciao Andrea,<br/>la squadra è pronta.</h1>
+      <p class="m-hero-sub">8 lezioni registrate questo mese, 2 gare assegnate a giugno. Hai un allenamento oggi alle 17:00.</p>
+      <div class="m-stats">
+        <div class="m-stat">
+          <div class="v">8</div><div class="l">lezioni · maggio</div>
+        </div>
+        <div class="m-stat">
+          <div class="v">67</div><div class="l">presenze totali</div>
+        </div>
+        <div class="m-stat">
+          <div class="v">2</div><div class="l">gare in programma</div>
+        </div>
+        <div class="m-stat">
+          <div class="v">18</div><div class="l">bambini attivi</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="page-inner">
+
+    <div class="dash-cols">
+
+      <!-- LEFT -->
+      <div>
+        <!-- OGGI -->
+        <a href="lezioni-nuova.html" class="today-card" style="text-decoration:none;margin-top:8px">
+          <div class="today-icon">
+            <i data-lucide="bike" style="width:24px;height:24px"></i>
+          </div>
+          <div class="today-body">
+            <h3 class="today-title">Allenamento MTB oggi · 17:00 → 18:30</h3>
+            <p class="today-sub">Parco Le Grazie · 18 bambini iscritti. Registra le presenze a fine lezione.</p>
+          </div>
+          <i data-lucide="arrow-right" style="width:22px;height:22px;color:var(--navy-900);flex-shrink:0"></i>
+        </a>
+
+        <!-- STORICO -->
+        <div class="section-h">
+          <h2>Le mie ultime lezioni</h2>
+          <a href="lezioni-lista.html" class="action">Storico completo →</a>
+        </div>
+
+        <a href="lezioni-dettaglio.html" class="lez-row">
+          <div class="lez-date">
+            <div class="d">16</div>
+            <div class="m">MAG</div>
+          </div>
+          <div class="lez-body">
+            <div class="lez-arg">Curva veloce in salita</div>
+            <div class="lez-meta">
+              <span class="ico"><i data-lucide="users" style="width:11px;height:11px"></i>9 bambini</span>
+              <span class="sep">·</span>
+              <span class="ico"><i data-lucide="bike" style="width:11px;height:11px"></i>MTB · Giovedì</span>
+              <span class="sep">·</span>
+              <span class="ico"><i data-lucide="user-check" style="width:11px;height:11px"></i>tu + Marta</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="lezioni-dettaglio.html" class="lez-row">
+          <div class="lez-date">
+            <div class="d">14</div>
+            <div class="m">MAG</div>
+          </div>
+          <div class="lez-body">
+            <div class="lez-arg">Cambio marce in scioltezza</div>
+            <div class="lez-meta">
+              <span class="ico"><i data-lucide="users" style="width:11px;height:11px"></i>7 bambini</span>
+              <span class="sep">·</span>
+              <span class="ico"><i data-lucide="bike" style="width:11px;height:11px"></i>BDC · Martedì</span>
+              <span class="sep">·</span>
+              <span class="ico"><i data-lucide="user" style="width:11px;height:11px"></i>solo tu</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="lezioni-dettaglio.html" class="lez-row">
+          <div class="lez-date">
+            <div class="d">09</div>
+            <div class="m">MAG</div>
+          </div>
+          <div class="lez-body">
+            <div class="lez-arg">Equilibrio in sella · slalom</div>
+            <div class="lez-meta">
+              <span class="ico"><i data-lucide="users" style="width:11px;height:11px"></i>11 bambini</span>
+              <span class="sep">·</span>
+              <span class="ico"><i data-lucide="bike" style="width:11px;height:11px"></i>MTB · Giovedì</span>
+              <span class="sep">·</span>
+              <span class="ico"><i data-lucide="user-check" style="width:11px;height:11px"></i>tu + Marta</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- QUICK ACTIONS -->
+        <div class="section-h">
+          <h2>Azioni rapide</h2>
+        </div>
+        <div class="qa-grid">
+          <a href="lezioni-nuova.html" class="qa-card primary">
+            <div class="qa-card-icon"><i data-lucide="plus-circle" style="width:22px;height:22px"></i></div>
+            <div class="qa-card-body">
+              <div class="qa-card-title">Nuova lezione</div>
+              <div class="qa-card-sub">Registra una lezione tenuta</div>
+            </div>
+          </a>
+          <a href="lezioni-lista.html" class="qa-card">
+            <div class="qa-card-icon" style="background:var(--sky-500)"><i data-lucide="history" style="width:22px;height:22px"></i></div>
+            <div class="qa-card-body">
+              <div class="qa-card-title">Storico lezioni</div>
+              <div class="qa-card-sub">Le mie 8 lezioni di maggio</div>
+            </div>
+          </a>
+          <a href="gare-assegnate.html" class="qa-card">
+            <div class="qa-card-icon" style="background:var(--grass-500)"><i data-lucide="trophy" style="width:22px;height:22px"></i></div>
+            <div class="qa-card-body">
+              <div class="qa-card-title">Gare assegnate</div>
+              <div class="qa-card-sub">2 gare future come accomp.</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- RIGHT: prossime gare -->
+      <aside>
+        <div class="section-h" style="margin-top:8px">
+          <h2 style="font-size:16px">Le mie prossime gare</h2>
+        </div>
+
+        <a href="#" class="gara-row">
+          <div class="date-tile featured">
+            <div class="d">14</div>
+            <div class="m">GIU</div>
+          </div>
+          <div class="body">
+            <div class="title">Trofeo Le Grazie · MTB Giov.</div>
+            <div class="meta">
+              <span><i data-lucide="map-pin" style="width:10px;height:10px"></i>Parco Le Grazie</span>
+              <span><i data-lucide="users" style="width:10px;height:10px"></i>tu + Marta</span>
+            </div>
+          </div>
+          <span class="badge badge-sun" style="font-size:10px;align-self:center"><i data-lucide="star" style="width:10px;height:10px"></i>Scuola</span>
+        </a>
+
+        <a href="#" class="gara-row">
+          <div class="date-tile">
+            <div class="d">28</div>
+            <div class="m">GIU</div>
+          </div>
+          <div class="body">
+            <div class="title">Trofeo Cesi · MTB e BDC</div>
+            <div class="meta">
+              <span><i data-lucide="map-pin" style="width:10px;height:10px"></i>Cesi (TR)</span>
+              <span><i data-lucide="users" style="width:10px;height:10px"></i>tu</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="gare-assegnate.html" style="display:block;text-align:center;font-size:13px;font-weight:600;color:var(--sky-600);text-decoration:none;padding:12px 0">
+          Vedi tutte le gare assegnate →
+        </a>
+
+        <!-- Calendario settimana corrente -->
+        <div class="section-h">
+          <h2 style="font-size:16px">Questa settimana</h2>
+        </div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:32px;height:32px;background:var(--sky-100);color:var(--sky-700);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-weight:700;font-size:11px">MAR</span>
+            <div style="flex:1;font-size:13px"><strong>BDC · Pista Cesi</strong><div style="font-size:11.5px;color:var(--ink-muted)">19 mag · 17:00 → 18:30</div></div>
+            <span class="badge badge-success" style="font-size:10px">Fatta</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:32px;height:32px;background:var(--grass-100);color:var(--grass-700);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-weight:700;font-size:11px">GIO</span>
+            <div style="flex:1;font-size:13px"><strong>MTB · Parco Le Grazie</strong><div style="font-size:11.5px;color:var(--ink-muted)">21 mag · 17:00 → 18:30 · oggi</div></div>
+            <span class="badge badge-warning" style="font-size:10px"><i data-lucide="clock" style="width:9px;height:9px"></i>Oggi</span>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;background:var(--sun-500);color:var(--navy-900);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px">T</div>
+          <div><div class="footer-brand-name">Triono Racing</div><div style="font-family:var(--f-mono);font-size:10.5px;color:rgba(255,255,255,.55);letter-spacing:0.06em;text-transform:uppercase">Area maestri</div></div>
+        </div>
+        <p class="footer-brand-tag">Loggato come <strong style="color:#fff">Andrea Mancini</strong> · ruolo Istruttore · MTB + BDC</p>
+      </div>
+      <div class="footer-col"><div class="footer-col-title">Maestro</div><ul><li><a href="#">Lezioni</a></li><li><a href="#">Gare</a></li></ul></div>
+      <div class="footer-col"><div class="footer-col-title">Supporto</div><ul><li><a href="#">Contatti</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>ASD CIEMME · Terni</span><span>© 2026</span></div>
+  </footer>
+
+</div>
+</template>
+
+<script src="../shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['Mockup Portale', 'Maestro', 'Dashboard'],
+    title: 'Dashboard Maestro',
+    route: '/portale',
+    statusBarTheme: 'dark',
+    desktopScale: 0.58,
+    stateLegend: { tag: 'Stato', items: [{ ref: 1, text: 'Maestro Andrea Mancini · 8 lezioni maggio · lezione MTB oggi 17:00 · 2 gare assegnate' }] },
+    annotations: [
+      { ref: 1, text: '<strong>Hero maestro</strong>: stessa DNA della dashboard genitore ma con eyebrow «Maestro · MTB + BDC» (multi-discipline supportato, vedi UX_DETTAGLIO_MAESTRO scope decisions §3). Stat: lezioni/presenze/gare/bambini attivi.' },
+      { ref: 2, text: '<strong>Card "Oggi"</strong>: visibile solo se calendario fissato corrisponde alla data oggi (martedì BDC / giovedì MTB). Background sun + pattern, icon navy. CTA implicita (card cliccabile) porta al form nuova lezione pre-compilato con data/orario/discipline.' },
+      { ref: 3, text: '<strong>Storico recente</strong>: ultime 3-5 lezioni con argomento in evidenza (DS §10.7 NUOVO). Pattern row con date-tile a sinistra + body + co-maestri inline. Click apre dettaglio/modifica.' },
+      { ref: 4, text: '<strong>Co-maestri in chiaro</strong>: «tu + Marta» o «solo tu». Quando un maestro tagga un collega, la lezione appare anche nella sua dashboard (UX decision §5).' },
+      { ref: 5, text: '<strong>Sidebar destra desktop</strong>: gare assegnate (max 3) + calendario settimana corrente con stato lezioni (fatta/oggi/futura). La gara «in evidenza» scuola è col date-tile sun.' },
+      { ref: 6, text: '<strong>NavBar maestro</strong>: 4 voci semplici (Home · Le mie lezioni · Gare assegnate · Profilo). Avatar ember (vs navy genitore, sun admin) per signal cromatico veloce del ruolo loggato.' },
+      { ref: 7, text: '<strong>Caso dual genitore+maestro</strong> (non mostrato): se l\'utente è ENTRAMBI, la dashboard concatena blocchi genitore in alto + sezione «Come Maestro» sotto, separati da divider grigio (UX §3.4).' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>

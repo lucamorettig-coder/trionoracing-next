@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Nuova lezione · Portale Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+.form-page-head { background: #fff; border-bottom: 1px solid var(--line); padding: 18px 16px; }
+.form-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--ink-muted); font-size: 13px; font-weight: 500;
+  text-decoration: none; margin-bottom: 10px;
+}
+.form-page-h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.015em; margin: 0 0 4px; }
+.form-page-sub { font-size: 13.5px; color: var(--ink-muted); margin: 0; line-height: 1.55; max-width: 560px; }
+
+.form-layout { max-width: 760px; margin: 0 auto; padding: 24px 16px 80px; }
+
+.form-section {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  padding: 20px; margin-bottom: 14px;
+  box-shadow: var(--sh-xs);
+}
+.form-section-head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.form-section-num {
+  width: 28px; height: 28px;
+  background: var(--navy-700); color: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; flex-shrink: 0;
+}
+.form-section-title { font-size: 16px; font-weight: 700; }
+.form-section-sub { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; }
+.form-section-badge {
+  margin-left: auto;
+  font-family: var(--f-mono); font-size: 10.5px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--flag-600);
+  font-weight: 700;
+}
+
+.form-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@container page (min-width: 720px) {
+  .form-grid.two { grid-template-columns: 1fr 1fr; }
+  .form-grid.three { grid-template-columns: 2fr 1fr 1fr; }
+}
+
+/* ===== Discipline picker (radio-style segmented) ===== */
+.disc-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.disc-card {
+  border: 2px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px;
+  cursor: pointer;
+  background: #fff;
+  display: flex; gap: 12px; align-items: center;
+  position: relative;
+}
+.disc-card.selected.mtb { border-color: var(--grass-500); background: var(--grass-50); }
+.disc-card.selected.bdc { border-color: var(--sky-500); background: var(--sky-50); }
+.disc-card .tag {
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--f-mono); font-weight: 700; font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.disc-card.mtb .tag { background: var(--grass-100); color: var(--grass-700); }
+.disc-card.bdc .tag { background: var(--sky-100); color: var(--sky-700); }
+.disc-card .info { flex: 1; min-width: 0; }
+.disc-card .nm { font-size: 14px; font-weight: 700; color: var(--ink); }
+.disc-card .day { font-size: 11.5px; color: var(--ink-muted); margin-top: 1px; font-family: var(--f-mono); }
+.disc-card .chk {
+  position: absolute; top: 8px; right: 10px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--bg-muted);
+  color: transparent;
+  display: flex; align-items: center; justify-content: center;
+}
+.disc-card.selected.mtb .chk { background: var(--grass-500); color: #fff; }
+.disc-card.selected.bdc .chk { background: var(--sky-500); color: #fff; }
+
+/* ===== Maestri chips ===== */
+.chips-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px 6px 6px;
+  background: var(--bg-muted);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  font-size: 13px; color: var(--ink);
+  font-weight: 500;
+  cursor: pointer;
+}
+.chip:hover { border-color: var(--navy-300); }
+.chip.selected { border-color: var(--navy-700); background: var(--navy-50); color: var(--navy-700); font-weight: 600; }
+.chip.locked { cursor: default; }
+.chip .avatar { width: 22px; height: 22px; font-size: 10px; }
+.chip-x { width: 14px; height: 14px; color: var(--navy-700); }
+
+/* ===== Bambini multi-select ===== */
+.bambini-filters {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 12px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.bambini-filter-pill {
+  background: #fff; border: 1px solid var(--line);
+  padding: 6px 10px; border-radius: 999px;
+  font-size: 12.5px; font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+.bambini-filter-pill.active { border-color: var(--navy-700); background: var(--navy-50); color: var(--navy-700); font-weight: 600; }
+.bambini-filter-pill .count { font-family: var(--f-mono); font-size: 11px; color: var(--ink-muted); margin-left: 3px; }
+.bambini-filter-pill.active .count { color: var(--navy-700); }
+
+.bambini-search {
+  position: relative;
+  margin-bottom: 14px;
+}
+.bambini-search input {
+  width: 100%; padding: 10px 14px 10px 38px;
+  background: var(--bg-soft); border: 1px solid var(--line);
+  border-radius: var(--r-md); font: inherit;
+  font-size: 13.5px; color: var(--ink);
+  outline: none;
+}
+.bambini-search input:focus { border-color: var(--navy-700); background: #fff; }
+.bambini-search .ico {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--ink-muted); pointer-events: none;
+}
+
+.bambini-list {
+  display: grid; grid-template-columns: 1fr; gap: 6px;
+}
+@container page (min-width: 720px) { .bambini-list { grid-template-columns: 1fr 1fr; } }
+
+.bambino-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-md);
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+}
+.bambino-row:hover { border-color: var(--navy-200); background: var(--bg-soft); }
+.bambino-row.selected { border-color: var(--navy-700); background: var(--navy-50); }
+.bambino-row .photo {
+  width: 32px; height: 32px;
+  border-radius: 8px; flex-shrink: 0;
+}
+.bambino-row .body { flex: 1; min-width: 0; }
+.bambino-row .nm { font-size: 13.5px; font-weight: 600; color: var(--ink); line-height: 1.2; }
+.bambino-row .sub { font-size: 11px; color: var(--ink-muted); font-family: var(--f-mono); margin-top: 1px; }
+.bambino-row .chk {
+  width: 18px; height: 18px;
+  border: 2px solid var(--line);
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.bambino-row.selected .chk { border-color: var(--navy-700); background: var(--navy-700); color: #fff; }
+
+.bambini-stats {
+  margin-top: 14px; padding: 10px 14px;
+  background: var(--navy-50); color: var(--navy-700);
+  border-radius: var(--r-md);
+  font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ===== Note textarea ===== */
+.textarea-block { display: flex; flex-direction: column; }
+.textarea-block textarea {
+  width: 100%; min-height: 80px;
+  padding: 12px 14px;
+  background: #fff; border: 1.5px solid var(--line);
+  border-radius: var(--r-md);
+  font: inherit; font-size: 14px;
+  color: var(--ink); resize: vertical;
+  outline: none;
+}
+.textarea-block textarea:focus { border-color: var(--navy-700); box-shadow: 0 0 0 4px rgba(31,45,90,.1); }
+.textarea-private {
+  border-left: 3px solid var(--ember-500) !important;
+  background: var(--ember-50) !important;
+}
+.private-banner {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-family: var(--f-mono);
+  letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--ember-700);
+  margin-bottom: 6px;
+}
+
+/* ===== Actions ===== */
+.form-actions {
+  display: flex; gap: 10px;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--line-soft);
+  margin-top: 6px;
+  flex-direction: column;
+}
+.form-actions .btn { width: 100%; }
+@container page (min-width: 720px) {
+  .form-actions { flex-direction: row; justify-content: flex-end; }
+  .form-actions .btn { width: auto; min-width: 160px; }
+  .form-actions .btn-ghost { margin-right: auto; }
+}
+
+@container page (min-width: 900px) {
+  .form-page-head { padding: 28px 40px; }
+  .form-page-h1 { font-size: 28px; }
+  .form-layout { padding: 32px 24px 80px; }
+  .form-section { padding: 28px; }
+}
+</style>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="page" style="background:var(--bg-soft)">
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" style="text-decoration:none;color:inherit">
+        <div class="nav-logo-mark">T</div>
+        <div><div class="nav-logo-text">Triono Racing</div><div class="nav-logo-sub">Maestri</div></div>
+      </a>
+      <nav class="nav-links">
+        <a href="#" class="nav-link">Home</a>
+        <a href="#" class="nav-link active">Le mie lezioni</a>
+        <a href="#" class="nav-link">Gare assegnate</a>
+        <a href="#" class="nav-link">Profilo</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <button class="nav-iconbtn nav-iconbtn-burger"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+        <a href="#" style="text-decoration:none;display:inline-flex"><span class="avatar avatar-sm" style="background:var(--ember-500);color:#fff">AM</span></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb">
+    <a href="#">Home</a><span class="sep">/</span>
+    <a href="lezioni-lista.html">Le mie lezioni</a><span class="sep">/</span>
+    <span class="current">Nuova</span>
+  </div>
+
+  <div class="form-page-head">
+    <a href="lezioni-lista.html" class="form-back">
+      <i data-lucide="arrow-left" style="width:14px;height:14px"></i>
+      Le mie lezioni
+    </a>
+    <h1 class="form-page-h1">Registra una nuova lezione</h1>
+    <p class="form-page-sub">Compila i 5 campi e segna i bambini presenti. La lezione comparirà nel diario di ognuno di loro entro pochi secondi.</p>
+  </div>
+
+  <div class="form-layout">
+
+    <!-- SEZIONE 1: QUANDO -->
+    <div class="form-section">
+      <div class="form-section-head">
+        <div class="form-section-num">1</div>
+        <div>
+          <div class="form-section-title">Quando</div>
+          <div class="form-section-sub">Data, orario, disciplina</div>
+        </div>
+      </div>
+
+      <div class="form-grid two">
+        <div>
+          <label class="label" for="data">Data</label>
+          <input id="data" type="date" class="field" value="2026-05-21" max="2026-05-21" />
+          <p class="helper">Default: oggi · max: oggi. Per registrare lezioni passate, usa data libera fino a 30gg fa.</p>
+        </div>
+        <div>
+          <label class="label">Disciplina</label>
+          <div class="disc-picker">
+            <label class="disc-card mtb selected">
+              <div class="tag">MTB</div>
+              <div class="info">
+                <div class="nm">Mountain bike</div>
+                <div class="day">Giovedì · Parco Le Grazie</div>
+              </div>
+              <span class="chk"><i data-lucide="check" style="width:11px;height:11px"></i></span>
+            </label>
+            <label class="disc-card bdc">
+              <div class="tag">BDC</div>
+              <div class="info">
+                <div class="nm">Strada</div>
+                <div class="day">Martedì · Pista Cesi</div>
+              </div>
+              <span class="chk"><i data-lucide="check" style="width:11px;height:11px"></i></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:16px"></div>
+
+      <div class="form-grid three">
+        <div>
+          <label class="label" for="ora">Orario inizio</label>
+          <input id="ora" type="time" class="field" value="17:00" />
+        </div>
+        <div>
+          <label class="label" for="durata">Durata</label>
+          <select id="durata" class="field">
+            <option>60 minuti</option>
+            <option selected>90 minuti</option>
+            <option>120 minuti</option>
+            <option>150 minuti</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="luogo">Luogo</label>
+          <input id="luogo" type="text" class="field" value="Parco Le Grazie" />
+        </div>
+      </div>
+    </div>
+
+    <!-- SEZIONE 2: CO-MAESTRI -->
+    <div class="form-section">
+      <div class="form-section-head">
+        <div class="form-section-num">2</div>
+        <div>
+          <div class="form-section-title">Chi ha tenuto la lezione</div>
+          <div class="form-section-sub">Tu sei già selezionato. Aggiungi i colleghi se eravate insieme.</div>
+        </div>
+      </div>
+
+      <div class="chips-row">
+        <span class="chip selected locked">
+          <span class="avatar" style="background:var(--ember-500);color:#fff">AM</span>
+          Andrea Mancini <span style="color:var(--ink-muted);font-weight:500">(tu)</span>
+          <i data-lucide="lock" class="chip-x" style="width:12px;height:12px;color:var(--ink-muted)"></i>
+        </span>
+        <span class="chip selected">
+          <span class="avatar" style="background:var(--sky-500);color:#fff">MC</span>
+          Marta Conti
+          <i data-lucide="x" class="chip-x"></i>
+        </span>
+        <button class="chip" style="background:#fff;color:var(--navy-700);font-weight:600">
+          <i data-lucide="plus" style="width:14px;height:14px"></i>
+          Aggiungi co-maestro
+        </button>
+      </div>
+    </div>
+
+    <!-- SEZIONE 3: ARGOMENTO -->
+    <div class="form-section">
+      <div class="form-section-head">
+        <div class="form-section-num">3</div>
+        <div>
+          <div class="form-section-title">Argomento della lezione</div>
+          <div class="form-section-sub">Visibile nel diario dei genitori · obbligatorio</div>
+        </div>
+        <span class="form-section-badge">obbligatorio</span>
+      </div>
+
+      <input type="text" class="field" placeholder="Es: Curva veloce in salita" value="Curva veloce in salita" maxlength="80" style="font-size:16px;font-weight:600" />
+      <div style="display:flex;justify-content:space-between;margin-top:8px">
+        <p class="helper">Es: «Equilibrio in sella», «Curva veloce», «Manutenzione bici»</p>
+        <span class="helper t-mono" style="font-variant-numeric:tabular-nums">22 / 80</span>
+      </div>
+    </div>
+
+    <!-- SEZIONE 4: BAMBINI PRESENTI -->
+    <div class="form-section">
+      <div class="form-section-head">
+        <div class="form-section-num">4</div>
+        <div>
+          <div class="form-section-title">Bambini presenti</div>
+          <div class="form-section-sub">Tocca per selezionare i bambini che hanno partecipato</div>
+        </div>
+      </div>
+
+      <div class="bambini-filters">
+        <button class="bambini-filter-pill active">Solo MTB <span class="count">18</span></button>
+        <button class="bambini-filter-pill">Tutti <span class="count">38</span></button>
+        <button class="bambini-filter-pill">Solo G3-G4 <span class="count">14</span></button>
+        <button class="bambini-filter-pill" style="margin-left:auto;color:var(--sky-600);border-color:transparent">
+          <i data-lucide="check-square" style="width:13px;height:13px"></i>
+          Seleziona tutti
+        </button>
+      </div>
+
+      <div class="bambini-search">
+        <span class="ico"><i data-lucide="search" style="width:15px;height:15px"></i></span>
+        <input type="text" placeholder="Cerca per nome o cognome…" />
+      </div>
+
+      <div class="bambini-list">
+        <div class="bambino-row selected">
+          <div class="photo photo-ph" style="font-size:7px">FOTO<br>MARCO</div>
+          <div class="body">
+            <div class="nm">Marco Rossi</div>
+            <div class="sub">G1 · 10 anni</div>
+          </div>
+          <div class="chk"><i data-lucide="check" style="width:12px;height:12px"></i></div>
+        </div>
+
+        <div class="bambino-row selected">
+          <div class="photo photo-ph" style="font-size:7px">FOTO<br>SOFIA</div>
+          <div class="body">
+            <div class="nm">Sofia Marini</div>
+            <div class="sub">G2 · 11 anni</div>
+          </div>
+          <div class="chk"><i data-lucide="check" style="width:12px;height:12px"></i></div>
+        </div>
+
+        <div class="bambino-row selected">
+          <div class="photo photo-ph" style="font-size:7px">FOTO<br>LUCA</div>
+          <div class="body">
+            <div class="nm">Luca Bianchi</div>
+            <div class="sub">G3 · 8 anni</div>
+          </div>
+          <div class="chk"><i data-lucide="check" style="width:12px;height:12px"></i></div>
+        </div>
+
+        <div class="bambino-row">
+          <div class="photo photo-ph" style="font-size:7px">FOTO<br>EMMA</div>
+          <div class="body">
+            <div class="nm">Emma Verdi</div>
+            <div class="sub">G3 · 8 anni</div>
+          </div>
+          <div class="chk"></div>
+        </div>
+
+        <div class="bambino-row selected">
+          <div class="photo photo-ph" style="font-size:7px">FOTO<br>TOMMASO</div>
+          <div class="body">
+            <div class="nm">Tommaso Greco</div>
+            <div class="sub">G4 · 9 anni</div>
+          </div>
+          <div class="chk"><i data-lucide="check" style="width:12px;height:12px"></i></div>
+        </div>
+
+        <div class="bambino-row">
+          <div class="photo photo-ph" style="font-size:7px">FOTO<br>AURORA</div>
+          <div class="body">
+            <div class="nm">Aurora De Santis</div>
+            <div class="sub">G2 · 11 anni</div>
+          </div>
+          <div class="chk"></div>
+        </div>
+
+        <div class="bambino-row selected">
+          <div class="photo photo-ph" style="font-size:7px">FOTO<br>FILIPPO</div>
+          <div class="body">
+            <div class="nm">Filippo Russo</div>
+            <div class="sub">G1 · 10 anni</div>
+          </div>
+          <div class="chk"><i data-lucide="check" style="width:12px;height:12px"></i></div>
+        </div>
+
+        <div class="bambino-row selected">
+          <div class="photo photo-ph" style="font-size:7px">FOTO<br>ALICE</div>
+          <div class="body">
+            <div class="nm">Alice Costantini</div>
+            <div class="sub">G5 · 7 anni</div>
+          </div>
+          <div class="chk"><i data-lucide="check" style="width:12px;height:12px"></i></div>
+        </div>
+      </div>
+
+      <div class="bambini-stats">
+        <i data-lucide="users" style="width:18px;height:18px"></i>
+        6 bambini selezionati · 12 non presenti oggi
+      </div>
+    </div>
+
+    <!-- SEZIONE 5: NOTE -->
+    <div class="form-section">
+      <div class="form-section-head">
+        <div class="form-section-num">5</div>
+        <div>
+          <div class="form-section-title">Note</div>
+          <div class="form-section-sub">Argomento approfondito + note interne per i colleghi</div>
+        </div>
+      </div>
+
+      <div class="textarea-block" style="margin-bottom:16px">
+        <label class="label">Note pubbliche · visibili ai genitori</label>
+        <textarea placeholder="Es: «Marco oggi ha imparato la curva piegata. Bravissimi tutti!»">Lezione su curva veloce su sterrato in salita. Marco e Sofia hanno gestito benissimo i tornanti tecnici. Bravissimi tutti, alla prossima!</textarea>
+        <p class="helper" style="margin-top:6px">Verrà mostrato nel tab «Diario» di ogni bambino presente.</p>
+      </div>
+
+      <div class="textarea-block">
+        <div class="private-banner">
+          <i data-lucide="eye-off" style="width:12px;height:12px"></i>
+          Note interne · solo maestri e admin
+        </div>
+        <textarea class="textarea-private" placeholder="Es: «Luca arrivato in ritardo. Roberta dovremmo fare attenzione alla postura.»">Luca arrivato 15 min in ritardo (chiedere ai genitori). Filippo dovremmo lavorare di più sulla postura in discesa — proviamo a dargli del feedback specifico la prossima.</textarea>
+        <p class="helper" style="margin-top:6px">Visibile solo ai maestri attivi e all'admin. Non comparirà nel diario dei genitori.</p>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="form-actions">
+      <a href="lezioni-lista.html" class="btn btn-ghost">Annulla</a>
+      <button class="btn btn-outline">
+        <i data-lucide="save" style="width:16px;height:16px"></i>
+        Salva come bozza
+      </button>
+      <button class="btn btn-primary">
+        <i data-lucide="check" style="width:16px;height:16px"></i>
+        Registra lezione · 6 presenze
+      </button>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;background:var(--sun-500);color:var(--navy-900);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px">T</div>
+          <div><div class="footer-brand-name">Triono Racing</div></div>
+        </div>
+      </div>
+      <div class="footer-col"><div class="footer-col-title">Maestro</div><ul><li><a href="#">Lezioni</a></li></ul></div>
+      <div class="footer-col"><div class="footer-col-title">Supporto</div><ul><li><a href="#">Contatti</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>ASD CIEMME</span><span>© 2026</span></div>
+  </footer>
+
+</div>
+</template>
+
+<script src="../shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['Mockup Portale', 'Maestro', 'Nuova lezione'],
+    title: 'Nuova lezione · 5 sezioni',
+    route: '/portale/lezioni/nuova',
+    statusBarTheme: 'dark',
+    desktopScale: 0.6,
+    stateLegend: { tag: 'Stato', items: [{ ref: 1, text: 'Form pre-compilato · 6 bambini selezionati · note compilate · pronto per submit' }] },
+    annotations: [
+      { ref: 1, text: '<strong>Form 5 sezioni numerate</strong>: Quando · Co-maestri · Argomento · Bambini · Note. Pattern coerente con figli-nuovo ma con multi-select bambini.' },
+      { ref: 2, text: '<strong>Disciplina picker</strong>: 2 card MTB grass / BDC sky. Selected con border grosso + bg colored. Reflect del corso unico (entrambe le discipline esistono per il maestro).' },
+      { ref: 3, text: '<strong>Co-maestri come chips</strong>: tu sei locked (sempre selezionato), gli altri con X rimovibile. Pattern multi-select inline con avatar mini.' },
+      { ref: 4, text: '<strong>Argomento obbligatorio</strong> (DS §10.7 NUOVO): badge \u00abobbligatorio\u00bb in alto a destra. Char counter mono live (22/80). Placeholder dichiarativo con 3 esempi.' },
+      { ref: 5, text: '<strong>Bambini multi-select</strong>: filtri sopra (Solo MTB/Tutti/G3-G4 con count + Seleziona tutti) → search → grid 2-col (1-col mobile) di righe con foto + nome + categoria + checkbox. Selected fill navy-50.' },
+      { ref: 6, text: '<strong>Privacy bambini</strong>: il maestro vede solo bambini iscritti ai corsi attivi (compliance UX_DETTAGLIO_MAESTRO Privacy). Non vede dati anagrafici genitori, pagamenti, certificati medici.' },
+      { ref: 7, text: '<strong>Stats live</strong>: navy callout in fondo alla lista \u00ab6 bambini selezionati \u00b7 12 non presenti oggi\u00bb. Si aggiorna in tempo reale.' },
+      { ref: 8, text: '<strong>Note pubbliche vs interne</strong>: due textarea separate. Quella interna ha bordo ember sinistro + bg ember-50 + label \u00absolo maestri e admin\u00bb con icon eye-off. Visivamente distinguibile a colpo d\'occhio.' },
+      { ref: 9, text: '<strong>CTA finale</strong>: \u00abRegistra lezione \u00b7 6 presenze\u00bb (dichiarativa col conteggio). Stato disabled se argomento vuoto o nessun bambino selezionato. Salva-bozza outline opzionale.' },
+      { ref: 10, text: '<strong>Validazioni server</strong> (non mostrate): data futura blocca submit; lezione duplicata stesso maestro+giorno mostra warning soft \u00abHai gi\u00e0 una lezione registrata oggi. Vuoi crearne un\\'altra?\u00bb con CTA conferma.' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>

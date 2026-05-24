@@ -5,8 +5,9 @@ import Link from "next/link";
 import NavLinks, { type NavLink } from "./NavLinks";
 import MobileMenu from "./MobileMenu";
 import { trionoClerkAppearance } from "@/lib/clerk-appearance";
+import { getGenitoreByClerkId } from "@/lib/airtable-portale";
 
-function getLinksForRole(role: string): NavLink[] {
+function getLinksForRole(role: string, hasFigli: boolean): NavLink[] {
   switch (role) {
     case "ADMIN":
       return [
@@ -15,13 +16,26 @@ function getLinksForRole(role: string): NavLink[] {
         { label: "Bambini", href: "/portale/admin/bambini" },
         { label: "Pagamenti", href: "/portale/admin/pagamenti" },
       ];
-    case "ISTRUTTORE":
-      return [
+    case "ISTRUTTORE": {
+      const maestroLinks: NavLink[] = [
         { label: "Home", href: "/portale" },
         { label: "Le mie lezioni", href: "/portale/lezioni" },
         { label: "Gare assegnate", href: "/portale/gare-assegnate" },
-        { label: "Profilo", href: "/portale/profilo" },
       ];
+      if (hasFigli) {
+        // Dual ruolo: anteporre le voci genitore (Home già presente)
+        return [
+          { label: "Home", href: "/portale" },
+          { label: "I miei figli", href: "/portale/figli" },
+          { label: "Iscrizioni", href: "/portale/iscrizioni" },
+          { label: "Pagamenti", href: "/portale/pagamenti" },
+          { label: "Le mie lezioni", href: "/portale/lezioni" },
+          { label: "Gare assegnate", href: "/portale/gare-assegnate" },
+          { label: "Profilo", href: "/portale/profilo" },
+        ];
+      }
+      return [...maestroLinks, { label: "Profilo", href: "/portale/profilo" }];
+    }
     default:
       return [
         { label: "Home", href: "/portale" },
@@ -35,9 +49,21 @@ function getLinksForRole(role: string): NavLink[] {
 }
 
 export default async function PortaleNavBar() {
-  const { sessionClaims } = await auth();
+  const { sessionClaims, userId } = await auth();
   const role = (sessionClaims?.role as string) ?? "GENITORE";
-  const links = getLinksForRole(role);
+
+  // Dual ruolo: per ISTRUTTORE controlla se ha figli linkati al record genitore.
+  let hasFigli = false;
+  if (role === "ISTRUTTORE" && userId) {
+    try {
+      const genitore = await getGenitoreByClerkId(userId);
+      hasFigli = (genitore?.fields.TABELLA_BAMBINI?.length ?? 0) > 0;
+    } catch {
+      hasFigli = false;
+    }
+  }
+
+  const links = getLinksForRole(role, hasFigli);
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-line shadow-[var(--shadow-xs)]">

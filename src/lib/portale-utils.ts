@@ -1,5 +1,5 @@
 import type { BadgeVariant } from "@/components/ui/badge";
-import type { Bambino, Iscrizione, TitoloPagamento } from "@/lib/airtable-portale";
+import type { Bambino, Iscrizione, Lezione, TitoloPagamento } from "@/lib/airtable-portale";
 
 export interface StatoIscrizioneBadge {
   variant: BadgeVariant;
@@ -296,6 +296,87 @@ export interface CertBadgeInfo {
  * Usa CERTIFICATO_MEDICO_STATO (formula Airtable) se disponibile,
  * altrimenti calcola dalla data di scadenza.
  */
+// ─── EVO-006 — lezioni/maestro helpers ─────────────────────────────────────
+
+export interface LezioneEditPermission {
+  canEdit: boolean;
+  reason?: string;
+}
+
+/**
+ * Determina se una lezione può essere modificata dal maestro.
+ * Admin: sempre sì. Maestro: solo se la lezione è ≤ 30 giorni nel passato.
+ * Lezioni nel futuro o oggi: editabili (la guard si applica solo a quelle vecchie).
+ */
+export function lezionePuoEssereModificata(
+  dataLezione: string | undefined,
+  isAdmin: boolean,
+): LezioneEditPermission {
+  if (isAdmin) return { canEdit: true };
+  if (!dataLezione) return { canEdit: true };
+  const days = daysUntil(dataLezione);
+  const giorniDallaLezione = days < 0 ? Math.abs(days) : 0;
+  if (giorniDallaLezione <= 30) return { canEdit: true };
+  return {
+    canEdit: false,
+    reason: "Le lezioni di oltre 30 giorni si modificano solo dall'admin.",
+  };
+}
+
+export interface TipoSessioneStyle {
+  bg: string;
+  text: string;
+  shortLabel: string;
+}
+
+/**
+ * Stile (tile colorato) per TIPO_SESSIONE. Palette DS coerente con tipoGaraStyle.
+ * MTB → grass, BDC → sky, Gara → ember. Fallback navy per valori sconosciuti.
+ */
+export function tipoSessioneStyle(tipo?: string): TipoSessioneStyle {
+  switch (tipo) {
+    case "Lezione MTB Ciclodromo":
+      return { bg: "bg-grass-500", text: "text-white", shortLabel: "MTB" };
+    case "Lezione BDC Ciclodromo":
+      return { bg: "bg-sky-500", text: "text-white", shortLabel: "BDC" };
+    case "Gara Giovanissimi":
+      return { bg: "bg-ember-500", text: "text-white", shortLabel: "Gara" };
+    default:
+      return { bg: "bg-navy-700", text: "text-white", shortLabel: tipo ?? "—" };
+  }
+}
+
+/**
+ * Raggruppa lezioni per mese (YYYY-MM). L'ordine interno di ogni gruppo
+ * eredita dall'input (le query helper restituiscono già DATA desc).
+ * Le chiavi sono ordinate dal mese più recente al più vecchio.
+ */
+export function groupLezioniByMese(lezioni: Lezione[]): Map<string, Lezione[]> {
+  const map = new Map<string, Lezione[]>();
+  for (const l of lezioni) {
+    const data = l.fields.DATA;
+    if (!data) continue;
+    const key = data.slice(0, 7);
+    const arr = map.get(key) ?? [];
+    arr.push(l);
+    map.set(key, arr);
+  }
+  return new Map([...map.entries()].sort((a, b) => b[0].localeCompare(a[0])));
+}
+
+const MESI_IT_FULL = [
+  "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+  "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre",
+] as const;
+
+/** Trasforma una chiave "YYYY-MM" in "Mese YYYY" (es. "2026-05" → "Maggio 2026"). */
+export function meseChiaveLabel(chiave: string): string {
+  const [annoStr, meseStr] = chiave.split("-");
+  const meseNum = parseInt(meseStr, 10);
+  const mese = MESI_IT_FULL[meseNum - 1] ?? meseStr;
+  return `${mese.charAt(0).toUpperCase()}${mese.slice(1)} ${annoStr}`;
+}
+
 export function certBadgeVariant(
   stato?: string,
   scadenza?: string,

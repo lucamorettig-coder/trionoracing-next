@@ -1,0 +1,111 @@
+"use server";
+
+import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import {
+  createLezione,
+  updateLezione,
+  getGenitoreByClerkId,
+  getMaestroByGenitoreId,
+  ATTIVITA_SVOLTE_VALUES,
+  TIPO_SESSIONE_VALUES,
+  type AttivitaSvolta,
+  type Lezione,
+  type TipoSessione,
+} from "@/lib/airtable-portale";
+
+interface CurrentMaestro {
+  maestroId: string;
+  isAdmin: boolean;
+}
+
+async function getCurrentMaestro(): Promise<CurrentMaestro> {
+  const { userId, sessionClaims } = await auth();
+  if (!userId) throw new Error("Non autenticato");
+  const role = (sessionClaims?.role as string) ?? "GENITORE";
+  const isAdmin = role === "ADMIN";
+
+  const genitore = await getGenitoreByClerkId(userId);
+  if (!genitore) throw new Error("Profilo utente non trovato");
+
+  const maestro = await getMaestroByGenitoreId(genitore.id);
+  if (!maestro) {
+    throw new Error(
+      "Profilo maestro non collegato — contattare admin per l'associazione.",
+    );
+  }
+  return { maestroId: maestro.id, isAdmin };
+}
+
+const TIPO_SET = new Set<string>(TIPO_SESSIONE_VALUES);
+const ATTIVITA_SET = new Set<string>(ATTIVITA_SVOLTE_VALUES);
+
+function parseLezioneFromForm(
+  formData: FormData,
+): Partial<Lezione["fields"]> {
+  const data = String(formData.get("DATA") ?? "").trim();
+  const tipoRaw = String(formData.get("TIPO_SESSIONE") ?? "").trim();
+  const tipo = TIPO_SET.has(tipoRaw) ? (tipoRaw as TipoSessione) : undefined;
+
+  const attivita = formData
+    .getAll("ATTIVITA_SVOLTE")
+    .map(String)
+    .filter((v) => ATTIVITA_SET.has(v)) as AttivitaSvolta[];
+
+  const bambini = formData.getAll("BAMBINI_PRESENTI").map(String).filter(Boolean);
+  const maestri = formData.getAll("MAESTRI_PRESENTI").map(String).filter(Boolean);
+  const gara = String(formData.get("GARA") ?? "").trim();
+  const notePub = String(formData.get("NOTE_ATTIVITA") ?? "").trim();
+  const noteInt = String(formData.get("NOTE_INTERNE") ?? "").trim();
+
+  const fields: Partial<Lezione["fields"]> = {
+    DATA: data || undefined,
+    TIPO_SESSIONE: tipo,
+    ATTIVITA_SVOLTE: attivita.length ? attivita : undefined,
+    BAMBINI_PRESENTI: bambini.length ? bambini : undefined,
+    MAESTRI_PRESENTI: maestri.length ? maestri : undefined,
+    NOTE_ATTIVITA: notePub || undefined,
+    NOTE_INTERNE: noteInt || undefined,
+    GARA: gara ? [gara] : undefined,
+  };
+  return fields;
+}
+
+/** Crea una nuova lezione registrata dal maestro corrente. */
+export async function actionCreateLezione(formData: FormData): Promise<void> {
+  const { maestroId } = await getCurrentMaestro();
+  const fields = parseLezioneFromForm(formData);
+
+  if (!fields.DATA) {
+    redirect("/portale/lezioni/nuova?error=missing-data");
+  }
+  if (!fields.TIPO_SESSIONE) {
+    redirect("/portale/lezioni/nuova?error=missing-tipo");
+  }
+
+  // Aggiunge sempre il maestro corrente fra i presenti se non già incluso.
+  const presenti = new Set(fields.MAESTRI_PRESENTI ?? []);
+  presenti.add(maestroId);
+  fields.MAESTRI_PRESENTI = Array.from(presenti);
+
+  await createLezione(fields, maestroId);
+  revalidatePath("/portale/lezioni");
+  revalidatePath("/portale");
+  redirect("/portale/lezioni?success=1");
+}
+
+/** Aggiorna una lezione esistente (guard 30gg + ownership lato libreria). */
+export async function actionUpdateLezione(formData: FormData): Promise<void> {
+  const id = String(formData.get("id") ?? "").trim();
+  if (!id) throw new Error("ID lezione mancante");
+  const { maestroId, isAdmin } = await getCurrentMaestro();
+
+  const patch = parseLezioneFromForm(formData);
+  await updateLezione(id, patch, maestroId, isAdmin);
+
+  revalidatePath(`/portale/lezioni/${id}`);
+  revalidatePath("/portale/lezioni");
+  revalidatePath("/portale");
+  redirect(`/portale/lezioni/${id}?success=1`);
+}
