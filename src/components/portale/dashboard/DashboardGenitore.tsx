@@ -172,7 +172,7 @@ export default function DashboardGenitore({ genitore, bambini }: Props) {
               Nuova iscrizione
             </Link>
             <Link
-              href="/portale/iscrizioni"
+              href="/portale/pagamenti"
               className="flex items-center gap-3 bg-white border border-line text-ink rounded-[var(--radius-xl)] px-5 py-4 font-semibold hover:border-navy-300 transition-colors shadow-[var(--shadow-sm)]"
             >
               <CreditCard className="w-5 h-5 shrink-0 text-ink-muted" />

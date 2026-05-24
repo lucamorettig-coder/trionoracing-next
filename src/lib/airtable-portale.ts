@@ -719,6 +719,27 @@ export async function getTitoliPagamento(iscrizioneId: string): Promise<TitoloPa
   return titoli.sort((a, b) => (a.fields.NUMERO_RATA ?? 0) - (b.fields.NUMERO_RATA ?? 0));
 }
 
+export interface TitoliByGenitoreResult {
+  titoli: TitoloPagamento[];
+  iscrizioniById: Record<string, Iscrizione>;
+}
+
+/**
+ * Tutti i titoli pagamento di un genitore (aggregati da tutte le sue iscrizioni).
+ * Ritorna anche la mappa iscrizioneId → iscrizione, così la UI può arricchire
+ * ogni titolo con nome bambino, foto e anno (lookup già esposti su Iscrizione).
+ */
+export async function getTitoliByGenitore(
+  genitoreId: string,
+): Promise<TitoliByGenitoreResult> {
+  const iscrizioni = await getIscrizioniByGenitore(genitoreId);
+  const iscrizioniById = Object.fromEntries(iscrizioni.map((i) => [i.id, i]));
+  const ids = iscrizioni.flatMap((i) => i.fields.TITOLI_PAGAMENTO ?? []);
+  if (ids.length === 0) return { titoli: [], iscrizioniById };
+  const titoli = await fetchRecordsByIds<TitoloPagamento>("TITOLI_PAGAMENTO", ids);
+  return { titoli, iscrizioniById };
+}
+
 /** Singolo titolo per ID. */
 export async function getTitoloById(id: string): Promise<TitoloPagamento | null> {
   try {
