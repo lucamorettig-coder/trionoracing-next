@@ -161,6 +161,55 @@ Su esplicita richiesta dell'utente, saltato il prompt per Claude Design. Motivaz
 ### [2026-05-24] Fase 7 — Prompt Claude Code completato
 Generato prompt end-to-end autocontenuto in `evolutive/EVO-015-titoli-descrizione/prompt-claude-code.md`. Stato evolutiva: **in pianificazione → pronta per implementazione**. Aggiornato `memory.md` di conseguenza.
 
+### [2026-05-24 pomeriggio] Affinamento post-Fase 7 — TITOLI misti + Make.com NUMERO_RATA
+
+Durante la configurazione del Make.com DEV è emerso un vincolo critico non documentato in Fase 3:
+
+**`TITOLI_PAGAMENTO` ospita titoli misti, non solo rate**:
+- Quote iscrizione/rate (TIPO_TITOLO = `prima_rata` o `rata`) — generate da `createIscrizione()` lato app Next e da scenario Make.com mensile
+- **Abbigliamento/Kit** — TIPO_TITOLO dedicato (es. `abbigliamento`), NUMERO_RATA resta vuoto, DESCRIZIONE compilata **manualmente** da admin
+- **Una tantum / altre causali** — idem: NUMERO_RATA vuoto, DESCRIZIONE manuale
+
+**Implicazione Make.com**: `length({{1.TITOLI_PAGAMENTO}})` su Make NON è utilizzabile per calcolare NUMERO_RATA (conterebbe anche i titoli non-rata). Serve un SearchRecords filtrato per `OR({TIPO_TITOLO}="prima_rata", {TIPO_TITOLO}="rata")`.
+
+**Implicazione app Next**: la fallback di `titoloLabel()` per titoli senza DESCRIZIONE deve gestire anche TIPO_TITOLO sconosciuti (es. "abbigliamento") con fallback generico `"Pagamento"`. Il prompt Claude Code (Macro-task 3, riga `else { primary = "Pagamento"; }`) già copre questo caso — nessuna modifica al prompt necessaria.
+
+**Nuovo layout flusso Make.com (DEV 5141682)**:
+
+```
+[2] SetVariable Mese_corrente
+   ↓
+[1] Search ISCRIZIONI (formula esistente)
+   ↓
+[4] Search TITOLI_PAGAMENTO idempotency (stesso mese + stessa iscrizione)
+   ↓ [FILTER: 4.__IMTLENGTH__ = 0]  ← spostato dalla freccia 4→9 alla freccia 4→nuovo modulo
+   ↓
+[NUOVO] Search TITOLI_PAGAMENTO conta-rate
+   Formula: AND(
+     FIND("{{1.ID_ISCRIZIONE}}", ARRAYJOIN({ISCRIZIONE}))>0,
+     OR({TIPO_TITOLO}="prima_rata", {TIPO_TITOLO}="rata")
+   )
+   maxRecords: 100
+   Output: NUMERO_RATA, TIPO_TITOLO, ISCRIZIONE
+   ↓
+[9] Create TITOLI_PAGAMENTO
+   - NUMERO_RATA = {{nuovo_modulo.__IMTLENGTH__ + 1}}
+   - DESCRIZIONE = "Rata di {{lower(2.Mese_corrente)}} {{formatDate(now; \"YYYY\")}}"
+   - (resto invariato)
+```
+
+**Verifica funzionale richiesta sul DEV**:
+1. Trovare/creare un'iscrizione DEV con `prima_rata` + `abbigliamento` esistenti, nessun titolo per il mese corrente
+2. Run once dello scenario
+3. Atteso: nuovo titolo con `NUMERO_RATA = 2` (non 3) → conferma che il filtro TIPO_TITOLO funziona correttamente
+
+**Replica su PROD `4746166`**: dopo validazione DEV, stessa identica procedura sullo scenario PROD `generazione titolo rata mensile + comunicazione`. Prerequisito: campo `DESCRIZIONE` esistente sulla TITOLI_PAGAMENTO base PROD `appszpkU1aXb3xrFM`.
+
+**Bonus**: con questa modifica Make applicata su PROD, **tutti i titoli rata nuovi avranno NUMERO_RATA popolato**. Il bug "undefinedª rata" sul dashboard genitore non si presenterà più per i titoli generati post-modifica. EVO-015 resta utile per:
+- Centralizzare il rendering (helper + componente `<TitoloLabel />`)
+- Coprire i titoli storici legacy senza NUMERO_RATA
+- Permettere descrizioni personalizzate per i titoli non-rata (abbigliamento, una tantum)
+
 ---
 
 ## Azioni manuali Luca post-merge
