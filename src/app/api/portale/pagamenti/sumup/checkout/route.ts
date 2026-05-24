@@ -49,11 +49,17 @@ export async function POST(req: NextRequest) {
 
   const apiKey = process.env.SUMUP_API_KEY;
   const merchantCode = process.env.SUMUP_MERCHANT_CODE;
+  const returnUrl = process.env.MAKE_SUMUP_RETURN_URL;
   if (!apiKey || !merchantCode) {
     console.error("[sumup/checkout] SUMUP_API_KEY o SUMUP_MERCHANT_CODE mancante");
     return NextResponse.json(
       { error: "Configurazione pagamento non disponibile" },
       { status: 500 },
+    );
+  }
+  if (!returnUrl) {
+    console.warn(
+      "[sumup/checkout] MAKE_SUMUP_RETURN_URL non configurato — fallback Make.com disabilitato",
     );
   }
 
@@ -104,6 +110,7 @@ export async function POST(req: NextRequest) {
     checkout_reference: checkoutReference,
     description: "Pagamento iscrizione Triono Racing",
     merchant_code: merchantCode,
+    ...(returnUrl ? { return_url: returnUrl } : {}),
   };
 
   const sumupRes = await fetch("https://api.sumup.com/v0.1/checkouts", {
