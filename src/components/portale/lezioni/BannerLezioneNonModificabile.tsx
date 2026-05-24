@@ -16,7 +16,6 @@ export default function BannerLezioneNonModificabile({ reason }: Props) {
         <p className="font-semibold">Lezione in sola lettura</p>
         <p className="mt-0.5">
           {reason ?? "Le lezioni di oltre 30 giorni si modificano solo dall'admin."}
-          {" "}Contatta <a href="mailto:admin@trionoracing.it" className="underline">admin@trionoracing.it</a> per richiedere modifiche.
         </p>
       </div>
     </div>
