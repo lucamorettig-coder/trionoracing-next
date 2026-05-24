@@ -2,9 +2,9 @@
 
 - **ID**: EVO-015
 - **Slug**: titoli-descrizione
-- **Data inizio**: _da compilare al kick-off (post-merge EVO-014)_
+- **Data inizio**: 2026-05-24
 - **Data fine**: _da compilare a chiusura_
-- **Stato**: in pianificazione
+- **Stato**: pronta per implementazione
 - **Tipo**: refactor architetturale dati + bug fix
 - **Area**: cross-cutting — Airtable schema · portale genitore (lista pagamenti, dettaglio iscrizione, dashboard prossime scadenze, wizard sommario) · Make.com scenari
 - **Priorità**: media — non blocca, ma rimuove un bug visibile in produzione ("undefinedª rata") e migliora la chiarezza UI generale dei titoli
@@ -102,4 +102,113 @@ Visual da generare:
 
 ## Log fasi
 
-> Append automatico a fine di ogni fase, con timestamp. _Vuoto fino al kick-off formale via skill `evolutive-workflow`._
+> Append automatico a fine di ogni fase, con timestamp.
+
+### [2026-05-24] Fase 1 — Raccolta requisiti completata
+Decisioni architetturali chiuse (5 punti aperti nel brief originale):
+- **Tipo campo Airtable**: `singleLineText` opzionale (fallback robusto via helper, backfill graduale possibile)
+- **Template prima rata** (`createIscrizione`): `"Quota iscrizione + 1ª rata {anno}"`
+- **Template rate Make.com**: `"Rata di {mese} {anno}"` (modifica manuale Luca su scenari 4746166 PROD + 5141682 DEV)
+- **Rendering TIPO_TITOLO secondario**: Badge piccolo accanto alla descrizione (varianti `prima_rata`→info/sky, `rata`/`rata_successiva`→neutral, `saldo`→warning/ember)
+- **Backfill titoli storici**: Manuale post-deploy a carico di Luca (UI gestisce fallback)
+
+Implicazione emersa: DESCRIZIONE può essere compilata manualmente dall'admin per titoli non-rata (abbigliamento, una tantum). Il sistema accetta testo libero — niente vincoli di format imposti dal codice oltre il template automatico della prima rata.
+
+### [2026-05-24] Fase 2 — Definizione ambito completata
+Confermate le 8 voci in scope (vedi sezione "Ambito proposto" sopra) con un'aggiunta rispetto al brief originale: introduzione di un componente atomico **`<TitoloLabel />`** in `src/components/portale/pagamenti/` per evitare duplicazione del rendering nei 4+ consumer (pattern DRY). L'helper `titoloLabel()` ora ritorna anche `secondaryVariant: BadgeVariant` per pilotare il colore del badge tipo.
+
+### [2026-05-24] Fase 3 — Analisi as-is completata
+Stack confermato: Next 16.2.6 + React 19.2.4 + Tailwind v4 + Clerk 7.3.7 + TypeScript 5. Nessun test runner configurato, nessun Lighthouse CI. Quality gate: lint + `npx tsc --noEmit` + build.
+
+**Bug "undefinedª rata" localizzato** in `src/components/portale/dashboard/DashboardGenitore.tsx:113`:
+```tsx
+: `${s.numeroRata}ª rata · ${s.bambinoNome}${s.importo !== undefined ? ` · €${s.importo}` : ''}`;
+```
+Quando `s.numeroRata` è `undefined` → letterale `"undefinedª rata"`.
+
+**5 consumer identificati** (non 4 come ipotizzato in Fase 2):
+1. `src/components/portale/iscrizioni/tabs/TabPagamenti.tsx` (mappa locale `TITOLO_LABEL` + template inline)
+2. `src/components/portale/pagamenti/PagamentiLista.tsx` (mappa locale + funzione locale `titoloLabel` con **naming conflict** col nuovo helper)
+3. `src/components/portale/iscrizioni/steps/StepSommario.tsx` (mappa `MESI_LABEL` locale + template inline)
+4. `src/components/portale/dashboard/DashboardGenitore.tsx` (**bug "undefinedª rata"**)
+5. `src/app/portale/(portal)/iscrizioni/[id]/checkout/page.tsx` (prop `titoloTipo` a `CheckoutSumUp`) — non era nel brief originale, scoperto in fase 3
+
+i18n: n/a (portale IT-only). SEO: n/a (area autenticata).
+
+### [2026-05-24] Fase 4 — WBS completata
+WBS strutturata in 18 task ordinati su 7 macro-task L1:
+1. Schema dati (S) — azione manuale Luca su Airtable
+2. Backend / data layer (M) — tipo + writable + createIscrizione
+3. Helper utility (M) — `titoloLabel()` + `meseITLabel()` + `Scadenza.titoloLabel`
+4. Componente UI atomico (M) — `<TitoloLabel />` Server Component
+5. Refactor 5 consumer (M)
+6. Quality gate + smoke test (S)
+7. Documentazione azioni manuali Luca (S)
+
+**Verifica rilasciabilità**: singolo deploy. L'evolutiva è atomica — schema + codice + UI escono insieme. Una sola PR.
+
+### [2026-05-24] Fase 5 — Verifica coerenza completata
+- **Design system**: ✅ coerente. Riusa solo Badge variants (`info`/`neutral`/`warning`) e tipografia esistente. ⚠️ minore: convivenza con badge stato pagamento richiede layout `flex flex-wrap` (specificato nel prompt Claude Code).
+- **Architettura**: ✅ coerente. Helper puro in `portale-utils.ts`, componente Server in `src/components/portale/pagamenti/`. ⚠️ minore: duplicazione mappa mesi documentata via JSDoc.
+- **i18n**: n/a
+- **SEO**: n/a
+
+Nessuna correzione strutturale alla WBS. Solo istruzioni operative aggiuntive nel prompt Claude Code.
+
+### [2026-05-24] Fase 6 — Saltata (decisione utente)
+Su esplicita richiesta dell'utente, saltato il prompt per Claude Design. Motivazione implicita: l'evolutiva è di refactor + bug fix con pattern UI replicabili dai consumer esistenti (Badge variants + tipografia DS). Il componente nuovo `<TitoloLabel />` è semplice e si basa su primitive del DS già documentate. Annotato qui per consistenza del log.
+
+### [2026-05-24] Fase 7 — Prompt Claude Code completato
+Generato prompt end-to-end autocontenuto in `evolutive/EVO-015-titoli-descrizione/prompt-claude-code.md`. Stato evolutiva: **in pianificazione → pronta per implementazione**. Aggiornato `memory.md` di conseguenza.
+
+---
+
+## Azioni manuali Luca post-merge
+
+> Da eseguire dopo il merge della PR. L'UI ha fallback robusto via `titoloLabel()`: anche con `DESCRIZIONE` vuota il render è sensato ("Rata di {mese} {anno}" oppure "Pagamento"). Queste azioni rendono le label perfette e allineate al template ufficiale.
+
+### 1. Make.com scenario `4746166` PROD — `generazione titolo rata mensile + comunicazione`
+
+Obiettivo: lo scenario crea i titoli rata mensile il giorno 1 di ogni mese. Dopo EVO-015 deve popolare anche `DESCRIZIONE` con template `"Rata di {mese} {anno}"`.
+
+Passi:
+1. Aprire scenario su Make.com → editor
+2. Individuare il modulo Airtable **Create Record** che inserisce in `TITOLI_PAGAMENTO`
+3. Aggiungere mapping per il nuovo campo `DESCRIZIONE` con la formula:
+   ```
+   Rata di {{lower(formatDate(now; "MMMM"; "it_IT"))}} {{formatDate(now; "YYYY")}}
+   ```
+   - Validare in editor che `lower(formatDate(now; "MMMM"; "it_IT"))` produca `febbraio` (lowercase). Se la locale `it_IT` non è disponibile in quella versione di Make, alternativa:
+     - usare modulo **Set Variable** con un dictionary `1→gennaio, 2→febbraio, ..., 12→dicembre` indicizzato da `formatDate(now; "M")` (numero mese senza zero leading), oppure
+     - hardcodare il mese atteso allo scheduling se lo scenario è fissato a una data nota.
+4. Salvare, eseguire un **Run once** di prova in un mese di test (o forzare con un titolo manuale) e verificare che il record creato ha `DESCRIZIONE` valorizzato.
+5. Riattivare lo scenario.
+
+### 2. Make.com scenario `5141682` DEV — stesso scenario in ambiente DEV
+
+Replicare gli stessi passi del punto 1 sullo scenario DEV, così che lo sviluppo futuro abbia parità con PROD.
+
+### 3. Backfill titoli storici Airtable PROD
+
+Obiettivo: popolare `DESCRIZIONE` sui titoli pre-esistenti per non lasciare la UI sul fallback "Rata di {mese} {anno}".
+
+Passi:
+1. Airtable PROD → base `appszpkU1aXb3xrFM` → tabella `TITOLI_PAGAMENTO`
+2. Creare una view filtrata `{DESCRIZIONE} = ""` (oppure `BLANK()`)
+3. Per ogni record (o bulk edit se pochi):
+   - Se `TIPO_TITOLO = "prima_rata"` → `DESCRIZIONE = "Quota iscrizione + 1ª rata {anno}"` (anno = `ANNO_ISCRIZIONE`)
+   - Se `TIPO_TITOLO = "saldo"` → `DESCRIZIONE = "Saldo {anno}"`
+   - Altrimenti → `DESCRIZIONE = "Rata di {mese} {anno}"` (mese da `SCADENZA_MESE` lowercased)
+4. Non bloccante: la UI gestisce i record ancora vuoti via fallback `titoloLabel()`.
+
+Nota: il bug "undefinedª rata" è già risolto da codice (commit `0593cc4`) — il backfill è solo per uniformare il copy delle label.
+
+---
+
+## Pattern emersi (placeholder per AGENTS.md a fine ciclo)
+
+- **Helper utility centralizzato per label cross-consumer**: quando 3+ consumer applicano la stessa logica di rendering su un record (con piccole varianti tra "primary" e "secondary"), centralizzare in un helper `xLabel(record) → { primary, secondary, secondaryVariant }` in `portale-utils.ts`. Evita mappe locali duplicate, naming conflict e drift di copy.
+- **Server Component atomico per pattern di rendering duplicato**: quando il pattern di rendering ha un layout fisso (testo + badge + spacing), packagizzarlo in un Server Component `<XLabel />` in `src/components/portale/{dominio}/`. Il consumer chiama `<XLabel record={x} showSecondary={false} />` e non duplica markup.
+- **Mai template inline `${value ?? ""}` su trailing space**: `${"Rata "}${value ?? ""}` produce `"Rata "` con trailing space se value è undefined. Mai. Usare helper che ritornano stringa già pulita.
+- **Mai `${undefined}ª rata`**: identico al sopra ma per ordinali. JSON parsing safe — chiunque legga il render in produzione vede `"undefinedª rata"` letterale.
+- **Make.com può non popolare campi calcolati**: quando uno scenario Make.com non riesce a popolare in modo affidabile un campo (es. progressivo numerico), non insistere a forzarlo via workaround. Ripensare lo schema dati per non dipendere da quel campo (DESCRIZIONE come label primaria > NUMERO_RATA come label primaria).
