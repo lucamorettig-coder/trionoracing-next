@@ -31,8 +31,10 @@ const PROVIDER = [
 const TIPI = [
   { value: "prima_rata", label: "1ª rata" },
   { value: "rata", label: "Rata" },
-  { value: "abbigliamento", label: "Abbigliamento" },
-  { value: "una_tantum", label: "Una tantum" },
+  { value: "seconda_rata", label: "2ª rata" },
+  { value: "terza_rata", label: "3ª rata" },
+  { value: "Abbigliamento", label: "Abbigliamento" },
+  { value: "altro", label: "Altro" },
 ];
 
 const MESI = [

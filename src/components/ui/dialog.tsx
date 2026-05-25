@@ -25,7 +25,7 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 const dialogContentVariants = cva(
   [
-    "ds-modal fixed left-1/2 top-1/2 z-50 grid w-[calc(100%-2rem)]",
+    "ds-modal fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 grid w-[calc(100%-2rem)]",
     "bg-white border border-line rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] p-6",
     "focus:outline-none",
   ].join(" "),

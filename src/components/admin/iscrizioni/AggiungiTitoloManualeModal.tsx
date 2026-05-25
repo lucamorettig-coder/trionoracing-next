@@ -13,16 +13,15 @@ interface Props {
 }
 
 const TIPI: { value: TipoTitoloManuale; label: string }[] = [
-  { value: "supplemento_gadget", label: "Supplemento gadget" },
-  { value: "conguaglio", label: "Conguaglio" },
-  { value: "sconto_correttivo", label: "Sconto correttivo" },
-  { value: "quota_straordinaria", label: "Quota straordinaria" },
-  { value: "donazione", label: "Donazione" },
+  { value: "rata", label: "Rata" },
+  { value: "seconda_rata", label: "2ª rata" },
+  { value: "terza_rata", label: "3ª rata" },
+  { value: "Abbigliamento", label: "Abbigliamento / kit" },
   { value: "altro", label: "Altro" },
 ];
 
 export function AggiungiTitoloManualeModal({ open, onOpenChange, iscrizioneId, importoTotale }: Props) {
-  const [tipo, setTipo] = React.useState<TipoTitoloManuale>("conguaglio");
+  const [tipo, setTipo] = React.useState<TipoTitoloManuale>("altro");
   const [importo, setImporto] = React.useState("");
   const [scadenza, setScadenza] = React.useState(
     () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
@@ -32,7 +31,7 @@ export function AggiungiTitoloManualeModal({ open, onOpenChange, iscrizioneId, i
 
   const handleOpenChange = (next: boolean) => {
     if (!next) {
-      setTipo("conguaglio");
+      setTipo("altro");
       setImporto("");
       setScadenza(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)); // ok: inside event handler
       setDescrizione("");
@@ -97,7 +96,7 @@ export function AggiungiTitoloManualeModal({ open, onOpenChange, iscrizioneId, i
             placeholder="es. 25.00 o -10.00"
             className="h-9 px-3 text-[13.5px] border border-line rounded-[var(--radius-md)] bg-white text-ink focus:outline-none focus:ring-2 focus:ring-navy-700/20"
           />
-          {tipo === "sconto_correttivo" && (
+          {tipo === "altro" && (
             <p className="text-[11px] text-ink-muted">Usa valore negativo per sconti (es. -15.00)</p>
           )}
         </div>

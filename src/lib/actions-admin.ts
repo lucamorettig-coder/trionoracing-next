@@ -123,12 +123,13 @@ export async function updateNoteAdmin(id: string, note: string): Promise<void> {
 
 // ─── 4. Crea titolo manuale ─────────────────────────────────────────────────
 
+// Valori allineati al singleSelect TIPO_TITOLO su Airtable (TITOLI_PAGAMENTO).
+// `prima_rata` è gestito automaticamente dal flusso iscrizione, non dal form manuale.
 export type TipoTitoloManuale =
-  | "supplemento_gadget"
-  | "conguaglio"
-  | "sconto_correttivo"
-  | "quota_straordinaria"
-  | "donazione"
+  | "rata"
+  | "seconda_rata"
+  | "terza_rata"
+  | "Abbigliamento"
   | "altro";
 
 export async function creaTitoloManuale(
