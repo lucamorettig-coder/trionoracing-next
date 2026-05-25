@@ -370,6 +370,7 @@ export interface Iscrizione {
     "COGNOME_BAMBINO (from TABELLA_BAMBINI)"?: string[];
     "FOTO_BAMBINO (from TABELLA_BAMBINI)"?: AirtableAttachment[];
     "CERTIFICATO_MEDICO_STATO (from TABELLA_BAMBINI)"?: string[];
+    NOTE_ADMIN?: string;
   };
 }
 
@@ -404,6 +405,10 @@ const ISCRIZIONI_WRITABLE_FIELDS = new Set([
   "DATA_CONFERMA_TAGLIE",
   "PRIMA_RATA_PAGATA",
   "ORDINE_ISCRIZIONE_GENITORE",
+  "NOTE_ADMIN",
+  "ANNULLATA",
+  "MOTIVO_ANNULLAMENTO",
+  "DATA_ANNULLAMENTO",
 ]);
 
 export function stripIscrizioneReadOnlyFields<T extends object>(fields: T): Partial<T> {
