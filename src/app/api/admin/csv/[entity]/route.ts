@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { getGenitoreByClerkId } from "@/lib/airtable-portale";
+import { getAllIscrizioni, getAllBambini, csvWriter } from "@/lib/airtable-admin";
 
 const KNOWN_ENTITIES = new Set([
   "iscrizioni",
@@ -14,8 +15,6 @@ const KNOWN_ENTITIES = new Set([
 ]);
 
 const ENTITY_TO_EVO: Record<string, string> = {
-  iscrizioni: "EVO-017",
-  bambini: "EVO-017",
   pagamenti: "EVO-018",
   tariffe: "EVO-018",
   gare: "EVO-019",
@@ -24,23 +23,76 @@ const ENTITY_TO_EVO: Record<string, string> = {
   genitori: "EVO-020",
 };
 
+async function checkAdmin(): Promise<NextResponse | null> {
+  const { userId } = await auth();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const genitore = await getGenitoreByClerkId(userId);
+  if (!genitore || genitore.fields.RUOLO !== "ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  return null;
+}
+
 export async function POST(
   _req: Request,
   context: { params: Promise<{ entity: string }> },
 ): Promise<NextResponse> {
   const { entity } = await context.params;
 
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const genitore = await getGenitoreByClerkId(userId);
-  if (!genitore || genitore.fields.RUOLO !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const authError = await checkAdmin();
+  if (authError) return authError;
 
   if (!KNOWN_ENTITIES.has(entity)) {
     return NextResponse.json({ error: `Unknown entity '${entity}'` }, { status: 404 });
+  }
+
+  if (entity === "iscrizioni") {
+    const iscrizioni = await getAllIscrizioni();
+    const csv = csvWriter(iscrizioni, [
+      { key: "id", label: "ID", accessor: (r) => r.id },
+      { key: "bambino", label: "Bambino", accessor: (r) => `${r.fields.NOME_BAMBINO ?? ""} ${r.fields.COGNOME_BAMBINO ?? ""}`.trim() },
+      { key: "genitore", label: "Genitore", accessor: (r) => `${r.fields.NOME_GENITORE ?? ""} ${r.fields.COGNOME_GENITORE ?? ""}`.trim() },
+      { key: "corso", label: "Corso", accessor: (r) => r.fields.CORSO ?? "" },
+      { key: "anno", label: "Anno", accessor: (r) => r.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0] ?? "" },
+      { key: "stato", label: "Stato", accessor: (r) => r.fields.STATO_ISCRIZIONE ?? "" },
+      { key: "annullata", label: "Annullata", accessor: (r) => r.fields.ANNULLATA ? "SI" : "NO" },
+      { key: "importo", label: "Importo finale (€)", accessor: (r) => r.fields.IMPORTO_FINALE_ANNUO ?? "" },
+      { key: "prima_rata", label: "Prima rata pagata", accessor: (r) => r.fields.PRIMA_RATA_PAGATA ? "SI" : "NO" },
+      { key: "data_iscrizione", label: "Data iscrizione", accessor: (r) => r.fields.DATA_ISCRIZIONE ?? "" },
+      { key: "privacy", label: "Privacy", accessor: (r) => r.fields.PRIVACY_MINORE ? "SI" : "NO" },
+      { key: "regolamento", label: "Regolamento", accessor: (r) => r.fields.FLAG_REGOLAMENTO ? "SI" : "NO" },
+      { key: "modulo_triono", label: "Modulo Triono", accessor: (r) => r.fields.MODULO_TRIONO_STATO ?? "" },
+      { key: "modulo_fci", label: "Modulo FCI", accessor: (r) => r.fields.MODULO_FCI_STATO ?? "" },
+    ]);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="iscrizioni-${new Date().toISOString().slice(0, 10)}.csv"`,
+      },
+    });
+  }
+
+  if (entity === "bambini") {
+    const bambini = await getAllBambini();
+    const csv = csvWriter(bambini, [
+      { key: "id", label: "ID", accessor: (r) => r.id },
+      { key: "nome", label: "Nome", accessor: (r) => r.fields.NOME_BAMBINO ?? "" },
+      { key: "cognome", label: "Cognome", accessor: (r) => r.fields.COGNOME_BAMBINO ?? "" },
+      { key: "data_nascita", label: "Data di nascita", accessor: (r) => r.fields.DATA_NASCITA_BAMBINO ?? "" },
+      { key: "luogo_nascita", label: "Luogo di nascita", accessor: (r) => r.fields.LUOGO_NASCITA_BAMBINO ?? "" },
+      { key: "cf", label: "Codice Fiscale", accessor: (r) => r.fields.CODICE_FISCALE_BAMBINO ?? "" },
+      { key: "via", label: "Via residenza", accessor: (r) => r.fields.VIA_RESIDENZA_BAMBINO ?? "" },
+      { key: "citta", label: "Città residenza", accessor: (r) => r.fields.CITTA_RESIDENZA_BAMBINO ?? "" },
+      { key: "cert_stato", label: "Certificato stato", accessor: (r) => r.fields.CERTIFICATO_MEDICO_STATO ?? "" },
+      { key: "cert_scadenza", label: "Certificato scadenza", accessor: (r) => r.fields.CERTIFICATO_MEDICO_SCADENZA ?? "" },
+      { key: "n_iscrizioni", label: "N. iscrizioni", accessor: (r) => r.fields.TABELLA_ISCRIZIONI?.length ?? 0 },
+    ]);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="bambini-${new Date().toISOString().slice(0, 10)}.csv"`,
+      },
+    });
   }
 
   const evo = ENTITY_TO_EVO[entity] ?? "una futura evolutiva";

@@ -200,6 +200,7 @@ export interface Bambino {
     CERTIFICATO_MEDICO_STATO?: string;
     FOTO_BAMBINO?: AirtableAttachment[];
     GENITORE_RECORD_ID_LOOKUP?: string[];
+    EMAIL_GENITORE?: string[];
     ID_BAMBINO?: string;
     TABELLA_ISCRIZIONI?: string[];
     TABELLA_LEZIONI?: string[];
@@ -370,6 +371,10 @@ export interface Iscrizione {
     "COGNOME_BAMBINO (from TABELLA_BAMBINI)"?: string[];
     "FOTO_BAMBINO (from TABELLA_BAMBINI)"?: AirtableAttachment[];
     "CERTIFICATO_MEDICO_STATO (from TABELLA_BAMBINI)"?: string[];
+    NOME_BAMBINO?: string;
+    COGNOME_BAMBINO?: string;
+    NOME_GENITORE?: string;
+    COGNOME_GENITORE?: string;
     NOTE_ADMIN?: string;
   };
 }

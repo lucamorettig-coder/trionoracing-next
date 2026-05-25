@@ -7,7 +7,7 @@ import {
   updateTitoloPagamento,
   markPrimaRataPagata,
 } from "@/lib/airtable-portale";
-import { getIscrizioneByIdAdmin, getBambinoByIdAdmin, fetchAllPages } from "@/lib/airtable-admin";
+import { getIscrizioneByIdAdmin, getBambinoByIdAdmin } from "@/lib/airtable-admin";
 
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TOKEN = process.env.AIRTABLE_TOKEN;
