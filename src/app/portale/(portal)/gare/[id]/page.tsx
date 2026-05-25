@@ -114,10 +114,12 @@ export default async function GaraDettaglioPage({ params, searchParams }: Props)
       {/* Layout 2-col */}
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 lg:gap-8">
         <div className="space-y-4">
-          {gara.note && (
+          {(gara.descrizione ?? gara.note) && (
             <section className="bg-white border border-line rounded-[var(--radius-xl)] p-5 shadow-[var(--shadow-sm)]">
               <h2 className="text-base font-bold mb-2">Descrizione</h2>
-              <p className="text-[14px] leading-relaxed text-ink whitespace-pre-line">{gara.note}</p>
+              <p className="text-[14px] leading-relaxed text-ink whitespace-pre-line">
+                {gara.descrizione ?? gara.note}
+              </p>
             </section>
           )}
 

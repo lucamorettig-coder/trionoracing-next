@@ -1248,6 +1248,8 @@ export interface Gara {
   luogo: string;
   classe: string | null;
   tipoGara: string | null;
+  /** Descrizione user-facing mostrata ai genitori sul portale (EVO-019). */
+  descrizione: string | null;
   idGaraFci: string | null;
   linkFci: string | null;
   note: string | null;
@@ -1267,6 +1269,7 @@ interface GaraRecord {
     "ID Gara FCI"?: string;
     "Link FCI"?: string;
     Note?: string;
+    DESCRIZIONE?: string;
     COMITATO_REGIONALE?: string;
     IN_EVIDENZA?: boolean;
     "Maestro Accompagnatore"?: string[];
@@ -1282,6 +1285,7 @@ function mapGara(r: GaraRecord): Gara {
     luogo: f.Luogo ?? "",
     classe: f.Classe ?? null,
     tipoGara: f["Tipo Gara"] ?? null,
+    descrizione: f.DESCRIZIONE ?? null,
     idGaraFci: f["ID Gara FCI"] ?? null,
     linkFci: f["Link FCI"] ?? null,
     note: f.Note ?? null,
