@@ -8,7 +8,23 @@
  * Solo server-side. Riusa env AIRTABLE_BASE_ID + AIRTABLE_TOKEN.
  */
 
-import type { Bambino, Iscrizione, Lezione, TitoloPagamento } from "@/lib/airtable-portale";
+import type {
+  Bambino,
+  Gara,
+  GaraRecord,
+  IscrizioneGara,
+  IscrizioneGaraRecord,
+  Iscrizione,
+  Lezione,
+  StatoIscrizioneGara,
+  TitoloPagamento,
+} from "@/lib/airtable-portale";
+import {
+  GARE_TABLE,
+  calcCategoriaFCI,
+  mapGara,
+  mapIscrizioneGara,
+} from "@/lib/airtable-portale";
 
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TOKEN = process.env.AIRTABLE_TOKEN;
@@ -722,4 +738,446 @@ export async function getLezioniByBambino(bambinoId: string): Promise<Lezione[]>
     sort: [{ field: "DATA", direction: "desc" }],
   });
   return lezioni;
+}
+
+// ─── Gare (EVO-019) ─────────────────────────────────────────────────────────
+
+const ISCRIZIONI_GARE_TABLE = "ISCRIZIONI_GARE";
+const TABELLA_MAESTRI = "TABELLA_MAESTRI";
+
+/**
+ * Campi scrivibili su `Gare Giovanili Umbria 2026` (whitelist per evitare 422
+ * su lookup/formula). Coerente con pattern `stripReadOnlyFields` EVO-002.
+ */
+const GARA_WRITABLE_FIELDS = new Set([
+  "Nome Gara",
+  "Data",
+  "Luogo",
+  "Classe",
+  "Tipo Gara",
+  "ID Gara FCI",
+  "Link FCI",
+  "Note",
+  "DESCRIZIONE",
+  "COMITATO_REGIONALE",
+  "IN_EVIDENZA",
+  "Maestro Accompagnatore",
+]);
+
+function stripGaraReadOnly<T extends object>(fields: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(fields).filter(([k]) => GARA_WRITABLE_FIELDS.has(k)),
+  ) as Partial<T>;
+}
+
+export interface GaraAdminFilters {
+  toggle: "future" | "passate";
+  search?: string;
+}
+
+export function parseGareFilters(params: URLSearchParams): GaraAdminFilters {
+  const raw = params.get("toggle");
+  const toggle: GaraAdminFilters["toggle"] = raw === "passate" ? "passate" : "future";
+  const search = params.get("search") ?? undefined;
+  return { toggle, search };
+}
+
+export async function getAllGare(filters: GaraAdminFilters): Promise<Gara[]> {
+  const today = new Date().toISOString().slice(0, 10);
+  // Confronto su campo Date nativo via DATETIME_DIFF in giorni
+  const formula =
+    filters.toggle === "future"
+      ? `DATETIME_DIFF({Data},"${today}",'days')>=0`
+      : `DATETIME_DIFF({Data},"${today}",'days')<0`;
+  const records = await fetchAllPages<GaraRecord>(GARE_TABLE, {
+    filterByFormula: formula,
+    sort: [{ field: "Data", direction: filters.toggle === "future" ? "asc" : "desc" }],
+  });
+
+  let result = records.map(mapGara);
+
+  if (filters.search) {
+    const q = filters.search.toLowerCase();
+    result = result.filter(
+      (g) =>
+        g.nomeGara.toLowerCase().includes(q) ||
+        g.luogo.toLowerCase().includes(q) ||
+        (g.comitatoRegionale ?? "").toLowerCase().includes(q),
+    );
+  }
+
+  return result;
+}
+
+export async function getGaraByIdAdmin(id: string): Promise<Gara | null> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(GARE_TABLE)}/${encodeURIComponent(id)}`,
+    {
+      headers: { Authorization: `Bearer ${TOKEN}` },
+      cache: "no-store",
+    },
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`[airtable-admin] getGaraByIdAdmin ${id}: ${res.status}`);
+  const r: GaraRecord = await res.json();
+  return mapGara(r);
+}
+
+/**
+ * Numero iscrizioni gara collegate a una gara. Conta dagli ID linkati sul
+ * record gara (campo `ISCRIZIONI_GARE` di tipo multipleRecordLinks).
+ */
+export async function countIscrizioniByGara(garaId: string): Promise<number> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(GARE_TABLE)}/${encodeURIComponent(garaId)}`,
+    {
+      headers: { Authorization: `Bearer ${TOKEN}` },
+      cache: "no-store",
+    },
+  );
+  if (res.status === 404) return 0;
+  if (!res.ok) throw new Error(`[airtable-admin] countIscrizioniByGara ${garaId}: ${res.status}`);
+  const r: GaraRecord = await res.json();
+  return r.fields.ISCRIZIONI_GARE?.length ?? 0;
+}
+
+export interface IscrizioneGaraAdminEnriched extends IscrizioneGara {
+  bambinoNome: string;
+  bambinoCognome: string;
+  bambinoDataNascita: string | null;
+  categoriaFCI: string | null;
+  genitoreNome: string;
+  genitoreCognome: string;
+  genitoreEmail: string | null;
+}
+
+export interface GaraIscrizioniFilters {
+  stato?: StatoIscrizioneGara[];
+  search?: string;
+}
+
+export function parseGaraIscrizioniFilters(params: URLSearchParams): GaraIscrizioniFilters {
+  const statoRaw = params.getAll("stato") as StatoIscrizioneGara[];
+  const search = params.get("search") ?? undefined;
+  return {
+    stato: statoRaw.length > 0 ? statoRaw : undefined,
+    search,
+  };
+}
+
+/**
+ * Iscrizioni gara per una gara con join Bambino + Genitore + Categoria FCI
+ * computata. Pattern join leggero con `fields[]` mirati (EVO-017).
+ */
+export async function getIscrizioniByGara(
+  garaId: string,
+  filters?: GaraIscrizioniFilters,
+): Promise<IscrizioneGaraAdminEnriched[]> {
+  // 1. Fetch gara per ottenere gli ID iscrizioni linked
+  const gara = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(GARE_TABLE)}/${encodeURIComponent(garaId)}`,
+    { headers: { Authorization: `Bearer ${TOKEN}` }, cache: "no-store" },
+  );
+  if (gara.status === 404) return [];
+  if (!gara.ok) throw new Error(`[airtable-admin] getIscrizioniByGara fetch gara: ${gara.status}`);
+  const garaRecord: GaraRecord = await gara.json();
+  const iscrizioniIds = garaRecord.fields.ISCRIZIONI_GARE ?? [];
+  if (iscrizioniIds.length === 0) return [];
+
+  // 2. Fetch iscrizioni gara (batch via OR(RECORD_ID()=...))
+  const orFormula = iscrizioniIds.map((id) => `RECORD_ID()="${id}"`).join(",");
+  const iscrizioniRecords = await fetchAllPages<IscrizioneGaraRecord>(ISCRIZIONI_GARE_TABLE, {
+    filterByFormula: `OR(${orFormula})`,
+  });
+
+  // 3. Collect bambino + genitore IDs per il join
+  const bambinoIds = Array.from(
+    new Set(iscrizioniRecords.flatMap((r) => r.fields.BAMBINO ?? [])),
+  );
+  const genitoreIds = Array.from(
+    new Set(iscrizioniRecords.flatMap((r) => r.fields.GENITORE ?? [])),
+  );
+
+  type BambinoLite = {
+    id: string;
+    fields: {
+      NOME_BAMBINO?: string;
+      COGNOME_BAMBINO?: string;
+      DATA_NASCITA_BAMBINO?: string;
+    };
+  };
+  type GenitoreLite = {
+    id: string;
+    fields: {
+      NOME_GENITORE?: string;
+      COGNOME_GENITORE?: string;
+      EMAIL_GENITORE?: string;
+    };
+  };
+
+  const bambiniById: Record<string, BambinoLite> = {};
+  if (bambinoIds.length > 0) {
+    const formula = bambinoIds.map((id) => `RECORD_ID()="${id}"`).join(",");
+    const bambini = await fetchAllPages<BambinoLite>("TABELLA_BAMBINI", {
+      filterByFormula: `OR(${formula})`,
+      fields: ["NOME_BAMBINO", "COGNOME_BAMBINO", "DATA_NASCITA_BAMBINO"],
+    });
+    for (const b of bambini) bambiniById[b.id] = b;
+  }
+
+  const genitoriById: Record<string, GenitoreLite> = {};
+  if (genitoreIds.length > 0) {
+    const formula = genitoreIds.map((id) => `RECORD_ID()="${id}"`).join(",");
+    const genitori = await fetchAllPages<GenitoreLite>("TABELLA_GENITORI", {
+      filterByFormula: `OR(${formula})`,
+      fields: ["NOME_GENITORE", "COGNOME_GENITORE", "EMAIL_GENITORE"],
+    });
+    for (const g of genitori) genitoriById[g.id] = g;
+  }
+
+  // 4. Map + enrich + filter
+  let enriched: IscrizioneGaraAdminEnriched[] = iscrizioniRecords.map((r) => {
+    const base = mapIscrizioneGara(r);
+    const b = bambiniById[base.bambinoId];
+    const g = genitoriById[base.genitoreId];
+    const dataNascita = b?.fields.DATA_NASCITA_BAMBINO ?? null;
+    return {
+      ...base,
+      bambinoNome: b?.fields.NOME_BAMBINO ?? "",
+      bambinoCognome: b?.fields.COGNOME_BAMBINO ?? "",
+      bambinoDataNascita: dataNascita,
+      categoriaFCI: dataNascita ? calcCategoriaFCI(dataNascita) : null,
+      genitoreNome: g?.fields.NOME_GENITORE ?? "",
+      genitoreCognome: g?.fields.COGNOME_GENITORE ?? "",
+      genitoreEmail: g?.fields.EMAIL_GENITORE ?? null,
+    };
+  });
+
+  if (filters?.stato && filters.stato.length > 0) {
+    enriched = enriched.filter((i) => filters.stato!.includes(i.stato));
+  }
+
+  if (filters?.search) {
+    const q = filters.search.toLowerCase();
+    enriched = enriched.filter(
+      (i) =>
+        i.bambinoNome.toLowerCase().includes(q) ||
+        i.bambinoCognome.toLowerCase().includes(q) ||
+        i.genitoreNome.toLowerCase().includes(q) ||
+        i.genitoreCognome.toLowerCase().includes(q) ||
+        (i.genitoreEmail ?? "").toLowerCase().includes(q),
+    );
+  }
+
+  // Sort: Richiesta first (più urgenti), poi data richiesta desc
+  enriched.sort((a, b) => {
+    const orderA = a.stato === "Richiesta" ? 0 : 1;
+    const orderB = b.stato === "Richiesta" ? 0 : 1;
+    if (orderA !== orderB) return orderA - orderB;
+    return (b.dataRichiesta ?? "").localeCompare(a.dataRichiesta ?? "");
+  });
+
+  return enriched;
+}
+
+export interface GaraCreateInput {
+  "Nome Gara": string;
+  Data: string;
+  Luogo?: string;
+  Classe?: string;
+  "Tipo Gara"?: string;
+  "ID Gara FCI"?: string;
+  "Link FCI"?: string;
+  Note?: string;
+  DESCRIZIONE?: string;
+  COMITATO_REGIONALE?: string;
+  IN_EVIDENZA?: boolean;
+  "Maestro Accompagnatore"?: string[];
+}
+
+export type GaraUpdateInput = Partial<GaraCreateInput>;
+
+export async function createGara(data: GaraCreateInput): Promise<Gara> {
+  requireEnv();
+  const res = await fetch(`${API_BASE}/${BASE_ID}/${encodeURIComponent(GARE_TABLE)}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ fields: stripGaraReadOnly(data) }),
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`[airtable-admin] createGara failed: ${res.status} ${body}`);
+  }
+  const r: GaraRecord = await res.json();
+  return mapGara(r);
+}
+
+export async function updateGara(id: string, data: GaraUpdateInput): Promise<Gara> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(GARE_TABLE)}/${encodeURIComponent(id)}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ fields: stripGaraReadOnly(data) }),
+      cache: "no-store",
+    },
+  );
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`[airtable-admin] updateGara ${id} failed: ${res.status} ${body}`);
+  }
+  const r: GaraRecord = await res.json();
+  return mapGara(r);
+}
+
+export type DeleteGaraResult =
+  | { ok: true }
+  | { ok: false; reason: "has_iscrizioni"; count: number };
+
+/**
+ * Hard delete con guard: se la gara ha iscrizioni gara linkate, rifiuta
+ * la cancellazione e ritorna `reason: "has_iscrizioni"` + count. UI mostra
+ * messaggio bloccante. Senza guard, Airtable risponde 422 silenziosamente.
+ */
+export async function deleteGara(id: string): Promise<DeleteGaraResult> {
+  requireEnv();
+  const count = await countIscrizioniByGara(id);
+  if (count > 0) {
+    return { ok: false, reason: "has_iscrizioni", count };
+  }
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(GARE_TABLE)}/${encodeURIComponent(id)}`,
+    {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${TOKEN}` },
+      cache: "no-store",
+    },
+  );
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`[airtable-admin] deleteGara ${id} failed: ${res.status} ${body}`);
+  }
+  return { ok: true };
+}
+
+/**
+ * Update stato singola iscrizione gara. Quando stato="Confermata" valorizza
+ * automaticamente DATA_CONFERMA al giorno corrente.
+ */
+export async function updateIscrizioneGara(
+  id: string,
+  stato: StatoIscrizioneGara,
+): Promise<void> {
+  requireEnv();
+  const fields: Record<string, unknown> = { STATO: stato };
+  if (stato === "Confermata") {
+    fields.DATA_CONFERMA = new Date().toISOString().slice(0, 10);
+  }
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${ISCRIZIONI_GARE_TABLE}/${encodeURIComponent(id)}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ fields }),
+      cache: "no-store",
+    },
+  );
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`[airtable-admin] updateIscrizioneGara ${id} failed: ${res.status} ${body}`);
+  }
+}
+
+/**
+ * Bulk update stato su N iscrizioni gara. Airtable PATCH multi-record è
+ * limitato a 10 record per chiamata → loop a batch di 10.
+ */
+export async function bulkUpdateIscrizioniGara(
+  ids: string[],
+  stato: StatoIscrizioneGara,
+): Promise<void> {
+  requireEnv();
+  if (ids.length === 0) return;
+  const dataConferma =
+    stato === "Confermata" ? new Date().toISOString().slice(0, 10) : undefined;
+
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < ids.length; i += BATCH_SIZE) {
+    const batch = ids.slice(i, i + BATCH_SIZE);
+    const records = batch.map((id) => ({
+      id,
+      fields: {
+        STATO: stato,
+        ...(dataConferma ? { DATA_CONFERMA: dataConferma } : {}),
+      },
+    }));
+    const res = await fetch(`${API_BASE}/${BASE_ID}/${ISCRIZIONI_GARE_TABLE}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ records }),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      throw new Error(
+        `[airtable-admin] bulkUpdateIscrizioniGara batch ${i / BATCH_SIZE} failed: ${res.status} ${body}`,
+      );
+    }
+  }
+}
+
+export interface MaestroLite {
+  id: string;
+  nome: string;
+  cognome: string;
+  qualifica: string | null;
+  attivo: boolean;
+}
+
+/**
+ * Lista maestri attivi semplificata per multi-select sul form gara admin.
+ * Pattern: minimi campi necessari, no foto/email, ordinato per cognome.
+ */
+export async function getAllMaestriAttiviAdmin(): Promise<MaestroLite[]> {
+  type MaestroRecord = {
+    id: string;
+    fields: {
+      NOME_MAESTRO?: string;
+      COGNOME_MAESTRO?: string;
+      QUALIFICA?: string;
+      ATTIVO?: boolean;
+    };
+  };
+  const maestri = await fetchAllPages<MaestroRecord>(TABELLA_MAESTRI, {
+    fields: ["NOME_MAESTRO", "COGNOME_MAESTRO", "QUALIFICA", "ATTIVO"],
+    sort: [
+      { field: "COGNOME_MAESTRO", direction: "asc" },
+      { field: "NOME_MAESTRO", direction: "asc" },
+    ],
+  });
+  return maestri
+    .filter((m) => m.fields.ATTIVO === true)
+    .map((m) => ({
+      id: m.id,
+      nome: m.fields.NOME_MAESTRO ?? "",
+      cognome: m.fields.COGNOME_MAESTRO ?? "",
+      qualifica: m.fields.QUALIFICA ?? null,
+      attivo: m.fields.ATTIVO === true,
+    }));
 }

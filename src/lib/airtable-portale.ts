@@ -12,7 +12,7 @@
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TOKEN = process.env.AIRTABLE_TOKEN;
 const API_BASE = "https://api.airtable.com/v0";
-const GARE_TABLE = process.env.AIRTABLE_TABLE_GARE ?? "Gare Giovanili Umbria 2026";
+export const GARE_TABLE = process.env.AIRTABLE_TABLE_GARE ?? "Gare Giovanili Umbria 2026";
 
 export type Ruolo = "GENITORE" | "ISTRUTTORE" | "ADMIN";
 
@@ -1258,7 +1258,7 @@ export interface Gara {
   maestroAccompagnatoreIds: string[];
 }
 
-interface GaraRecord {
+export interface GaraRecord {
   id: string;
   fields: {
     "Nome Gara"?: string;
@@ -1273,10 +1273,11 @@ interface GaraRecord {
     COMITATO_REGIONALE?: string;
     IN_EVIDENZA?: boolean;
     "Maestro Accompagnatore"?: string[];
+    ISCRIZIONI_GARE?: string[];
   };
 }
 
-function mapGara(r: GaraRecord): Gara {
+export function mapGara(r: GaraRecord): Gara {
   const f = r.fields;
   return {
     id: r.id,
@@ -1326,7 +1327,7 @@ export interface IscrizioneGara {
   noteGenitore: string | null;
 }
 
-interface IscrizioneGaraRecord {
+export interface IscrizioneGaraRecord {
   id: string;
   fields: {
     GARA?: string[];
@@ -1339,7 +1340,7 @@ interface IscrizioneGaraRecord {
   };
 }
 
-function mapIscrizioneGara(r: IscrizioneGaraRecord): IscrizioneGara {
+export function mapIscrizioneGara(r: IscrizioneGaraRecord): IscrizioneGara {
   const f = r.fields;
   return {
     id: r.id,
