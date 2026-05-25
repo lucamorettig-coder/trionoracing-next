@@ -1,7 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { getGenitoreByClerkId } from "@/lib/airtable-portale";
-import { getAllIscrizioni, getAllBambini, csvWriter } from "@/lib/airtable-admin";
+import {
+  getAllIscrizioni,
+  getAllBambini,
+  getAllTitoli,
+  getAllTariffe,
+  csvWriter,
+} from "@/lib/airtable-admin";
 
 const KNOWN_ENTITIES = new Set([
   "iscrizioni",
@@ -15,8 +21,6 @@ const KNOWN_ENTITIES = new Set([
 ]);
 
 const ENTITY_TO_EVO: Record<string, string> = {
-  pagamenti: "EVO-018",
-  tariffe: "EVO-018",
   gare: "EVO-019",
   lezioni: "EVO-020",
   "presenze-maestri": "EVO-020",
@@ -91,6 +95,68 @@ export async function POST(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="bambini-${new Date().toISOString().slice(0, 10)}.csv"`,
+      },
+    });
+  }
+
+  if (entity === "pagamenti") {
+    const titoli = await getAllTitoli();
+    const csv = csvWriter(titoli, [
+      { key: "codice", label: "ID titolo", accessor: (r) => r.fields.CODICE_TITOLO ?? r.id },
+      { key: "data_pag", label: "Data pagamento", accessor: (r) => r.fields.DATA_PAGAMENTO ?? "" },
+      { key: "data_scad", label: "Data scadenza", accessor: (r) => r.fields.DATA_SCADENZA_PAGAMENTO ?? "" },
+      { key: "importo", label: "Importo (€)", accessor: (r) => r.fields.IMPORTO ?? 0 },
+      { key: "metodo", label: "Metodo", accessor: (r) => r.fields.METODO_PAGAMENTO ?? "" },
+      { key: "provider", label: "Provider", accessor: (r) => r.fields.PROVIDER_PAGAMENTO ?? "" },
+      { key: "stato", label: "Stato", accessor: (r) => r.fields.STATO_TITOLO ?? "" },
+      { key: "pagato", label: "Pagato", accessor: (r) => r.fields.PAGATO ? "SI" : "NO" },
+      { key: "tipo", label: "Tipo titolo", accessor: (r) => r.fields.TIPO_TITOLO ?? "" },
+      { key: "numero_rata", label: "N. rata", accessor: (r) => r.fields.NUMERO_RATA ?? "" },
+      {
+        key: "bambino",
+        label: "Bambino",
+        accessor: (r) =>
+          `${r.iscrizione?.fields.NOME_BAMBINO ?? ""} ${r.iscrizione?.fields.COGNOME_BAMBINO ?? ""}`.trim(),
+      },
+      {
+        key: "genitore",
+        label: "Genitore",
+        accessor: (r) =>
+          `${r.iscrizione?.fields.NOME_GENITORE ?? ""} ${r.iscrizione?.fields.COGNOME_GENITORE ?? ""}`.trim(),
+      },
+      { key: "iscrizione", label: "ID Iscrizione", accessor: (r) => r.iscrizione?.fields.ID_ISCRIZIONE ?? r.fields.ISCRIZIONE?.[0] ?? "" },
+      { key: "anno", label: "Anno", accessor: (r) => r.fields.ANNO_ISCRIZIONE?.[0] ?? "" },
+      { key: "descrizione", label: "Descrizione", accessor: (r) => r.fields.DESCRIZIONE ?? "" },
+      { key: "note", label: "Note interne", accessor: (r) => r.fields.NOTE_INTERNE ?? "" },
+    ]);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="pagamenti-${new Date().toISOString().slice(0, 10)}.csv"`,
+      },
+    });
+  }
+
+  if (entity === "tariffe") {
+    const tariffe = await getAllTariffe();
+    const csv = csvWriter(tariffe, [
+      { key: "anno", label: "Anno", accessor: (r) => r.fields.ANNO_ISCRIZIONE ?? "" },
+      { key: "quarter", label: "Quarter", accessor: (r) => r.fields.NOME_TARIFFA ?? "" },
+      { key: "descrizione", label: "Descrizione", accessor: (r) => r.fields.DESCRIZIONE_TARIFFA ?? "" },
+      { key: "quota_tot", label: "Quota totale (€)", accessor: (r) => r.fields.QUOTA_TOTALE_ANNO ?? "" },
+      { key: "n_rate", label: "N. rate", accessor: (r) => r.fields.NUMERO_RATE ?? "" },
+      { key: "imp_rata", label: "Importo rata (€)", accessor: (r) => r.fields.IMPORTO_RATA ?? "" },
+      { key: "scadenze", label: "Scadenze", accessor: (r) => r.fields.SCADENZA_RATE ?? "" },
+      { key: "kit", label: "Kit (€)", accessor: (r) => r.fields.IMPORTO_KIT_SCUOLA ?? "" },
+      { key: "iscrizione_imp", label: "Iscrizione (€)", accessor: (r) => r.fields.IMPORTO_ISCRIZIONE ?? "" },
+      { key: "sconto", label: "Sconto famiglia (€)", accessor: (r) => r.fields.SCONTO_FAMIGLIA_NUMEROSA ?? "" },
+      { key: "attiva", label: "Attiva", accessor: (r) => r.fields.ATTIVA ? "SI" : "NO" },
+      { key: "n_iscr", label: "N. iscrizioni collegate", accessor: (r) => r.fields.TABELLA_ISCRIZIONI?.length ?? 0 },
+    ]);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="tariffe-${new Date().toISOString().slice(0, 10)}.csv"`,
       },
     });
   }
