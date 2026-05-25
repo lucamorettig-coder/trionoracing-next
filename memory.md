@@ -21,8 +21,8 @@
 | EVO-013 | portale-pagina-pagamenti | Pagina trasversale `/portale/pagamenti` (nata dal QA EVO-004 hotfix #17) | 2026-05-24 | 2026-05-24 | completata | https://trionoracing-next.vercel.app/portale/pagamenti | [link](evolutive/EVO-013-portale-pagina-pagamenti.md) |
 | EVO-014 | portale-ux-stato-iscrizioni | Portale UX: stato iscrizione figli + Azioni Rapide condizionali + 5 bug fix | 2026-05-24 | 2026-05-24 | completata | https://trionoracing-next.vercel.app/portale | [link](evolutive/EVO-014-portale-ux-stato-iscrizioni.md) |
 | EVO-015 | titoli-descrizione | Titoli pagamento: campo DESCRIZIONE come label primaria + fix "undefinedª rata" | 2026-05-24 | 2026-05-24 | completata | https://trionoracing-next.vercel.app/portale | [link](evolutive/EVO-015-titoli-descrizione.md) |
-| EVO-016 | admin-infra-ds | Admin Infra & DS scaffold (Dialog/AlertDialog/DataTable + dashboard A-1 minimal + schema STATO_ISCRIZIONE annullata) | 2026-05-25 | — | pronta per implementazione | — | [link](evolutive/EVO-016-admin-infra-ds.md) |
-| EVO-017 | admin-iscrizioni-bambini | Admin iscrizioni A-2/A-3 + bambini A-4 + 4 modal (annulla/forza completa/titolo manuale/segna pagato) | — | — | in pianificazione | — | [link](evolutive/EVO-017-admin-iscrizioni-bambini.md) |
+| EVO-016 | admin-infra-ds | Admin Infra & DS scaffold (Dialog/AlertDialog/DataTable + dashboard A-1 minimal + schema STATO_ISCRIZIONE annullata) | 2026-05-25 | 2026-05-25 | completata | https://trionoracing-next.vercel.app/portale/admin | [link](evolutive/EVO-016-admin-infra-ds.md) |
+| EVO-017 | admin-iscrizioni-bambini | Admin iscrizioni A-2/A-3 + bambini A-4 + 4 modal (annulla/forza completa/titolo manuale/segna pagato) | 2026-05-25 | 2026-05-25 | completata | https://trionoracing-next.vercel.app/portale/admin/iscrizioni | [link](evolutive/EVO-017-admin-iscrizioni-bambini.md) |
 | EVO-018 | admin-pagamenti-tariffe | Admin pagamenti A-5 + KPI + tariffe A-11 CRUD Q1/Q2/Q3 | — | — | in pianificazione | — | [link](evolutive/EVO-018-admin-pagamenti-tariffe.md) |
 | EVO-019 | admin-gare | Admin gare A-6 CRUD + A-7 approvazioni + assegnazione maestri + upload R2 | — | — | in pianificazione | — | [link](evolutive/EVO-019-admin-gare.md) |
 | EVO-020 | admin-lezioni-maestri-genitori | Admin lezioni A-8 + presenze maestri A-9 + genitori A-10 + cambio ruolo Clerk sync | — | — | in pianificazione | — | [link](evolutive/EVO-020-admin-lezioni-maestri-genitori.md) |
@@ -61,6 +61,39 @@ Individuata regressione di EVO-004: il payload `POST /v0.1/checkouts` SumUp non 
 
 **2026-05-24 — EVO-012 completata (DS card colorate `.photo-bg-{color}`)**
 Scaffold DS: 5 utility CSS nuove in `globals.css` (`.photo-bg-sun|sky|grass|flag|ember`) accanto a `.photo-bg-navy` esistente, formula coerente (bitmap `footer-bg.jpg` per navy, `footer-bg-white.jpg` per gli altri + overlay linear-gradient verticale del colore al 82-90-96%, 88-94-98% per sun/ember chiari per evitare desaturazione, `> * { z-index: 1 }` per children sopra overlay). Migrazione di 8 card navy decorative al pattern `photo-bg-navy` (CtaFinale home, CtaScuola, CtaMarathon, MarathonHero, marathon-209 intro, StepperWizard portale, header DashboardGenitore, sidebar info /contatti). PR #15 squash-merged (commit `cde0230`) + hotfix marathon `58ecc09`. Sezione "Pattern appresi in EVO-012 (2026-05-23)" già in AGENTS.md con 5 pattern (utility scaffold preventivo, when-to-use vs `.pattern-{navy,light}`, override theme-209 solo su navy, migrazione `bg-navy-700` → `navy-900` accettata per coerenza, scaffold preventivo). Riferimento visivo: card manifesto Kit Scuola live su `/la-scuola` (no Claude Design mockup necessario, skip motivato in scheda).
+
+**2026-05-25 (sera) — EVO-016 completata e in produzione**
+Prima sotto-evolutiva di EVO-007 ombrello chiusa. PR #29 mergeata, commit `edffe5f`, 38 file + 4673 inserzioni, 96 cancellazioni. Live: https://trionoracing-next.vercel.app/portale/admin. Scaffolding EVO-016 deployato:
+- DS primitivi Radix: `Dialog`, `AlertDialog`, `DropdownMenu` in `src/components/ui/`
+- 8 componenti admin in `src/components/admin/`: DataTable generico (TS typed, sort + selection + pagination), AdminPageHeader, AdminFilters, BulkActionBar, ConfirmDialog, ExportCSVButton, KPICard, TodayTaskRow
+- `src/lib/airtable-admin.ts`: skeleton + 7 wrapper minimal (3 Today's tasks `getCertificatiScaduti`/`getRateScadute`/`getIscrizioniInStallo` + 4 KPI `getKPIIscrizioniAnno`/`getKPIBambiniAttivi`/`getKPIIncassiYTD`/`getKPIPagamentiPending`)
+- Schema Airtable: 3 campi nuovi (`ANNULLATA` checkbox, `MOTIVO_ANNULLAMENTO` longtext, `DATA_ANNULLAMENTO` date) + formula `STATO_ISCRIZIONE` estesa con short-circuit `IF({ANNULLATA}, "ANNULLATA", existing)` — applicato su **entrambe le basi PROD `appszpkU1aXb3xrFM` + DEV `app7FOqBdmmW0jBf5`** (recovery DEV applicato da Cowork via MCP dopo che Claude Code aveva fatto solo PROD)
+- `portale-utils.ts`: `getStatoIscrizioneAnnoCorrente` + `statoIscrizioneBadge` gestiscono "ANNULLATA" come `non_iscritto` (fix bug latente regressione FiglioCard EVO-014)
+- NavBar admin estesa da 4 a 9 link operativi
+- Dashboard A-1 minimal live (KPI + 3 Today's tasks + Quick actions + empty state celebrativo ☕)
+- 8 placeholder pages "In costruzione (EVO-XXX)" su tutte le sotto-pagine admin
+- Route `/api/admin/csv/[entity]` skeleton 501 con auth guard
+
+Smoke 7-step ✅. **2 issue emerse durante smoke**:
+- **P1 JWT staleness** (risolto via logout/login): primo accesso `/portale/admin` post-promozione ADMIN → `sessionClaims.role = undefined` perché il JWT Clerk si aggiorna ~60s dopo `syncClerkRole`. Workaround = sign-out + sign-in. Pattern da considerare in EVO future che toccano ruoli Clerk.
+- **P2 emoji icons** (fix pre-PR): dashboard passava emoji strings (`"🏥"`/`"💰"`/`"📝"`) a `TodayTaskRow.icon: ReactNode`. Fix = componenti Lucide JSX (`<ShieldAlert/>` ecc.).
+
+4 pattern aggiunti in AGENTS.md: (1) JWT staleness su first admin login, (2) Icone Lucide per `ReactNode` props mai emoji, (3) DEV/PROD schema sync obbligatorio in macro-task 0, (4) `safe()` wrapper per server data fetch resiliente.
+
+**Sblocchi**: EVO-017 (iscrizioni admin), EVO-018 (pagamenti/tariffe), EVO-019 (gare), EVO-020 (lezioni/maestri/genitori) — tutte le 4 sotto-evolutive figlie dell'ombrello EVO-007 sono ora pronte, parallelizzabili su branch indipendenti, ed ereditano lo scaffold completo EVO-016.
+
+**2026-05-25 — EVO-017 completata e in produzione**
+Prima sotto-evolutiva operativa di EVO-007 chiusa. PR #30 squash-merged (commit `6478670`), fix post-merge `f613cf0`, 23 file + 2516 inserzioni. Live: https://trionoracing-next.vercel.app/portale/admin/iscrizioni. Deliverable:
+- **A-2 Iscrizioni list** `/portale/admin/iscrizioni`: DataTable 8 colonne (Bambino · Genitore · Corso · Anno · Stato · Modulistica 4-icone · Importo · Azioni) + filtri Anno/Stato multi/Modulistica/Search + export CSV UTF-8 BOM.
+- **A-3 Dettaglio iscrizione** `/portale/admin/iscrizioni/[id]`: 5 tab (Stato+override · Modulistica · Taglie · Pagamenti admin · Storia+log) + 4 modal operativi (Annulla · Forza completa · Aggiungi titolo manuale · Segna pagato con sync `PRIMA_RATA_PAGATA`).
+- **A-4 Bambini list** `/portale/admin/bambini`: DataTable + filtri Stato cert/Search + colonna "Iscrizione" (anno badge vs contatore) + export CSV.
+- **Dettaglio bambino** `/portale/admin/bambini/[id]`: anagrafica + cert + iscrizioni card + EliminaBambinoButton con guard 0 iscrizioni.
+- **Schema Airtable**: `NOTE_ADMIN` (multilineText) aggiunto su `TABELLA_ISCRIZIONI` PROD + DEV.
+- **7 fix post-smoke**: client boundary (`parseIscrizioniFilters`/`parseBambiniFilters` spostate in `airtable-admin.ts`), max-width dettaglio iscrizione, ModulisticaIcons tooltip nativo, rm filtro MTB/Strada, cert badge "Cert." prefix, card iscrizioni bambino (fallback + quota), anno badge lista bambini.
+
+4 pattern da promuovere in AGENTS.md: parse function server-safe (mai in `"use client"`), join leggero con `fields[]`, Lucide title via `<span>`, `certBadgeVariant` come punto unico di verità.
+
+**Sblocchi**: EVO-018 (pagamenti/tariffe), EVO-019 (gare), EVO-020 (lezioni/maestri/genitori).
 
 **2026-05-25 — Kick-off EVO-007 ombrello + split in 5 sotto-evolutive (EVO-016→020)**
 Avviato workflow `evolutive-workflow` su EVO-007 (F3.6 Portale admin). Fasi 0-4 chiuse. Decisioni utente: urgenza alta (2 settimane), CRUD completo da subito, audit log rinviato post-launch, export CSV in scope, cambio ruolo sync Airtable+Clerk publicMetadata, disabilita account rinviato, aggiungi titolo manuale in scope. 3 scoperte chiave Fase 3: (a) Gap DS Dialog/AlertDialog → introdurre in EVO-016; (b) `proxy.ts` ha già guard `isAdminOnly`; (c) `STATO_ISCRIZIONE` è formula autoritativa → soluzione = aggiungere campo `ANNULLATA` checkbox + estendere formula. **Split in 5 sotto-evolutive figlie**: EVO-016 admin-infra-ds (sbloccante, ~3-4gg), EVO-017 iscrizioni+bambini (MVP critico, ~5-6gg), EVO-018 pagamenti+tariffe (~3-4gg), EVO-019 gare (~3-4gg), EVO-020 lezioni+presenze+genitori (~3-4gg). Le 4 sotto-evolutive post-EVO-016 sono parallelizzabili su branch indipendenti. Effort totale 17-22gg; MVP "iscrizioni live" (EVO-016+017+018) realisticamente in 2 settimane, le altre 2 nelle settimane successive. Dashboard A-1 in EVO-016 in versione **minimal** (KPI + Today's tasks + quick actions), trend chart + breakdown corsi rinviati post-MVP. Schema Airtable modificato all'inizio di EVO-016 via MCP. EVO-007 resta ombrello senza visual/code propri — il flusso evolutive-workflow riparte da Fase 1 dedicata su EVO-016 al prossimo kick-off.
