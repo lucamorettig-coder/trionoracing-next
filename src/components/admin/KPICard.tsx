@@ -10,7 +10,7 @@ interface KPICardProps {
   deltaVariant?: KPIDeltaVariant;
   subline?: string;
   icon?: ReactNode;
-  valueTone?: "default" | "critical";
+  valueTone?: "default" | "success" | "warning" | "critical";
   className?: string;
 }
 
@@ -48,7 +48,10 @@ export function KPICard({
         <span
           className={cn(
             "text-3xl font-bold leading-none",
-            valueTone === "critical" ? "text-flag-500" : "text-ink",
+            valueTone === "critical" && "text-flag-500",
+            valueTone === "success" && "text-grass-700",
+            valueTone === "warning" && "text-ember-700",
+            valueTone === "default" && "text-ink",
           )}
         >
           {value}
