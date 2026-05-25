@@ -3,8 +3,8 @@
 - **ID**: EVO-016
 - **Slug**: admin-infra-ds
 - **Data inizio**: 2026-05-25
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: pronta per implementazione
+- **Data fine**: 2026-05-25
+- **Stato**: ✅ chiusa
 - **Tipo**: nuova feature + scaffold DS
 - **Area**: `/portale/admin/*` + design system + schema Airtable
 - **Priorità**: 🔴 1 (sbloccante per EVO-017→020)
@@ -641,6 +641,51 @@ Prompt salvato in `evolutive/EVO-016-admin-infra-ds/prompt-claude-code.md`. Stat
 ### [2026-05-25] Fase 6 — Prompt Claude Design generato
 
 Prompt salvato in `evolutive/EVO-016-admin-infra-ds/prompt-claude-design.md`. Richiesti **4 visual**: (1) Dashboard A-1 piena desktop, (2) Dashboard A-1 empty Today's tasks, (3) DS primitivi showcase (Dialog + AlertDialog destructive con motivo + DropdownMenu row actions), (4) Pagina admin "Iscrizioni" demo con DataTable + AdminFilters + BulkActionBar 3 selezionati + ExportCSVButton + paginazione + vista mobile. Repo collegato → Claude Design applica DS Triono v0.1 automaticamente. Lingua italiano. Annotazioni inline richieste su: animations Dialog/AlertDialog, sticky behavior, NavBar overflow 11 link, DataTable scroll orizzontale mobile. Workflow in pausa fino a quando Luca avrà generato i visual (`visual pronti per EVO-016`).
+
+### [2026-05-25] Sezione 8 — Verifica implementazione ✅ CHIUSA
+
+**PR**: #29 `feat(admin): EVO-016 admin infra & DS scaffold` — merged su `main` (2026-05-25)
+**Commit**: `edffe5f` — 38 file, 4673 inserzioni, 96 cancellazioni
+
+**Smoke test eseguito da Luca (account `lucamoretti.g@gmail.com`):**
+
+1. ✅ Login admin → `/portale/admin` (dopo refresh JWT; inizialmente redirect su `/portale` — bug JWT staleness, vedi "Issues & fix" sotto)
+2. ✅ NavBar admin mostra tutte le 9 sezioni + home logo (Iscrizioni, Bambini, Pagamenti, Gare, Lezioni, Presenze, Genitori, Tariffe)
+3. ✅ Dashboard A-1: KPI cards renderizzano (Iscrizioni, Bambini attivi, Incassi YTD, Pagamenti pending)
+4. ✅ Today's tasks: sezione mostra correttamente con icone Lucide (fix post-smoke — vedi Issues)
+5. ✅ Quick actions: 4 card Iscrizioni/Bambini/Pagamenti/Gare navigabili
+6. ✅ Regressione genitore: utente GENITORE non accede a `/portale/admin` (guard middleware)
+7. ✅ Placeholder pages "In costruzione (EVO-XXX)" visibili su tutte le 8 sezioni admin
+
+**Issues & fix durante smoke:**
+
+- **Bug JWT staleness (P1 — risolto)**: primo login dopo deploy → middleware leggeva `sessionClaims?.role = undefined` (JWT non ancora aggiornato con publicMetadata post-syncClerkRole) → redirect su `/portale`. Soluzione: sign-out + sign-in forza refresh JWT. Causa root: il JWT Clerk si aggiorna ~60s dopo che `syncClerkRole` scrive su `publicMetadata`. Il middleware gira prima del layout, quindi la sync lazy del layout non ha fatto in tempo. **Workaround utente**: sign-out/sign-in. **Nota per EVO future**: se si aggiunge logica "crea account ADMIN manualmente", ricordare che il primo accesso su rotta admin richiede logout/login per avere il JWT fresco. Alternativamente, valutare `after()` in proxy per forzare token rotation (trade-off latency).
+- **Emoji icons in TodayTaskRow (P2 — fixato pre-PR)**: dashboard page passava emoji strings (`"🏥"`, `"💰"`, `"📝"`) invece di JSX Lucide al prop `icon: ReactNode` di `TodayTaskRow`. Fix: aggiunta import `ShieldAlert`, `Banknote`, `Clock` + sostituiti con `<Icon size={20} className="text-{severity}" />`.
+
+**Criteri di accettazione (dalla scheda):**
+
+| # | Criterio | Esito |
+|---|---|---|
+| AC-1 | NavBar admin mostra 9 sezioni | ✅ |
+| AC-2 | Dashboard KPI 4 card | ✅ |
+| AC-3 | Today's tasks 3 righe con icone | ✅ |
+| AC-4 | Quick actions 4 card | ✅ |
+| AC-5 | Placeholder pages tutte 8 | ✅ |
+| AC-6 | Guard admin redirect GENITORE | ✅ |
+| AC-7 | Defense-in-depth su ogni page admin | ✅ |
+| AC-8 | CSV route 501 scaffoldata | ✅ |
+| AC-9 | DS primitivi Radix installati | ✅ |
+| AC-10 | DataTable/Filters/BulkBar/KPICard/TodayTask/ExportCSV | ✅ |
+| AC-11 | airtable-admin.ts con 7 helper KPI | ✅ |
+| AC-12 | ANNULLATA schema PROD+DEV allineati | ✅ |
+| AC-13 | statoIscrizioneBadge gestisce ANNULLATA | ✅ |
+| AC-14 | Type/build/lint clean | ✅ |
+
+**Schema Airtable — riepilogo campi aggiunti:**
+- `TABELLA_ISCRIZIONI`: `ANNULLATA` (checkbox), `MOTIVO_ANNULLAMENTO` (multilineText), `DATA_ANNULLAMENTO` (date) su PROD e DEV
+- `STATO_ISCRIZIONE` formula estesa con short-circuit `OR({ANNULLATA}, ...)` → output "ANNULLATA" come nuovo stato
+
+---
 
 ### [2026-05-25] Fase 5 — Verifica coerenza completata
 
