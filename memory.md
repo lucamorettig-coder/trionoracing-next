@@ -23,7 +23,7 @@
 | EVO-015 | titoli-descrizione | Titoli pagamento: campo DESCRIZIONE come label primaria + fix "undefinedª rata" | 2026-05-24 | 2026-05-24 | completata | https://trionoracing-next.vercel.app/portale | [link](evolutive/EVO-015-titoli-descrizione.md) |
 | EVO-016 | admin-infra-ds | Admin Infra & DS scaffold (Dialog/AlertDialog/DataTable + dashboard A-1 minimal + schema STATO_ISCRIZIONE annullata) | 2026-05-25 | 2026-05-25 | completata | https://trionoracing-next.vercel.app/portale/admin | [link](evolutive/EVO-016-admin-infra-ds.md) |
 | EVO-017 | admin-iscrizioni-bambini | Admin iscrizioni A-2/A-3 + bambini A-4 + 4 modal (annulla/forza completa/titolo manuale/segna pagato) | 2026-05-25 | 2026-05-25 | completata | https://trionoracing-next.vercel.app/portale/admin/iscrizioni | [link](evolutive/EVO-017-admin-iscrizioni-bambini.md) |
-| EVO-018 | admin-pagamenti-tariffe | Admin pagamenti A-5 + KPI + tariffe A-11 CRUD Q1/Q2/Q3 | — | — | in pianificazione | — | [link](evolutive/EVO-018-admin-pagamenti-tariffe.md) |
+| EVO-018 | admin-pagamenti-tariffe | Admin pagamenti A-5 + KPI + tariffe A-11 CRUD Q1/Q2/Q3 | 2026-05-25 | 2026-05-26 | completata | https://trionoracing-next.vercel.app/portale/admin/pagamenti | [link](evolutive/EVO-018-admin-pagamenti-tariffe.md) |
 | EVO-019 | admin-gare | Admin gare A-6 CRUD + A-7 approvazioni + assegnazione maestri + upload R2 | — | — | in pianificazione | — | [link](evolutive/EVO-019-admin-gare.md) |
 | EVO-020 | admin-lezioni-maestri-genitori | Admin lezioni A-8 + presenze maestri A-9 + genitori A-10 + cambio ruolo Clerk sync | — | — | in pianificazione | — | [link](evolutive/EVO-020-admin-lezioni-maestri-genitori.md) |
 
@@ -81,6 +81,23 @@ Smoke 7-step ✅. **2 issue emerse durante smoke**:
 4 pattern aggiunti in AGENTS.md: (1) JWT staleness su first admin login, (2) Icone Lucide per `ReactNode` props mai emoji, (3) DEV/PROD schema sync obbligatorio in macro-task 0, (4) `safe()` wrapper per server data fetch resiliente.
 
 **Sblocchi**: EVO-017 (iscrizioni admin), EVO-018 (pagamenti/tariffe), EVO-019 (gare), EVO-020 (lezioni/maestri/genitori) — tutte le 4 sotto-evolutive figlie dell'ombrello EVO-007 sono ora pronte, parallelizzabili su branch indipendenti, ed ereditano lo scaffold completo EVO-016.
+
+**2026-05-26 — EVO-018 completata e in produzione + MVP "iscrizioni live" chiuso**
+Terza e ultima sotto-evolutiva del MVP `iscrizioni live` (EVO-016+017+018) chiusa. PR #31 squash-merged (commit `28fedcb`), 16 file + 1803 inserzioni / 43 cancellazioni. Live: https://trionoracing-next.vercel.app/portale/admin/pagamenti + https://trionoracing-next.vercel.app/portale/admin/tariffe. Deliverable:
+- **A-5 Pagamenti** `/portale/admin/pagamenti`: 3 KPI top (Incassato YTD grass · Da incassare default · Scaduti flag) + filtri sticky multi-dimensione (Anno · Mese · Stato · Metodo · Provider · Tipo · Search debounced 300ms) + DataTable 10 colonne con `MethodTag` colorato (SumUp gradient / sky / neutral / ember) + **Bulk "Segna pagati in blocco"** con riepilogo titoli + totale aggregato + sync hint `PRIMA_RATA_PAGATA` per 1ª rata + dropdown azioni per riga + export CSV 16 colonne contabilità UTF-8 BOM.
+- **A-11 Tariffe** `/portale/admin/tariffe`: year selector pills + 3 card Q1/Q2/Q3 con **header gradient** (`grass`/`ember`/`sky`) + `pattern.svg` overlay opacity 0.15 + body breakdown campi semplificati (1 solo `SCONTO_FAMIGLIA_NUMEROSA`) + modal CRUD `AdminFormDialog` con **soft warning ember** se >0 iscrizioni collegate ("modifiche non retroattive") + export CSV 12 colonne.
+- **Backend**: `getAllTitoli` (filterByFormula su native/formula fields + in-memory join iscrizione via batch fetch RECORD_ID() OR + search lookup multipli), `getAllTariffe`, `getAnniDisponibiliTariffe`, `countIscrizioniByTariffa`, `parseTitoliFilters`/`parseTariffeFilters` server-safe.
+- **Server Actions**: `bulkSegnaPagato` (loop sequenziale rate-limit safe + idempotenza skip già pagati + sync `markPrimaRataPagata` per 1ª rata non bloccante + revalidate per ogni iscrizione coinvolta), `upsertTariffa` con validazione + revalidate.
+- **DS extend**: 5 nuovi pattern (`BulkSegnaPagatoModal`, `TariffaCard` header gradient, `WarningSoftBanner` inline ember, `MethodTag` componente DS, `KPICard.valueTone` esteso 4 tone).
+- **Zero schema change Airtable**.
+
+Smoke dev 7-step + smoke prod 7-step entrambi ✅. **2 bug fixati nello stesso branch** (pattern "smoke rivela bug latenti" già emerso in EVO-014/017):
+1. **Dialog centering** (fix ortogonale cross-feature): `DialogContent` perdeva `translate(-50%, -50%)` alla fine dell'animazione `ds-modal-in` perché il transform era applicato solo nei keyframe → modali drift in basso-destra. Fix: `-translate-x-1/2 -translate-y-1/2` statici nel className. **Corregge tutte le modali EVO-016/017** pre-esistenti.
+2. **TIPO_TITOLO enum allineato Airtable** singleSelect (6 valori reali: `prima_rata`, `rata`, `seconda_rata`, `terza_rata`, `Abbigliamento`, `altro`). Filter PagamentiFilters aveva `una_tantum` inesistente + `abbigliamento` minuscolo. AggiungiTitoloManualeModal (EVO-017) aveva 5 enum fantasia (`supplemento_gadget`/`conguaglio`/`sconto_correttivo`/`quota_straordinaria`/`donazione`) che Airtable rifiutava con `INVALID_MULTIPLE_CHOICE_OPTIONS` → fix con valori reali.
+
+5 nuovi pattern in AGENTS.md (sezione EVO-018): bulk modal con riepilogo aggregato, TariffaCard header gradient + pattern (vs `.photo-bg-{color}` editoriale EVO-012), WarningSoftBanner ember non-bloccante, MethodTag componente DS, `KPICard.valueTone` standardizzato 4 tone. + 2 pattern apprendimento "Dialog centering richiede transform statico" e "TIPO_TITOLO enum validation" come hardening cross-feature.
+
+**Sblocca**: chiude MVP "iscrizioni live" (EVO-016 + EVO-017 + EVO-018). Restano sotto-evolutive parallelizzabili dell'ombrello EVO-007 post-MVP: EVO-019 (gare admin), EVO-020 (lezioni/maestri/genitori).
 
 **2026-05-25 — EVO-017 completata e in produzione**
 Prima sotto-evolutiva operativa di EVO-007 chiusa. PR #30 squash-merged (commit `6478670`), fix post-merge `f613cf0`, 23 file + 2516 inserzioni. Live: https://trionoracing-next.vercel.app/portale/admin/iscrizioni. Deliverable:

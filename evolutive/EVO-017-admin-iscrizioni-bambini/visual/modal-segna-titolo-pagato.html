@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Modal · Segna titolo come pagato · Admin · Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+.stage-bg { position: fixed; inset: 0; background: rgba(20, 25, 58, 0.55); backdrop-filter: blur(6px); z-index: 1; }
+
+.afd { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 64px); background: #fff; border-radius: var(--r-xl); box-shadow: 0 24px 60px -10px rgba(0,0,0,0.3); z-index: 2; display: flex; flex-direction: column; overflow: hidden; }
+.afd-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: flex-start; }
+.afd-header-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--grass-100); color: var(--grass-700); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.afd-header-body { flex: 1; min-width: 0; }
+.afd-title { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
+.afd-desc { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; line-height: 1.4; }
+.afd-close { background: transparent; border: none; padding: 4px; color: var(--ink-muted); cursor: pointer; border-radius: 4px; }
+.afd-close:hover { background: var(--bg-muted); }
+.afd-body { padding: 18px 20px; overflow-y: auto; flex: 1; }
+.afd-footer { padding: 14px 20px; border-top: 1px solid var(--line); background: var(--bg-soft); display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+.afd-footer-hint { flex: 1; font-size: 11.5px; color: var(--ink-muted); }
+
+.field-row { margin-bottom: 14px; }
+.field-row:last-child { margin-bottom: 0; }
+.field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.label { display: block; font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+.label .req { color: var(--flag-600); }
+.field { width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r-sm); font-size: 13.5px; font-family: inherit; background: #fff; }
+.field:focus { outline: 2px solid var(--sky-300); outline-offset: 0; border-color: var(--sky-500); }
+.helper { font-size: 11.5px; color: var(--ink-muted); margin-top: 4px; line-height: 1.4; }
+
+.context-card { background: var(--grass-50); border: 1px solid var(--grass-100); border-left: 3px solid var(--grass-500); border-radius: var(--r-md); padding: 12px 14px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; }
+.context-card-l { flex: 1; min-width: 0; }
+.context-card-title { font-size: 13px; font-weight: 700; color: var(--grass-700); }
+.context-card-sub { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+.context-card-amount { font-family: var(--f-mono); font-size: 20px; font-weight: 700; color: var(--grass-700); }
+
+.sync-info { background: var(--sky-50); border-left: 3px solid var(--sky-500); padding: 10px 12px; border-radius: var(--r-sm); margin-top: 14px; font-size: 12px; color: var(--ink); display: flex; gap: 8px; align-items: flex-start; }
+.sync-info i { color: var(--sky-700); flex-shrink: 0; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="page" style="background:var(--bg-soft);position:relative;min-height:100vh">
+
+  <header class="navbar" style="opacity:0.6">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" style="text-decoration:none;color:inherit"><div class="nav-logo-mark">T</div><div><div class="nav-logo-text">Triono Racing</div><div class="nav-logo-sub">Gestione</div></div></a>
+    </div>
+  </header>
+
+  <div style="opacity:0.5;padding:18px 16px">
+    <div style="font-size:11px;font-family:var(--f-mono);color:var(--ink-muted);text-transform:uppercase">ID iscrizione · #2026-0042 — Tab Pagamenti</div>
+    <h1 style="font-size:20px;font-weight:700;margin:2px 0">Riga: 1ª rata · 130 € · scadenza 25 gen 2026</h1>
+  </div>
+
+  <div class="stage-bg"></div>
+
+  <!-- AdminFormDialog -->
+  <div class="afd" role="dialog" aria-labelledby="afd-title-2">
+    <div class="afd-header">
+      <div class="afd-header-icon"><i data-lucide="check" style="width:18px;height:18px"></i></div>
+      <div class="afd-header-body">
+        <h2 id="afd-title-2" class="afd-title">Segna titolo come pagato</h2>
+        <p class="afd-desc">Registra un pagamento ricevuto fuori SumUp (bonifico, contanti, POS in segreteria). Operazione idempotente.</p>
+      </div>
+      <button class="afd-close" aria-label="Chiudi"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+
+    <div class="afd-body">
+
+      <!-- Context card grass -->
+      <div class="context-card">
+        <div class="context-card-l">
+          <div class="context-card-title">1ª rata · iscrizione #2026-0042</div>
+          <div class="context-card-sub">Giulia Rossi · scadenza 25 gen 2026 (oggi è 25 mag)</div>
+        </div>
+        <div class="context-card-amount">130 €</div>
+      </div>
+
+      <!-- Metodo + Data -->
+      <div class="field-grid-2">
+        <div class="field-row">
+          <label class="label" for="f-metodo">Metodo pagamento <span class="req">*</span></label>
+          <select class="field" id="f-metodo">
+            <option>— Seleziona —</option>
+            <option>App (SumUp online)</option>
+            <option selected>Bonifico</option>
+            <option>Contanti</option>
+            <option>POS segreteria</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label class="label" for="f-data">Data pagamento <span class="req">*</span></label>
+          <input type="datetime-local" class="field" id="f-data" value="2026-05-25T10:30" />
+          <div class="helper">Default: ora corrente. Modificabile per backdate.</div>
+        </div>
+      </div>
+
+      <!-- Provider -->
+      <div class="field-row">
+        <label class="label" for="f-provider">Provider <span class="req">*</span></label>
+        <select class="field" id="f-provider">
+          <option>SUMUP</option>
+          <option>Nexi</option>
+          <option selected>Altro</option>
+        </select>
+        <div class="helper">Per bonifico/contanti/POS segreteria → "Altro".</div>
+      </div>
+
+      <!-- Note -->
+      <div class="field-row">
+        <label class="label" for="f-note">Note (opzionali)</label>
+        <textarea class="field" id="f-note" rows="2" placeholder="Es: bonifico con causale 'rata gen Giulia' ricevuto su Unicredit IT60..."></textarea>
+        <div class="helper">Salvate in TITOLI_PAGAMENTO.NOTE_INTERNE.</div>
+      </div>
+
+      <!-- Sync info -->
+      <div class="sync-info">
+        <i data-lucide="zap" style="width:14px;height:14px"></i>
+        <div>
+          <strong>Sync automatica</strong>: trattandosi della 1ª rata (NUMERO_RATA=1), verrà aggiornato anche il flag <code>PRIMA_RATA_PAGATA</code> sull'iscrizione → la dashboard del genitore mostrerà la tile verde "Iscritto" (pattern EVO-014).
+        </div>
+      </div>
+
+    </div>
+
+    <div class="afd-footer">
+      <div class="afd-footer-hint">Idempotente · se già pagato verrà saltato senza errore.</div>
+      <button class="btn btn-ghost btn-sm">Annulla</button>
+      <button class="btn btn-primary btn-sm" style="background:var(--grass-500)"><i data-lucide="check" style="width:13px;height:13px"></i>Conferma pagamento</button>
+    </div>
+  </div>
+
+</div>
+</template>
+
+<script src="shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['EVO-017', 'Admin', 'Modal Segna pagato'],
+    title: 'Modal SegnaTitoloPagato · AdminFormDialog',
+    route: 'overlay /portale/admin/iscrizioni/[id]',
+    statusBarTheme: 'dark',
+    desktopScale: 0.58,
+    stateLegend: { tag: 'Stato', items: [{ ref: 1, text: 'Form aperto in modale sopra Tab Pagamenti · contesto = 1ª rata 130€ · pre-compilato bonifico oggi 10:30' }] },
+    annotations: [
+      { ref: 1, text: '<strong>Pattern AdminFormDialog</strong> riusato (stesso wrapper di "Aggiungi titolo manuale"). Header icon grass + title + close · body con context-card + form · footer sticky con hint idempotenza.' },
+      { ref: 2, text: '<strong>Context card grass</strong>: riepilogo grande della riga su cui si opera (rata · iscrizione · scadenza) con importo in mono. Riduce errori "segno la rata sbagliata".' },
+      { ref: 3, text: '<strong>Form 2 sezioni</strong>: METODO+DATA in grid 2-col + PROVIDER su riga separata + NOTE su riga separata. Sufficiente per audit.' },
+      { ref: 4, text: '<strong>Default data = now</strong>, ma modificabile per backdate (es. bonifico ricevuto ieri ma registrato oggi).' },
+      { ref: 5, text: '<strong>Provider = "Altro"</strong> default per bonifico/contanti/POS. Solo se metodo "app SumUp online" → "SUMUP".' },
+      { ref: 6, text: '<strong>Sync info sky</strong>: spiega esplicitamente l\'effetto collaterale benigno → sync `PRIMA_RATA_PAGATA` se è la 1ª rata, perché impatta dashboard genitore (pattern EVO-014). Trasparenza.' },
+      { ref: 7, text: '<strong>Idempotenza esplicita nel footer hint</strong>: se titolo già pagato, no errore. Pattern dal webhook SumUp.' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bambino · Admin · Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+.adm-bamb-head { background: #fff; border-bottom: 1px solid var(--line); padding: 18px 16px; }
+.adm-bamb-top { display: flex; gap: 14px; align-items: flex-start; }
+.adm-bamb-photo { width: 64px; height: 64px; border-radius: var(--r-lg); flex-shrink: 0; font-size: 9px; }
+.adm-bamb-body { flex: 1; min-width: 0; }
+.adm-bamb-eyebrow { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); }
+.adm-bamb-name { font-size: 22px; font-weight: 700; letter-spacing: -0.015em; margin: 2px 0; }
+.adm-bamb-meta { font-size: 12.5px; color: var(--ink-muted); display: flex; gap: 4px 10px; flex-wrap: wrap; }
+.adm-bamb-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+.gen-panel { background: var(--sky-50); border: 1px solid var(--sky-100); border-left: 3px solid var(--sky-500); border-radius: var(--r-md); padding: 12px 14px; margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.gen-panel-l { display: flex; align-items: center; gap: 10px; }
+.gen-panel .ico-circ { width: 32px; height: 32px; border-radius: 50%; background: var(--sky-100); color: var(--sky-700); display: flex; align-items: center; justify-content: center; }
+.gen-panel-title { font-size: 12px; color: var(--ink-muted); }
+.gen-panel-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+.gen-panel-actions { display: flex; gap: 6px; }
+.gen-panel-actions a { color: var(--sky-700); text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 10px; border-radius: var(--r-sm); display: inline-flex; align-items: center; gap: 4px; }
+.gen-panel-actions a:hover { background: var(--sky-100); }
+
+.adm-tabs { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); margin: 16px -16px 0; padding: 0 16px; }
+.adm-tabs::-webkit-scrollbar { display: none; }
+.adm-tab { display: inline-flex; align-items: center; gap: 6px; padding: 12px 14px; font-size: 13.5px; font-weight: 600; color: var(--ink-muted); background: transparent; border: none; border-bottom: 2.5px solid transparent; cursor: pointer; white-space: nowrap; text-decoration: none; }
+.adm-tab.active { color: var(--navy-700); border-bottom-color: var(--navy-700); }
+.adm-tab.tab-new::after { content: 'admin'; font-family: var(--f-mono); font-size: 9px; padding: 1px 4px; background: var(--ember-100); color: var(--ember-700); border-radius: 3px; font-weight: 700; margin-left: 4px; }
+.adm-tab .count { font-family: var(--f-mono); font-size: 10px; padding: 1px 5px; background: var(--bg-muted); border-radius: 4px; color: var(--ink-muted); font-weight: 700; }
+.adm-tab.active .count { background: var(--navy-100); color: var(--navy-700); }
+
+.adm-card { background: #fff; border: 1px solid var(--line); border-radius: var(--r-xl); padding: 18px 20px; margin-bottom: 12px; }
+.adm-card h3 { font-size: 14px; font-weight: 700; margin: 0 0 12px; display: flex; align-items: center; gap: 6px; }
+
+.story-list { display: flex; flex-direction: column; }
+.story-row { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line-soft); align-items: center; }
+.story-row:last-child { border-bottom: none; }
+.story-year { font-family: var(--f-mono); font-size: 11px; font-weight: 700; color: var(--navy-700); width: 56px; flex-shrink: 0; }
+.story-main { flex: 1; min-width: 0; }
+.story-title { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.story-sub { font-size: 11.5px; color: var(--ink-muted); margin-top: 1px; }
+.story-status { font-size: 11.5px; flex-shrink: 0; }
+.story-action a { font-size: 12px; color: var(--sky-600); text-decoration: none; font-weight: 600; }
+
+.lesson-row { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line-soft); align-items: flex-start; }
+.lesson-row:last-child { border-bottom: none; }
+.lesson-date { font-family: var(--f-mono); font-size: 11px; font-weight: 600; color: var(--ink-muted); width: 78px; flex-shrink: 0; padding-top: 2px; }
+.lesson-body { flex: 1; min-width: 0; }
+.lesson-tipo { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 3px; margin-right: 6px; }
+.lesson-tipo.mtb { background: var(--grass-100); color: var(--grass-700); }
+.lesson-tipo.bdc { background: var(--sky-100); color: var(--sky-700); }
+.lesson-tipo.gara { background: var(--ember-100); color: var(--ember-700); }
+.lesson-title { font-size: 13.5px; font-weight: 600; color: var(--ink); display: inline; }
+.lesson-meta { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; }
+.lesson-note { font-size: 12px; color: var(--ink); margin-top: 4px; padding: 6px 8px; background: var(--bg-soft); border-radius: var(--r-sm); border-left: 2px solid var(--navy-200); }
+.lesson-note-internal { background: var(--ember-50); border-left-color: var(--ember-500); }
+.lesson-note-internal::before { content: 'INT '; font-family: var(--f-mono); font-size: 9px; font-weight: 700; color: var(--ember-700); margin-right: 4px; }
+
+.danger-zone { background: var(--flag-50); border: 1px solid var(--flag-100); border-radius: var(--r-xl); padding: 16px 18px; margin-top: 20px; }
+.danger-zone h3 { font-size: 13px; font-weight: 700; color: var(--flag-700); display: flex; align-items: center; gap: 6px; margin: 0 0 6px; }
+.danger-zone p { font-size: 12.5px; color: var(--ink); margin: 0 0 12px; line-height: 1.5; }
+.danger-zone .reason { font-size: 11.5px; color: var(--flag-700); font-style: italic; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="page" style="background:var(--bg-soft)">
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" style="text-decoration:none;color:inherit">
+        <div class="nav-logo-mark">T</div>
+        <div><div class="nav-logo-text">Triono Racing</div><div class="nav-logo-sub">Gestione</div></div>
+      </a>
+      <nav class="nav-links">
+        <a href="#" class="nav-link">Home</a>
+        <a href="#" class="nav-link active" style="display:inline-flex;align-items:center;gap:4px">Gestione<i data-lucide="chevron-down" style="width:14px;height:14px"></i></a>
+        <a href="#" class="nav-link">Profilo</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <button class="nav-iconbtn nav-iconbtn-burger"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+        <a href="#" style="text-decoration:none;display:inline-flex"><span class="avatar avatar-sm" style="background:var(--sun-500);color:var(--navy-900)">AM</span></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb"><a href="#">Admin</a><span class="sep">/</span><a href="bambini-lista.html">Bambini</a><span class="sep">/</span><span class="current">Giulia Rossi</span></div>
+
+  <!-- HEADER -->
+  <div class="adm-bamb-head">
+    <div class="adm-bamb-top">
+      <div class="adm-bamb-photo photo-ph">FOTO<br>GIULIA</div>
+      <div class="adm-bamb-body">
+        <div class="adm-bamb-eyebrow">ID bambina · #B-0089 · iscritta 2024</div>
+        <h1 class="adm-bamb-name">Giulia Rossi</h1>
+        <div class="adm-bamb-meta">
+          <span>Nata 12 set 2018 · 7 anni</span>
+          <span>·</span>
+          <span><span class="badge badge-sun" style="font-size:10px;padding:1px 5px">G3 Giovanissimi</span></span>
+          <span>·</span>
+          <span>CF RSSGLI18P52L117W</span>
+        </div>
+
+        <!-- Pannello genitore read-only -->
+        <div class="gen-panel">
+          <div class="gen-panel-l">
+            <div class="ico-circ"><i data-lucide="user" style="width:16px;height:16px"></i></div>
+            <div>
+              <div class="gen-panel-title">Genitore di riferimento</div>
+              <div class="gen-panel-name">Luca Rossi</div>
+            </div>
+          </div>
+          <div class="gen-panel-actions">
+            <a href="mailto:luca.rossi@email.it"><i data-lucide="mail" style="width:13px;height:13px"></i>luca.rossi@email.it</a>
+            <a href="tel:+393331234567"><i data-lucide="phone" style="width:13px;height:13px"></i>+39 333 123 4567</a>
+            <span style="font-size:11.5px;color:var(--ink-muted);align-self:center">Modifica anagrafica in <em>Genitori</em> (EVO-020)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="adm-tabs">
+      <a class="adm-tab active" href="#"><i data-lucide="user" style="width:14px;height:14px"></i>Anagrafica</a>
+      <a class="adm-tab" href="#"><i data-lucide="file-text" style="width:14px;height:14px"></i>Certificato <span class="count">OK</span></a>
+      <a class="adm-tab" href="#"><i data-lucide="image" style="width:14px;height:14px"></i>Foto</a>
+      <a class="adm-tab" href="#"><i data-lucide="file-check" style="width:14px;height:14px"></i>Iscrizione 2026 <span class="count">1</span></a>
+      <a class="adm-tab" href="#"><i data-lucide="trophy" style="width:14px;height:14px"></i>Gare <span class="count">2</span></a>
+      <a class="adm-tab" href="#"><i data-lucide="calendar" style="width:14px;height:14px"></i>Diario</a>
+      <a class="adm-tab tab-new" href="#"><i data-lucide="archive" style="width:14px;height:14px"></i>Iscriz. storiche <span class="count">2</span></a>
+      <a class="adm-tab tab-new" href="#"><i data-lucide="history" style="width:14px;height:14px"></i>Storia lezioni <span class="count">47</span></a>
+    </div>
+  </div>
+
+  <div class="page-inner">
+
+    <!-- TAB Iscriz. storiche (MOCKUP CONTENUTO MINIMAL) -->
+    <div class="adm-card">
+      <h3><i data-lucide="archive" style="width:14px;height:14px;color:var(--navy-700)"></i>Iscrizioni storiche · lista cronologica nuda</h3>
+      <div class="story-list">
+        <div class="story-row">
+          <span class="story-year">2026</span>
+          <div class="story-main">
+            <div class="story-title">Iscrizione #2026-0042 · Corso MTB + BDC</div>
+            <div class="story-sub">Creata 18 gen 2026 · Tariffa 340 € · Sconto famiglia −40 €</div>
+          </div>
+          <span class="badge badge-warning" style="font-size:10.5px">INCOMPLETA</span>
+          <div class="story-action"><a href="iscrizioni-dettaglio.html">Apri →</a></div>
+        </div>
+        <div class="story-row">
+          <span class="story-year">2025</span>
+          <div class="story-main">
+            <div class="story-title">Iscrizione #2025-0031 · Corso MTB</div>
+            <div class="story-sub">Creata 15 gen 2025 · Tariffa 320 € · Saldo finale 320 €</div>
+          </div>
+          <span class="badge badge-success" style="font-size:10.5px">COMPLETATA</span>
+          <div class="story-action"><a href="#">Apri →</a></div>
+        </div>
+        <div class="story-row">
+          <span class="story-year">2024</span>
+          <div class="story-main">
+            <div class="story-title">Iscrizione #2024-0019 · Primo anno</div>
+            <div class="story-sub">Creata 22 feb 2024 · Tariffa 280 € · Saldo finale 280 €</div>
+          </div>
+          <span class="badge badge-success" style="font-size:10.5px">COMPLETATA</span>
+          <div class="story-action"><a href="#">Apri →</a></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB Storia lezioni (MOCKUP MINIMAL) -->
+    <div class="adm-card">
+      <h3><i data-lucide="history" style="width:14px;height:14px;color:var(--navy-700)"></i>Storia lezioni complete · cronologica nuda (47 totali)</h3>
+      <div class="story-list">
+        <div class="lesson-row">
+          <span class="lesson-date">22 mag 2026</span>
+          <div class="lesson-body">
+            <span class="lesson-tipo mtb">MTB</span>
+            <span class="lesson-title">Lezione MTB · Tecnica curve</span>
+            <div class="lesson-meta">Maestro Andrea Mariotti · Ciclodromo Renato Perona, Terni · 1h30'</div>
+            <div class="lesson-note">Giulia ha provato i tornanti stretti, buon controllo del manubrio. Si è divertita molto sulla discesa.</div>
+            <div class="lesson-note lesson-note-internal">Continuità con maestro Andrea consigliata, lavora bene insieme — admin 22/05</div>
+          </div>
+        </div>
+        <div class="lesson-row">
+          <span class="lesson-date">15 mag 2026</span>
+          <div class="lesson-body">
+            <span class="lesson-tipo bdc">BDC</span>
+            <span class="lesson-title">Lezione BDC · Cambio di rapporto</span>
+            <div class="lesson-meta">Maestro Luca Bianchi · Ciclodromo · 1h</div>
+            <div class="lesson-note">Esercizio di cambio fluido salita/discesa. Migliorata.</div>
+          </div>
+        </div>
+        <div class="lesson-row">
+          <span class="lesson-date">8 mag 2026</span>
+          <div class="lesson-body">
+            <span class="lesson-tipo gara">GARA</span>
+            <span class="lesson-title">Gara · 3ª prova Trofeo Giovanissimi</span>
+            <div class="lesson-meta">Accompagnatore Andrea Mariotti · Acquasparta · 2h45'</div>
+            <div class="lesson-note">Arrivo 8/22 cat. G3. Giulia entusiasta, prima gara stagione.</div>
+          </div>
+        </div>
+        <div class="lesson-row">
+          <span class="lesson-date">1 mag 2026</span>
+          <div class="lesson-body">
+            <span class="lesson-tipo mtb">MTB</span>
+            <span class="lesson-title">Lezione MTB · Pump track</span>
+            <div class="lesson-meta">Maestro Andrea Mariotti · Ciclodromo · 1h30'</div>
+          </div>
+        </div>
+        <div class="lesson-row">
+          <span class="lesson-date">24 apr 2026</span>
+          <div class="lesson-body">
+            <span class="lesson-tipo bdc">BDC</span>
+            <span class="lesson-title">Lezione BDC · Posizione in bici</span>
+            <div class="lesson-meta">Maestro Luca Bianchi · Ciclodromo · 1h</div>
+          </div>
+        </div>
+        <a href="#" style="display:block;text-align:center;font-size:13px;font-weight:600;color:var(--sky-600);text-decoration:none;padding:12px 0;margin-top:8px">Vedi tutte le 47 lezioni →</a>
+      </div>
+    </div>
+
+    <!-- DANGER ZONE: delete bambino -->
+    <div class="danger-zone">
+      <h3><i data-lucide="alert-triangle" style="width:14px;height:14px"></i>Zona pericolosa</h3>
+      <p>Elimina definitivamente la scheda di <strong>Giulia Rossi</strong>. Operazione irreversibile, rimuove anagrafica, certificato, foto, link gare e link lezioni.</p>
+      <button class="btn btn-destructive btn-sm" disabled style="opacity:0.5;cursor:not-allowed"><i data-lucide="trash-2" style="width:13px;height:13px"></i>Elimina bambino</button>
+      <div class="reason"><i data-lucide="info" style="width:11px;height:11px;display:inline-block;vertical-align:-1px"></i> Non eliminabile: ha <strong>3 iscrizioni</strong> (2024, 2025, 2026). Vincolo legacy: i bambini con iscrizione storica restano nel DB per audit.</div>
+    </div>
+
+  </div>
+
+  <!-- NB: nessun footer — layout (portal) include solo NavBar + main, vedi src/app/portale/(portal)/layout.tsx -->
+
+</div>
+</template>
+
+<script src="shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['EVO-017', 'Admin', 'Bambino dettaglio'],
+    title: 'Bambino admin · 6+2 tab + delete',
+    route: '/portale/admin/bambini/[id]',
+    statusBarTheme: 'dark',
+    desktopScale: 0.58,
+    stateLegend: { tag: 'Stato', items: [{ ref: 1, text: 'Pannello genitore in evidenza · 2 tab nuovi admin marcati · Danger zone delete disabilitato perché ha 3 iscrizioni storiche' }] },
+    annotations: [
+      { ref: 1, text: '<strong>Pannello genitore read-only</strong>: highlight sky sopra le tab. Mostra nome + mailto: + tel:. Modifica anagrafica rinviata a EVO-020 (link informativo).' },
+      { ref: 2, text: '<strong>Tab base ereditati dal lato genitore</strong>: Anagrafica · Certificato · Foto · Iscrizione anno corrente · Gare · Diario. Riusa componente come da `figli-dettaglio.html` genitore con stesso look&feel.' },
+      { ref: 3, text: '<strong>2 tab nuovi admin</strong> con badge `admin` ember: "Iscrizioni storiche" (lista cronologica nuda di tutte le iscrizioni passate) + "Storia lezioni complete" (47 lezioni totali, non filtrate per anno). Decisi Fase 1 EVO-017 come MINIMAL: no filtri, no export per-bambino.' },
+      { ref: 4, text: '<strong>Lista nuda iscrizioni storiche</strong>: anno + ID + corso + tariffa + sconto + stato badge + link "Apri →" al dettaglio iscrizione admin. Sort cronologico desc.' },
+      { ref: 5, text: '<strong>Lista nuda storia lezioni</strong>: data mono + tipo pill colorato (MTB grass / BDC sky / GARA ember) + titolo + meta (maestro · luogo · durata) + note pubbliche (border-left navy soft) + note interne admin (border-left ember + tag INT). Mostra ultime 5 + CTA "Vedi tutte le 47".' },
+      { ref: 6, text: '<strong>Danger zone delete bambino</strong>: card flag-50 con regola legacy. Bottone disabilitato + tooltip esplicativo se ha ≥1 iscrizione. Conferma via AlertDialog quando enabled.' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>

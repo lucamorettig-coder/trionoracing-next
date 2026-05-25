@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Modal · Aggiungi titolo manuale · Admin · Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+/* Backdrop con stage offuscato */
+.stage-bg { position: fixed; inset: 0; background: rgba(20, 25, 58, 0.55); backdrop-filter: blur(6px); z-index: 1; }
+
+/* AdminFormDialog pattern */
+.afd { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(540px, calc(100vw - 32px)); max-height: calc(100vh - 64px); background: #fff; border-radius: var(--r-xl); box-shadow: 0 24px 60px -10px rgba(0,0,0,0.3); z-index: 2; display: flex; flex-direction: column; overflow: hidden; }
+.afd-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: flex-start; }
+.afd-header-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--navy-50); color: var(--navy-700); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.afd-header-body { flex: 1; min-width: 0; }
+.afd-title { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
+.afd-desc { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; line-height: 1.4; }
+.afd-close { background: transparent; border: none; padding: 4px; color: var(--ink-muted); cursor: pointer; border-radius: 4px; }
+.afd-close:hover { background: var(--bg-muted); }
+.afd-body { padding: 18px 20px; overflow-y: auto; flex: 1; }
+.afd-footer { padding: 14px 20px; border-top: 1px solid var(--line); background: var(--bg-soft); display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+.afd-footer-hint { flex: 1; font-size: 11.5px; color: var(--ink-muted); }
+
+/* Form fields */
+.field-row { margin-bottom: 14px; }
+.field-row:last-child { margin-bottom: 0; }
+.field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.label { display: block; font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+.label .req { color: var(--flag-600); }
+.field { width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r-sm); font-size: 13.5px; font-family: inherit; background: #fff; }
+.field:focus { outline: 2px solid var(--sky-300); outline-offset: 0; border-color: var(--sky-500); }
+.field-currency { position: relative; }
+.field-currency::before { content: '€'; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ink-muted); font-weight: 600; pointer-events: none; }
+.field-currency input { padding-left: 26px; font-family: var(--f-mono); font-weight: 600; }
+.helper { font-size: 11.5px; color: var(--ink-muted); margin-top: 4px; line-height: 1.4; }
+.helper-warn { color: var(--ember-700); display: flex; align-items: center; gap: 4px; }
+.context-card { background: var(--bg-soft); border: 1px solid var(--line); border-left: 3px solid var(--navy-700); border-radius: var(--r-md); padding: 10px 12px; margin-bottom: 14px; font-size: 12px; color: var(--ink); }
+.context-card strong { color: var(--navy-700); }
+</style>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="page" style="background:var(--bg-soft);position:relative;min-height:100vh">
+
+  <!-- Stage: header + tab modal del dettaglio iscrizione mostrato in trasparenza -->
+  <header class="navbar" style="opacity:0.6">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" style="text-decoration:none;color:inherit"><div class="nav-logo-mark">T</div><div><div class="nav-logo-text">Triono Racing</div><div class="nav-logo-sub">Gestione</div></div></a>
+    </div>
+  </header>
+
+  <div style="opacity:0.5;padding:18px 16px">
+    <div style="font-size:11px;font-family:var(--f-mono);color:var(--ink-muted);text-transform:uppercase">ID iscrizione · #2026-0042</div>
+    <h1 style="font-size:20px;font-weight:700;margin:2px 0">Giulia Rossi · Corso 2026 — Tab Pagamenti admin</h1>
+    <div style="font-size:13px;color:var(--ink-muted);margin-top:8px">3 titoli registrati · 1ª pagata 130 € · 2ª scade 27 mag 95 € · 3ª da emettere 115 €</div>
+  </div>
+
+  <!-- Backdrop -->
+  <div class="stage-bg"></div>
+
+  <!-- AdminFormDialog -->
+  <div class="afd" role="dialog" aria-labelledby="afd-title-1">
+    <div class="afd-header">
+      <div class="afd-header-icon"><i data-lucide="plus" style="width:18px;height:18px"></i></div>
+      <div class="afd-header-body">
+        <h2 id="afd-title-1" class="afd-title">Aggiungi titolo manuale</h2>
+        <p class="afd-desc">Crea un titolo "extra" collegato a questa iscrizione. Non modifica il totale del piano rate (es. supplemento gadget, conguaglio, sconto correttivo).</p>
+      </div>
+      <button class="afd-close" aria-label="Chiudi"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+
+    <div class="afd-body">
+
+      <!-- Context card -->
+      <div class="context-card">
+        Stai aggiungendo a → <strong>Iscrizione #2026-0042 · Giulia Rossi</strong> · Totale attuale piano <strong>340 €</strong>
+      </div>
+
+      <!-- Tipo + Importo -->
+      <div class="field-grid-2">
+        <div class="field-row">
+          <label class="label" for="f-tipo">Tipo titolo <span class="req">*</span></label>
+          <select class="field" id="f-tipo">
+            <option value="">— Seleziona —</option>
+            <option>Supplemento gadget</option>
+            <option selected>Conguaglio</option>
+            <option>Sconto correttivo</option>
+            <option>Quota straordinaria</option>
+            <option>Donazione</option>
+            <option>Altro</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label class="label" for="f-importo">Importo <span class="req">*</span></label>
+          <div class="field-currency">
+            <input type="number" step="0.01" class="field" id="f-importo" value="25.00" />
+          </div>
+          <div class="helper">Positivo per supplemento, negativo per sconto.</div>
+        </div>
+      </div>
+
+      <!-- Scadenza -->
+      <div class="field-row">
+        <label class="label" for="f-scadenza">Data scadenza pagamento <span class="req">*</span></label>
+        <input type="date" class="field" id="f-scadenza" value="2026-06-15" />
+      </div>
+
+      <!-- Descrizione -->
+      <div class="field-row">
+        <label class="label" for="f-desc">Descrizione (mostrata al genitore) <span class="req">*</span></label>
+        <input type="text" class="field" id="f-desc" maxlength="80" value="Conguaglio kit completo (taglia maglia 10 anziché 8)" />
+        <div class="helper">Max 80 caratteri. Viene mostrata come label primaria nella lista pagamenti del genitore (pattern EVO-015).</div>
+      </div>
+
+      <!-- Note interne -->
+      <div class="field-row">
+        <label class="label" for="f-note">Note interne (solo admin)</label>
+        <textarea class="field" id="f-note" rows="2" placeholder="Note libere, non visibili al genitore"></textarea>
+      </div>
+
+      <div class="helper helper-warn">
+        <i data-lucide="info" style="width:12px;height:12px"></i>
+        Il titolo verrà creato senza NUMERO_RATA per evitare conflitti con il piano rate automatico. Make.com lo ignorerà per gli email reminder.
+      </div>
+
+    </div>
+
+    <div class="afd-footer">
+      <div class="afd-footer-hint">Verrà loggato in Tab Storia con il tuo nome.</div>
+      <button class="btn btn-ghost btn-sm">Annulla</button>
+      <button class="btn btn-primary btn-sm"><i data-lucide="check" style="width:13px;height:13px"></i>Crea titolo</button>
+    </div>
+  </div>
+
+</div>
+</template>
+
+<script src="shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['EVO-017', 'Admin', 'Modal Aggiungi titolo'],
+    title: 'Modal AggiungiTitoloManuale · AdminFormDialog',
+    route: 'overlay /portale/admin/iscrizioni/[id]',
+    statusBarTheme: 'dark',
+    desktopScale: 0.58,
+    stateLegend: { tag: 'Stato', items: [{ ref: 1, text: 'Form aperto in modale sopra Tab Pagamenti del dettaglio iscrizione · pre-compilato esempio conguaglio kit 25€' }] },
+    annotations: [
+      { ref: 1, text: '<strong>Pattern AdminFormDialog</strong>: wrapper riusabile (header con icon + title + desc + close · body scrollable · footer sticky con hint + Cancel + Submit). Da introdurre nel DS come componente in MT-1bis di EVO-017.' },
+      { ref: 2, text: '<strong>Context card navy</strong>: riepiloga su quale iscrizione si sta operando + totale attuale piano. Evita errori di "scrivo sul figlio sbagliato".' },
+      { ref: 3, text: '<strong>Form grid 2-col</strong>: TIPO singleSelect + IMPORTO currency con prefix €. Mobile: collassano in 1 colonna (responsive grid).' },
+      { ref: 4, text: '<strong>DESCRIZIONE come label primaria</strong>: pattern EVO-015 — questo è il testo che il genitore vedrà nella lista pagamenti. Max 80 chars.' },
+      { ref: 5, text: '<strong>Note interne</strong>: textarea non visibile al genitore. Persiste in TITOLI_PAGAMENTO.NOTE_INTERNE.' },
+      { ref: 6, text: '<strong>Helper warn</strong>: spiega che il titolo manuale NON ha NUMERO_RATA (per evitare che Make 4086727 lo tratti come rata normale → MT-9bis azione manuale utente pre-merge).' },
+      { ref: 7, text: '<strong>Footer hint</strong>: l\'azione verrà loggata in Tab Storia del dettaglio iscrizione (pattern audit log light, riusa il campo NOTE_ADMIN).' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>

@@ -559,7 +559,44 @@ I sub-file JSX/CSS del canvas Claude Design (`dashboard-full.jsx`, `ds-primitive
 
 ## 8. Verifica e go-live
 
-_Da compilare in Fase 8._
+- **URL produzione**: https://trionoracing-next.vercel.app/portale/admin
+- **Pull Request**: #29 — `feat(admin): EVO-016 admin infra & DS scaffold` — merged su `main`
+- **Commit di merge**: `edffe5f` — 38 file, 4673 inserzioni, 96 cancellazioni
+- **Data go-live**: 2026-05-25
+- **Report verifica dettagliato**: vedi sezione "Log fasi" → entry "Sezione 8 — Verifica implementazione ✅ CHIUSA"
+
+### Esito sintetico
+
+| Dimensione | Stato | Note |
+|------------|-------|------|
+| Design system | ✅ | 3 primitivi Radix (Dialog/AlertDialog/DropdownMenu) + 8 componenti admin allineati a token Triono. DataTable generico verificato in dashboard A-1. |
+| Localizzazione (i18n) | n/a | Italiano-only, nessuna chiave da estrarre. |
+| SEO | n/a | Area protetta `/portale/admin/*`, noindex implicito. |
+| Fedeltà ai visual | ✅ | Dashboard A-1 + NavBar 11 link + placeholder pages corrispondono al canvas Claude Design + descrizioni testuali del prompt-claude-design.md. DataTable demo rinviato a EVO-017 (in EVO-016 c'è solo il componente). |
+| Criteri di accettazione | ✅ | 14/14 AC verificati (vedi tabella nel Log fasi). |
+| Smoke test dev | ✅ | 5-step checklist eseguita pre-merge. |
+| Smoke test produzione | ✅ | 7-step checklist eseguita post-merge da Luca. 2 issues emerse (JWT staleness P1 → workaround logout/login; emoji icons P2 → fix pre-PR). |
+| Schema Airtable PROD+DEV | ✅ | Allineato specularmente (recovery DEV via MCP da Cowork il 2026-05-25). |
+
+### Apprendimenti riusabili (riportati anche in AGENTS.md)
+
+L'utente ha già aggiunto in `AGENTS.md` i 4 pattern emersi:
+1. **JWT staleness su first admin login** — al primo accesso post-promozione ADMIN, il `sessionClaims.role` del JWT non è ancora aggiornato → middleware redirige a `/portale`. Workaround: logout + login forza refresh JWT. Da considerare in EVO future che toccano ruoli Clerk.
+2. **Icone Lucide per `ReactNode` props** — quando un componente accetta `icon: ReactNode`, passare componente Lucide JSX (`<ShieldAlert size={20} />`), non stringa emoji. Emoji vanno solo in copy testuale dentro `<span>`.
+3. **DEV/PROD schema sync obbligatorio** — pattern `feedback-airtable-schema-dev-prod-speculari` confermato dal recovery applicato in EVO-016. Da EVO-017 in poi, macro-task 0 deve includere DEV esplicitamente.
+4. **`safe()` wrapper per server data fetch** — usato in dashboard A-1 per non far crashare la pagina se uno dei 7 wrapper KPI fallisce. Pattern da riusare in EVO-017+ per dashboard admin con dati Airtable.
+
+Pattern memoria persistente già salvati dall'utente (JWT staleness + closure EVO-016).
+
+### Sblocchi
+
+EVO-016 ✅ → sbloca:
+- **EVO-017** (admin-iscrizioni-bambini) — pronta a partire, scaffold DS disponibile
+- **EVO-018** (admin-pagamenti-tariffe) — pronta a partire
+- **EVO-019** (admin-gare) — pronta a partire
+- **EVO-020** (admin-lezioni-maestri-genitori) — pronta a partire
+
+Le 4 sotto-evolutive figlie sono parallelizzabili su branch indipendenti.
 
 ---
 
@@ -641,6 +678,18 @@ Prompt salvato in `evolutive/EVO-016-admin-infra-ds/prompt-claude-code.md`. Stat
 ### [2026-05-25] Fase 6 — Prompt Claude Design generato
 
 Prompt salvato in `evolutive/EVO-016-admin-infra-ds/prompt-claude-design.md`. Richiesti **4 visual**: (1) Dashboard A-1 piena desktop, (2) Dashboard A-1 empty Today's tasks, (3) DS primitivi showcase (Dialog + AlertDialog destructive con motivo + DropdownMenu row actions), (4) Pagina admin "Iscrizioni" demo con DataTable + AdminFilters + BulkActionBar 3 selezionati + ExportCSVButton + paginazione + vista mobile. Repo collegato → Claude Design applica DS Triono v0.1 automaticamente. Lingua italiano. Annotazioni inline richieste su: animations Dialog/AlertDialog, sticky behavior, NavBar overflow 11 link, DataTable scroll orizzontale mobile. Workflow in pausa fino a quando Luca avrà generato i visual (`visual pronti per EVO-016`).
+
+### [2026-05-25] Fase 8 — Consolidamento completato
+
+EVO-016 chiusa nel workflow `evolutive-workflow`. Aggiornamenti propagati:
+- **Scheda EVO-016**: sezione 8 compilata canonicamente (URL prod, PR #29, commit `edffe5f`, esito 8 dimensioni, sblocchi).
+- **`memory.md`** (root repo): riga EVO-016 → stato "completata" + URL prod + data fine. Entry narrativa "EVO-016 completata e in produzione" con dettaglio scaffold + 2 issue + 4 pattern AGENTS.md.
+- **`PROGETTO_MASTER.md`** (Cowork): revisione header aggiornata, Fase 3 stato aggiornato con EVO-016 ✅.
+- **Scheda ombrello EVO-007**: riga EVO-016 nella tabella §9 → ✅ completata con link PR e URL prod.
+- **`AGENTS.md`** (repo): 4 pattern aggiunti da utente (JWT staleness, icone Lucide per ReactNode, DEV/PROD schema sync, `safe()` wrapper).
+- **Memoria persistente Cowork**: 2 memorie aggiunte da utente (JWT staleness + closure EVO-016) — già nel file system Cowork.
+
+**Sblocchi attivi**: EVO-017 (admin-iscrizioni-bambini, MVP critico), EVO-018 (admin-pagamenti-tariffe), EVO-019 (admin-gare), EVO-020 (admin-lezioni-maestri-genitori). Tutte parallelizzabili su branch indipendenti.
 
 ### [2026-05-25] Sezione 8 — Verifica implementazione ✅ CHIUSA
 

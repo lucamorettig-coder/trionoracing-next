@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>EVO-018 · Modal CRUD Tariffa</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy-700: #1F2D5A; --navy-900: #050E3F; --navy-50: #f1f3fa; --navy-100: #dde2f0;
+    --sky-50: #eaf4fc; --sky-100: #cee5f7; --sky-500: #3A82C8; --sky-700: #2a5e8e;
+    --grass-50: #eef6e6; --grass-100: #d8ebc4; --grass-500: #5FAC36; --grass-600: #4f9329; --grass-700: #3f7421;
+    --ember-50: #fdf3e0; --ember-100: #fae0b3; --ember-500: #E09618; --ember-600: #c08015; --ember-700: #a16608;
+    --bg: #fff; --bg-soft: #fafbfd; --bg-muted: #f2f4f9;
+    --ink: #14193A; --ink-muted: #6B7388;
+    --line: #e4e8ef; --line-soft: #eef1f6;
+    --r-sm: 6px; --r-md: 10px; --r-lg: 16px;
+    --sh-lg: 0 24px 60px -10px rgba(20,25,58,0.25);
+    --f-mono: 'JetBrains Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: rgba(20,25,58,0.5); color: var(--ink); margin: 0; padding: 60px 20px; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; }
+
+  .modal { background: #fff; border-radius: var(--r-lg); width: 100%; max-width: 580px; box-shadow: var(--sh-lg); overflow: hidden; display: flex; flex-direction: column; max-height: calc(100vh - 80px); }
+  .modal-header { display: flex; align-items: flex-start; gap: 12px; padding: 18px 20px 14px; border-bottom: 1px solid var(--line); position: relative; }
+  .icon-circle { width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--navy-50); color: var(--navy-700); font-size: 16px; font-weight: 700; }
+  .modal-title { font-size: 16px; font-weight: 800; color: var(--ink); margin: 0; }
+  .modal-desc { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; line-height: 1.4; }
+  .close { position: absolute; right: 16px; top: 16px; background: transparent; border: none; color: var(--ink-muted); cursor: pointer; padding: 4px; border-radius: var(--r-sm); }
+
+  .modal-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+
+  /* Soft warning iscrizioni collegate */
+  .warning-soft {
+    background: var(--ember-50);
+    border: 1px solid var(--ember-100);
+    border-left: 3px solid var(--ember-500);
+    border-radius: var(--r-md);
+    padding: 12px 14px;
+    font-size: 12.5px;
+    color: var(--ember-700);
+    line-height: 1.5;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .warning-soft strong { color: var(--ink); }
+
+  /* Form fields */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11.5px; font-weight: 700; color: var(--ink); }
+  .field .helper { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+  .field select, .field input, .field textarea { height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: #fff; font-family: inherit; font-size: 13px; color: var(--ink); }
+  .field textarea { height: 60px; padding: 8px 12px; resize: vertical; }
+  .field select:focus, .field input:focus, .field textarea:focus { outline: none; border-color: var(--navy-700); box-shadow: 0 0 0 3px rgba(31,45,90,0.1); }
+
+  .input-with-suffix { position: relative; }
+  .input-with-suffix input { padding-right: 32px; text-align: right; font-variant-numeric: tabular-nums; }
+  .input-with-suffix .suffix { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--ink-muted); font-size: 13px; font-weight: 600; }
+
+  .checkbox-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--bg-soft); border-radius: var(--r-md); }
+  .checkbox-row input { margin: 0; }
+  .checkbox-row label { font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; }
+  .checkbox-row .desc { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+
+  .section-divider { height: 1px; background: var(--line-soft); margin: 4px 0; }
+  .section-title { font-size: 11.5px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 4px 0 2px; }
+
+  /* Footer */
+  .modal-footer { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: var(--bg-soft); border-top: 1px solid var(--line); }
+  .footer-hint { font-size: 11px; color: var(--ink-muted); line-height: 1.4; max-width: 300px; }
+  .btn-group { display: flex; gap: 8px; }
+  .btn { padding: 8px 14px; border-radius: var(--r-md); font-size: 13px; font-weight: 600; border: 1.5px solid; cursor: pointer; }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: transparent; }
+  .btn-primary { background: var(--navy-700); color: #fff; border-color: var(--navy-700); }
+
+  .annotation { background: var(--sky-50); border: 1px solid var(--sky-100); border-left: 3px solid var(--sky-500); border-radius: var(--r-md); padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: var(--sky-700); max-width: 580px; width: 100%; }
+  .annotation strong { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%;">
+
+  <div class="annotation">
+    <strong>EVO-018 / mockup nuovo:</strong> modal <code>TariffaFormDialog</code> aperto da click "Modifica" su una <code>TariffaCard</code>. Pattern <code>AdminFormDialog</code> con campi allineati allo <strong>schema Airtable reale</strong> (1 solo campo <code>SCONTO_FAMIGLIA_NUMEROSA</code>, non 2 come nel mockup F3). Warning soft <strong>non-bloccante</strong> con conteggio iscrizioni storiche collegate. Submit è <code>upsertTariffa()</code> Server Action.
+  </div>
+
+  <div class="modal">
+
+    <div class="modal-header">
+      <div class="icon-circle">€</div>
+      <div style="flex: 1; padding-right: 28px;">
+        <h2 class="modal-title">Modifica tariffa</h2>
+        <p class="modal-desc">Tariffa Q1 · 2026 · Gennaio → Aprile</p>
+      </div>
+      <button class="close">×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Soft warning: tariffa con iscrizioni collegate -->
+      <div class="warning-soft">
+        <span style="font-size: 16px; flex-shrink: 0; margin-top: 1px;">⚠</span>
+        <span><strong>22 iscrizioni storiche collegate a questa tariffa</strong> (incluse eventuali annullate). Le modifiche <strong>non sono retroattive</strong>: le iscrizioni esistenti mantengono i valori al momento dell'iscrizione. Le modifiche valgono solo per le iscrizioni create dopo il salvataggio.</span>
+      </div>
+
+      <!-- Anagrafica -->
+      <div class="section-title">Anagrafica</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Anno</label>
+          <input type="text" value="2026" />
+        </div>
+        <div class="field">
+          <label>Quarter</label>
+          <select>
+            <option>Q1 (Gennaio → Aprile)</option>
+            <option>Q2 (Maggio → Agosto)</option>
+            <option>Q3 (Settembre → Dicembre)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Descrizione tariffa (opzionale)</label>
+        <input type="text" value="Tariffa standard primo quadrimestre" />
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- Importi -->
+      <div class="section-title">Importi</div>
+      <div class="grid-3">
+        <div class="field">
+          <label>Quota totale anno</label>
+          <div class="input-with-suffix">
+            <input type="text" value="430,00" />
+            <span class="suffix">€</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Importo iscrizione</label>
+          <div class="input-with-suffix">
+            <input type="text" value="90,00" />
+            <span class="suffix">€</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Importo kit scuola</label>
+          <div class="input-with-suffix">
+            <input type="text" value="65,00" />
+            <span class="suffix">€</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="field">
+          <label>Numero rate</label>
+          <input type="number" value="3" min="1" max="12" />
+        </div>
+        <div class="field">
+          <label>Importo rata base</label>
+          <div class="input-with-suffix">
+            <input type="text" value="113,33" />
+            <span class="suffix">€</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Sconto famiglia numerosa</label>
+          <div class="input-with-suffix">
+            <input type="text" value="50,00" />
+            <span class="suffix">€</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Scadenze rate</label>
+        <textarea>FEBBRAIO;MARZO;APRILE</textarea>
+        <span class="helper">Formato: nome mese in MAIUSCOLO separato da ; (es. <code>FEBBRAIO;MARZO;APRILE</code>). Concatenato dalla formula SCADENZA_RATE su TABELLA_ISCRIZIONI.</span>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- Flag attiva -->
+      <div class="checkbox-row">
+        <input type="checkbox" id="attiva" checked />
+        <div>
+          <label for="attiva">Tariffa attiva</label>
+          <div class="desc">Solo le tariffe ATTIVE sono selezionabili in fase di iscrizione. Una sola tariffa attiva consigliata per Anno × Quarter.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <p class="footer-hint">Modifiche non retroattive — vedi warning. Submit chiama <code>upsertTariffa()</code> Server Action.</p>
+      <div class="btn-group">
+        <button class="btn btn-ghost">Annulla</button>
+        <button class="btn btn-primary">Salva modifiche</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

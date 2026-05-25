@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>EVO-018 · Pagamenti lista con bulk attivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy-50: #f1f3fa; --navy-100: #dde2f0; --navy-200: #b9c2d9; --navy-700: #1F2D5A; --navy-900: #050E3F;
+    --sky-50: #eaf4fc; --sky-100: #cee5f7; --sky-500: #3A82C8; --sky-700: #2a5e8e;
+    --grass-50: #eef6e6; --grass-100: #d8ebc4; --grass-500: #5FAC36; --grass-600: #4f9329; --grass-700: #3f7421;
+    --ember-50: #fdf3e0; --ember-100: #fae0b3; --ember-500: #E09618; --ember-700: #a16608;
+    --flag-50: #fce6e6; --flag-100: #f7c2c2; --flag-500: #C01818; --flag-600: #a01212; --flag-700: #7a0e0e;
+    --sun-500: #EFE63A;
+    --bg: #fff; --bg-soft: #fafbfd; --bg-muted: #f2f4f9;
+    --ink: #14193A; --ink-muted: #6B7388;
+    --line: #e4e8ef; --line-soft: #eef1f6;
+    --r-sm: 6px; --r-md: 10px; --r-lg: 16px; --r-xl: 22px;
+    --sh-sm: 0 1px 2px rgba(20,25,58,0.06); --sh-lg: 0 18px 40px -10px rgba(20,25,58,0.18);
+    --f-mono: 'JetBrains Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg-soft); color: var(--ink); margin: 0; padding: 0; }
+  .page { max-width: 1280px; margin: 0 auto; padding: 32px 40px; }
+  .header-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 4px; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.015em; margin: 0; }
+  .subtitle { color: var(--ink-muted); font-size: 14px; margin-top: 4px; }
+  .btn { padding: 8px 14px; border-radius: var(--r-md); font-size: 13.5px; font-weight: 600; border: 1.5px solid; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all .15s; }
+  .btn-outline { background: #fff; color: var(--navy-700); border-color: var(--navy-700); }
+  .btn-primary { background: var(--navy-700); color: #fff; border-color: var(--navy-700); }
+  .btn-success { background: var(--grass-600); color: #fff; border-color: var(--grass-600); }
+
+  .kpi-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .kpi { background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 18px; box-shadow: var(--sh-sm); }
+  .kpi .label { font-size: 12px; color: var(--ink-muted); margin-bottom: 6px; font-weight: 500; }
+  .kpi .value { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .kpi .sub { font-size: 11px; color: var(--ink-muted); margin-top: 4px; }
+  .kpi.success .value { color: var(--grass-700); }
+  .kpi.warn .value { color: var(--ember-700); }
+  .kpi.danger .value { color: var(--flag-600); }
+
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: var(--r-md); padding: 8px; margin-bottom: 12px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: var(--bg-muted); font-size: 12.5px; font-weight: 500; cursor: pointer; color: var(--ink-muted); border: 1px solid transparent; }
+  .chip.active { background: var(--navy-700); color: #fff; }
+  .chip .label-tiny { font-size: 10.5px; opacity: 0.7; margin-right: 2px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .search-input { flex: 1; min-width: 220px; padding: 7px 12px; border: 1px solid var(--line); border-radius: var(--r-sm); font-size: 13px; font-family: inherit; }
+  .count-tag { font-size: 12px; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+
+  .table-wrap { background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--sh-sm); margin-bottom: 80px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: var(--bg-soft); padding: 10px 14px; text-align: left; font-weight: 700; color: var(--ink); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--line); }
+  tbody td { padding: 12px 14px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+  tbody tr.selected { background: var(--sky-50); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  td.mono { font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-muted); }
+  .cell-person { display: flex; gap: 8px; align-items: center; }
+  .avatar-sm { width: 28px; height: 28px; border-radius: 50%; background: var(--navy-100); color: var(--navy-700); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+  .cell-person .name { font-weight: 600; color: var(--ink); font-size: 13px; }
+  .cell-person .meta { font-size: 11px; color: var(--ink-muted); }
+
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .badge-success { background: var(--grass-50); color: var(--grass-700); }
+  .badge-error { background: var(--flag-50); color: var(--flag-600); }
+  .badge-warning { background: var(--ember-50); color: var(--ember-700); }
+  .badge-info { background: var(--sky-50); color: var(--sky-700); }
+
+  .method-tag { display: inline-flex; align-items: center; padding: 2.5px 7px; border-radius: 4px; font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; }
+  .method-tag.sumup { background: linear-gradient(135deg, #1c79e6, #00b86b); color: #fff; }
+  .method-tag.bonifico { background: var(--sky-100); color: var(--sky-700); }
+  .method-tag.contanti { background: var(--bg-muted); color: var(--ink); }
+  .method-tag.pos { background: var(--ember-100); color: var(--ember-700); }
+  .method-tag.app { background: var(--navy-100); color: var(--navy-700); }
+
+  .cell-actions { display: flex; gap: 4px; justify-content: flex-end; }
+  .icon-btn { background: transparent; border: 1px solid transparent; padding: 4px 6px; border-radius: var(--r-sm); cursor: pointer; color: var(--ink-muted); }
+  .icon-btn:hover { background: var(--bg-muted); color: var(--ink); }
+
+  /* Bulk action bar fixed bottom */
+  .bulk-bar {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: #fff;
+    box-shadow: var(--sh-lg); border-radius: var(--r-lg);
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 16px;
+    z-index: 40; max-width: calc(100% - 32px);
+  }
+  .bulk-clear { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; color: #fff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .bulk-count { font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+  .bulk-divider { height: 24px; width: 1px; background: rgba(255,255,255,0.2); }
+  .bulk-action { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 7px 14px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .15s; }
+  .bulk-action.primary { background: var(--grass-600); }
+  .bulk-action.primary:hover { background: var(--grass-700); }
+
+  .annotation { background: var(--sky-50); border: 1px solid var(--sky-100); border-left: 3px solid var(--sky-500); border-radius: var(--r-md); padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: var(--sky-700); }
+  .annotation strong { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="annotation">
+    <strong>EVO-018 / mockup nuovo:</strong> variante della lista pagamenti F3 con <strong>bulk action bar attiva</strong> (3 titoli selezionati). Mostra UX del flusso "seleziona + Segna pagati in blocco" — pattern unico nuovo introdotto da EVO-018. La modal che si apre è in <code>bulk-segna-pagati-modal.html</code>.
+  </div>
+
+  <div class="header-row">
+    <div>
+      <div class="eyebrow">Area Admin</div>
+      <h1>Pagamenti</h1>
+      <p class="subtitle">47 titoli · anno 2026 · YTD 14.820 €</p>
+    </div>
+    <div>
+      <button class="btn btn-outline">↓ Esporta CSV</button>
+    </div>
+  </div>
+
+  <!-- 3 KPI top (Incassato YTD / Da incassare / Scaduti) -->
+  <div class="kpi-strip">
+    <div class="kpi success">
+      <div class="label">Incassato YTD</div>
+      <div class="value">14.820 €</div>
+      <div class="sub">App 8.230 € · Bonifico 4.190 € · Contanti 2.400 €</div>
+    </div>
+    <div class="kpi warn">
+      <div class="label">Da incassare</div>
+      <div class="value">1.940 €</div>
+      <div class="sub">8 titoli pendenti</div>
+    </div>
+    <div class="kpi danger">
+      <div class="label">Scaduti non pagati</div>
+      <div class="value">320 €</div>
+      <div class="sub">3 titoli scaduti</div>
+    </div>
+  </div>
+
+  <!-- Filtri sticky con Provider + Mese aggiunti rispetto a F3 -->
+  <div class="filters">
+    <button class="chip active"><span class="label-tiny">Stato</span> Da pagare + scaduti ×</button>
+    <button class="chip"><span class="label-tiny">Metodo</span> Tutti ▾</button>
+    <button class="chip"><span class="label-tiny">Provider</span> Tutti ▾</button>
+    <button class="chip"><span class="label-tiny">Tipo</span> Tutti ▾</button>
+    <button class="chip"><span class="label-tiny">Anno</span> 2026 ▾</button>
+    <button class="chip"><span class="label-tiny">Mese</span> Tutti ▾</button>
+    <input type="text" class="search-input" placeholder="Cerca bambino o genitore…" value="" />
+    <span class="count-tag">8 / 47</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:32px"><input type="checkbox" /></th>
+          <th>Bambino</th>
+          <th>Genitore</th>
+          <th>Tipo</th>
+          <th>Importo</th>
+          <th>Scadenza</th>
+          <th>Stato</th>
+          <th>Metodo</th>
+          <th>Pagato il</th>
+          <th>Riferim.</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="selected">
+          <td><input type="checkbox" checked /></td>
+          <td><div class="cell-person"><span class="avatar-sm">MR</span><div><div class="name">Marco Rossi</div></div></div></td>
+          <td><span class="meta">Luca Rossi</span></td>
+          <td>3ª rata</td>
+          <td class="num">95,00 €</td>
+          <td style="color: var(--flag-600); font-weight: 600;">18 mag 2026 · -3 gg</td>
+          <td><span class="badge badge-error">Scaduto</span></td>
+          <td><span style="color: var(--ink-muted)">—</span></td>
+          <td><span style="color: var(--ink-muted)">—</span></td>
+          <td class="mono">#2026-0001-R3</td>
+          <td><div class="cell-actions"><button class="icon-btn">⋯</button></div></td>
+        </tr>
+        <tr class="selected">
+          <td><input type="checkbox" checked /></td>
+          <td><div class="cell-person"><span class="avatar-sm">SM</span><div><div class="name">Sofia Marini</div></div></div></td>
+          <td><span class="meta">Anna Marini</span></td>
+          <td>1ª rata</td>
+          <td class="num">130,00 €</td>
+          <td style="color: var(--flag-600); font-weight: 600;">15 mag 2026 · -6 gg</td>
+          <td><span class="badge badge-error">Scaduto</span></td>
+          <td><span style="color: var(--ink-muted)">—</span></td>
+          <td><span style="color: var(--ink-muted)">—</span></td>
+          <td class="mono">#2026-0014-R1</td>
+          <td><div class="cell-actions"><button class="icon-btn">⋯</button></div></td>
+        </tr>
+        <tr class="selected">
+          <td><input type="checkbox" checked /></td>
+          <td><div class="cell-person"><span class="avatar-sm">GR</span><div><div class="name">Giulia Rossi</div></div></div></td>
+          <td><span class="meta">Luca Rossi</span></td>
+          <td>2ª rata</td>
+          <td class="num">95,00 €</td>
+          <td style="color: var(--ember-700); font-weight: 600;">27 mag 2026 · 6 gg</td>
+          <td><span class="badge badge-warning">Da pagare</span></td>
+          <td><span style="color: var(--ink-muted)">—</span></td>
+          <td><span style="color: var(--ink-muted)">—</span></td>
+          <td class="mono">#2026-0042-R2</td>
+          <td><div class="cell-actions"><button class="icon-btn">⋯</button></div></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" /></td>
+          <td><div class="cell-person"><span class="avatar-sm">FR</span><div><div class="name">Filippo Russo</div></div></div></td>
+          <td><span class="meta">Roberto Russo</span></td>
+          <td>Saldo</td>
+          <td class="num">115,00 €</td>
+          <td>30 mag 2026</td>
+          <td><span class="badge badge-warning">Da pagare</span></td>
+          <td><span style="color: var(--ink-muted)">—</span></td>
+          <td><span style="color: var(--ink-muted)">—</span></td>
+          <td class="mono">#2026-0023-S1</td>
+          <td><div class="cell-actions"><button class="icon-btn">⋯</button></div></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" /></td>
+          <td><div class="cell-person"><span class="avatar-sm">MR</span><div><div class="name">Marco Rossi</div></div></div></td>
+          <td><span class="meta">Luca Rossi</span></td>
+          <td>2ª rata</td>
+          <td class="num" style="color: var(--grass-700)">95,00 €</td>
+          <td><span style="color: var(--ink-muted)">18 apr 2026</span></td>
+          <td><span class="badge badge-success">✓ Pagato</span></td>
+          <td><span class="method-tag sumup">SUMUP</span></td>
+          <td>15 apr 2026</td>
+          <td class="mono">#2026-0001-R2</td>
+          <td><div class="cell-actions"><button class="icon-btn">⋯</button></div></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" /></td>
+          <td><div class="cell-person"><span class="avatar-sm">LB</span><div><div class="name">Luca Bianchi</div></div></div></td>
+          <td><span class="meta">Anna Bianchi</span></td>
+          <td>Saldo</td>
+          <td class="num" style="color: var(--grass-700)">160,00 €</td>
+          <td><span style="color: var(--ink-muted)">5 mag 2026</span></td>
+          <td><span class="badge badge-success">✓ Pagato</span></td>
+          <td><span class="method-tag bonifico">BONIFICO</span></td>
+          <td>5 mag 2026</td>
+          <td class="mono">#2026-0034-S1</td>
+          <td><div class="cell-actions"><button class="icon-btn">⋯</button></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Bulk action bar fixed bottom -->
+  <div class="bulk-bar">
+    <button class="bulk-clear" aria-label="Annulla selezione">×</button>
+    <span class="bulk-count">3 selezionati</span>
+    <div class="bulk-divider"></div>
+    <button class="bulk-action primary">✓ Segna pagati in blocco</button>
+  </div>
+
+</div>
+
+</body>
+</html>

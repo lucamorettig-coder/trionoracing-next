@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>EVO-018 · Modal Bulk Segna pagati</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy-700: #1F2D5A; --navy-900: #050E3F;
+    --sky-50: #eaf4fc; --sky-100: #cee5f7; --sky-200: #a8d0eb; --sky-500: #3A82C8; --sky-700: #2a5e8e;
+    --grass-50: #eef6e6; --grass-100: #d8ebc4; --grass-500: #5FAC36; --grass-600: #4f9329; --grass-700: #3f7421;
+    --ember-50: #fdf3e0; --ember-100: #fae0b3; --ember-500: #E09618; --ember-700: #a16608;
+    --bg: #fff; --bg-soft: #fafbfd; --bg-muted: #f2f4f9;
+    --ink: #14193A; --ink-muted: #6B7388;
+    --line: #e4e8ef; --line-soft: #eef1f6;
+    --r-sm: 6px; --r-md: 10px; --r-lg: 16px;
+    --sh-lg: 0 24px 60px -10px rgba(20,25,58,0.25);
+    --f-mono: 'JetBrains Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: rgba(20,25,58,0.5); color: var(--ink); margin: 0; padding: 60px 20px; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; }
+
+  .modal { background: #fff; border-radius: var(--r-lg); width: 100%; max-width: 560px; box-shadow: var(--sh-lg); overflow: hidden; display: flex; flex-direction: column; max-height: calc(100vh - 80px); }
+  .modal-header { display: flex; align-items: flex-start; gap: 12px; padding: 18px 20px 14px; border-bottom: 1px solid var(--line); position: relative; }
+  .icon-circle { width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--grass-100); color: var(--grass-700); font-size: 18px; font-weight: 700; }
+  .modal-title { font-size: 16px; font-weight: 800; color: var(--ink); margin: 0; }
+  .modal-desc { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; line-height: 1.4; }
+  .close { position: absolute; right: 16px; top: 16px; background: transparent; border: none; color: var(--ink-muted); cursor: pointer; padding: 4px; border-radius: var(--r-sm); }
+  .close:hover { background: var(--bg-muted); }
+
+  .modal-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+
+  /* Context card riepilogo titoli */
+  .context-card { background: var(--grass-50); border: 1px solid var(--grass-100); border-radius: var(--r-md); padding: 14px 16px; }
+  .context-card .row { display: flex; justify-content: space-between; align-items: center; }
+  .context-card .label { font-size: 12px; color: var(--ink-muted); font-weight: 500; }
+  .context-card .titoli-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto; }
+  .titolo-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(255,255,255,0.6); border-radius: var(--r-sm); font-size: 12.5px; }
+  .titolo-row .who { display: flex; align-items: center; gap: 8px; }
+  .titolo-row .who .avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--navy-700); color: #fff; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+  .titolo-row .what { color: var(--ink-muted); font-size: 11.5px; }
+  .titolo-row .amount { font-family: var(--f-mono); font-weight: 600; color: var(--ink); }
+  .total-row { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--grass-100); display: flex; justify-content: space-between; align-items: center; }
+  .total-row .label-tot { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .total-row .amount-tot { font-size: 22px; font-weight: 800; color: var(--grass-700); font-variant-numeric: tabular-nums; }
+
+  /* Sync hint per titoli prima rata */
+  .sync-hint { background: var(--sky-50); border: 1px solid var(--sky-200); border-radius: var(--r-md); padding: 10px 12px; font-size: 12px; color: var(--sky-700); display: flex; gap: 8px; align-items: flex-start; }
+
+  /* Form fields */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11.5px; font-weight: 700; color: var(--ink); }
+  .field select, .field input { height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: #fff; font-family: inherit; font-size: 13px; color: var(--ink); }
+  .field select:focus, .field input:focus { outline: none; border-color: var(--navy-700); box-shadow: 0 0 0 3px rgba(31,45,90,0.1); }
+
+  /* Footer */
+  .modal-footer { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: var(--bg-soft); border-top: 1px solid var(--line); }
+  .footer-hint { font-size: 11px; color: var(--ink-muted); line-height: 1.4; max-width: 280px; }
+  .btn-group { display: flex; gap: 8px; }
+  .btn { padding: 8px 14px; border-radius: var(--r-md); font-size: 13px; font-weight: 600; border: 1.5px solid; cursor: pointer; }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: transparent; }
+  .btn-success { background: var(--grass-600); color: #fff; border-color: var(--grass-600); }
+
+  .annotation { background: var(--sky-50); border: 1px solid var(--sky-100); border-left: 3px solid var(--sky-500); border-radius: var(--r-md); padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: var(--sky-700); max-width: 560px; width: 100%; }
+  .annotation strong { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%;">
+
+  <div class="annotation">
+    <strong>EVO-018 / mockup nuovo:</strong> modal <code>BulkSegnaPagatoModal</code> aperto dopo click su "Segna pagati in blocco" nella bulk bar. Mostra <strong>riepilogo dei N titoli selezionati con totale aggregato</strong>, form con metodo+data+provider+note applicati a tutti, hint sync <code>PRIMA_RATA_PAGATA</code> per titoli con <code>NUMERO_RATA===1</code>. Pattern <code>AdminFormDialog</code> con <code>iconTone="grass"</code> + <code>submitVariant="success"</code>.
+  </div>
+
+  <div class="modal">
+
+    <div class="modal-header">
+      <div class="icon-circle">✓</div>
+      <div style="flex: 1; padding-right: 28px;">
+        <h2 class="modal-title">Segna pagati in blocco</h2>
+        <p class="modal-desc">Registra manualmente il pagamento di 3 titoli con lo stesso metodo e data.</p>
+      </div>
+      <button class="close">×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Context card: lista dei titoli + totale -->
+      <div class="context-card">
+        <div class="row">
+          <span class="label">3 titoli selezionati</span>
+        </div>
+        <div class="titoli-list">
+          <div class="titolo-row">
+            <div class="who">
+              <span class="avatar">MR</span>
+              <div>
+                <div style="font-weight: 600;">Marco Rossi</div>
+                <div class="what">3ª rata · #2026-0001-R3</div>
+              </div>
+            </div>
+            <span class="amount">95,00 €</span>
+          </div>
+          <div class="titolo-row">
+            <div class="who">
+              <span class="avatar">SM</span>
+              <div>
+                <div style="font-weight: 600;">Sofia Marini</div>
+                <div class="what">1ª rata · #2026-0014-R1</div>
+              </div>
+            </div>
+            <span class="amount">130,00 €</span>
+          </div>
+          <div class="titolo-row">
+            <div class="who">
+              <span class="avatar">GR</span>
+              <div>
+                <div style="font-weight: 600;">Giulia Rossi</div>
+                <div class="what">2ª rata · #2026-0042-R2</div>
+              </div>
+            </div>
+            <span class="amount">95,00 €</span>
+          </div>
+        </div>
+        <div class="total-row">
+          <span class="label-tot">Totale aggregato</span>
+          <span class="amount-tot">320,00 €</span>
+        </div>
+      </div>
+
+      <!-- Sync hint -->
+      <div class="sync-hint">
+        <span style="font-size: 14px;">ℹ️</span>
+        <span><strong>1 titolo è 1ª rata</strong> (Sofia Marini): verrà aggiornato anche <strong>PRIMA_RATA_PAGATA</strong> sulla relativa iscrizione.</span>
+      </div>
+
+      <!-- Form fields -->
+      <div class="grid-2">
+        <div class="field">
+          <label>Metodo di pagamento</label>
+          <select>
+            <option>Bonifico</option>
+            <option>Contanti</option>
+            <option>POS segreteria</option>
+            <option>App SumUp</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Provider</label>
+          <select>
+            <option>Altro / manuale</option>
+            <option>SumUp</option>
+            <option>Nexi</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Data pagamento</label>
+        <input type="datetime-local" value="2026-05-25T14:30" />
+      </div>
+
+      <div class="field">
+        <label>Note interne (opzionale)</label>
+        <input type="text" placeholder="Es: bonifico cumulativo famiglia Rossi · n. ricevuta…" />
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <p class="footer-hint">Idempotente: titoli già pagati vengono ignorati silenziosamente. Risultato: <strong>{processed} aggiornati · {skipped} ignorati</strong>.</p>
+      <div class="btn-group">
+        <button class="btn btn-ghost">Annulla</button>
+        <button class="btn btn-success">Segna 3 pagati</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
