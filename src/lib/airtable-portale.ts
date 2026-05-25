@@ -328,7 +328,10 @@ export interface Iscrizione {
   createdTime?: string;
   fields: {
     ID_ISCRIZIONE?: string;
-    STATO_ISCRIZIONE?: string; // formula: COMPLETA | INCOMPLETA
+    STATO_ISCRIZIONE?: string; // formula: COMPLETA | INCOMPLETA | ANNULLATA
+    ANNULLATA?: boolean;
+    MOTIVO_ANNULLAMENTO?: string;
+    DATA_ANNULLAMENTO?: string;
     DATA_ISCRIZIONE?: string;
     CORSO?: Corso;
     TABELLA_BAMBINI?: string[];
@@ -474,6 +477,9 @@ export async function getIscrizioneById(id: string): Promise<Iscrizione | null> 
  * Cerca un'iscrizione "in bozza" (STATO_ISCRIZIONE = INCOMPLETA) del genitore
  * per l'anno indicato. Restituisce la prima trovata (ordinata da getIscrizioniByGenitore
  * per data desc), o null.
+ *
+ * Nota: ANNULLATA (introdotto in EVO-016) NON è considerata una bozza — viene
+ * esclusa dal filtro perché un'iscrizione annullata non va riusata come draft.
  */
 export async function getIscrizioneInBozzaPerGenitore(
   genitoreId: string,
