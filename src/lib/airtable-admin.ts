@@ -8,7 +8,7 @@
  * Solo server-side. Riusa env AIRTABLE_BASE_ID + AIRTABLE_TOKEN.
  */
 
-import type { Bambino, Iscrizione, TitoloPagamento } from "@/lib/airtable-portale";
+import type { Bambino, Iscrizione, Lezione, TitoloPagamento } from "@/lib/airtable-portale";
 
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TOKEN = process.env.AIRTABLE_TOKEN;
@@ -291,4 +291,188 @@ export async function getKPIPagamentiPending(): Promise<KPIPagamentiPendingResul
   });
   const totaleImporto = titoli.reduce((sum, t) => sum + (t.fields.IMPORTO ?? 0), 0);
   return { count: titoli.length, totaleImporto };
+}
+
+// ─── Read helpers: iscrizioni & bambini ──────────────────────────────────────
+
+export interface IscrizioneAdminFilters {
+  anno?: number;
+  stato?: ("COMPLETA" | "INCOMPLETA" | "ANNULLATA" | "DEROGA")[];
+  corso?: ("MTB" | "Strada")[];
+  modulistica?: "completa" | "incompleta";
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface BambinoAdminFilters {
+  statoCert?: ("valido" | "in_scadenza" | "scaduto")[];
+  catFCI?: string[];
+  genitoreSearch?: string;
+  iscrittoAnnoCorrente?: boolean;
+  search?: string;
+}
+
+function buildIscrizioniFormula(filters: IscrizioneAdminFilters): string {
+  const conditions: string[] = [];
+
+  if (filters.anno) {
+    conditions.push(`ARRAYJOIN({ANNO_ISCRIZIONE (from TABELLA_TARIFFE)})="${filters.anno}"`);
+  }
+
+  if (filters.stato && filters.stato.length > 0) {
+    const statoConditions: string[] = [];
+    const statiReali = filters.stato.filter((s) => s !== "DEROGA");
+    if (statiReali.length > 0) {
+      statoConditions.push(
+        `OR(${statiReali.map((s) => `{STATO_ISCRIZIONE}="${s}"`).join(",")})`,
+      );
+    }
+    if (filters.stato.includes("DEROGA")) {
+      statoConditions.push(`FIND("FORZA_COMPLETA",{NOTE_ADMIN})>0`);
+    }
+    if (statoConditions.length > 0) {
+      conditions.push(`OR(${statoConditions.join(",")})`);
+    }
+  }
+
+  if (filters.corso && filters.corso.length > 0) {
+    conditions.push(`OR(${filters.corso.map((c) => `{CORSO}="${c}"`).join(",")})`);
+  }
+
+  return conditions.length > 0 ? `AND(${conditions.join(",")})` : "";
+}
+
+export async function getAllIscrizioni(filters?: IscrizioneAdminFilters): Promise<Iscrizione[]> {
+  const formula = filters ? buildIscrizioniFormula(filters) : "";
+  const iscrizioni = await fetchAllPages<Iscrizione>("TABELLA_ISCRIZIONI", {
+    filterByFormula: formula || undefined,
+    sort: [{ field: "DATA_ISCRIZIONE", direction: "desc" }],
+  });
+
+  let result = iscrizioni;
+
+  if (filters?.search) {
+    const q = filters.search.toLowerCase();
+    result = result.filter((i) => {
+      const nomeBambino = (i.fields.NOME_BAMBINO ?? "").toLowerCase();
+      const cognomeBambino = (i.fields.COGNOME_BAMBINO ?? "").toLowerCase();
+      const nomeGenitore = (i.fields.NOME_GENITORE ?? "").toLowerCase();
+      const cognomeGenitore = (i.fields.COGNOME_GENITORE ?? "").toLowerCase();
+      const id = (i.fields.ID_ISCRIZIONE ?? "").toLowerCase();
+      return (
+        nomeBambino.includes(q) ||
+        cognomeBambino.includes(q) ||
+        nomeGenitore.includes(q) ||
+        cognomeGenitore.includes(q) ||
+        id.includes(q)
+      );
+    });
+  }
+
+  if (filters?.modulistica) {
+    result = result.filter((i) => {
+      const completa =
+        !!i.fields.PRIVACY_MINORE &&
+        !!i.fields.FLAG_REGOLAMENTO &&
+        i.fields.MODULO_TRIONO_STATO === "approvato" &&
+        i.fields.MODULO_FCI_STATO === "approvato";
+      return filters.modulistica === "completa" ? completa : !completa;
+    });
+  }
+
+  return result;
+}
+
+export async function getAllBambini(filters?: BambinoAdminFilters): Promise<Bambino[]> {
+  const bambini = await fetchAllPages<Bambino>("TABELLA_BAMBINI", {
+    sort: [
+      { field: "COGNOME_BAMBINO", direction: "asc" },
+      { field: "NOME_BAMBINO", direction: "asc" },
+    ],
+  });
+
+  let result = bambini;
+
+  if (filters?.search) {
+    const q = filters.search.toLowerCase();
+    result = result.filter((b) => {
+      const nome = (b.fields.NOME_BAMBINO ?? "").toLowerCase();
+      const cognome = (b.fields.COGNOME_BAMBINO ?? "").toLowerCase();
+      const email = ((b.fields.EMAIL_GENITORE as string[] | undefined)?.[0] ?? "").toLowerCase();
+      return nome.includes(q) || cognome.includes(q) || email.includes(q);
+    });
+  }
+
+  if (filters?.statoCert && filters.statoCert.length > 0) {
+    result = result.filter((b) => {
+      const stato = b.fields.CERTIFICATO_MEDICO_STATO ?? "";
+      return filters.statoCert!.some((s) => {
+        if (s === "valido") return stato === "VALIDO";
+        if (s === "in_scadenza") return stato === "IN SCADENZA";
+        if (s === "scaduto") return stato === "SCADUTO";
+        return false;
+      });
+    });
+  }
+
+  return result;
+}
+
+export async function getIscrizioneByIdAdmin(id: string): Promise<Iscrizione | null> {
+  requireEnv();
+  const res = await fetch(`${API_BASE}/${BASE_ID}/TABELLA_ISCRIZIONI/${encodeURIComponent(id)}`, {
+    headers: { Authorization: `Bearer ${TOKEN}` },
+    cache: "no-store",
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`[airtable-admin] getIscrizioneByIdAdmin ${id}: ${res.status}`);
+  return res.json() as Promise<Iscrizione>;
+}
+
+export async function getBambinoByIdAdmin(id: string): Promise<Bambino | null> {
+  requireEnv();
+  const res = await fetch(`${API_BASE}/${BASE_ID}/TABELLA_BAMBINI/${encodeURIComponent(id)}`, {
+    headers: { Authorization: `Bearer ${TOKEN}` },
+    cache: "no-store",
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`[airtable-admin] getBambinoByIdAdmin ${id}: ${res.status}`);
+  return res.json() as Promise<Bambino>;
+}
+
+/**
+ * Iscrizioni per un bambino.
+ * USA batch fetch per ID (no ARRAYJOIN su linked records — bug EVO-006).
+ */
+export async function getIscrizioniByBambino(bambinoId: string): Promise<Iscrizione[]> {
+  const bambino = await getBambinoByIdAdmin(bambinoId);
+  if (!bambino) return [];
+  const ids = bambino.fields.TABELLA_ISCRIZIONI ?? [];
+  if (ids.length === 0) return [];
+  const conditions = ids.map((id) => `RECORD_ID()="${id}"`).join(",");
+  const formula = `OR(${conditions})`;
+  const iscrizioni = await fetchAllPages<Iscrizione>("TABELLA_ISCRIZIONI", {
+    filterByFormula: formula,
+    sort: [{ field: "DATA_ISCRIZIONE", direction: "desc" }],
+  });
+  return iscrizioni;
+}
+
+/**
+ * Lezioni per un bambino.
+ * USA batch fetch per ID (no ARRAYJOIN su linked records — bug EVO-006).
+ */
+export async function getLezioniByBambino(bambinoId: string): Promise<Lezione[]> {
+  const bambino = await getBambinoByIdAdmin(bambinoId);
+  if (!bambino) return [];
+  const ids = bambino.fields.TABELLA_LEZIONI ?? [];
+  if (ids.length === 0) return [];
+  const conditions = ids.map((id) => `RECORD_ID()="${id}"`).join(",");
+  const formula = `OR(${conditions})`;
+  const lezioni = await fetchAllPages<Lezione>("TABELLA_LEZIONI", {
+    filterByFormula: formula,
+    sort: [{ field: "DATA", direction: "desc" }],
+  });
+  return lezioni;
 }
