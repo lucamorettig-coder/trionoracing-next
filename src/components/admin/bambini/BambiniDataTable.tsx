@@ -17,10 +17,10 @@ import type { Bambino } from "@/lib/airtable-portale";
 
 interface BambiniDataTableProps {
   bambini: Bambino[];
+  anniIscrizione?: Record<string, string>;
 }
 
-
-export function BambiniDataTable({ bambini }: BambiniDataTableProps) {
+export function BambiniDataTable({ bambini, anniIscrizione = {} }: BambiniDataTableProps) {
   const columns: ColumnDef<Bambino>[] = [
     {
       key: "cognome",
@@ -87,16 +87,15 @@ export function BambiniDataTable({ bambini }: BambiniDataTableProps) {
       },
     },
     {
-      key: "iscrizioni",
-      label: "Iscrizioni",
+      key: "iscrizione",
+      label: "Iscrizione",
       sortable: true,
-      accessor: (r) => r.fields.TABELLA_ISCRIZIONI?.length ?? 0,
+      accessor: (r) => anniIscrizione[r.id] ?? "",
       align: "center",
       cellRenderer: (r) => {
-        const n = r.fields.TABELLA_ISCRIZIONI?.length ?? 0;
-        return (
-          <span className="font-mono text-[13px] text-ink-muted">{n}</span>
-        );
+        const anno = anniIscrizione[r.id];
+        if (!anno) return <span className="text-ink-muted">—</span>;
+        return <Badge variant="default" size="sm">{anno}</Badge>;
       },
     },
     {

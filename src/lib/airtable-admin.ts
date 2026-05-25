@@ -313,6 +313,30 @@ export interface BambinoAdminFilters {
   search?: string;
 }
 
+const ANNO_CORRENTE = new Date().getFullYear();
+
+export function parseIscrizioniFilters(params: URLSearchParams): IscrizioneAdminFilters {
+  const anno = params.get("anno");
+  const statoRaw = params.getAll("stato") as ("COMPLETA" | "INCOMPLETA" | "ANNULLATA" | "DEROGA")[];
+  const modulistica = params.get("modulistica") as IscrizioneAdminFilters["modulistica"];
+  const search = params.get("search") ?? undefined;
+  return {
+    anno: anno ? parseInt(anno, 10) : ANNO_CORRENTE,
+    stato: statoRaw.length > 0 ? statoRaw : undefined,
+    modulistica: modulistica || undefined,
+    search,
+  };
+}
+
+export function parseBambiniFilters(params: URLSearchParams): BambinoAdminFilters {
+  const statoCertRaw = params.getAll("statoCert") as ("valido" | "in_scadenza" | "scaduto")[];
+  const search = params.get("search") ?? undefined;
+  return {
+    statoCert: statoCertRaw.length > 0 ? statoCertRaw : undefined,
+    search,
+  };
+}
+
 function buildIscrizioniFormula(filters: IscrizioneAdminFilters): string {
   const conditions: string[] = [];
 
@@ -416,6 +440,25 @@ export async function getAllBambini(filters?: BambinoAdminFilters): Promise<Bamb
     });
   }
 
+  return result;
+}
+
+/** Returns the most recent iscrizione year per bambino record ID. */
+export async function getBambiniAnniIscrizione(): Promise<Record<string, string>> {
+  type MinimalIscrizione = { id: string; fields: { TABELLA_BAMBINI?: string[]; "ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"?: string[] } };
+  const records = await fetchAllPages<MinimalIscrizione>("TABELLA_ISCRIZIONI", {
+    fields: ["TABELLA_BAMBINI", "ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"],
+  });
+  const result: Record<string, string> = {};
+  for (const r of records) {
+    const bambinoId = r.fields.TABELLA_BAMBINI?.[0];
+    const anno = r.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0];
+    if (!bambinoId || !anno) continue;
+    const existing = result[bambinoId];
+    if (!existing || parseInt(anno, 10) > parseInt(existing, 10)) {
+      result[bambinoId] = anno;
+    }
+  }
   return result;
 }
 

@@ -49,12 +49,9 @@ export function ModulisticaIcons({
         const status = values[key];
         const title = `${label}: ${LABEL[status]}`;
         return (
-          <Icon
-            key={key}
-            size={sizePx}
-            className={cn(TONE[status])}
-            aria-label={title}
-          />
+          <span key={key} title={title} className="inline-flex">
+            <Icon size={sizePx} className={cn(TONE[status])} aria-hidden />
+          </span>
         );
       })}
     </div>

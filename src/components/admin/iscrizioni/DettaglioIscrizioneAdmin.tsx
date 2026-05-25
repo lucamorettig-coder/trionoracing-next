@@ -12,6 +12,7 @@ import {
   ExternalLink,
   ShieldOff,
   Zap,
+  ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -146,7 +147,14 @@ export function DettaglioIscrizioneAdmin({ iscrizione, titoli }: Props) {
   };
 
   return (
-    <>
+    <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-12 lg:py-16">
+      <Link
+        href="/portale/admin/iscrizioni"
+        className="inline-flex items-center gap-1.5 text-[13px] text-ink-muted hover:text-ink mb-6"
+      >
+        <ArrowLeft size={14} />
+        Torna alla lista iscrizioni
+      </Link>
       {/* Header iscrizione */}
       <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
         <div>
@@ -443,6 +451,6 @@ export function DettaglioIscrizioneAdmin({ iscrizione, titoli }: Props) {
           titolo={titoloPerSegna}
         />
       )}
-    </>
+    </div>
   );
 }

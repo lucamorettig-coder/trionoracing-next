@@ -388,17 +388,17 @@ export function certBadgeVariant(
   if (stato === "VALIDO" || (!stato && scadenza)) {
     if (scadenza) {
       const days = daysUntil(scadenza);
-      if (days < 0) return { variant: "error", label: `Scaduto il ${formatDateIT(scadenza)}` };
-      if (days <= 30) return { variant: "warning", label: `In scadenza il ${formatDateIT(scadenza)}` };
-      return { variant: "success", label: `Valido fino al ${formatDateIT(scadenza)}` };
+      if (days < 0) return { variant: "error", label: `Cert. scaduto (${formatDateIT(scadenza)})` };
+      if (days <= 30) return { variant: "warning", label: `Cert. in scadenza (${formatDateIT(scadenza)})` };
+      return { variant: "success", label: `Cert. valido al ${formatDateIT(scadenza)}` };
     }
     return { variant: "success", label: "Certificato valido" };
   }
   if (stato === "SCADUTO") {
-    return { variant: "error", label: scadenza ? `Scaduto il ${formatDateIT(scadenza)}` : "Certificato scaduto" };
+    return { variant: "error", label: scadenza ? `Cert. scaduto (${formatDateIT(scadenza)})` : "Certificato scaduto" };
   }
   if (stato === "IN_SCADENZA") {
-    return { variant: "warning", label: scadenza ? `In scadenza il ${formatDateIT(scadenza)}` : "In scadenza" };
+    return { variant: "warning", label: scadenza ? `Cert. in scadenza (${formatDateIT(scadenza)})` : "Cert. in scadenza" };
   }
   return { variant: "warning", label: "Certificato mancante" };
 }

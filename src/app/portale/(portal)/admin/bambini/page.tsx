@@ -3,7 +3,8 @@ import { requireAdmin } from "@/lib/auth-admin";
 import { getAllBambini } from "@/lib/airtable-admin";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { ExportCSVButton } from "@/components/admin/ExportCSVButton";
-import { BambiniFilters, parseBambiniFilters } from "@/components/admin/bambini/BambiniFilters";
+import { BambiniFilters } from "@/components/admin/bambini/BambiniFilters";
+import { parseBambiniFilters, getBambiniAnniIscrizione } from "@/lib/airtable-admin";
 import { BambiniDataTable } from "@/components/admin/bambini/BambiniDataTable";
 
 async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
@@ -23,7 +24,10 @@ export default async function BambiniAdminPage({
     ),
   );
   const filters = parseBambiniFilters(urlSearchParams);
-  const bambini = await safe(() => getAllBambini(filters), []);
+  const [bambini, anniIscrizione] = await Promise.all([
+    safe(() => getAllBambini(filters), []),
+    safe(() => getBambiniAnniIscrizione(), {}),
+  ]);
 
   return (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-12 lg:py-16">
@@ -43,7 +47,7 @@ export default async function BambiniAdminPage({
           <BambiniFilters initial={filters} />
         </Suspense>
       </div>
-      <BambiniDataTable bambini={bambini} />
+      <BambiniDataTable bambini={bambini} anniIscrizione={anniIscrizione} />
     </div>
   );
 }

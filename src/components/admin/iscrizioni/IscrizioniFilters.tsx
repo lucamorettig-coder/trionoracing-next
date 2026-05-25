@@ -16,25 +16,6 @@ const STATI = [
   { value: "DEROGA", label: "Completata in deroga" },
 ] as const;
 
-const CORSI = [
-  { value: "MTB", label: "MTB" },
-  { value: "Strada", label: "Strada" },
-] as const;
-
-export function parseIscrizioniFilters(params: URLSearchParams): IscrizioneAdminFilters {
-  const anno = params.get("anno");
-  const statoRaw = params.getAll("stato") as ("COMPLETA" | "INCOMPLETA" | "ANNULLATA" | "DEROGA")[];
-  const corsoRaw = params.getAll("corso") as ("MTB" | "Strada")[];
-  const modulistica = params.get("modulistica") as IscrizioneAdminFilters["modulistica"];
-  const search = params.get("search") ?? undefined;
-  return {
-    anno: anno ? parseInt(anno, 10) : ANNO_CORRENTE,
-    stato: statoRaw.length > 0 ? statoRaw : undefined,
-    corso: corsoRaw.length > 0 ? corsoRaw : undefined,
-    modulistica: modulistica || undefined,
-    search,
-  };
-}
 
 interface IscrizioniFiltersProps {
   initial: IscrizioneAdminFilters;
@@ -69,7 +50,6 @@ export function IscrizioniFilters({ initial }: IscrizioniFiltersProps) {
   const hasFilters =
     (initial.anno && initial.anno !== ANNO_CORRENTE) ||
     (initial.stato && initial.stato.length > 0) ||
-    (initial.corso && initial.corso.length > 0) ||
     initial.modulistica ||
     initial.search;
 
@@ -81,7 +61,6 @@ export function IscrizioniFilters({ initial }: IscrizioniFiltersProps) {
   }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const statiAttivi = initial.stato ?? [];
-  const corsiAttivi = initial.corso ?? [];
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -107,25 +86,6 @@ export function IscrizioniFilters({ initial }: IscrizioniFiltersProps) {
             className={cn(
               "h-9 px-3 text-[13px] font-medium border rounded-[var(--radius-md)] transition-colors",
               statiAttivi.includes(value as typeof statiAttivi[number])
-                ? "bg-navy-700 text-white border-navy-700"
-                : "bg-white text-ink-muted border-line hover:border-navy-700 hover:text-ink",
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* Corso */}
-      <div className="flex items-center gap-1">
-        {CORSI.map(({ value, label }) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => toggleMultiParam("corso", value)}
-            className={cn(
-              "h-9 px-3 text-[13px] font-medium border rounded-[var(--radius-md)] transition-colors",
-              corsiAttivi.includes(value as typeof corsiAttivi[number])
                 ? "bg-navy-700 text-white border-navy-700"
                 : "bg-white text-ink-muted border-line hover:border-navy-700 hover:text-ink",
             )}

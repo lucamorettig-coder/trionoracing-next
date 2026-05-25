@@ -12,14 +12,6 @@ const STATI_CERT = [
   { value: "scaduto", label: "Scaduto" },
 ] as const;
 
-export function parseBambiniFilters(params: URLSearchParams): BambinoAdminFilters {
-  const statoCertRaw = params.getAll("statoCert") as ("valido" | "in_scadenza" | "scaduto")[];
-  const search = params.get("search") ?? undefined;
-  return {
-    statoCert: statoCertRaw.length > 0 ? statoCertRaw : undefined,
-    search,
-  };
-}
 
 interface BambiniFiltersProps {
   initial: BambinoAdminFilters;

@@ -3,7 +3,8 @@ import { requireAdmin } from "@/lib/auth-admin";
 import { getAllIscrizioni } from "@/lib/airtable-admin";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { ExportCSVButton } from "@/components/admin/ExportCSVButton";
-import { IscrizioniFilters, parseIscrizioniFilters } from "@/components/admin/iscrizioni/IscrizioniFilters";
+import { IscrizioniFilters } from "@/components/admin/iscrizioni/IscrizioniFilters";
+import { parseIscrizioniFilters } from "@/lib/airtable-admin";
 import { IscrizioniDataTable } from "@/components/admin/iscrizioni/IscrizioniDataTable";
 
 async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {

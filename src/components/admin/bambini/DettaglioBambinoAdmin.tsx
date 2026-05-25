@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowLeft, User, FileText, Calendar, MapPin, Hash, Mail, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { certBadgeVariant, formatDateIT } from "@/lib/portale-utils";
+import { certBadgeVariant, formatDateIT, formatEUR } from "@/lib/portale-utils";
 import { calcCategoriaFCI } from "@/lib/airtable-portale";
 import type { Bambino, Iscrizione } from "@/lib/airtable-portale";
 import { EliminaBambinoButton } from "./EliminaBambinoButton";
@@ -142,11 +142,12 @@ export function DettaglioBambinoAdmin({ bambino, iscrizioni }: Props) {
                     <div key={isc.id} className="flex items-center justify-between gap-4 py-3">
                       <div>
                         <p className="text-[13.5px] font-medium text-ink">
-                          {isc.fields.CORSO ?? "—"} {anno ? `· ${anno}` : ""}
+                          {isc.fields.CORSO ?? "Iscrizione"} {anno ? `· ${anno}` : ""}
                         </p>
                         {isc.fields.DATA_ISCRIZIONE && (
                           <p className="text-[12px] text-ink-muted mt-0.5">
                             Iscritta il {new Date(isc.fields.DATA_ISCRIZIONE).toLocaleDateString("it-IT")}
+                            {isc.fields.IMPORTO_FINALE_ANNUO != null && ` · ${formatEUR(isc.fields.IMPORTO_FINALE_ANNUO)}`}
                           </p>
                         )}
                       </div>
