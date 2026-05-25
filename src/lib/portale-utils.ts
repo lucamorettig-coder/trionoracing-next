@@ -8,11 +8,12 @@ export interface StatoIscrizioneBadge {
 
 /**
  * Mappa STATO_ISCRIZIONE (formula Airtable) → badge UI.
- * Valori reali: COMPLETA | INCOMPLETA. Per coerenza UX usiamo etichette italiane comprensibili.
+ * Valori reali: COMPLETA | INCOMPLETA | ANNULLATA. Per coerenza UX usiamo etichette italiane comprensibili.
  */
 export function statoIscrizioneBadge(stato?: string): StatoIscrizioneBadge {
   const s = (stato ?? "").toUpperCase();
   if (s === "COMPLETA") return { variant: "success", label: "Attiva" };
+  if (s === "ANNULLATA") return { variant: "error", label: "Annullata" };
   if (s === "INCOMPLETA") return { variant: "warning", label: "Da completare" };
   return { variant: "neutral", label: "Bozza" };
 }
@@ -171,6 +172,7 @@ export function getStatoIscrizioneAnnoCorrente(
       i.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0] === anno,
   );
   if (!match) return { stato: 'non_iscritto' };
+  if (match.fields.STATO_ISCRIZIONE === "ANNULLATA") return { stato: 'non_iscritto' };
   if (match.fields.STATO_ISCRIZIONE === "COMPLETA") return { stato: 'iscritto', iscrizioneId: match.id };
   return { stato: 'da_completare', iscrizioneId: match.id };
 }
