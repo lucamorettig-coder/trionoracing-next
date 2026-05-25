@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Iscrizioni gara · Admin · Triono Racing — MVP EVO-019</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --navy-50:  #EEF1FA;
+    --navy-100: #D6DDF0;
+    --navy-200: #ADBAE0;
+    --navy-300: #7889C7;
+    --navy-500: #3C4F94;
+    --navy-700: #1F2D5A;
+    --navy-800: #131E47;
+    --navy-900: #050E3F;
+
+    --sky-100: #E4F0FB;
+    --sky-500: #3A82C8;
+    --sky-700: #1E5A95;
+
+    --grass-100: #E8F4DE;
+    --grass-300: #B0D894;
+    --grass-500: #5FAC36;
+    --grass-700: #3F7A1F;
+
+    --ember-100: #FCEFD6;
+    --ember-300: #F4C474;
+    --ember-500: #E09618;
+    --ember-700: #8B5A0E;
+
+    --flag-100: #FBDADA;
+    --flag-300: #E68585;
+    --flag-500: #C01818;
+    --flag-700: #8A0F0F;
+
+    --sun-100: #FDFBC9;
+    --sun-500: #EFE63A;
+    --sun-700: #B5A926;
+
+    --ink: #0F1729;
+    --ink-muted: #5B6478;
+    --line: #E4E7EE;
+    --line-soft: #EEF0F4;
+    --bg-soft: #F7F8FB;
+    --bg-muted: #ECEEF3;
+
+    --f-sans: 'Inter', system-ui, sans-serif;
+    --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: var(--f-sans); color: var(--ink); background: var(--bg-soft); font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+  /* NAVBAR */
+  .navbar { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+  .nav-inner { max-width: 1280px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 24px; }
+  .nav-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+  .nav-logo-mark { width: 36px; height: 36px; background: var(--sun-500); color: var(--navy-900); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
+  .nav-logo-eyebrow { font-family: var(--f-mono); font-size: 9.5px; font-weight: 700; color: var(--sun-700); letter-spacing: 0.12em; text-transform: uppercase; line-height: 1; margin-bottom: 3px; }
+  .nav-logo-text { font-weight: 700; font-size: 15px; color: var(--ink); letter-spacing: -0.01em; line-height: 1.1; }
+  .nav-links { flex: 1; display: flex; gap: 2px; align-items: center; overflow-x: auto; }
+  .nav-link { text-decoration: none; padding: 7px 11px; border-radius: 7px; color: var(--ink-muted); font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .nav-link.active { background: var(--navy-50); color: var(--navy-700); font-weight: 600; }
+  .nav-actions { display: inline-flex; align-items: center; gap: 8px; }
+  .nav-iconbtn { width: 36px; height: 36px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-muted); cursor: pointer; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+
+  /* BREADCRUMB */
+  .breadcrumb { max-width: 1280px; margin: 0 auto; padding: 16px 24px 0; font-size: 12.5px; color: var(--ink-muted); display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--ink-muted); text-decoration: none; }
+  .breadcrumb .sep { color: var(--line); }
+  .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+  /* PAGE CONTAINER */
+  .page-container { max-width: 1280px; margin: 0 auto; padding: 24px 24px 64px; position: relative; }
+
+  /* HEADER */
+  .adm-eyebrow { font-family: var(--f-mono); font-size: 10.5px; color: var(--sun-700); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px; }
+  .adm-page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+  .adm-page-h1 { font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.02em; color: var(--ink); }
+  .adm-page-h1 .gara-name { color: var(--navy-700); }
+  .adm-page-sub { font-size: 14px; color: var(--ink-muted); margin: 6px 0 0; line-height: 1.5; display: inline-flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .adm-page-sub .meta-item { display: inline-flex; align-items: center; gap: 5px; }
+  .adm-page-sub .counter { font-family: var(--f-mono); font-size: 13px; background: var(--bg-muted); padding: 3px 8px; border-radius: 6px; color: var(--ink); font-weight: 500; }
+  .adm-page-actions { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; text-decoration: none; height: 36px; }
+  .btn-primary { background: var(--navy-700); color: #fff; border-color: var(--navy-700); }
+  .btn-outline { background: #fff; color: var(--ink); border-color: var(--line); }
+  .btn-success { background: var(--grass-500); color: #fff; border-color: var(--grass-500); }
+  .btn-danger { background: var(--flag-500); color: #fff; border-color: var(--flag-500); }
+  .btn-ghost { background: transparent; color: var(--ink-muted); border-color: transparent; }
+  .btn-sm { height: 32px; padding: 6px 11px; font-size: 12.5px; }
+
+  /* FILTERS */
+  .adm-filters {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .adm-filter {
+    background: var(--bg-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 12px; color: var(--ink-muted);
+    display: inline-flex; align-items: center; gap: 6px;
+    cursor: pointer;
+  }
+  .adm-filter .label { color: var(--ink-muted); font-weight: 500; }
+  .adm-filter.active {
+    background: var(--navy-700); color: #fff;
+    border-color: var(--navy-700);
+  }
+  .adm-filter.active .label { color: rgba(255,255,255,0.7); }
+  .adm-filter .clear { display: inline-flex; cursor: pointer; }
+  .adm-search { flex: 1; display: flex; align-items: center; gap: 8px; background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: 8px; padding: 7px 12px; min-width: 220px; }
+  .adm-search input { flex: 1; border: none; outline: none; background: transparent; font-size: 13px; }
+  .adm-search .ico { color: var(--ink-muted); display: inline-flex; }
+  .adm-results-count { font-family: var(--f-mono); font-size: 12px; color: var(--ink-muted); }
+
+  /* BULK ACTION BAR */
+  .adm-bulk {
+    background: var(--navy-700); color: #fff;
+    border-radius: 12px;
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 6px 18px rgba(31,45,90,0.15);
+  }
+  .adm-bulk .count {
+    font-weight: 700; font-size: 13px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .adm-bulk .count .pill {
+    background: var(--sun-500); color: var(--navy-900);
+    padding: 2px 8px; border-radius: 6px;
+    font-family: var(--f-mono); font-size: 11.5px;
+  }
+  .adm-bulk-actions { margin-left: auto; display: inline-flex; gap: 6px; align-items: center; }
+  .adm-bulk-actions .btn { font-size: 12.5px; height: 32px; }
+  .adm-bulk-close {
+    background: rgba(255,255,255,0.1);
+    border: none; color: #fff;
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; margin-left: 4px;
+  }
+
+  /* TABLE */
+  .adm-table-wrap { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(15,23,42,0.06); }
+  .adm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .adm-table thead th { background: var(--bg-soft); padding: 11px 14px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); text-align: left; border-bottom: 1px solid var(--line); }
+  .adm-table tbody td { padding: 12px 14px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+  .adm-table tbody tr.selected { background: var(--navy-50); }
+  .adm-table tbody tr:last-child td { border-bottom: none; }
+
+  .cell-person { display: inline-flex; align-items: center; gap: 10px; }
+  .cell-person .photo {
+    width: 32px; height: 32px;
+    background: var(--navy-100); color: var(--navy-700);
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 11px;
+  }
+  .cell-person .name { font-weight: 600; color: var(--ink); font-size: 13px; }
+  .cell-person .meta { font-size: 11px; color: var(--ink-muted); display: inline-flex; align-items: center; gap: 6px; margin-top: 2px; }
+  .cell-link { color: var(--navy-700); text-decoration: none; font-weight: 500; }
+  .cell-link:hover { text-decoration: underline; }
+  .cell-email { font-size: 11px; color: var(--ink-muted); display: block; margin-top: 2px; }
+  .cell-email:hover { color: var(--navy-700); }
+
+  .date-time {
+    font-family: var(--f-mono); font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .date-time .sub { color: var(--ink-muted); display: block; font-size: 11px; }
+
+  .note-genitore {
+    font-style: italic; color: var(--ink-muted);
+    font-size: 12px;
+    max-width: 200px;
+    overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 6px;
+    font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .badge-neutral { background: var(--bg-muted); color: var(--ink); }
+  .badge-success { background: var(--grass-100); color: var(--grass-700); }
+  .badge-warning { background: var(--ember-100); color: var(--ember-700); }
+  .badge-error   { background: var(--flag-100); color: var(--flag-700); }
+  .badge-info    { background: var(--sky-100); color: var(--sky-700); }
+  .badge-fci     { background: var(--sun-500); color: var(--navy-900); font-size: 9.5px; padding: 2px 6px; }
+
+  .cell-action-btn { width: 28px; height: 28px; background: transparent; border: 1px solid transparent; border-radius: 6px; cursor: pointer; color: var(--ink-muted); display: inline-flex; align-items: center; justify-content: center; }
+  .cell-action-btn:hover { background: var(--bg-soft); border-color: var(--line); color: var(--ink); }
+  .cell-action-btn[disabled] { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+
+  input[type="checkbox"] { accent-color: var(--navy-700); width: 15px; height: 15px; cursor: pointer; }
+
+  /* MODAL OVERLAY */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(5,14,63,0.42);
+    backdrop-filter: blur(2px);
+    z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal {
+    background: #fff;
+    border-radius: 18px;
+    width: 100%; max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+  }
+  .modal-head {
+    padding: 22px 24px 16px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .modal-icon {
+    width: 44px; height: 44px;
+    background: var(--grass-100); color: var(--grass-700);
+    border-radius: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .modal-title { font-size: 17px; font-weight: 700; color: var(--ink); margin: 0 0 4px; letter-spacing: -0.01em; }
+  .modal-close {
+    margin-left: auto;
+    background: transparent; border: none;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    color: var(--ink-muted); cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .modal-close:hover { background: var(--bg-soft); color: var(--ink); }
+  .modal-body {
+    padding: 0 24px 16px;
+    font-size: 14px; color: var(--ink); line-height: 1.55;
+  }
+  .modal-body strong { color: var(--navy-700); font-weight: 700; }
+
+  .modal-toggle-row {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    display: flex; align-items: flex-start; gap: 10px;
+    opacity: 0.7;
+  }
+  .modal-toggle-row .switch-mini {
+    width: 36px; height: 20px;
+    background: var(--grass-500);
+    border-radius: 999px; position: relative;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .modal-toggle-row .switch-mini::after {
+    content: ''; position: absolute;
+    top: 2px; left: 18px;
+    width: 16px; height: 16px;
+    background: #fff; border-radius: 50%;
+  }
+  .modal-toggle-text .toggle-label {
+    font-size: 13px; font-weight: 600; color: var(--ink);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .modal-toggle-text .toggle-sub { font-size: 11.5px; color: var(--ink-muted); margin-top: 3px; line-height: 1.4; }
+
+  .modal-footer {
+    padding: 16px 24px 22px;
+    display: flex; gap: 8px; justify-content: flex-end;
+    background: var(--bg-soft);
+    border-top: 1px solid var(--line-soft);
+  }
+
+  /* ANNOTATIONS */
+  .annotations { margin-top: 40px; background: var(--bg-muted); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; }
+  .annotations h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-muted); font-weight: 700; margin: 0 0 12px; }
+  .annotations ol { list-style: decimal; margin: 0; padding-left: 24px; font-size: 13px; color: var(--ink); line-height: 1.6; }
+  .annotations ol li { margin-bottom: 6px; }
+  .annotations strong { color: var(--navy-700); font-weight: 700; }
+  .annotations code { font-family: var(--f-mono); background: #fff; padding: 1px 5px; border-radius: 4px; font-size: 12px; color: var(--flag-700); }
+</style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-mark">T</div>
+        <div>
+          <div class="nav-logo-eyebrow">Area Admin</div>
+          <div class="nav-logo-text">Triono Racing · Gestione</div>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="#" class="nav-link">Dashboard</a>
+        <a href="#" class="nav-link">Iscrizioni</a>
+        <a href="#" class="nav-link">Bambini</a>
+        <a href="#" class="nav-link">Pagamenti</a>
+        <a href="#" class="nav-link active">Gare</a>
+        <a href="#" class="nav-link">Lezioni</a>
+        <a href="#" class="nav-link">Presenze maestri</a>
+        <a href="#" class="nav-link">Genitori</a>
+        <a href="#" class="nav-link">Tariffe</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <span class="avatar" style="background:var(--sun-500);color:var(--navy-900)">AM</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="#">Admin</a><span class="sep">/</span>
+    <a href="#">Gare</a><span class="sep">/</span>
+    <a href="#">Trofeo Don Bosco</a><span class="sep">/</span>
+    <span class="current">Iscrizioni</span>
+  </div>
+
+  <!-- PAGE CONTENT -->
+  <main class="page-container">
+
+    <!-- AdminPageHeader -->
+    <div>
+      <div class="adm-eyebrow">Area Admin</div>
+      <div class="adm-page-head">
+        <div>
+          <h1 class="adm-page-h1">
+            Iscrizioni a <span class="gara-name">Trofeo Don Bosco</span>
+          </h1>
+          <p class="adm-page-sub">
+            <span class="meta-item">
+              <i data-lucide="calendar" style="width:13px;height:13px"></i>
+              Domenica 12/04/2026
+            </span>
+            <span class="meta-item">
+              <i data-lucide="map-pin" style="width:13px;height:13px"></i>
+              Foligno (PG)
+            </span>
+            <span class="counter">8 richieste · 3 confermate · 5 in attesa</span>
+          </p>
+        </div>
+        <div class="adm-page-actions">
+          <button class="btn btn-outline">
+            <i data-lucide="download" style="width:14px;height:14px"></i>
+            Esporta CSV
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="adm-filters">
+      <button class="adm-filter active">
+        <span class="label">Stato</span>Richiesta
+        <span class="clear"><i data-lucide="x" style="width:9px;height:9px"></i></span>
+      </button>
+      <button class="adm-filter">
+        <span class="label">Stato</span>Tutti
+        <i data-lucide="chevron-down" style="width:12px;height:12px"></i>
+      </button>
+      <div class="adm-search">
+        <span class="ico"><i data-lucide="search" style="width:14px;height:14px"></i></span>
+        <input type="text" placeholder="Cerca per bambino o genitore..." />
+      </div>
+      <span class="adm-results-count">8 / 8</span>
+    </div>
+
+    <!-- BULK ACTION BAR -->
+    <div class="adm-bulk">
+      <input type="checkbox" checked />
+      <span class="count">
+        <span class="pill">3</span>
+        selezionate
+      </span>
+      <div class="adm-bulk-actions">
+        <button class="btn btn-success btn-sm">
+          <i data-lucide="check" style="width:13px;height:13px"></i>
+          Approva selezionate (3)
+        </button>
+        <button class="btn btn-danger btn-sm">
+          <i data-lucide="x" style="width:13px;height:13px"></i>
+          Rifiuta selezionate (3)
+        </button>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.2)">
+          <i data-lucide="download" style="width:13px;height:13px"></i>
+          Esporta selezionate
+        </button>
+        <button class="adm-bulk-close" title="Annulla selezione">
+          <i data-lucide="x" style="width:14px;height:14px"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- DATATABLE -->
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th style="width:36px"><input type="checkbox" /></th>
+            <th>Bambino</th>
+            <th>Genitore</th>
+            <th style="width:140px">Data richiesta</th>
+            <th style="width:120px">Stato</th>
+            <th>Note genitore</th>
+            <th style="width:60px"></th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- 3 RICHIESTA (selected) -->
+          <tr class="selected">
+            <td><input type="checkbox" checked /></td>
+            <td>
+              <div class="cell-person">
+                <div class="photo">MR</div>
+                <div>
+                  <div class="name">Marco Rossi</div>
+                  <div class="meta">10 anni · <span class="badge badge-fci">G3</span></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <a href="#" class="cell-link">Luca Rossi</a>
+              <a href="mailto:luca.rossi@email.it" class="cell-email">luca.rossi@email.it</a>
+            </td>
+            <td class="date-time">12/04/2026<span class="sub">14:32</span></td>
+            <td><span class="badge badge-warning">Richiesta</span></td>
+            <td><span class="note-genitore">Marco si è già allenato sul percorso, è pronto!</span></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr class="selected">
+            <td><input type="checkbox" checked /></td>
+            <td>
+              <div class="cell-person">
+                <div class="photo">TG</div>
+                <div>
+                  <div class="name">Tommaso Greco</div>
+                  <div class="meta">9 anni · <span class="badge badge-fci">G4</span></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <a href="#" class="cell-link">Marco Greco</a>
+              <a href="mailto:marco.greco@email.it" class="cell-email">marco.greco@email.it</a>
+            </td>
+            <td class="date-time">11/04/2026<span class="sub">09:14</span></td>
+            <td><span class="badge badge-warning">Richiesta</span></td>
+            <td><span class="note-genitore">—</span></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr class="selected">
+            <td><input type="checkbox" checked /></td>
+            <td>
+              <div class="cell-person">
+                <div class="photo">AC</div>
+                <div>
+                  <div class="name">Alice Costantini</div>
+                  <div class="meta">7 anni · <span class="badge badge-fci">G5</span></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <a href="#" class="cell-link">Sara Costantini</a>
+              <a href="mailto:sara.costantini@email.it" class="cell-email">sara.costantini@email.it</a>
+            </td>
+            <td class="date-time">10/04/2026<span class="sub">18:47</span></td>
+            <td><span class="badge badge-warning">Richiesta</span></td>
+            <td><span class="note-genitore">Prima gara, conferma se serve carry-on rim...</span></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <!-- 3 CONFERMATE -->
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td>
+              <div class="cell-person">
+                <div class="photo">GR</div>
+                <div>
+                  <div class="name">Giulia Rossi</div>
+                  <div class="meta">7 anni · <span class="badge badge-fci">G3</span></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <a href="#" class="cell-link">Luca Rossi</a>
+              <a href="mailto:luca.rossi@email.it" class="cell-email">luca.rossi@email.it</a>
+            </td>
+            <td class="date-time">08/04/2026<span class="sub">11:23</span></td>
+            <td><span class="badge badge-success">Confermata</span></td>
+            <td><span class="note-genitore">—</span></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td>
+              <div class="cell-person">
+                <div class="photo">LB</div>
+                <div>
+                  <div class="name">Luca Bianchi</div>
+                  <div class="meta">8 anni · <span class="badge badge-fci">G3</span></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <a href="#" class="cell-link">Anna Bianchi</a>
+              <a href="mailto:anna.bianchi@email.it" class="cell-email">anna.bianchi@email.it</a>
+            </td>
+            <td class="date-time">07/04/2026<span class="sub">20:11</span></td>
+            <td><span class="badge badge-success">Confermata</span></td>
+            <td><span class="note-genitore">Verrà accompagnato dal nonno</span></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td>
+              <div class="cell-person">
+                <div class="photo">SM</div>
+                <div>
+                  <div class="name">Sofia Marini</div>
+                  <div class="meta">11 anni · <span class="badge badge-fci">G2</span></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <a href="#" class="cell-link">Anna Marini</a>
+              <a href="mailto:anna.marini@email.it" class="cell-email">anna.marini@email.it</a>
+            </td>
+            <td class="date-time">06/04/2026<span class="sub">16:02</span></td>
+            <td><span class="badge badge-success">Confermata</span></td>
+            <td><span class="note-genitore">—</span></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <!-- RIFIUTATA -->
+          <tr style="opacity:0.6">
+            <td><input type="checkbox" /></td>
+            <td>
+              <div class="cell-person">
+                <div class="photo">EP</div>
+                <div>
+                  <div class="name">Edoardo Pini</div>
+                  <div class="meta">11 anni · <span class="badge badge-fci">G2</span></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <a href="#" class="cell-link">Lara Pini</a>
+              <a href="mailto:lara.pini@email.it" class="cell-email">lara.pini@email.it</a>
+            </td>
+            <td class="date-time">05/04/2026<span class="sub">12:48</span></td>
+            <td><span class="badge badge-error">Rifiutata</span></td>
+            <td><span class="note-genitore">Certificato medico scaduto</span></td>
+            <td>
+              <button class="cell-action-btn" disabled><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <!-- RITIRATA -->
+          <tr style="opacity:0.55">
+            <td><input type="checkbox" /></td>
+            <td>
+              <div class="cell-person">
+                <div class="photo">FR</div>
+                <div>
+                  <div class="name">Filippo Ricci</div>
+                  <div class="meta">10 anni · <span class="badge badge-fci">G3</span></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <a href="#" class="cell-link">Sandra Ricci</a>
+              <a href="mailto:sandra.ricci@email.it" class="cell-email">sandra.ricci@email.it</a>
+            </td>
+            <td class="date-time">04/04/2026<span class="sub">10:31</span></td>
+            <td><span class="badge badge-neutral">Ritirata</span></td>
+            <td><span class="note-genitore">Infortunio al ginocchio, ci dispiace</span></td>
+            <td>
+              <button class="cell-action-btn" disabled><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Annotations -->
+    <div class="annotations">
+      <h3>Note di design · scope MVP EVO-019</h3>
+      <ol>
+        <li><strong>BulkActionBar</strong> (pattern riuso EVO-016): visibile quando ≥1 riga selezionata. Bottoni <em>Approva selezionate</em> (grass) e <em>Rifiuta selezionate</em> (flag). Max bulk = batch 10 PATCH Airtable per chiamata.</li>
+        <li><strong>Toggle "Notifica email"</strong> presente in UI ma <em>inerte in MVP</em>: il toggle è solo placeholder visivo, le notifiche vere verranno gestite in evolutiva futura. Disabled checked con tooltip esplicativo.</li>
+        <li><strong>Rifiuto secco</strong>: niente campo motivo nella modal (scope MVP — il F3 mostrava <code>MOTIVO_RIFIUTO</code>, da ignorare).</li>
+        <li><strong>Modal pattern</strong>: <code>AdminFormDialog</code> riuso EVO-017. Icon grass per approvazione, icon flag per rifiuto. Toggle inerte come placeholder per evolutiva notifiche.</li>
+        <li><strong>Filtri stato + search + counter</strong> parsabili server-side via <code>parseGaraIscrizioniFilters()</code> helper (pattern coerente con altre liste admin EVO-016/017/018). Stati possibili: All / Richiesta / Confermata / Rifiutata / Ritirata.</li>
+      </ol>
+    </div>
+
+  </main>
+
+  <!-- ===== MODAL APPROVA (overlay visible) ===== -->
+  <div class="modal-overlay">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-icon">
+          <i data-lucide="check" style="width:22px;height:22px"></i>
+        </div>
+        <div style="flex:1">
+          <h2 class="modal-title">Approva iscrizione</h2>
+        </div>
+        <button class="modal-close" title="Chiudi">
+          <i data-lucide="x" style="width:16px;height:16px"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p style="margin:0">
+          Confermi l'iscrizione di <strong>Marco Rossi</strong> (G3) alla gara <strong>Trofeo Don Bosco</strong> del 12/04/2026?
+        </p>
+
+        <div class="modal-toggle-row">
+          <div class="switch-mini"></div>
+          <div class="modal-toggle-text">
+            <div class="toggle-label">
+              <i data-lucide="mail" style="width:13px;height:13px"></i>
+              Notifica genitore via email
+            </div>
+            <div class="toggle-sub">Non attivo in MVP — il toggle è solo placeholder, le notifiche verranno gestite in evolutiva futura.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline">Annulla</button>
+        <button class="btn btn-success">
+          <i data-lucide="check" style="width:14px;height:14px"></i>
+          Conferma approvazione
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

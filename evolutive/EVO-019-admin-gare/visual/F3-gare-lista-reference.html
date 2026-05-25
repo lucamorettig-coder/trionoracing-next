@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gare · Admin · Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+.adm-gara-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@container page (min-width: 720px) { .adm-gara-grid { grid-template-columns: 1fr 1fr; } }
+@container page (min-width: 1100px) { .adm-gara-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.gara-card {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: var(--sh-sm);
+  position: relative;
+}
+.gara-card.featured { border-color: var(--sun-500); border-width: 2px; }
+.gara-card.draft { border-style: dashed; opacity: 0.85; }
+
+.gara-card-img {
+  height: 100px;
+  position: relative;
+  overflow: hidden;
+}
+.gara-card-img-ph {
+  background-color: var(--navy-800);
+  background-image: url('../assets/pattern.svg');
+  background-size: 160px 160px;
+  background-repeat: repeat;
+  height: 100%;
+}
+.gara-card-img .featured-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: var(--sun-500); color: var(--navy-900);
+  font-family: var(--f-mono); font-size: 10px; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.gara-card-img .date-overlay {
+  position: absolute; bottom: 10px; right: 10px;
+  background: rgba(255,255,255,0.92);
+  color: var(--navy-900);
+  padding: 6px 10px;
+  border-radius: 8px;
+  text-align: center;
+  font-family: var(--f-mono);
+  line-height: 1.1;
+}
+.gara-card-img .date-overlay .d { font-size: 18px; font-weight: 800; }
+.gara-card-img .date-overlay .m { font-size: 10px; opacity: 0.7; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; }
+
+.gara-card-body { padding: 14px 16px; flex: 1; }
+.gara-card-title {
+  font-size: 15px; font-weight: 700;
+  color: var(--ink); letter-spacing: -0.005em;
+  margin: 0 0 4px; line-height: 1.25;
+}
+.gara-card-meta {
+  font-size: 12px; color: var(--ink-muted);
+  display: flex; flex-wrap: wrap; gap: 4px 8px;
+  align-items: center;
+}
+.gara-card-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+}
+.gara-card-stat { font-size: 11px; color: var(--ink-muted); }
+.gara-card-stat strong { font-size: 16px; color: var(--ink); display: block; font-weight: 700; font-variant-numeric: tabular-nums; }
+.gara-card-stat.warn strong { color: var(--ember-600); }
+.gara-card-foot {
+  padding: 10px 14px;
+  background: var(--bg-soft);
+  border-top: 1px solid var(--line-soft);
+  display: flex; gap: 6px; align-items: center;
+}
+.gara-card-foot .maestri {
+  flex: 1; font-size: 11px; color: var(--ink-muted);
+  display: flex; align-items: center; gap: 4px;
+}
+.gara-card-foot .avatar { width: 22px; height: 22px; font-size: 9px; border: 1.5px solid #fff; }
+</style>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="page" style="background:var(--bg-soft)">
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" style="text-decoration:none;color:inherit">
+        <div class="nav-logo-mark">T</div>
+        <div><div class="nav-logo-text">Triono Racing</div><div class="nav-logo-sub">Gestione</div></div>
+      </a>
+      <nav class="nav-links">
+        <a href="dashboard.html" class="nav-link">Home</a>
+        <a href="#" class="nav-link active" style="display:inline-flex;align-items:center;gap:4px">Gestione<i data-lucide="chevron-down" style="width:14px;height:14px"></i></a>
+        <a href="#" class="nav-link">Profilo</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <button class="nav-iconbtn nav-iconbtn-burger"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+        <a href="#" style="text-decoration:none;display:inline-flex"><span class="avatar avatar-sm avatar-sun" style="background:var(--sun-500);color:var(--navy-900)">AM</span></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb"><a href="dashboard.html">Admin</a><span class="sep">/</span><span class="current">Gare</span></div>
+
+  <div class="adm-page-head">
+    <div class="adm-page-head-row">
+      <div>
+        <h1 class="adm-page-h1">Gare <span class="count">8 attive 2026</span></h1>
+        <p class="adm-page-sub">Calendario gare con assegnazione maestri e flag «In evidenza» per quelle ufficiali della scuola.</p>
+      </div>
+      <div class="adm-page-actions">
+        <div style="display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:3px;gap:2px">
+          <button class="btn-sm" style="background:var(--navy-700);color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer">Future <span style="font-family:var(--f-mono);font-size:10.5px;background:rgba(255,255,255,0.2);padding:1px 5px;border-radius:3px;margin-left:3px">5</span></button>
+          <button class="btn-sm" style="background:transparent;color:var(--ink-muted);border:none;padding:6px 12px;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer">Passate <span style="font-family:var(--f-mono);font-size:10.5px;background:var(--bg-muted);padding:1px 5px;border-radius:3px;margin-left:3px">3</span></button>
+          <button class="btn-sm" style="background:transparent;color:var(--ink-muted);border:none;padding:6px 12px;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer">Bozze <span style="font-family:var(--f-mono);font-size:10.5px;background:var(--bg-muted);padding:1px 5px;border-radius:3px;margin-left:3px">1</span></button>
+        </div>
+        <button class="btn btn-primary btn-sm"><i data-lucide="plus" style="width:14px;height:14px"></i>Nuova gara</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-inner">
+
+    <div class="adm-gara-grid">
+
+      <div class="gara-card featured">
+        <div class="gara-card-img">
+          <div class="gara-card-img-ph"></div>
+          <span class="featured-badge"><i data-lucide="star" style="width:11px;height:11px"></i>In evidenza · scuola</span>
+          <div class="date-overlay"><div class="d">14</div><div class="m">GIU</div></div>
+        </div>
+        <div class="gara-card-body">
+          <h3 class="gara-card-title">Trofeo Le Grazie · MTB Giov.</h3>
+          <div class="gara-card-meta">
+            <span><i data-lucide="map-pin" style="width:11px;height:11px"></i>Parco Le Grazie</span>
+            <span>·</span><span>09:00</span><span>·</span><span>G3-G6</span>
+          </div>
+          <div class="gara-card-stats">
+            <div class="gara-card-stat"><strong>9</strong>iscrizioni conferm.</div>
+            <div class="gara-card-stat warn"><strong>3</strong>richieste pending</div>
+          </div>
+        </div>
+        <div class="gara-card-foot">
+          <div class="maestri">
+            <span class="avatar" style="background:var(--ember-500);color:#fff">AM</span>
+            <span class="avatar" style="background:var(--sky-500);color:#fff;margin-left:-4px">MC</span>
+            <span style="margin-left:4px">Andrea + Marta</span>
+          </div>
+          <button class="cell-action-btn"><i data-lucide="users" style="width:14px;height:14px"></i></button>
+          <button class="cell-action-btn"><i data-lucide="edit-3" style="width:14px;height:14px"></i></button>
+          <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+        </div>
+      </div>
+
+      <div class="gara-card">
+        <div class="gara-card-img">
+          <div class="gara-card-img-ph" style="background-color:var(--grass-700)"></div>
+          <div class="date-overlay"><div class="d">28</div><div class="m">GIU</div></div>
+        </div>
+        <div class="gara-card-body">
+          <h3 class="gara-card-title">Trofeo Cesi · MTB e BDC</h3>
+          <div class="gara-card-meta">
+            <span><i data-lucide="map-pin" style="width:11px;height:11px"></i>Cesi (TR)</span>
+            <span>·</span><span>09:00</span><span>·</span><span>Tutte cat.</span>
+          </div>
+          <div class="gara-card-stats">
+            <div class="gara-card-stat"><strong>4</strong>iscrizioni conferm.</div>
+            <div class="gara-card-stat warn"><strong>2</strong>richieste pending</div>
+          </div>
+        </div>
+        <div class="gara-card-foot">
+          <div class="maestri">
+            <span class="avatar" style="background:var(--ember-500);color:#fff">AM</span>
+            <span style="margin-left:4px">Solo Andrea</span>
+          </div>
+          <button class="cell-action-btn"><i data-lucide="users" style="width:14px;height:14px"></i></button>
+          <button class="cell-action-btn"><i data-lucide="edit-3" style="width:14px;height:14px"></i></button>
+          <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+        </div>
+      </div>
+
+      <div class="gara-card">
+        <div class="gara-card-img">
+          <div class="gara-card-img-ph" style="background-color:var(--sky-700)"></div>
+          <div class="date-overlay"><div class="d">12</div><div class="m">LUG</div></div>
+        </div>
+        <div class="gara-card-body">
+          <h3 class="gara-card-title">Gran Premio Narni · BDC</h3>
+          <div class="gara-card-meta">
+            <span><i data-lucide="map-pin" style="width:11px;height:11px"></i>Narni (TR)</span>
+            <span>·</span><span>09:30</span><span>·</span><span>G1-G4</span>
+          </div>
+          <div class="gara-card-stats">
+            <div class="gara-card-stat"><strong>0</strong>iscritti</div>
+            <div class="gara-card-stat"><strong>—</strong>iscriz. apre 20 giu</div>
+          </div>
+        </div>
+        <div class="gara-card-foot">
+          <div class="maestri" style="color:var(--ember-700)"><i data-lucide="alert-circle" style="width:11px;height:11px"></i>Maestri da assegnare</div>
+          <button class="cell-action-btn"><i data-lucide="user-plus" style="width:14px;height:14px"></i></button>
+          <button class="cell-action-btn"><i data-lucide="edit-3" style="width:14px;height:14px"></i></button>
+          <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+        </div>
+      </div>
+
+      <div class="gara-card">
+        <div class="gara-card-img">
+          <div class="gara-card-img-ph" style="background-color:var(--ember-600)"></div>
+          <div class="date-overlay"><div class="d">21</div><div class="m">GIU</div></div>
+        </div>
+        <div class="gara-card-body">
+          <h3 class="gara-card-title">Cronoscalata Piediluco · BDC</h3>
+          <div class="gara-card-meta">
+            <span><i data-lucide="map-pin" style="width:11px;height:11px"></i>Piediluco</span>
+            <span>·</span><span>10:00</span><span>·</span><span>G5-G6</span>
+          </div>
+          <div class="gara-card-stats">
+            <div class="gara-card-stat"><strong>2</strong>iscrizioni conferm.</div>
+            <div class="gara-card-stat"><strong>0</strong>pending</div>
+          </div>
+        </div>
+        <div class="gara-card-foot">
+          <div class="maestri">
+            <span class="avatar" style="background:var(--ember-500);color:#fff">AM</span>
+            <span style="margin-left:4px">Solo Andrea</span>
+          </div>
+          <button class="cell-action-btn"><i data-lucide="users" style="width:14px;height:14px"></i></button>
+          <button class="cell-action-btn"><i data-lucide="edit-3" style="width:14px;height:14px"></i></button>
+          <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+        </div>
+      </div>
+
+      <div class="gara-card draft">
+        <div class="gara-card-img">
+          <div class="gara-card-img-ph" style="background-color:var(--ink-muted);opacity:0.5"></div>
+          <span class="featured-badge" style="background:var(--bg-muted);color:var(--ink)"><i data-lucide="file-edit" style="width:11px;height:11px"></i>BOZZA</span>
+          <div class="date-overlay" style="background:rgba(255,255,255,0.85)"><div class="d">25</div><div class="m">OTT</div></div>
+        </div>
+        <div class="gara-card-body">
+          <h3 class="gara-card-title">Trofeo Autunnale · MTB Giov.</h3>
+          <div class="gara-card-meta">
+            <span><i data-lucide="map-pin" style="width:11px;height:11px"></i>Da definire</span>
+            <span>·</span><span class="t-muted">non pubblicata</span>
+          </div>
+          <div class="gara-card-stats">
+            <div class="gara-card-stat"><strong>—</strong>non pubblicata</div>
+            <div class="gara-card-stat"><strong>—</strong>—</div>
+          </div>
+        </div>
+        <div class="gara-card-foot">
+          <div class="maestri"><span style="color:var(--ink-muted)">Bozza da Andrea Mariotti</span></div>
+          <button class="cell-action-btn"><i data-lucide="eye" style="width:14px;height:14px"></i></button>
+          <button class="cell-action-btn"><i data-lucide="send" style="width:14px;height:14px"></i></button>
+          <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+        </div>
+      </div>
+
+      <a href="#" class="gara-card" style="background:transparent;border:2px dashed var(--navy-200);box-shadow:none;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:40px 20px;text-decoration:none;color:var(--navy-700);text-align:center;gap:8px;min-height:280px">
+        <div style="width:48px;height:48px;background:var(--navy-50);color:var(--navy-700);border-radius:50%;display:flex;align-items:center;justify-content:center"><i data-lucide="plus" style="width:24px;height:24px"></i></div>
+        <div style="font-size:15px;font-weight:700;color:var(--ink)">Aggiungi gara</div>
+        <div style="font-size:12.5px;color:var(--ink-muted);max-width:220px;line-height:1.4">Crea una nuova gara col form completo (nome, data, luogo, categorie, copertina, costo).</div>
+      </a>
+
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand"><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;background:var(--sun-500);color:var(--navy-900);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px">T</div><div><div class="footer-brand-name">Triono Racing</div></div></div></div>
+      <div class="footer-col"><div class="footer-col-title">Gestione</div><ul><li><a href="#">Gare</a></li></ul></div>
+      <div class="footer-col"><div class="footer-col-title">Risorse</div><ul><li><a href="#">Audit log</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>Admin v2.0</span><span>© 2026</span></div>
+  </footer>
+
+</div>
+</template>
+
+<script src="../shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['Mockup Portale', 'Admin', 'Gare'],
+    title: 'Gare · CRUD admin',
+    route: '/portale/admin/gare',
+    statusBarTheme: 'dark',
+    desktopScale: 0.58,
+    stateLegend: { tag: 'Stato', items: [{ ref: 1, text: 'Future selezionate · 5 gare visibili (1 featured scuola + 1 maestri da assegnare + 1 bozza)' }] },
+    annotations: [
+      { ref: 1, text: '<strong>Layout card grid 3-col</strong> (vs tabella delle altre admin): le gare hanno copertina visiva e sono poche, le card sono più narrative. Pattern coerente con vetrina genitore.' },
+      { ref: 2, text: '<strong>Toggle Future/Passate/Bozze</strong>: segmented control top-right. Le bozze sono visibili solo all\'admin (non pubblicate ai genitori).' },
+      { ref: 3, text: '<strong>Featured badge sun</strong>: stella + label «In evidenza · scuola». Si applica via toggle nel form gara. Solo gare scuola Triono — visibilità top in calendario genitore.' },
+      { ref: 4, text: '<strong>Card foot CRUD inline</strong>: 3 azioni per riga · users (apri iscrizioni) · edit (modifica gara) · more-horizontal (menu: delete, duplica, esporta). Pattern compact.' },
+      { ref: 5, text: '<strong>Maestri da assegnare</strong> warning ember: card del Gran Premio Narni mostra alert se ancora nessun maestro assegnato come accompagnatore. Action user-plus per assign rapido.' },
+      { ref: 6, text: '<strong>Bozza state</strong>: opacity ridotta + border dashed + badge «BOZZA». Action send pubblica al genitore. Permette pre-pianificazione lungo termine.' },
+      { ref: 7, text: '<strong>Card "Aggiungi gara"</strong>: empty-slot dashed con icon plus. Apre form modal/page completo (nome, data, orario, luogo, descrizione, immagine, categorie, costo, apertura/chiusura iscriz, flag evidenza).' },
+      { ref: 8, text: '<strong>Stats inline</strong>: iscrizioni confermate + pending. Click sulla card apre la pagina /gare/[id]/iscrizioni con workflow approvazione.' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>

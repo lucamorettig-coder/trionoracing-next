@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gare · Admin · Triono Racing — MVP EVO-019</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --navy-50:  #EEF1FA;
+    --navy-100: #D6DDF0;
+    --navy-200: #ADBAE0;
+    --navy-300: #7889C7;
+    --navy-500: #3C4F94;
+    --navy-700: #1F2D5A;
+    --navy-800: #131E47;
+    --navy-900: #050E3F;
+
+    --sky-100: #E4F0FB;
+    --sky-300: #94BFE4;
+    --sky-500: #3A82C8;
+    --sky-700: #1E5A95;
+
+    --grass-100: #E8F4DE;
+    --grass-300: #B0D894;
+    --grass-500: #5FAC36;
+    --grass-700: #3F7A1F;
+
+    --ember-100: #FCEFD6;
+    --ember-300: #F4C474;
+    --ember-500: #E09618;
+    --ember-600: #B97812;
+    --ember-700: #8B5A0E;
+
+    --flag-100: #FBDADA;
+    --flag-300: #E68585;
+    --flag-500: #C01818;
+    --flag-700: #8A0F0F;
+
+    --sun-100: #FDFBC9;
+    --sun-300: #F5EE7A;
+    --sun-500: #EFE63A;
+    --sun-700: #B5A926;
+
+    --ink: #0F1729;
+    --ink-muted: #5B6478;
+    --line: #E4E7EE;
+    --line-soft: #EEF0F4;
+    --bg-soft: #F7F8FB;
+    --bg-muted: #ECEEF3;
+
+    --r-sm: 6px;
+    --r-md: 8px;
+    --r-lg: 12px;
+    --r-xl: 16px;
+    --r-2xl: 20px;
+
+    --sh-sm: 0 1px 2px rgba(15,23,42,0.06);
+    --sh-md: 0 4px 12px rgba(15,23,42,0.08);
+
+    --f-sans: 'Inter', system-ui, sans-serif;
+    --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--f-sans);
+    color: var(--ink);
+    background: var(--bg-soft);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== NAVBAR ===== */
+  .navbar {
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 30;
+  }
+  .nav-inner {
+    max-width: 1280px; margin: 0 auto;
+    padding: 14px 24px;
+    display: flex; align-items: center; gap: 24px;
+  }
+  .nav-logo {
+    display: inline-flex; align-items: center; gap: 10px;
+    text-decoration: none; color: inherit;
+  }
+  .nav-logo-mark {
+    width: 36px; height: 36px;
+    background: var(--sun-500); color: var(--navy-900);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 18px;
+  }
+  .nav-logo-eyebrow {
+    font-family: var(--f-mono); font-size: 9.5px; font-weight: 700;
+    color: var(--sun-700); letter-spacing: 0.12em;
+    text-transform: uppercase; line-height: 1;
+    margin-bottom: 3px;
+  }
+  .nav-logo-text {
+    font-weight: 700; font-size: 15px; color: var(--ink);
+    letter-spacing: -0.01em; line-height: 1.1;
+  }
+  .nav-logo-sub {
+    font-size: 11px; color: var(--ink-muted); margin-top: 1px;
+  }
+  .nav-links {
+    flex: 1; display: flex; gap: 2px; align-items: center;
+    overflow-x: auto;
+  }
+  .nav-link {
+    text-decoration: none;
+    padding: 7px 11px;
+    border-radius: 7px;
+    color: var(--ink-muted);
+    font-size: 13px; font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .nav-link:hover { background: var(--bg-soft); color: var(--ink); }
+  .nav-link.active {
+    background: var(--navy-50);
+    color: var(--navy-700);
+    font-weight: 600;
+  }
+  .nav-actions { display: inline-flex; align-items: center; gap: 8px; }
+  .nav-iconbtn {
+    width: 36px; height: 36px;
+    background: var(--bg-soft); border: 1px solid var(--line);
+    border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--ink-muted); cursor: pointer;
+  }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+
+  /* ===== BREADCRUMB ===== */
+  .breadcrumb {
+    max-width: 1280px; margin: 0 auto;
+    padding: 16px 24px 0;
+    font-size: 12.5px; color: var(--ink-muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .breadcrumb a { color: var(--ink-muted); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--ink); }
+  .breadcrumb .sep { color: var(--line); }
+  .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+  /* ===== PAGE CONTAINER ===== */
+  .page-container {
+    max-width: 1280px; margin: 0 auto;
+    padding: 24px 24px 64px;
+  }
+
+  /* ===== ADMIN PAGE HEADER ===== */
+  .adm-eyebrow {
+    font-family: var(--f-mono); font-size: 10.5px;
+    color: var(--sun-700); font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .adm-page-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 24px; margin-bottom: 24px;
+  }
+  .adm-page-h1 {
+    font-size: 28px; font-weight: 700; margin: 0;
+    letter-spacing: -0.02em; color: var(--ink);
+    display: inline-flex; align-items: baseline; gap: 12px;
+  }
+  .adm-page-h1 .count {
+    font-family: var(--f-mono); font-size: 13px; font-weight: 500;
+    color: var(--ink-muted); letter-spacing: 0;
+    background: var(--bg-muted); padding: 3px 8px; border-radius: 6px;
+  }
+  .adm-page-sub {
+    font-size: 14px; color: var(--ink-muted);
+    margin: 6px 0 0; max-width: 720px; line-height: 1.5;
+  }
+  .adm-page-actions {
+    display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; border: 1px solid transparent;
+    transition: all 0.15s; text-decoration: none;
+    height: 36px;
+  }
+  .btn-primary {
+    background: var(--navy-700); color: #fff; border-color: var(--navy-700);
+  }
+  .btn-primary:hover { background: var(--navy-800); }
+  .btn-outline {
+    background: #fff; color: var(--ink); border-color: var(--line);
+  }
+  .btn-outline:hover { background: var(--bg-soft); border-color: var(--navy-200); }
+  .btn-success {
+    background: var(--grass-500); color: #fff; border-color: var(--grass-500);
+  }
+  .btn-success:hover { background: var(--grass-700); }
+  .btn-danger {
+    background: var(--flag-500); color: #fff; border-color: var(--flag-500);
+  }
+  .btn-ghost {
+    background: transparent; color: var(--ink-muted); border-color: transparent;
+  }
+  .btn-ghost:hover { background: var(--bg-soft); color: var(--ink); }
+
+  /* ===== SEGMENTED CONTROL ===== */
+  .segmented {
+    display: inline-flex; background: #fff;
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 3px; gap: 2px;
+  }
+  .segmented button {
+    background: transparent; border: none;
+    padding: 7px 14px; border-radius: 7px;
+    font-size: 13px; font-weight: 600;
+    color: var(--ink-muted); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .segmented button.active {
+    background: var(--navy-700); color: #fff;
+  }
+  .segmented button .pill-count {
+    font-family: var(--f-mono); font-size: 10.5px;
+    background: rgba(255,255,255,0.2);
+    color: inherit;
+    padding: 1px 6px; border-radius: 4px; font-weight: 600;
+  }
+  .segmented button:not(.active) .pill-count {
+    background: var(--bg-muted);
+    color: var(--ink-muted);
+  }
+
+  /* ===== ADMIN FILTERS ===== */
+  .adm-filters {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .adm-search {
+    flex: 1;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-soft); border: 1px solid var(--line-soft);
+    border-radius: 8px; padding: 7px 12px;
+    min-width: 260px;
+  }
+  .adm-search input {
+    flex: 1; border: none; outline: none; background: transparent;
+    font-size: 13px; color: var(--ink);
+  }
+  .adm-search .ico { color: var(--ink-muted); display: inline-flex; }
+  .adm-results-count {
+    font-family: var(--f-mono); font-size: 12px;
+    color: var(--ink-muted); flex-shrink: 0;
+    padding: 0 4px;
+  }
+
+  /* ===== DATATABLE ===== */
+  .adm-table-wrap {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 14px; overflow: hidden;
+    box-shadow: var(--sh-sm);
+  }
+  .adm-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  .adm-table thead th {
+    background: var(--bg-soft);
+    padding: 11px 14px;
+    font-size: 11.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--ink-muted);
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+  }
+  .adm-table tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: middle;
+  }
+  .adm-table tbody tr:hover { background: var(--bg-soft); cursor: pointer; }
+  .adm-table tbody tr:last-child td { border-bottom: none; }
+
+  .date-cell .date-main {
+    font-weight: 600; color: var(--ink); font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .date-cell .date-sub {
+    font-family: var(--f-mono); font-size: 10.5px;
+    color: var(--ink-muted);
+    text-transform: lowercase;
+    margin-top: 1px;
+  }
+
+  .tipo-tile {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .tipo-tile.strada { background: var(--flag-500); color: #fff; }
+  .tipo-tile.xc { background: var(--grass-500); color: #fff; }
+  .tipo-tile.enduro { background: var(--ember-500); color: #fff; }
+  .tipo-tile.xcc { background: var(--sky-500); color: #fff; }
+  .tipo-tile.gioco { background: var(--sun-500); color: var(--navy-900); }
+  .tipo-tile.abilita { background: var(--navy-700); color: #fff; }
+
+  .nome-gara {
+    font-weight: 600; color: var(--ink); font-size: 13.5px;
+    letter-spacing: -0.005em;
+  }
+  .luogo-cell {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--ink); font-size: 13px;
+  }
+  .luogo-cell i { color: var(--ink-muted); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 6px;
+    font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .badge-neutral { background: var(--bg-muted); color: var(--ink); }
+  .badge-success { background: var(--grass-100); color: var(--grass-700); }
+  .badge-warning { background: var(--ember-100); color: var(--ember-700); }
+  .badge-error   { background: var(--flag-100); color: var(--flag-700); }
+  .badge-info    { background: var(--sky-100); color: var(--sky-700); }
+  .badge-sun     { background: var(--sun-500); color: var(--navy-900); }
+
+  .iscr-counter {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--f-mono); font-weight: 600;
+    font-size: 13px; font-variant-numeric: tabular-nums;
+  }
+  .iscr-counter.muted { color: var(--ink-muted); }
+  .iscr-counter.active { color: var(--grass-700); }
+
+  .star-on { color: var(--sun-500); }
+
+  .cell-action-btn {
+    width: 28px; height: 28px;
+    background: transparent; border: 1px solid transparent;
+    border-radius: 6px; cursor: pointer;
+    color: var(--ink-muted);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .cell-action-btn:hover { background: var(--bg-soft); border-color: var(--line); color: var(--ink); }
+
+  /* ===== ANNOTATIONS BOX ===== */
+  .annotations {
+    margin-top: 40px;
+    background: var(--bg-muted);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 24px;
+  }
+  .annotations h3 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--ink-muted); font-weight: 700;
+    margin: 0 0 12px;
+  }
+  .annotations ol {
+    list-style: decimal; margin: 0; padding-left: 24px;
+    font-size: 13px; color: var(--ink); line-height: 1.6;
+  }
+  .annotations ol li { margin-bottom: 6px; }
+  .annotations strong { color: var(--navy-700); font-weight: 700; }
+</style>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-mark">T</div>
+        <div>
+          <div class="nav-logo-eyebrow">Area Admin</div>
+          <div class="nav-logo-text">Triono Racing · Gestione</div>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="#" class="nav-link">Dashboard</a>
+        <a href="#" class="nav-link">Iscrizioni</a>
+        <a href="#" class="nav-link">Bambini</a>
+        <a href="#" class="nav-link">Pagamenti</a>
+        <a href="#" class="nav-link active">Gare</a>
+        <a href="#" class="nav-link">Lezioni</a>
+        <a href="#" class="nav-link">Presenze maestri</a>
+        <a href="#" class="nav-link">Genitori</a>
+        <a href="#" class="nav-link">Tariffe</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <span class="avatar" style="background:var(--sun-500);color:var(--navy-900)">AM</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== BREADCRUMB ===== -->
+  <div class="breadcrumb">
+    <a href="#">Admin</a><span class="sep">/</span><span class="current">Gare</span>
+  </div>
+
+  <!-- ===== PAGE CONTENT ===== -->
+  <main class="page-container">
+
+    <!-- AdminPageHeader -->
+    <div>
+      <div class="adm-eyebrow">Area Admin</div>
+      <div class="adm-page-head">
+        <div>
+          <h1 class="adm-page-h1">
+            Gare
+            <span class="count">12 gare future</span>
+          </h1>
+          <p class="adm-page-sub">Calendario gare giovanili e workflow approvazione iscrizioni dai genitori.</p>
+        </div>
+        <div class="adm-page-actions">
+          <button class="btn btn-outline">
+            <i data-lucide="download" style="width:14px;height:14px"></i>
+            Esporta CSV
+          </button>
+          <button class="btn btn-primary">
+            <i data-lucide="plus" style="width:14px;height:14px"></i>
+            Nuova gara manuale
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toggle Future/Passate -->
+    <div style="margin-bottom: 16px;">
+      <div class="segmented">
+        <button class="active">
+          Future
+          <span class="pill-count">12</span>
+        </button>
+        <button>
+          Passate
+          <span class="pill-count">47</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- AdminFilters -->
+    <div class="adm-filters">
+      <div class="adm-search">
+        <span class="ico"><i data-lucide="search" style="width:14px;height:14px"></i></span>
+        <input type="text" placeholder="Cerca gara per nome o luogo…" />
+      </div>
+      <span class="adm-results-count">12 / 12</span>
+    </div>
+
+    <!-- DataTable -->
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th style="width:120px">Data</th>
+            <th style="width:64px">Tipo</th>
+            <th>Nome gara</th>
+            <th>Luogo</th>
+            <th style="width:140px">Classe</th>
+            <th style="width:120px">Iscrizioni</th>
+            <th style="width:80px;text-align:center">In evidenza</th>
+            <th style="width:60px"></th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">22/03/2026</div>
+              <div class="date-sub">dom</div>
+            </td>
+            <td><div class="tipo-tile gioco">GIOCO</div></td>
+            <td><div class="nome-gara">Gioco Ciclismo Scuola · Triono Cup</div></td>
+            <td><div class="luogo-cell"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Narni (TR)</div></td>
+            <td><span class="badge badge-neutral">Gioco Ciclismo</span></td>
+            <td>
+              <span class="iscr-counter active">
+                <i data-lucide="users" style="width:13px;height:13px"></i>14
+              </span>
+            </td>
+            <td style="text-align:center">
+              <i data-lucide="star" class="star-on" style="width:16px;height:16px;fill:currentColor"></i>
+            </td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">12/04/2026</div>
+              <div class="date-sub">dom</div>
+            </td>
+            <td><div class="tipo-tile strada">STRADA</div></td>
+            <td><div class="nome-gara">Trofeo Don Bosco</div></td>
+            <td><div class="luogo-cell"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Foligno (PG)</div></td>
+            <td><span class="badge badge-neutral">Giovanissimi</span></td>
+            <td>
+              <span class="iscr-counter active">
+                <i data-lucide="users" style="width:13px;height:13px"></i>8
+              </span>
+            </td>
+            <td style="text-align:center">
+              <i data-lucide="star" class="star-on" style="width:16px;height:16px;fill:currentColor"></i>
+            </td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">26/04/2026</div>
+              <div class="date-sub">dom</div>
+            </td>
+            <td><div class="tipo-tile xc">XC</div></td>
+            <td><div class="nome-gara">Coppa Italia Giovanile · MTB XC</div></td>
+            <td><div class="luogo-cell"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Spoleto (PG)</div></td>
+            <td><span class="badge badge-neutral">Giovanissimi</span></td>
+            <td>
+              <span class="iscr-counter active">
+                <i data-lucide="users" style="width:13px;height:13px"></i>11
+              </span>
+            </td>
+            <td style="text-align:center"></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">03/05/2026</div>
+              <div class="date-sub">dom</div>
+            </td>
+            <td><div class="tipo-tile xcc">XCC</div></td>
+            <td><div class="nome-gara">Short Track Ternano</div></td>
+            <td><div class="luogo-cell"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Terni</div></td>
+            <td><span class="badge badge-neutral">Giovanissimi</span></td>
+            <td>
+              <span class="iscr-counter active">
+                <i data-lucide="users" style="width:13px;height:13px"></i>6
+              </span>
+            </td>
+            <td style="text-align:center"></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">17/05/2026</div>
+              <div class="date-sub">dom</div>
+            </td>
+            <td><div class="tipo-tile abilita">ABIL</div></td>
+            <td><div class="nome-gara">Prova Abilità Strada e Fuoristrada</div></td>
+            <td><div class="luogo-cell"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Acquasparta (TR)</div></td>
+            <td><span class="badge badge-neutral">Gioco Ciclismo</span></td>
+            <td>
+              <span class="iscr-counter active">
+                <i data-lucide="users" style="width:13px;height:13px"></i>4
+              </span>
+            </td>
+            <td style="text-align:center"></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">31/05/2026</div>
+              <div class="date-sub">dom</div>
+            </td>
+            <td><div class="tipo-tile enduro">END</div></td>
+            <td><div class="nome-gara">Enduro Kids · Monte Subasio</div></td>
+            <td><div class="luogo-cell"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Assisi (PG)</div></td>
+            <td><span class="badge badge-neutral">Giovanissimi</span></td>
+            <td>
+              <span class="iscr-counter muted">
+                <i data-lucide="users" style="width:13px;height:13px"></i>0
+              </span>
+            </td>
+            <td style="text-align:center"></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">14/06/2026</div>
+              <div class="date-sub">dom</div>
+            </td>
+            <td><div class="tipo-tile xc">XC</div></td>
+            <td><div class="nome-gara">Trofeo Le Grazie · MTB Giovanile</div></td>
+            <td><div class="luogo-cell"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Parco Le Grazie · Terni</div></td>
+            <td><span class="badge badge-neutral">Giovanissimi</span></td>
+            <td>
+              <span class="iscr-counter active">
+                <i data-lucide="users" style="width:13px;height:13px"></i>9
+              </span>
+            </td>
+            <td style="text-align:center"></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">28/06/2026</div>
+              <div class="date-sub">dom</div>
+            </td>
+            <td><div class="tipo-tile strada">STRADA</div></td>
+            <td><div class="nome-gara">Crono Marathon Kids</div></td>
+            <td><div class="luogo-cell"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Terni</div></td>
+            <td><span class="badge badge-neutral">Giovanissimi</span></td>
+            <td>
+              <span class="iscr-counter active">
+                <i data-lucide="users" style="width:13px;height:13px"></i>5
+              </span>
+            </td>
+            <td style="text-align:center"></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">12/07/2026</div>
+              <div class="date-sub">dom</div>
+            </td>
+            <td><div class="tipo-tile gioco">GIOCO</div></td>
+            <td><div class="nome-gara">Mini Triathlon Estivo</div></td>
+            <td><div class="luogo-cell"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Piediluco (TR)</div></td>
+            <td><span class="badge badge-neutral">Gioco Ciclismo</span></td>
+            <td>
+              <span class="iscr-counter muted">
+                <i data-lucide="users" style="width:13px;height:13px"></i>0
+              </span>
+            </td>
+            <td style="text-align:center"></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">06/09/2026</div>
+              <div class="date-sub">dom</div>
+            </td>
+            <td><div class="tipo-tile xc">XC</div></td>
+            <td><div class="nome-gara">XC Autunno · Bosco di Cesi</div></td>
+            <td><div class="luogo-cell"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Cesi (TR)</div></td>
+            <td><span class="badge badge-neutral">Giovanissimi</span></td>
+            <td>
+              <span class="iscr-counter active">
+                <i data-lucide="users" style="width:13px;height:13px"></i>3
+              </span>
+            </td>
+            <td style="text-align:center"></td>
+            <td>
+              <button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Annotations -->
+    <div class="annotations">
+      <h3>Note di design · scope MVP EVO-019</h3>
+      <ol>
+        <li><strong>Toggle Future/Passate</strong>: segmented control 2-stati. <em>Niente toggle "Bozze"</em> nel MVP (out of scope, le gare arrivano dal database FCI o da inserimento manuale esplicito).</li>
+        <li><strong>Tile colorato tipoGara</strong> (32x32, rounded-md, shortLabel uppercase bold): riusa la helper esistente <code>tipoGaraStyle()</code> da <code>gara-utils.tsx</code> (EVO-005). Niente upload immagine/copertina.</li>
+        <li><strong>Counter iscrizioni colorato</strong>: <code>0</code> in grigio muted, <code>&gt;0</code> in grass-700 con icona persone. Il click sulla riga (o sul counter) drill-down a <code>/admin/gare/[id]/iscrizioni</code> per gestione approvazione.</li>
+        <li><strong>CTA "Nuova gara manuale"</strong>: caso eccezionale. Nel form (mockup #2) c'è un banner ember sopra che richiama l'attenzione sul fatto che le gare arrivano normalmente dal DB.</li>
+        <li><strong>DataTable</strong> (non card grid del mockup F3): coerente con altre liste admin EVO-016/017/018 (Iscrizioni, Bambini, Pagamenti, Tariffe). Componente base <code>DataTable&lt;Gara&gt;</code> già esistente in <code>src/components/admin/</code>.</li>
+      </ol>
+    </div>
+
+  </main>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>
