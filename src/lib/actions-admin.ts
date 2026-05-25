@@ -218,7 +218,148 @@ export async function segnaTitoloPagato(
   return { ok: true };
 }
 
-// ─── 6. Delete bambino con guard ─────────────────────────────────────────────
+// ─── 6. Bulk segna pagato ───────────────────────────────────────────────────
+
+export interface BulkSegnaPagatoResult {
+  ok: true;
+  processed: number;
+  skipped: number;
+  errors: { id: string; message: string }[];
+}
+
+/**
+ * Marca pagati N titoli in blocco, applicando stesso metodo/data/provider/note.
+ * Loop sequenziale per rispettare rate limit Airtable (5 req/s) + non saturare
+ * timeout Vercel. Idempotente: titoli già pagati vengono skippati silenziosamente.
+ */
+export async function bulkSegnaPagato(params: {
+  ids: string[];
+  metodo: MetodoPagamentoAdmin;
+  dataPagamento: string;
+  provider: ProviderPagamentoAdmin;
+  note?: string;
+}): Promise<BulkSegnaPagatoResult> {
+  const adminEmail = await getAdminEmailFromAuth();
+  const iso = new Date().toISOString();
+  const iscrizioniToRevalidate = new Set<string>();
+  let processed = 0;
+  let skipped = 0;
+  const errors: { id: string; message: string }[] = [];
+
+  for (const id of params.ids) {
+    try {
+      const titolo = await getTitoloById(id);
+      if (!titolo) {
+        errors.push({ id, message: "Titolo non trovato" });
+        continue;
+      }
+      if (titolo.fields.STATO_TITOLO === "pagato") {
+        skipped++;
+        continue;
+      }
+
+      const noteAggiornate = params.note
+        ? titolo.fields.NOTE_INTERNE
+          ? `${titolo.fields.NOTE_INTERNE}\n${params.note}`
+          : params.note
+        : titolo.fields.NOTE_INTERNE;
+
+      await updateTitoloPagamento(id, {
+        PAGATO: true,
+        METODO_PAGAMENTO: params.metodo,
+        DATA_PAGAMENTO: params.dataPagamento,
+        PROVIDER_PAGAMENTO: params.provider,
+        ...(noteAggiornate ? { NOTE_INTERNE: noteAggiornate } : {}),
+        METADATA_PAGAMENTO: JSON.stringify({
+          source: "admin_bulk",
+          admin: adminEmail,
+          timestamp: iso,
+        }),
+      });
+
+      const iscrIds = titolo.fields.ISCRIZIONE as string[] | undefined;
+      if (iscrIds && iscrIds.length > 0) {
+        iscrizioniToRevalidate.add(iscrIds[0]);
+        if (titolo.fields.NUMERO_RATA === 1) {
+          try {
+            await markPrimaRataPagata(iscrIds[0]);
+          } catch (err) {
+            console.warn(`[bulkSegnaPagato] markPrimaRataPagata failed for ${id}:`, err);
+          }
+        }
+      }
+
+      processed++;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      errors.push({ id, message });
+    }
+  }
+
+  revalidatePath("/portale/admin/pagamenti");
+  for (const iscrId of iscrizioniToRevalidate) {
+    revalidatePath(`/portale/admin/iscrizioni/${iscrId}`);
+  }
+
+  return { ok: true, processed, skipped, errors };
+}
+
+// ─── 7. Upsert tariffa ──────────────────────────────────────────────────────
+
+export interface TariffaFormData {
+  anno: string;
+  nomeTariffa: string; // Q1 | Q2 | Q3
+  descrizione?: string;
+  quotaTotaleAnno: number;
+  numeroRate: number;
+  importoRata: number;
+  scadenzeRate: string;
+  importoKitScuola: number;
+  importoIscrizione: number;
+  scontoFamigliaNumerosa: number;
+  attiva: boolean;
+}
+
+export async function upsertTariffa(
+  data: TariffaFormData,
+  idEsistente?: string,
+): Promise<{ id: string }> {
+  if (!data.anno || !/^\d{4}$/.test(data.anno)) {
+    throw new Error("Anno non valido (atteso YYYY)");
+  }
+  if (!data.nomeTariffa) throw new Error("Quarter (NOME_TARIFFA) obbligatorio");
+  if (data.numeroRate < 1) throw new Error("Numero rate deve essere >= 1");
+  if (data.quotaTotaleAnno < 0 || data.importoRata < 0 || data.importoKitScuola < 0 || data.importoIscrizione < 0 || data.scontoFamigliaNumerosa < 0) {
+    throw new Error("Importi non possono essere negativi");
+  }
+
+  const fields = {
+    ANNO_ISCRIZIONE: data.anno,
+    NOME_TARIFFA: data.nomeTariffa,
+    DESCRIZIONE_TARIFFA: data.descrizione ?? "",
+    QUOTA_TOTALE_ANNO: data.quotaTotaleAnno,
+    NUMERO_RATE: data.numeroRate,
+    IMPORTO_RATA: data.importoRata,
+    SCADENZA_RATE: data.scadenzeRate,
+    IMPORTO_KIT_SCUOLA: data.importoKitScuola,
+    IMPORTO_ISCRIZIONE: data.importoIscrizione,
+    SCONTO_FAMIGLIA_NUMEROSA: data.scontoFamigliaNumerosa,
+    ATTIVA: data.attiva,
+  };
+
+  let result: { id: string };
+  if (idEsistente) {
+    await airtablePatch("TABELLA_TARIFFE", idEsistente, fields);
+    result = { id: idEsistente };
+  } else {
+    result = await airtablePost("TABELLA_TARIFFE", fields);
+  }
+
+  revalidatePath("/portale/admin/tariffe");
+  return result;
+}
+
+// ─── 8. Delete bambino con guard ─────────────────────────────────────────────
 
 export async function deleteBambino(id: string): Promise<void> {
   const bambino = await getBambinoByIdAdmin(id);

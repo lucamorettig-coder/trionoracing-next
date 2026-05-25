@@ -473,6 +473,210 @@ export async function getIscrizioneByIdAdmin(id: string): Promise<Iscrizione | n
   return res.json() as Promise<Iscrizione>;
 }
 
+// ─── Pagamenti (M1) ─────────────────────────────────────────────────────────
+
+export type StatoTitolo = "pagato" | "da_pagare" | "scaduto";
+export type MetodoPagamentoAdmin = "app" | "bonifico" | "contanti" | "pos_segreteria";
+export type ProviderPagamentoAdmin = "SUMUP" | "Nexi" | "Altro";
+
+export interface TitoliAdminFilters {
+  stato?: StatoTitolo[];
+  metodo?: MetodoPagamentoAdmin[];
+  provider?: ProviderPagamentoAdmin[];
+  tipoTitolo?: string[];
+  anno?: number;
+  mese?: number; // 1-12
+  search?: string;
+  limit?: number;
+}
+
+export interface TitoloAdminEnriched extends TitoloPagamento {
+  iscrizione?: Iscrizione | null;
+}
+
+export function parseTitoliFilters(params: URLSearchParams): TitoliAdminFilters {
+  const stato = params.getAll("stato") as StatoTitolo[];
+  const metodo = params.getAll("metodo") as MetodoPagamentoAdmin[];
+  const provider = params.getAll("provider") as ProviderPagamentoAdmin[];
+  const tipoTitolo = params.getAll("tipo");
+  const anno = params.get("anno");
+  const mese = params.get("mese");
+  const search = params.get("search") ?? undefined;
+  return {
+    stato: stato.length > 0 ? stato : undefined,
+    metodo: metodo.length > 0 ? metodo : undefined,
+    provider: provider.length > 0 ? provider : undefined,
+    tipoTitolo: tipoTitolo.length > 0 ? tipoTitolo : undefined,
+    anno: anno ? parseInt(anno, 10) : undefined,
+    mese: mese ? parseInt(mese, 10) : undefined,
+    search,
+  };
+}
+
+function buildTitoliFormula(filters: TitoliAdminFilters): string {
+  const conditions: string[] = [];
+
+  if (filters.stato && filters.stato.length > 0) {
+    conditions.push(
+      `OR(${filters.stato.map((s) => `{STATO_TITOLO}="${s}"`).join(",")})`,
+    );
+  }
+
+  if (filters.metodo && filters.metodo.length > 0) {
+    conditions.push(
+      `OR(${filters.metodo.map((m) => `{METODO_PAGAMENTO}="${m}"`).join(",")})`,
+    );
+  }
+
+  if (filters.provider && filters.provider.length > 0) {
+    conditions.push(
+      `OR(${filters.provider.map((p) => `{PROVIDER_PAGAMENTO}="${p}"`).join(",")})`,
+    );
+  }
+
+  if (filters.tipoTitolo && filters.tipoTitolo.length > 0) {
+    conditions.push(
+      `OR(${filters.tipoTitolo.map((t) => `{TIPO_TITOLO}="${t}"`).join(",")})`,
+    );
+  }
+
+  if (filters.anno) {
+    // ANNO_ISCRIZIONE è multipleLookupValues su titolo (singleLineText sulla tariffa).
+    // ARRAYJOIN OK perché il valore origine è scalare testuale, non un linked record ID.
+    conditions.push(`ARRAYJOIN({ANNO_ISCRIZIONE})="${filters.anno}"`);
+  }
+
+  if (filters.mese) {
+    // DATA_SCADENZA_PAGAMENTO è un campo data nativo
+    conditions.push(`MONTH({DATA_SCADENZA_PAGAMENTO})=${filters.mese}`);
+  }
+
+  return conditions.length > 0 ? `AND(${conditions.join(",")})` : "";
+}
+
+/**
+ * Lista titoli pagamento per admin, con filtri server-side via filterByFormula
+ * (no ARRAYJOIN su linked records — bug EVO-006) + in-memory join con iscrizione
+ * per esporre nomi bambino/genitore alla UI.
+ *
+ * Search è in-memory perché coinvolge lookup multipli (bambino + genitore + ID).
+ */
+export async function getAllTitoli(
+  filters?: TitoliAdminFilters,
+): Promise<TitoloAdminEnriched[]> {
+  const formula = filters ? buildTitoliFormula(filters) : "";
+  const titoli = await fetchAllPages<TitoloPagamento>("TITOLI_PAGAMENTO", {
+    filterByFormula: formula || undefined,
+    sort: [{ field: "DATA_SCADENZA_PAGAMENTO", direction: "asc" }],
+  });
+
+  // Batch fetch iscrizioni linkate per arricchire la UI (nome bambino/genitore).
+  const iscrIds = Array.from(
+    new Set(titoli.flatMap((t) => t.fields.ISCRIZIONE ?? [])),
+  );
+  const iscrizioniById: Record<string, Iscrizione> = {};
+  if (iscrIds.length > 0) {
+    const conditions = iscrIds.map((id) => `RECORD_ID()="${id}"`).join(",");
+    const iscrizioni = await fetchAllPages<Iscrizione>("TABELLA_ISCRIZIONI", {
+      filterByFormula: `OR(${conditions})`,
+    });
+    for (const i of iscrizioni) iscrizioniById[i.id] = i;
+  }
+
+  let enriched: TitoloAdminEnriched[] = titoli.map((t) => ({
+    ...t,
+    iscrizione: iscrizioniById[t.fields.ISCRIZIONE?.[0] ?? ""] ?? null,
+  }));
+
+  if (filters?.search) {
+    const q = filters.search.toLowerCase();
+    enriched = enriched.filter((t) => {
+      const i = t.iscrizione;
+      const nomeBambino = (i?.fields.NOME_BAMBINO ?? "").toLowerCase();
+      const cognomeBambino = (i?.fields.COGNOME_BAMBINO ?? "").toLowerCase();
+      const nomeGenitore = (i?.fields.NOME_GENITORE ?? "").toLowerCase();
+      const cognomeGenitore = (i?.fields.COGNOME_GENITORE ?? "").toLowerCase();
+      const codice = (t.fields.CODICE_TITOLO ?? "").toLowerCase();
+      return (
+        nomeBambino.includes(q) ||
+        cognomeBambino.includes(q) ||
+        nomeGenitore.includes(q) ||
+        cognomeGenitore.includes(q) ||
+        codice.includes(q)
+      );
+    });
+  }
+
+  if (filters?.limit) enriched = enriched.slice(0, filters.limit);
+  return enriched;
+}
+
+// ─── Tariffe (M2) ───────────────────────────────────────────────────────────
+
+export interface TariffeAdminFilters {
+  anno?: number;
+}
+
+export interface Tariffa {
+  id: string;
+  createdTime?: string;
+  fields: {
+    ANNO_ISCRIZIONE?: string;
+    NOME_TARIFFA?: string; // Q1 | Q2 | Q3
+    DESCRIZIONE_TARIFFA?: string;
+    QUOTA_TOTALE_ANNO?: number;
+    NUMERO_RATE?: number;
+    IMPORTO_RATA?: number;
+    SCADENZA_RATE?: string; // "FEBBRAIO;MARZO;APRILE"
+    IMPORTO_KIT_SCUOLA?: number;
+    IMPORTO_ISCRIZIONE?: number;
+    SCONTO_FAMIGLIA_NUMEROSA?: number;
+    ATTIVA?: boolean;
+    TABELLA_ISCRIZIONI?: string[];
+  };
+}
+
+export function parseTariffeFilters(params: URLSearchParams): TariffeAdminFilters {
+  const anno = params.get("anno");
+  return { anno: anno ? parseInt(anno, 10) : new Date().getFullYear() };
+}
+
+export async function getAllTariffe(filters?: TariffeAdminFilters): Promise<Tariffa[]> {
+  const anno = filters?.anno ?? new Date().getFullYear();
+  return fetchAllPages<Tariffa>("TABELLA_TARIFFE", {
+    filterByFormula: `{ANNO_ISCRIZIONE}="${anno}"`,
+    sort: [{ field: "NOME_TARIFFA", direction: "asc" }],
+  });
+}
+
+export async function getAnniDisponibiliTariffe(): Promise<number[]> {
+  const all = await fetchAllPages<Tariffa>("TABELLA_TARIFFE", {
+    fields: ["ANNO_ISCRIZIONE"],
+  });
+  const anni = new Set<number>();
+  for (const t of all) {
+    const a = parseInt(t.fields.ANNO_ISCRIZIONE ?? "", 10);
+    if (!Number.isNaN(a)) anni.add(a);
+  }
+  if (anni.size === 0) anni.add(new Date().getFullYear());
+  return Array.from(anni).sort((a, b) => a - b);
+}
+
+export function countIscrizioniByTariffa(tariffa: Tariffa): number {
+  return tariffa.fields.TABELLA_ISCRIZIONI?.length ?? 0;
+}
+
+export async function getTariffaByIdAdmin(id: string): Promise<Tariffa | null> {
+  requireEnv();
+  const res = await fetch(`${API_BASE}/${BASE_ID}/TABELLA_TARIFFE/${encodeURIComponent(id)}`, {
+    headers: { Authorization: `Bearer ${TOKEN}` },
+    cache: "no-store",
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`[airtable-admin] getTariffaByIdAdmin ${id}: ${res.status}`);
+  return res.json() as Promise<Tariffa>;
+}
+
 export async function getBambinoByIdAdmin(id: string): Promise<Bambino | null> {
   requireEnv();
   const res = await fetch(`${API_BASE}/${BASE_ID}/TABELLA_BAMBINI/${encodeURIComponent(id)}`, {
