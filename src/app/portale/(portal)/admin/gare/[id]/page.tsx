@@ -20,7 +20,6 @@ export default async function GaraDetailAdminPage({
   const { id } = await params;
   const search = await searchParams;
   const successFlag = typeof search.success === "string" ? search.success : null;
-  const autoOpenDelete = search.delete === "1";
 
   const gara = await getGaraByIdAdmin(id);
   if (!gara) notFound();
@@ -64,7 +63,6 @@ export default async function GaraDetailAdminPage({
           gara={gara}
           numIscrizioni={numIscrizioni}
           maestriAssegnati={maestriAssegnati}
-          autoOpenDelete={autoOpenDelete}
         />
       </div>
     </div>

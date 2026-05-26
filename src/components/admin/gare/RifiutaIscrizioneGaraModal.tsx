@@ -12,6 +12,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   iscrizione: IscrizioneGaraAdminEnriched;
   nomeGara: string;
+  onSuccess?: () => void;
 }
 
 export function RifiutaIscrizioneGaraModal({
@@ -19,11 +20,13 @@ export function RifiutaIscrizioneGaraModal({
   onOpenChange,
   iscrizione,
   nomeGara,
+  onSuccess,
 }: Props) {
   const [notifyEmail, setNotifyEmail] = React.useState(true);
 
   const handleSubmit = async () => {
     await rifiutaIscrizioneAction(iscrizione.id);
+    onSuccess?.();
   };
 
   const bambinoFull = `${iscrizione.bambinoNome} ${iscrizione.bambinoCognome}`.trim();

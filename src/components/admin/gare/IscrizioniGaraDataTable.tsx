@@ -1,16 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { MoreHorizontal, Check, X, Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Check, X, Mail } from "lucide-react";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
 import { BulkActionBar } from "@/components/admin/BulkActionBar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { formatDataOraIT } from "./gare-helpers";
 import { ApprovaIscrizioneGaraModal } from "./ApprovaIscrizioneGaraModal";
 import { RifiutaIscrizioneGaraModal } from "./RifiutaIscrizioneGaraModal";
@@ -32,11 +27,18 @@ const STATO_VARIANT: Record<StatoIscrizioneGara, BadgeVariant> = {
 };
 
 export function IscrizioniGaraDataTable({ iscrizioni, nomeGara, dataGara }: Props) {
+  const router = useRouter();
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
   const [resetKey, setResetKey] = React.useState(0);
   const [singleApprova, setSingleApprova] = React.useState<IscrizioneGaraAdminEnriched | null>(null);
   const [singleRifiuta, setSingleRifiuta] = React.useState<IscrizioneGaraAdminEnriched | null>(null);
   const [bulkVariant, setBulkVariant] = React.useState<"approva" | "rifiuta" | null>(null);
+
+  const onActionSuccess = React.useCallback(() => {
+    // Forza refetch RSC dopo Server Action (oltre a revalidatePath server-side).
+    // Senza questo, in alcuni scenari la pagina restava con dati stale.
+    router.refresh();
+  }, [router]);
 
   const byId = React.useMemo(() => {
     const m: Record<string, IscrizioneGaraAdminEnriched> = {};
@@ -132,51 +134,38 @@ export function IscrizioniGaraDataTable({ iscrizioni, nomeGara, dataGara }: Prop
     },
     {
       key: "azioni",
-      label: "",
-      width: "48px",
-      align: "center",
+      label: "Azioni",
+      width: "150px",
+      align: "right",
       cellRenderer: (r) => {
         const canApprova = r.stato !== "Confermata";
         const canRifiuta = r.stato !== "Rifiutata";
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="p-1 rounded hover:bg-bg-muted transition-colors"
-                aria-label="Azioni"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MoreHorizontal size={16} className="text-ink-muted" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {canApprova && (
-                <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault();
-                    setSingleApprova(r);
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <Check size={14} className="text-grass-700" />
-                  Approva
-                </DropdownMenuItem>
-              )}
-              {canRifiuta && (
-                <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault();
-                    setSingleRifiuta(r);
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <X size={14} className="text-flag-500" />
-                  Rifiuta
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div
+            className="inline-flex items-center gap-1.5 justify-end"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setSingleApprova(r)}
+              disabled={!canApprova}
+              title="Approva iscrizione"
+              className="inline-flex items-center justify-center w-8 h-8 rounded-[var(--radius-sm)] border border-grass-500 text-grass-700 bg-white hover:bg-grass-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              aria-label="Approva"
+            >
+              <Check size={15} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setSingleRifiuta(r)}
+              disabled={!canRifiuta}
+              title="Rifiuta iscrizione"
+              className="inline-flex items-center justify-center w-8 h-8 rounded-[var(--radius-sm)] border border-flag-500 text-flag-500 bg-white hover:bg-flag-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              aria-label="Rifiuta"
+            >
+              <X size={15} />
+            </button>
+          </div>
         );
       },
     },
@@ -225,6 +214,7 @@ export function IscrizioniGaraDataTable({ iscrizioni, nomeGara, dataGara }: Prop
           iscrizione={singleApprova}
           nomeGara={nomeGara}
           dataGara={dataGara}
+          onSuccess={onActionSuccess}
         />
       )}
 
@@ -234,6 +224,7 @@ export function IscrizioniGaraDataTable({ iscrizioni, nomeGara, dataGara }: Prop
           onOpenChange={(open) => !open && setSingleRifiuta(null)}
           iscrizione={singleRifiuta}
           nomeGara={nomeGara}
+          onSuccess={onActionSuccess}
         />
       )}
 
@@ -244,7 +235,10 @@ export function IscrizioniGaraDataTable({ iscrizioni, nomeGara, dataGara }: Prop
           iscrizioni={selected}
           variant={bulkVariant}
           nomeGara={nomeGara}
-          onSuccess={clearSelection}
+          onSuccess={() => {
+            clearSelection();
+            onActionSuccess();
+          }}
         />
       )}
     </>

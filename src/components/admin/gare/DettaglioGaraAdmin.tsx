@@ -11,11 +11,9 @@ interface Props {
   gara: Gara;
   numIscrizioni: number;
   maestriAssegnati: MaestroLite[];
-  /** Apre automaticamente il dialog di eliminazione al mount (?delete=1). */
-  autoOpenDelete?: boolean;
 }
 
-export function DettaglioGaraAdmin({ gara, numIscrizioni, maestriAssegnati, autoOpenDelete }: Props) {
+export function DettaglioGaraAdmin({ gara, numIscrizioni, maestriAssegnati }: Props) {
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
@@ -71,7 +69,6 @@ export function DettaglioGaraAdmin({ gara, numIscrizioni, maestriAssegnati, auto
             garaId={gara.id}
             numIscrizioni={numIscrizioni}
             nomeGara={gara.nomeGara}
-            autoOpen={autoOpenDelete}
           />
         </div>
       </div>

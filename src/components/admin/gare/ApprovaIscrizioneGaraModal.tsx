@@ -12,6 +12,7 @@ interface Props {
   iscrizione: IscrizioneGaraAdminEnriched;
   nomeGara: string;
   dataGara: string;
+  onSuccess?: () => void;
 }
 
 export function ApprovaIscrizioneGaraModal({
@@ -20,11 +21,13 @@ export function ApprovaIscrizioneGaraModal({
   iscrizione,
   nomeGara,
   dataGara,
+  onSuccess,
 }: Props) {
   const [notifyEmail, setNotifyEmail] = React.useState(true);
 
   const handleSubmit = async () => {
     await approvaIscrizioneAction(iscrizione.id);
+    onSuccess?.();
   };
 
   const bambinoFull = `${iscrizione.bambinoNome} ${iscrizione.bambinoCognome}`.trim();

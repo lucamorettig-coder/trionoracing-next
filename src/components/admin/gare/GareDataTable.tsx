@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MoreHorizontal, Star, Users, ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Star, Users, ExternalLink, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
 import {
@@ -138,41 +137,26 @@ export function GareDataTable({ gare, toggle }: Props) {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem asChild>
-              <Link
-                href={`/portale/admin/gare/${r.id}`}
-                className="flex items-center gap-2"
-              >
-                <ExternalLink size={14} />
-                Apri
-              </Link>
+            <DropdownMenuItem
+              onSelect={() => router.push(`/portale/admin/gare/${r.id}`)}
+              className="flex items-center gap-2"
+            >
+              <ExternalLink size={14} />
+              Apri
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link
-                href={`/portale/admin/gare/${r.id}/modifica`}
-                className="flex items-center gap-2"
-              >
-                <Pencil size={14} />
-                Modifica
-              </Link>
+            <DropdownMenuItem
+              onSelect={() => router.push(`/portale/admin/gare/${r.id}/modifica`)}
+              className="flex items-center gap-2"
+            >
+              <Pencil size={14} />
+              Modifica
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link
-                href={`/portale/admin/gare/${r.id}/iscrizioni`}
-                className="flex items-center gap-2"
-              >
-                <Users size={14} />
-                Iscrizioni ({r.numIscrizioni})
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link
-                href={`/portale/admin/gare/${r.id}?delete=1`}
-                className="flex items-center gap-2 text-flag-500"
-              >
-                <Trash2 size={14} />
-                Elimina
-              </Link>
+            <DropdownMenuItem
+              onSelect={() => router.push(`/portale/admin/gare/${r.id}/iscrizioni`)}
+              className="flex items-center gap-2"
+            >
+              <Users size={14} />
+              Iscrizioni ({r.numIscrizioni})
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

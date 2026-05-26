@@ -11,13 +11,11 @@ interface Props {
   garaId: string;
   numIscrizioni: number;
   nomeGara: string;
-  /** Apre il dialog automaticamente al mount (usato dal link "Elimina" della tabella). */
-  autoOpen?: boolean;
 }
 
-export function EliminaGaraButton({ garaId, numIscrizioni, nomeGara, autoOpen = false }: Props) {
+export function EliminaGaraButton({ garaId, numIscrizioni, nomeGara }: Props) {
   const router = useRouter();
-  const [open, setOpen] = React.useState(autoOpen);
+  const [open, setOpen] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   const hasIscrizioni = numIscrizioni > 0;
