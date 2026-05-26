@@ -6,6 +6,9 @@ import {
   getAllBambini,
   getAllTitoli,
   getAllTariffe,
+  getAllGare,
+  countIscrizioniByGara,
+  getIscrizioniByGara,
   csvWriter,
 } from "@/lib/airtable-admin";
 
@@ -18,10 +21,10 @@ const KNOWN_ENTITIES = new Set([
   "genitori",
   "tariffe",
   "gare",
+  "iscrizioni-gara",
 ]);
 
 const ENTITY_TO_EVO: Record<string, string> = {
-  gare: "EVO-019",
   lezioni: "EVO-020",
   "presenze-maestri": "EVO-020",
   genitori: "EVO-020",
@@ -157,6 +160,73 @@ export async function POST(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="tariffe-${new Date().toISOString().slice(0, 10)}.csv"`,
+      },
+    });
+  }
+
+  if (entity === "gare") {
+    const body = await _req.clone().json().catch(() => ({} as Record<string, unknown>));
+    const filters = (body?.filters ?? {}) as {
+      toggle?: "future" | "passate";
+      search?: string;
+    };
+    const toggle: "future" | "passate" = filters.toggle === "passate" ? "passate" : "future";
+    const gare = await getAllGare({ toggle, search: filters.search });
+    const enriched = await Promise.all(
+      gare.map(async (g) => ({
+        ...g,
+        numIscrizioni: await countIscrizioniByGara(g.id).catch(() => 0),
+      })),
+    );
+    const csv = csvWriter(enriched, [
+      { key: "id", label: "ID", accessor: (r) => r.id },
+      { key: "data", label: "Data", accessor: (r) => r.data },
+      { key: "nome", label: "Nome gara", accessor: (r) => r.nomeGara },
+      { key: "luogo", label: "Luogo", accessor: (r) => r.luogo },
+      { key: "tipo", label: "Tipo Gara", accessor: (r) => r.tipoGara ?? "" },
+      { key: "classe", label: "Classe", accessor: (r) => r.classe ?? "" },
+      { key: "comitato", label: "Comitato", accessor: (r) => r.comitatoRegionale ?? "" },
+      { key: "descrizione", label: "Descrizione", accessor: (r) => r.descrizione ?? "" },
+      { key: "note", label: "Note interne", accessor: (r) => r.note ?? "" },
+      { key: "fci_id", label: "ID Gara FCI", accessor: (r) => r.idGaraFci ?? "" },
+      { key: "fci_link", label: "Link FCI", accessor: (r) => r.linkFci ?? "" },
+      { key: "in_evidenza", label: "In evidenza", accessor: (r) => (r.inEvidenza ? "SI" : "NO") },
+      { key: "num_maestri", label: "N. maestri assegnati", accessor: (r) => r.maestroAccompagnatoreIds.length },
+      { key: "num_iscrizioni", label: "N. iscrizioni", accessor: (r) => r.numIscrizioni },
+    ]);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="gare-${new Date().toISOString().slice(0, 10)}.csv"`,
+      },
+    });
+  }
+
+  if (entity === "iscrizioni-gara") {
+    const body = await _req.clone().json().catch(() => ({} as Record<string, unknown>));
+    const filters = (body?.filters ?? {}) as { garaId?: string };
+    if (!filters.garaId) {
+      return NextResponse.json({ error: "garaId richiesto" }, { status: 400 });
+    }
+    const iscrizioni = await getIscrizioniByGara(filters.garaId);
+    const csv = csvWriter(iscrizioni, [
+      { key: "id", label: "ID", accessor: (r) => r.id },
+      { key: "bambino_cognome", label: "Cognome bambino", accessor: (r) => r.bambinoCognome },
+      { key: "bambino_nome", label: "Nome bambino", accessor: (r) => r.bambinoNome },
+      { key: "bambino_data_nascita", label: "Data nascita bambino", accessor: (r) => r.bambinoDataNascita ?? "" },
+      { key: "categoria_fci", label: "Categoria FCI", accessor: (r) => r.categoriaFCI ?? "" },
+      { key: "genitore_cognome", label: "Cognome genitore", accessor: (r) => r.genitoreCognome },
+      { key: "genitore_nome", label: "Nome genitore", accessor: (r) => r.genitoreNome },
+      { key: "genitore_email", label: "Email genitore", accessor: (r) => r.genitoreEmail ?? "" },
+      { key: "stato", label: "Stato", accessor: (r) => r.stato },
+      { key: "data_richiesta", label: "Data richiesta", accessor: (r) => r.dataRichiesta ?? "" },
+      { key: "data_conferma", label: "Data conferma", accessor: (r) => r.dataConferma ?? "" },
+      { key: "note_genitore", label: "Note genitore", accessor: (r) => r.noteGenitore ?? "" },
+    ]);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="iscrizioni-gara-${new Date().toISOString().slice(0, 10)}.csv"`,
       },
     });
   }

@@ -31,11 +31,10 @@ export function EliminaGaraButton({ garaId, numIscrizioni, nomeGara, autoOpen = 
           `Impossibile eliminare: ci sono ${result.count} iscrizioni gara collegate.`,
         );
       } else {
-        setError(result.error ?? "Errore durante l'eliminazione");
+        setError(result.error);
       }
       return;
     }
-    // redirect a lista dopo successo (gestito dalla Server Action)
     router.push("/portale/admin/gare?success=deleted");
     router.refresh();
   };
