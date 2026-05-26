@@ -392,12 +392,15 @@ body {
   from { opacity: 1; transform: scale(1); }
   to { opacity: 0; transform: scale(0.96); }
 }
-.ds-overlay[data-state="open"] { animation: ds-overlay-in 160ms ease-out; }
-.ds-overlay[data-state="closed"] { animation: ds-overlay-out 140ms ease-in; }
-.ds-modal[data-state="open"] { animation: ds-modal-in 180ms cubic-bezier(0.16, 1, 0.3, 1); }
-.ds-modal[data-state="closed"] { animation: ds-modal-out 140ms ease-in; }
-.ds-pop[data-state="open"] { animation: ds-pop-in 140ms ease-out; }
-.ds-pop[data-state="closed"] { animation: ds-pop-out 100ms ease-in; }
+/* animation-fill-mode: both applica il keyframe `from` immediatamente al primo
+   paint, evitando il flash di un frame con transform=none (modale in alto a
+   sinistra) prima che l'animazione subentri. Pattern hardening EVO-020. */
+.ds-overlay[data-state="open"] { animation: ds-overlay-in 160ms ease-out both; }
+.ds-overlay[data-state="closed"] { animation: ds-overlay-out 140ms ease-in both; }
+.ds-modal[data-state="open"] { animation: ds-modal-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.ds-modal[data-state="closed"] { animation: ds-modal-out 140ms ease-in both; }
+.ds-pop[data-state="open"] { animation: ds-pop-in 140ms ease-out both; }
+.ds-pop[data-state="closed"] { animation: ds-pop-out 100ms ease-in both; }
 @keyframes ds-slide-up {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
