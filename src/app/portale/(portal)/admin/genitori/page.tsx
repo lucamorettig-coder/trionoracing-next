@@ -38,7 +38,7 @@ export default async function GenitoriAdminPage({ searchParams }: PageProps) {
         title="Genitori & Utenti"
         subtitle="Gestione anagrafica utenti del portale. Cambio ruolo sincronizzato con Clerk."
         action={
-          <ExportCSVButton entity="genitori" filters={filters as Record<string, unknown>} />
+          <ExportCSVButton entity="genitori" filters={filters as unknown as Record<string, unknown>} />
         }
       />
 

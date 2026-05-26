@@ -94,7 +94,7 @@ export default async function LezioniAdminPage({ searchParams }: PageProps) {
         title="Lezioni"
         subtitle="Storico delle lezioni registrate dai maestri."
         action={
-          <ExportCSVButton entity="lezioni" filters={filters as Record<string, unknown>} />
+          <ExportCSVButton entity="lezioni" filters={filters as unknown as Record<string, unknown>} />
         }
       />
 

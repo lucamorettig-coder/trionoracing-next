@@ -46,10 +46,10 @@ export default async function PresenzeMaestriAdminPage({ searchParams }: PagePro
         subtitle="Aggregato presenze per maestro nel periodo selezionato. Drill-down per dettaglio e segnare pagati."
         action={
           <div className="flex items-center gap-2">
-            <ExportCSVButton entity="presenze-maestri" filters={filters as Record<string, unknown>} />
+            <ExportCSVButton entity="presenze-maestri" filters={filters as unknown as Record<string, unknown>} />
             <ExportCSVButton
               entity="presenze-riepilogo"
-              filters={filters as Record<string, unknown>}
+              filters={filters as unknown as Record<string, unknown>}
               label="Riepilogo contabile"
             />
           </div>

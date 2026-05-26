@@ -53,27 +53,45 @@ export function AggiungiPresenzaManualeModal({
   );
   const [note, setNote] = React.useState<string>("");
 
-  // Prefill importo dalla tariffa del maestro corrente quando cambia tipo/maestro
-  React.useEffect(() => {
+  // Prefill importo dalla tariffa del maestro quando cambia tipo/maestro.
+  // Pattern React ufficiale: state snapshot vs prop, setState durante render
+  // con bailout (lint React 19 no setState-in-effect).
+  const [prevPrefillKey, setPrevPrefillKey] = React.useState<string>("");
+  const prefillKey = `${tipo}|${maestroId}`;
+  if (prefillKey !== prevPrefillKey) {
+    setPrevPrefillKey(prefillKey);
     const target =
       maestri.find((m) => m.id === maestroId) ??
-      (maestroPrefill ? { id: maestroPrefill.id, tariffaLezione: maestroPrefill.tariffaLezione, tariffaGara: maestroPrefill.tariffaGara, nome: "", cognome: "" } : null);
-    if (!target) return;
-    const value = tipo === "lezione" ? target.tariffaLezione : target.tariffaGara;
-    if (value !== undefined && importo === "") {
-      setImporto(String(value));
+      (maestroPrefill
+        ? {
+            id: maestroPrefill.id,
+            tariffaLezione: maestroPrefill.tariffaLezione,
+            tariffaGara: maestroPrefill.tariffaGara,
+            nome: "",
+            cognome: "",
+          }
+        : null);
+    if (target) {
+      const value = tipo === "lezione" ? target.tariffaLezione : target.tariffaGara;
+      if (value !== undefined && importo === "") {
+        setImporto(String(value));
+      }
     }
-  }, [tipo, maestroId, maestri, maestroPrefill, importo]);
+  }
 
-  // Prefill data dall'evento selezionato
-  React.useEffect(() => {
-    if (!eventoId) return;
+  // Prefill data dall'evento selezionato (stesso pattern).
+  const [prevEventoKey, setPrevEventoKey] = React.useState<string>("");
+  const eventoKey = `${tipo}|${eventoId}`;
+  if (eventoId && eventoKey !== prevEventoKey) {
+    setPrevEventoKey(eventoKey);
     const evento =
       tipo === "lezione"
         ? lezioniRecenti.find((e) => e.id === eventoId)
         : garePassate.find((e) => e.id === eventoId);
-    if (evento) setData(evento.data);
-  }, [eventoId, tipo, lezioniRecenti, garePassate]);
+    if (evento && data !== evento.data) {
+      setData(evento.data);
+    }
+  }
 
   const handleOpenChange = (next: boolean) => {
     if (!next) {

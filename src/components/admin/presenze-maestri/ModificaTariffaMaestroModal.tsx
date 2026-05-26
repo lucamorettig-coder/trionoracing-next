@@ -34,12 +34,19 @@ export function ModificaTariffaMaestroModal({
     tariffaGara !== undefined ? String(tariffaGara) : "",
   );
 
-  React.useEffect(() => {
-    if (open) {
-      setLezione(tariffaLezione !== undefined ? String(tariffaLezione) : "");
-      setGara(tariffaGara !== undefined ? String(tariffaGara) : "");
+  // Re-init quando il modale si apre con un maestro diverso. Pattern React
+  // ufficiale: state snapshot vs prop, setState durante render con bailout.
+  const [prevKey, setPrevKey] = React.useState<string | null>(null);
+  const currentKey = open ? maestroId : null;
+  if (currentKey !== prevKey) {
+    setPrevKey(currentKey);
+    if (currentKey) {
+      const nextLezione = tariffaLezione !== undefined ? String(tariffaLezione) : "";
+      const nextGara = tariffaGara !== undefined ? String(tariffaGara) : "";
+      if (lezione !== nextLezione) setLezione(nextLezione);
+      if (gara !== nextGara) setGara(nextGara);
     }
-  }, [open, tariffaLezione, tariffaGara]);
+  }
 
   const handleSubmit = async () => {
     const lezioneNum = lezione === "" ? undefined : parseFloat(lezione);

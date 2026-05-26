@@ -60,12 +60,19 @@ export function CambiaRuoloModal({ open, onOpenChange, genitore, onSuccess }: Pr
   const [submitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
-    if (open && genitore) {
-      setNuovoRuolo(genitore.fields.RUOLO ?? "GENITORE");
-      setError(null);
+  // Re-init quando il modale si apre con un genitore diverso. Pattern React
+  // ufficiale: state snapshot vs prop, setState durante render con bailout.
+  // Vedi react.dev "Storing information from previous renders".
+  const [prevKey, setPrevKey] = React.useState<string | null>(null);
+  const currentKey = open && genitore ? genitore.id : null;
+  if (currentKey !== prevKey) {
+    setPrevKey(currentKey);
+    if (currentKey && genitore) {
+      const targetRuolo = genitore.fields.RUOLO ?? "GENITORE";
+      if (nuovoRuolo !== targetRuolo) setNuovoRuolo(targetRuolo);
+      if (error !== null) setError(null);
     }
-  }, [open, genitore]);
+  }
 
   if (!genitore) return null;
 
