@@ -25,10 +25,11 @@ AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName;
 
 const alertDialogContentVariants = cva(
   [
-    // -translate-x-1/2 -translate-y-1/2 STATICI: il keyframe d'entrata applica
-    // anche un transform che, terminata l'animazione, viene rimosso lasciando
-    // la modale offset (bug pattern EVO-018 hardening).
-    "ds-modal fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 grid w-[calc(100%-2rem)] max-w-md",
+    // Centering via arbitrary `transform:` invece di Tailwind translate
+    // utilities — Tailwind v4 usa la proprietà `translate:` separata che
+    // non si compone col `transform:` del keyframe, generando flash top-left
+    // prima dell'avvio animazione. Pattern hardening EVO-020.
+    "ds-modal fixed left-1/2 top-1/2 [transform:translate(-50%,-50%)] z-50 grid w-[calc(100%-2rem)] max-w-md",
     "bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] p-6",
     "focus:outline-none",
   ].join(" "),
