@@ -12,7 +12,7 @@
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TOKEN = process.env.AIRTABLE_TOKEN;
 const API_BASE = "https://api.airtable.com/v0";
-const GARE_TABLE = process.env.AIRTABLE_TABLE_GARE ?? "Gare Giovanili Umbria 2026";
+export const GARE_TABLE = process.env.AIRTABLE_TABLE_GARE ?? "Gare Giovanili Umbria 2026";
 
 export type Ruolo = "GENITORE" | "ISTRUTTORE" | "ADMIN";
 
@@ -1248,15 +1248,19 @@ export interface Gara {
   luogo: string;
   classe: string | null;
   tipoGara: string | null;
+  /** Descrizione user-facing mostrata ai genitori sul portale (EVO-019). */
+  descrizione: string | null;
   idGaraFci: string | null;
   linkFci: string | null;
   note: string | null;
   comitatoRegionale: string | null;
   inEvidenza: boolean;
   maestroAccompagnatoreIds: string[];
+  /** IDs iscrizioni gara linkate. Permette `numIscrizioni = iscrizioniGareIds.length` senza round-trip extra (no N+1 / rate limit). */
+  iscrizioniGareIds: string[];
 }
 
-interface GaraRecord {
+export interface GaraRecord {
   id: string;
   fields: {
     "Nome Gara"?: string;
@@ -1267,13 +1271,15 @@ interface GaraRecord {
     "ID Gara FCI"?: string;
     "Link FCI"?: string;
     Note?: string;
+    DESCRIZIONE?: string;
     COMITATO_REGIONALE?: string;
     IN_EVIDENZA?: boolean;
     "Maestro Accompagnatore"?: string[];
+    ISCRIZIONI_GARE?: string[];
   };
 }
 
-function mapGara(r: GaraRecord): Gara {
+export function mapGara(r: GaraRecord): Gara {
   const f = r.fields;
   return {
     id: r.id,
@@ -1282,12 +1288,14 @@ function mapGara(r: GaraRecord): Gara {
     luogo: f.Luogo ?? "",
     classe: f.Classe ?? null,
     tipoGara: f["Tipo Gara"] ?? null,
+    descrizione: f.DESCRIZIONE ?? null,
     idGaraFci: f["ID Gara FCI"] ?? null,
     linkFci: f["Link FCI"] ?? null,
     note: f.Note ?? null,
     comitatoRegionale: f.COMITATO_REGIONALE ?? null,
     inEvidenza: f.IN_EVIDENZA === true,
     maestroAccompagnatoreIds: f["Maestro Accompagnatore"] ?? [],
+    iscrizioniGareIds: f.ISCRIZIONI_GARE ?? [],
   };
 }
 
@@ -1322,7 +1330,7 @@ export interface IscrizioneGara {
   noteGenitore: string | null;
 }
 
-interface IscrizioneGaraRecord {
+export interface IscrizioneGaraRecord {
   id: string;
   fields: {
     GARA?: string[];
@@ -1335,7 +1343,7 @@ interface IscrizioneGaraRecord {
   };
 }
 
-function mapIscrizioneGara(r: IscrizioneGaraRecord): IscrizioneGara {
+export function mapIscrizioneGara(r: IscrizioneGaraRecord): IscrizioneGara {
   const f = r.fields;
   return {
     id: r.id,

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Iscrizioni gara · Admin · Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="page" style="background:var(--bg-soft)">
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" style="text-decoration:none;color:inherit">
+        <div class="nav-logo-mark">T</div>
+        <div><div class="nav-logo-text">Triono Racing</div><div class="nav-logo-sub">Gestione</div></div>
+      </a>
+      <nav class="nav-links">
+        <a href="dashboard.html" class="nav-link">Home</a>
+        <a href="#" class="nav-link active" style="display:inline-flex;align-items:center;gap:4px">Gestione<i data-lucide="chevron-down" style="width:14px;height:14px"></i></a>
+        <a href="#" class="nav-link">Profilo</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <button class="nav-iconbtn nav-iconbtn-burger"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+        <a href="#" style="text-decoration:none;display:inline-flex"><span class="avatar avatar-sm" style="background:var(--sun-500);color:var(--navy-900)">AM</span></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb"><a href="dashboard.html">Admin</a><span class="sep">/</span><a href="gare-lista.html">Gare</a><span class="sep">/</span><a href="#">Trofeo Le Grazie</a><span class="sep">/</span><span class="current">Iscrizioni</span></div>
+
+  <!-- Gara header -->
+  <div style="background:var(--navy-900);color:#fff;padding:24px 16px;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;background:url('../assets/pattern.svg') 220px 220px repeat;opacity:0.45"></div>
+    <div style="position:relative;z-index:1">
+      <a href="gare-lista.html" style="color:rgba(255,255,255,0.7);font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:10px"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>Tutte le gare</a>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="badge badge-sun" style="font-size:11px"><i data-lucide="star" style="width:11px;height:11px"></i>In evidenza · scuola</span></div>
+      <h1 style="font-size:24px;font-weight:700;letter-spacing:-0.02em;margin:0">Trofeo Le Grazie · MTB Giov.</h1>
+      <div style="font-family:var(--f-mono);font-size:12px;opacity:0.7;margin-top:6px">DOM 14 GIU 2026 · 09:00 · Parco Le Grazie · Terni</div>
+    </div>
+  </div>
+
+  <div class="page-inner">
+
+    <div class="adm-kpi-strip">
+      <div class="adm-kpi"><div class="l">Capacità max</div><div class="v">20</div></div>
+      <div class="adm-kpi success"><div class="l">Confermate</div><div class="v">9</div></div>
+      <div class="adm-kpi warn"><div class="l">In attesa</div><div class="v">3</div></div>
+      <div class="adm-kpi danger"><div class="l">Rifiutate</div><div class="v">1</div></div>
+      <div class="adm-kpi"><div class="l">Posti rimasti</div><div class="v">11</div></div>
+    </div>
+
+    <div class="adm-filters">
+      <button class="adm-filter active"><span class="label">Stato</span>Richiesta<span class="clear"><i data-lucide="x" style="width:9px;height:9px"></i></span></button>
+      <button class="adm-filter"><span class="label">Categoria</span>Tutte<i data-lucide="chevron-down" style="width:13px;height:13px;color:var(--ink-muted)"></i></button>
+      <div class="adm-search">
+        <span class="ico"><i data-lucide="search" style="width:14px;height:14px"></i></span>
+        <input type="text" placeholder="Cerca bambino…" />
+      </div>
+      <span class="adm-results-count">3 / 13</span>
+    </div>
+
+    <div class="adm-bulk">
+      <input type="checkbox" checked style="accent-color:var(--sun-500);width:15px;height:15px" />
+      <span class="count">3 selezionate</span>
+      <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px">
+        <input type="checkbox" checked style="accent-color:var(--sun-500)" />
+        Notifica al genitore via email
+      </label>
+      <div class="adm-bulk-actions">
+        <button style="background:var(--grass-500);border-color:var(--grass-500)"><i data-lucide="check" style="width:13px;height:13px"></i>Approva tutte</button>
+        <button class="danger"><i data-lucide="x" style="width:13px;height:13px"></i>Rifiuta tutte</button>
+        <button class="adm-bulk-close"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+      </div>
+    </div>
+
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th style="width:32px"><input type="checkbox" checked /></th>
+            <th>Bambino</th>
+            <th>Genitore</th>
+            <th>Cat.</th>
+            <th>Cert.</th>
+            <th>Stato</th>
+            <th>Data richiesta</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="selected warn">
+            <td><input type="checkbox" checked /></td>
+            <td><div class="cell-person"><div class="photo photo-ph">M</div><div><div class="name">Marco Rossi</div><div class="meta">10 anni</div></div></div></td>
+            <td><a href="#" class="cell-link">Luca Rossi</a></td>
+            <td><span class="badge badge-sun" style="font-size:10px">G1</span></td>
+            <td><span class="badge badge-warning" style="font-size:10.5px">In scad. 5 giu</span></td>
+            <td><span class="badge badge-info" style="font-size:10.5px">Richiesta</span></td>
+            <td class="tnum"><span class="t-muted">18 mag · 3gg fa</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn" style="background:var(--grass-100);color:var(--grass-700)" title="Approva"><i data-lucide="check" style="width:14px;height:14px"></i></button><button class="cell-action-btn danger" title="Rifiuta"><i data-lucide="x" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr class="selected">
+            <td><input type="checkbox" checked /></td>
+            <td><div class="cell-person"><div class="photo photo-ph">T</div><div><div class="name">Tommaso Greco</div><div class="meta">9 anni</div></div></div></td>
+            <td><a href="#" class="cell-link">Marco Greco</a></td>
+            <td><span class="badge badge-sun" style="font-size:10px">G4</span></td>
+            <td><span class="badge badge-success" style="font-size:10.5px"><i data-lucide="check" style="width:11px;height:11px"></i>Valido</span></td>
+            <td><span class="badge badge-info" style="font-size:10.5px">Richiesta</span></td>
+            <td class="tnum"><span class="t-muted">19 mag · 2gg fa</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn" style="background:var(--grass-100);color:var(--grass-700)"><i data-lucide="check" style="width:14px;height:14px"></i></button><button class="cell-action-btn danger"><i data-lucide="x" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr class="selected">
+            <td><input type="checkbox" checked /></td>
+            <td><div class="cell-person"><div class="photo photo-ph">A</div><div><div class="name">Alice Costantini</div><div class="meta">7 anni</div></div></div></td>
+            <td><a href="#" class="cell-link">Sara Costantini</a></td>
+            <td><span class="badge badge-sun" style="font-size:10px">G5</span></td>
+            <td><span class="badge badge-success" style="font-size:10.5px"><i data-lucide="check" style="width:11px;height:11px"></i>Valido</span></td>
+            <td><span class="badge badge-info" style="font-size:10.5px">Richiesta</span></td>
+            <td class="tnum"><span class="t-muted">20 mag · ieri</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn" style="background:var(--grass-100);color:var(--grass-700)"><i data-lucide="check" style="width:14px;height:14px"></i></button><button class="cell-action-btn danger"><i data-lucide="x" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr style="opacity:0.6">
+            <td><input type="checkbox" disabled /></td>
+            <td><div class="cell-person"><div class="photo photo-ph">G</div><div><div class="name">Giulia Rossi</div><div class="meta">7 anni</div></div></div></td>
+            <td><a href="#" class="cell-link">Luca Rossi</a></td>
+            <td><span class="badge badge-sun" style="font-size:10px">G3</span></td>
+            <td><span class="badge badge-success" style="font-size:10.5px">Valido</span></td>
+            <td><span class="badge badge-success" style="font-size:10.5px">Confermata</span></td>
+            <td class="tnum"><span class="t-muted">12 mag · 9gg fa</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="x-circle" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr style="opacity:0.5">
+            <td><input type="checkbox" disabled /></td>
+            <td><div class="cell-person"><div class="photo photo-ph">E</div><div><div class="name">Edoardo Pini</div><div class="meta">11 anni</div></div></div></td>
+            <td><a href="#" class="cell-link">Lara Pini</a></td>
+            <td><span class="badge badge-sun" style="font-size:10px">G2</span></td>
+            <td><span class="badge badge-error" style="font-size:10.5px">Scaduto</span></td>
+            <td><span class="badge badge-error" style="font-size:10.5px">Rifiutata</span></td>
+            <td class="tnum"><span class="t-muted">10 mag · 11gg fa</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn" title="Vedi motivo"><i data-lucide="message-square" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="adm-pagination">
+        <span>13 iscrizioni totali · 11 posti rimasti</span>
+        <div class="pages"><button>‹</button><button class="active">1</button><button>›</button></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand"><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;background:var(--sun-500);color:var(--navy-900);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px">T</div><div><div class="footer-brand-name">Triono Racing</div></div></div></div>
+      <div class="footer-col"><div class="footer-col-title">Gare</div><ul><li><a href="#">Calendario</a></li></ul></div>
+      <div class="footer-col"><div class="footer-col-title">Risorse</div><ul><li><a href="#">Audit</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>Admin v2.0</span><span>© 2026</span></div>
+  </footer>
+
+</div>
+</template>
+
+<script src="../shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['Mockup Portale', 'Admin', 'Iscrizioni gara'],
+    title: 'Approva iscrizioni gara',
+    route: '/portale/admin/gare/[id]/iscrizioni',
+    statusBarTheme: 'dark',
+    desktopScale: 0.58,
+    stateLegend: { tag: 'Stato', items: [{ ref: 1, text: '3 richieste pending selezionate · bulk «Approva tutte» con toggle notifica email · 1 conferm. + 1 rifiut. visibili' }] },
+    annotations: [
+      { ref: 1, text: '<strong>Hero gara navy</strong> con badge featured + breadcrumb + back link. Identifica la gara come contesto della pagina iscrizioni.' },
+      { ref: 2, text: '<strong>5 KPI</strong>: capacità + confermate + in attesa + rifiutate + posti rimasti. «Posti rimasti» è derivato (capacità − confermate − in attesa).' },
+      { ref: 3, text: '<strong>Bulk bar con toggle notifica</strong>: oltre alle azioni Approva/Rifiuta bulk, checkbox inline «Notifica al genitore via email». Default ON. Trigger Make.com.' },
+      { ref: 4, text: '<strong>Azioni inline per riga</strong>: check grass (approva) + X flag (rifiuta) + more-horizontal. Pattern compact per workflow rapido — admin scrolla e clicca senza menu.' },
+      { ref: 5, text: '<strong>Riga con certificato in scadenza</strong> (Marco): bg ember-50 + badge ember in colonna cert. L\'admin può comunque approvare (decisione sua) ma il rischio è esposto.' },
+      { ref: 6, text: '<strong>Modal approvazione singola</strong> (non mostrato): conferma «Confermi iscrizione di Marco a Trofeo Le Grazie?» + checkbox notifica + CTA. Rifiuto chiede motivo opzionale.' },
+      { ref: 7, text: '<strong>Confermate e rifiutate visibili</strong> in coda con opacity ridotta. Permettono di disconfermare (action X-circle) o vedere motivo del rifiuto (action message-square).' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>

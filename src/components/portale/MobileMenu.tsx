@@ -26,10 +26,10 @@ export default function MobileMenu({ links }: { links: NavLink[] }) {
         <div className="lg:hidden fixed top-14 inset-x-0 bg-white border-b border-line shadow-[var(--shadow-md)] z-50">
           <nav className="max-w-[1280px] mx-auto px-6 py-3 flex flex-col gap-0.5">
             {links.map((link) => {
-              const isActive =
-                link.href === "/portale"
-                  ? pathname === "/portale"
-                  : pathname.startsWith(link.href);
+              const isIndex = link.href === "/portale" || link.href === "/portale/admin";
+              const isActive = isIndex
+                ? pathname === link.href
+                : pathname === link.href || pathname.startsWith(`${link.href}/`);
 
               return (
                 <Link

@@ -24,7 +24,7 @@
 | EVO-016 | admin-infra-ds | Admin Infra & DS scaffold (Dialog/AlertDialog/DataTable + dashboard A-1 minimal + schema STATO_ISCRIZIONE annullata) | 2026-05-25 | 2026-05-25 | completata | https://trionoracing-next.vercel.app/portale/admin | [link](evolutive/EVO-016-admin-infra-ds.md) |
 | EVO-017 | admin-iscrizioni-bambini | Admin iscrizioni A-2/A-3 + bambini A-4 + 4 modal (annulla/forza completa/titolo manuale/segna pagato) | 2026-05-25 | 2026-05-25 | completata | https://trionoracing-next.vercel.app/portale/admin/iscrizioni | [link](evolutive/EVO-017-admin-iscrizioni-bambini.md) |
 | EVO-018 | admin-pagamenti-tariffe | Admin pagamenti A-5 + KPI + tariffe A-11 CRUD Q1/Q2/Q3 | 2026-05-25 | 2026-05-26 | completata | https://trionoracing-next.vercel.app/portale/admin/pagamenti | [link](evolutive/EVO-018-admin-pagamenti-tariffe.md) |
-| EVO-019 | admin-gare | Admin gare A-6 CRUD + A-7 approvazioni + assegnazione maestri + upload R2 | — | — | in pianificazione | — | [link](evolutive/EVO-019-admin-gare.md) |
+| EVO-019 | admin-gare | Admin gare A-6 CRUD manuale (fallback) + A-7 approvazioni iscrizioni + assegnazione maestri | 2026-05-26 | — | pronta per implementazione | — | [link](evolutive/EVO-019-admin-gare.md) |
 | EVO-020 | admin-lezioni-maestri-genitori | Admin lezioni A-8 + presenze maestri A-9 + genitori A-10 + cambio ruolo Clerk sync | — | — | in pianificazione | — | [link](evolutive/EVO-020-admin-lezioni-maestri-genitori.md) |
 
 ## Stati possibili
