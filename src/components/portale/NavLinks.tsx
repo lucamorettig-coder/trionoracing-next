@@ -17,10 +17,16 @@ export default function NavLinks({ links, className }: NavLinksProps) {
   return (
     <nav className={cn("h-14 flex items-center", className)}>
       {links.map((link) => {
-        const isActive =
-          link.href === "/portale"
-            ? pathname === "/portale"
-            : pathname.startsWith(link.href);
+        // Le route "indice" (es. /portale, /portale/admin) richiedono match
+        // esatto, altrimenti vengono evidenziate da qualsiasi sottoroute
+        // (es. /portale/admin/gare attiverebbe sia Dashboard che Gare).
+        // Le voci non-indice usano `startsWith` con slash finale così le
+        // pagine figlie (es. /portale/admin/gare/[id]/iscrizioni) mantengono
+        // attivo il link parent corretto.
+        const isIndex = link.href === "/portale" || link.href === "/portale/admin";
+        const isActive = isIndex
+          ? pathname === link.href
+          : pathname === link.href || pathname.startsWith(`${link.href}/`);
 
         return (
           <Link
