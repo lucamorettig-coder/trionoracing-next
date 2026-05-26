@@ -53,7 +53,7 @@ export function GareDataTable({ gare, toggle }: Props) {
     {
       key: "tipo",
       label: "Tipo",
-      width: "80px",
+      width: "110px",
       accessor: (r) => r.tipoGara ?? "",
       cellRenderer: (r) => <TipoGaraTile tipo={r.tipoGara} />,
     },

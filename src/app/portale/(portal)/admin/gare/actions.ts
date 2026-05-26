@@ -12,12 +12,9 @@ import {
   type GaraUpdateInput,
   type DeleteGaraResult,
 } from "@/lib/airtable-admin";
+import type { DeleteGaraActionResult } from "./actions-types";
 
-export type ActionResult<T = unknown> =
-  | { ok: true; data: T }
-  | { ok: false; error: string };
-
-function revalidateGareAdmin(garaId?: string) {
+async function revalidateGareAdmin(garaId?: string): Promise<void> {
   revalidatePath("/portale/admin/gare");
   revalidatePath("/portale/gare");
   if (garaId) {
@@ -34,7 +31,7 @@ export async function createGaraAction(
   await requireAdmin();
   try {
     const gara = await createGara(payload);
-    revalidateGareAdmin(gara.id);
+    await revalidateGareAdmin(gara.id);
     return { ok: true, garaId: gara.id };
   } catch (err) {
     console.error("[evo-019] createGaraAction", err);
@@ -49,7 +46,7 @@ export async function updateGaraAction(
   await requireAdmin();
   try {
     await updateGara(id, payload);
-    revalidateGareAdmin(id);
+    await revalidateGareAdmin(id);
     return { ok: true, garaId: id };
   } catch (err) {
     console.error("[evo-019] updateGaraAction", err);
@@ -57,17 +54,12 @@ export async function updateGaraAction(
   }
 }
 
-export type DeleteGaraActionResult =
-  | { ok: true }
-  | { ok: false; reason: "has_iscrizioni"; count: number }
-  | { ok: false; reason: "error"; error: string };
-
 export async function deleteGaraAction(id: string): Promise<DeleteGaraActionResult> {
   await requireAdmin();
   try {
     const result: DeleteGaraResult = await deleteGara(id);
     if (result.ok) {
-      revalidateGareAdmin();
+      await revalidateGareAdmin();
       return { ok: true };
     }
     return { ok: false, reason: "has_iscrizioni", count: result.count };

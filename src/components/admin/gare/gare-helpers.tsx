@@ -1,17 +1,23 @@
 import { tipoGaraStyle } from "@/components/portale/gare/gara-utils";
 import { cn } from "@/lib/utils";
 
-/** Pill colorata 32x32 per `tipoGara` (riuso EVO-005). */
+/**
+ * Pill colorata per `tipoGara` (riuso EVO-005).
+ * `md` è la versione lista: pill orizzontale auto-sized in modo che "STRADA" / "ABILITÀ"
+ * non vengano troncati. `lg` è il blocco quadrato grande del dettaglio.
+ */
 export function TipoGaraTile({ tipo, size = "md" }: { tipo: string | null; size?: "sm" | "md" | "lg" }) {
   const style = tipoGaraStyle(tipo);
   const sizeClass =
-    size === "sm" ? "w-7 h-7 text-[10px]"
-    : size === "lg" ? "w-24 h-24 text-base"
-    : "w-9 h-9 text-[11px]";
+    size === "sm"
+      ? "h-6 px-2 min-w-[28px] text-[10px] rounded-md"
+      : size === "lg"
+        ? "w-24 h-24 text-base rounded-xl"
+        : "h-8 px-2.5 min-w-[44px] text-[10.5px] rounded-md tracking-[0.04em]";
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center rounded-md font-bold uppercase tracking-tight shrink-0",
+        "inline-flex items-center justify-center font-extrabold uppercase shrink-0",
         sizeClass,
         style?.bg ?? "bg-navy-700",
         style?.text ?? "text-white",
