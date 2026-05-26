@@ -3,8 +3,10 @@
 - **ID**: EVO-020
 - **Slug**: admin-lezioni-maestri-genitori
 - **Data inizio**: 2026-05-26
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: in pianificazione
+- **Data fine**: 2026-05-26
+- **Stato**: completata
+- **PR feature**: [#34](https://github.com/lucamorettig-coder/trionoracing-next/pull/34) (squash `1c64473`)
+- **URL produzione**: https://trionoracing-next.vercel.app/portale/admin/lezioni
 - **Tipo**: nuova feature
 - **Area**: `/portale/admin/lezioni` + `/portale/admin/presenze-maestri` + `/portale/admin/genitori/*`
 - **Priorità**: 🟢 5 (chiude scope completo admin post-MVP)
@@ -376,3 +378,70 @@ n/a — area admin protetta da Clerk middleware + `requireAdmin()` server-side. 
 - **Clerk transazione atomica**: leggere RUOLO precedente prima dell'update Airtable → try block che fa update Clerk → catch fa rollback Airtable al RUOLO precedente. **Importante**: ordine = Airtable first (autoritativo), Clerk dopo. Non viceversa (l'Airtable potrebbe restare disallineato se Clerk fallisce ma il rollback Clerk fosse il primo).
 
 ### [2026-05-26] Fase 1 — Raccolta requisiti completata
+
+---
+
+## 8. Verifica e go-live (Fase 8 — 2026-05-26)
+
+**Esito complessivo: ✅ APPROVATA**
+
+### Deliverable consegnati
+
+- **A-8 Lezioni storico** (`/portale/admin/lezioni`): DataTable 5 colonne + 3 KPI (Lezioni totali / Bambini-presenze totali / Maestro più attivo) + 4 filtri sticky URL-driven (Anno pills · Mese · Maestro · Search bambino, NO Corso) + modal dettaglio read-only Dialog raw con 4 sezioni (Maestri presenti + compilatore ★ / Bambini badge / Attività sun pills / Note pubbliche+interne) + Export CSV.
+- **A-9 Presenze maestri & Rimborsi** (`/portale/admin/presenze-maestri` + `/[maestroId]?mese=X&anno=Y`):
+  - Aggregato per maestro con avatar iniziali + qualifica + breakdown "12 lez · 2 gare" + Dovuto/Pagato grass/**Residuo ember se >0** tabular-nums.
+  - Drill-down con DataTable selezionabile + per-row "Segna pagata" via kebab + BulkActionBar "Segna {N} pagate".
+  - **3 modal**: `SegnaPagatePresenzeModal` (pattern BulkSegnaPagatoModal EVO-018 + idempotenza skip già pagate) + `ModificaTariffaMaestroModal` (2 input currency + WarningSoftBanner ember "non retroattiva") + `AggiungiPresenzaManualeModal` (radio tipo + select evento opzionale + DatePicker + importo override prefill + checkbox pagato condizionale + note).
+  - 2 Export CSV: `presenze-maestri` (record dump con join maestro) + `presenze-riepilogo` (aggregato contabile per maestro/mese).
+- **A-10 Genitori** (`/portale/admin/genitori` + `/[id]`):
+  - DataTable 7 colonne (Nome+email mailto / Cellulare tel / Badge Ruolo sky/ember/grass / N° figli / Registrato / DropdownMenu).
+  - Filtri Ruolo multi-chip + Search debounced + Toggle "Solo con figli" + Export CSV.
+  - Pagina dettaglio aggregatore: header full-width + 4 sezioni card (Anagrafica / Figli card grid / Iscrizioni mini-table / Titoli mini-table con stato).
+  - `CambiaRuoloModal` (Dialog raw + AlertDialog conferma destructive se downgrade ADMIN→non-ADMIN + WarningSoftBanner JWT staleness ember).
+
+### Pattern nuovo introdotto: Server Action transazionale Airtable+Clerk
+
+`cambiaRuoloGenitore` in `airtable-admin.ts` — **primo del progetto**:
+1. Read RUOLO precedente (snapshot per rollback) + AUTH_USER_ID dal record genitore.
+2. Guard: throw early se `AUTH_USER_ID` mancante (no rollback necessario, transazione mai iniziata).
+3. PATCH Airtable RUOLO=nuovoRuolo (autoritativo first).
+4. `Promise.race([clerkClient.users.updateUserMetadata, timeout(5s)])`.
+5. Catch Clerk error → PATCH rollback Airtable a `ruoloPrecedente` → throw esplicito `"Cambio ruolo fallito su Clerk: {msg}. Airtable ripristinato a {ruolo}"`.
+6. Catch rollback fail → log critical + throw `"Errore critico: Clerk e Airtable disallineati"` (intervento manuale richiesto).
+
+Verificato in smoke step (k) con AUTH_USER_ID Clerk-Not-Found: errore inline `"Cambio ruolo fallito su Clerk: Not Found. Airtable ripristinato a GENITORE"` mostrato in UI + rollback Airtable confermato.
+
+### Iterazioni / bug recepiti durante smoke (commit dedicati)
+
+1. **DEV NOTE_INTERNE missing**: TABELLA_LEZIONI su DEV mancava il campo `NOTE_INTERNE` introdotto in EVO-006. Fix: aggiunto via MCP. Pattern AGENTS.md "DEV/PROD schema sync obbligatorio come macro-task 0" già documentato, ma in EVO-006 era stato applicato solo PROD.
+2. **Aggiunto secondo maestro test DEV**: solo Luca Moretti era ATTIVO su DEV → aggiunto "Mario Rossi (TEST)" per validare il flusso multi-maestro EVO-020. Workaround dev-only, non in scope produzione.
+3. **AlertDialog DS-alignment** (`fix(ui): AlertDialog centering transform statico + buttons DS-aligned`): bug latente EVO-016 emerso solo allo smoke EVO-020 (AlertDialog non era mai stato usato in produzione prima). Centering richiede `-translate-x-1/2 -translate-y-1/2` statici + buttons `AlertDialogAction`/`Cancel` wrappati con `buttonVariants({variant:"primary"/"ghost"})`.
+4. **Flash modali animazione** (`fix(ui): elimina flash modale top-left con [transform:] arbitrary value`): Tailwind v4 outputta `-translate-x-1/2` come proprietà CSS `translate:` separata dal `transform:` del keyframe → mismatch tra primo paint e avvio animazione genera flash visibile. Fix con arbitrary value `[transform:translate(-50%,-50%)]` su Dialog + AlertDialog. **Super-set del fix EVO-018** (che aveva risolto un caso simile in Tailwind v3 ma è stato rotto al passaggio v4).
+5. **Per-row action drill-down** (`feat(evo-020): per-row 'Segna pagata' action su drill-down`): UX gap richiesto dallo smoke step (e) — aggiunto DropdownMenu kebab "Segna pagata" disabled se già pagata, apre `SegnaPagatePresenzeModal` con singolo record.
+
+### Quality gates
+
+- `npm run lint` ✅ 0 errori (8 warning preesistenti su `<img>` legacy non in scope)
+- `npm run build` ✅ Compiled successfully in 4.2s · 47/47 pagine
+- Smoke test guidato 11-step (a-k) tutti ✅
+
+### Tabella verifica per dimensione
+
+| Dimensione | Stato | Note |
+|---|---|---|
+| Design system | ✅ | Riuso completo scaffold EVO-016/017/018/019 + 2 nuove utility (AlertDialog DS + Tailwind v4 transform fix). Niente token CSS nuovi. |
+| Architettura | ✅ | Rispetta route group `(portal)`, requireAdmin server-side, parsers server-only, safe() wrapper, sottocartelle per area, separazione airtable-portale/airtable-admin. |
+| i18n | n/a | Solo italiano. |
+| SEO | n/a | Area admin Clerk-protetta. |
+| Pattern transazionale | ✅ | Nuovo del progetto, snippet TS canonico in DS-NOTES §8, smoke step (k) verificato con AUTH_USER_ID Clerk-Not-Found → rollback eseguito. |
+| Generazione PRESENZE_MAESTRI cross-feature | ✅ | Hook su `createLezione` + `createGaraAction`/`updateGaraAction`, best-effort non-bloccante, idempotenza via inverse field `TABELLA_MAESTRI.PRESENZE_MAESTRI[]`. |
+
+### Azioni manuali residue lato utente
+
+1. Configurare tariffe rimborso sui 9 maestri reali in produzione via modal "Modifica tariffa" su `/portale/admin/presenze-maestri/{maestroId}?mese=...&anno=...`.
+2. (Opzionale) Backfill manuale di lezioni pregresse importanti via modal "Aggiungi presenza" → tipo lezione/gara + maestro + data + importo override + flag pagato condizionale.
+3. Comunicare ai maestri la nuova gestione rimborsi tracciata (lezioni e gare future genereranno automaticamente record PRESENZE_MAESTRI da quel punto in avanti).
+
+### [2026-05-26] Fase 8 — Verifica e go-live completata
+
+EVO-020 chiusa. **Chiude lo scope ombrello EVO-007 admin** (A-1..A-11 tutte rilasciate: EVO-016 A-1 + EVO-017 A-2/3/4 + EVO-018 A-5/A-11 + EVO-019 A-6/A-7 + EVO-020 A-8/A-9/A-10). PR docs di chiusura su branch separato `docs/evo-020-close` con aggiornamento memory.md + scheda sezione 8 + AGENTS.md "Pattern appresi in EVO-020".
