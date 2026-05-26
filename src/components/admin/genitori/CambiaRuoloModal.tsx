@@ -18,7 +18,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { cambiaRuoloAction } from "@/app/portale/(portal)/admin/genitori/actions";
 import type { Genitore, Ruolo } from "@/lib/airtable-portale";
 
@@ -219,7 +219,9 @@ export function CambiaRuoloModal({ open, onOpenChange, genitore, onSuccess }: Pr
               onClick={handleConfirm}
               disabled={submitting}
               className={
-                isDowngrade ? "bg-flag-500 hover:bg-flag-600 text-white" : undefined
+                isDowngrade
+                  ? buttonVariants({ variant: "destructive", size: "sm" })
+                  : undefined
               }
             >
               {submitting ? "Sincronizzazione…" : "Conferma"}

@@ -5,6 +5,7 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { AlertTriangle, AlertCircle } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 const AlertDialog = AlertDialogPrimitive.Root;
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
@@ -24,7 +25,10 @@ AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName;
 
 const alertDialogContentVariants = cva(
   [
-    "ds-modal fixed left-1/2 top-1/2 z-50 grid w-[calc(100%-2rem)] max-w-md",
+    // -translate-x-1/2 -translate-y-1/2 STATICI: il keyframe d'entrata applica
+    // anche un transform che, terminata l'animazione, viene rimosso lasciando
+    // la modale offset (bug pattern EVO-018 hardening).
+    "ds-modal fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 grid w-[calc(100%-2rem)] max-w-md",
     "bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] p-6",
     "focus:outline-none",
   ].join(" "),
@@ -115,8 +119,29 @@ const AlertDialogDescription = React.forwardRef<
 ));
 AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName;
 
-const AlertDialogAction = AlertDialogPrimitive.Action;
-const AlertDialogCancel = AlertDialogPrimitive.Cancel;
+const AlertDialogAction = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Action>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Action
+    ref={ref}
+    className={cn(buttonVariants({ variant: "primary", size: "sm" }), className)}
+    {...props}
+  />
+));
+AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
+
+const AlertDialogCancel = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Cancel>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Cancel
+    ref={ref}
+    className={cn(buttonVariants({ variant: "ghost", size: "sm" }), className)}
+    {...props}
+  />
+));
+AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName;
 
 export {
   AlertDialog,
