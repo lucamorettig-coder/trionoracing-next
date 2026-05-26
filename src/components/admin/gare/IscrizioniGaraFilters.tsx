@@ -19,15 +19,12 @@ export function IscrizioniGaraFilters({ initial, totalResults }: Props) {
 
   const [search, setSearch] = React.useState(initial.search ?? "");
 
-  const setParam = React.useCallback(
-    (key: string, value: string | null) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (value === null || value === "") params.delete(key);
-      else params.set(key, value);
-      router.replace(`${pathname}?${params.toString()}`);
-    },
-    [router, pathname, searchParams],
-  );
+  const setParam = (key: string, value: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value === null || value === "") params.delete(key);
+    else params.set(key, value);
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
   const toggleMultiParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -46,7 +43,8 @@ export function IscrizioniGaraFilters({ initial, totalResults }: Props) {
       setParam("search", search || null);
     }, 300);
     return () => clearTimeout(timer);
-  }, [search, setParam]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
 
   const statiAttivi = initial.stato ?? [];
   const hasFilters = statiAttivi.length > 0 || !!initial.search;

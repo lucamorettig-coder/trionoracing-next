@@ -58,7 +58,12 @@ export function GareTableWithFilters({ gare, toggle, initialSearch }: Props) {
       router.replace(`${pathname}?${params.toString()}`);
     }, 300);
     return () => clearTimeout(timer);
-  }, [search, router, pathname, searchParams]);
+    // searchParams / router / pathname intentionally omitted: includere
+    // searchParams crea un loop infinito (router.replace cambia searchParams →
+    // ri-triggera l'effect). Closure cattura i valori corretti al momento del
+    // timer fire — è sufficiente.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
 
   // Filtri mese/regione/tipo in-memory con prefiltro mese corrente + Umbria.
   const mesiOptions = React.useMemo(() => {
