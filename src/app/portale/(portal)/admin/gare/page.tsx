@@ -73,6 +73,7 @@ export default async function GareAdminPage({
 
       <div className="mt-6">
         <GareTableWithFilters
+          key={filters.toggle}
           gare={gare}
           toggle={filters.toggle}
           initialSearch={filters.search ?? ""}

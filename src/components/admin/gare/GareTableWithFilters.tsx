@@ -100,14 +100,6 @@ export function GareTableWithFilters({ gare, toggle, initialSearch }: Props) {
   const [regione, setRegione] = React.useState<string>(initialRegione);
   const [tipo, setTipo] = React.useState<string>(ALL);
 
-  // Re-sync se cambiano le opzioni iniziali (es. toggle Future/Passate)
-  React.useEffect(() => {
-    setMese(initialMese);
-  }, [initialMese]);
-  React.useEffect(() => {
-    setRegione(initialRegione);
-  }, [initialRegione]);
-
   const filtrate = React.useMemo(() => {
     return gare.filter((g) => {
       if (mese !== ALL && meseKeyOf(g.data) !== mese) return false;
