@@ -25,7 +25,7 @@
 | EVO-017 | admin-iscrizioni-bambini | Admin iscrizioni A-2/A-3 + bambini A-4 + 4 modal (annulla/forza completa/titolo manuale/segna pagato) | 2026-05-25 | 2026-05-25 | completata | https://trionoracing-next.vercel.app/portale/admin/iscrizioni | [link](evolutive/EVO-017-admin-iscrizioni-bambini.md) |
 | EVO-018 | admin-pagamenti-tariffe | Admin pagamenti A-5 + KPI + tariffe A-11 CRUD Q1/Q2/Q3 | 2026-05-25 | 2026-05-26 | completata | https://trionoracing-next.vercel.app/portale/admin/pagamenti | [link](evolutive/EVO-018-admin-pagamenti-tariffe.md) |
 | EVO-019 | admin-gare | Admin gare A-6 CRUD manuale (fallback) + A-7 approvazioni iscrizioni + assegnazione maestri | 2026-05-26 | — | pronta per implementazione | — | [link](evolutive/EVO-019-admin-gare.md) |
-| EVO-020 | admin-lezioni-maestri-genitori | Admin lezioni A-8 + presenze maestri A-9 + genitori A-10 + cambio ruolo Clerk sync | — | — | in pianificazione | — | [link](evolutive/EVO-020-admin-lezioni-maestri-genitori.md) |
+| EVO-020 | admin-lezioni-maestri-genitori | Admin lezioni A-8 + presenze maestri A-9 con **gestione rimborsi maestri** (nuova tabella PRESENZE_MAESTRI) + genitori A-10 + cambio ruolo **Clerk-sync transazionale con rollback** | 2026-05-26 | — | pronta per implementazione | — | [link](evolutive/EVO-020-admin-lezioni-maestri-genitori.md) |
 
 ## Stati possibili
 
@@ -40,6 +40,18 @@
 - **ombrello** — evolutiva contenitore con sotto-evolutive collegate
 
 ## Cronologia narrativa
+
+**2026-05-26 — Kick-off EVO-020 + pianificazione completata (Fasi 1-7)**
+Avviato workflow `evolutive-workflow` su EVO-020 (ultima sotto-evolutiva ombrello EVO-007 admin). Fasi 0-7 chiuse in sessione Cowork. **Estensione scope significativa**: lo stub originale era "report read-only" su lezioni/presenze/genitori; durante Fase 1 l'utente ha richiesto di aggiungere la **gestione rimborsi spese maestri** (tariffa per maestro per lezione/gara + tracking pagamento per singola presenza + riepilogo dato/da-dare). Decisioni chiuse (2 round AskUserQuestion, 9 domande):
+- **Scope**: singolo deploy `feat/evo-020-admin-lezioni-maestri-genitori`, 3 macro-aree + cambio ruolo Clerk-sync transazionale + nuovo modulo rimborsi.
+- **Schema Airtable**: 2 modifiche speculari PROD+DEV via MCP: (a) `TABELLA_MAESTRI` +2 campi `IMPORTO_RIMBORSO_LEZIONE`/`IMPORTO_RIMBORSO_GARA` (currency, per-maestro, valore corrente non storico); (b) **nuova tabella `PRESENZE_MAESTRI`** (9 campi: TIPO/LEZIONE/GARA/MAESTRO/DATA/IMPORTO_DOVUTO/PAGATO/DATA_PAGAMENTO/NOTE). Cutoff su data deploy, no backfill — eventi storici via modal "Aggiungi presenza manuale".
+- **Generazione presenze**: in codice Next.js (no Make.com). `createLezione` esteso + hook su `createGaraAction`/`updateGaraAction` di EVO-019 (già mergiata `f1ef6c7` quindi zero coordinamento merge). Best-effort non-bloccante + idempotenza pre-create.
+- **Cambio ruolo Clerk-sync**: nuovo pattern del progetto **Server Action transazionale con rollback atomico** (Airtable first authoritative → Clerk con timeout 5s → rollback Airtable se Clerk fallisce + errore esplicito in UI). Snippet TS canonico in `evolutive/EVO-020-.../visual/DS-NOTES-evo-020.md` §8.
+- **Filtro Corso**: rimosso da A-8 — Triono ha 1 SOLO corso MTB/BDC combinato (regola salvata in memoria persistente Cowork `reference-triono-corso-unico`).
+- **Bundle visual**: pattern Cowork-only validato EVO-017/019 — 10 file in `visual/` (README + DS-NOTES con snippet TS Server Action transazionale + 3 F3 reference + 5 mockup MVP nuovi 3170 righe totali coprendo tutte le pagine/modal MVP).
+- **Prompt Claude Code**: 16 KB autocontenuto, WBS 6 macro-task/17 task, smoke 11-step incluso step (k) test rollback Clerk fail simulato. Stato → "pronta per implementazione". Effort stimato ~5-6gg (era 3-4gg prima dell'estensione rimborsi).
+
+Out of scope confermati: audit log (EVO-007 ombrello), bulk cambio ruolo (sicurezza), disabilita account (EVO-008), modifica anagrafica admin, notifiche email, tariffe storiche, backfill, PSP per rimborsi, sync Make.com presenze, calendario UI.
 
 **2026-05-21 — Kick-off Fase 3 portale**
 Fase 1 (8 pagine statiche) completata. Censimento as-is, UX completa (32 mockup), schema funzionalità per ruolo prodotti in sessioni Cowork precedenti. L'ombrello EVO-001 contiene 7 sotto-evolutive rilasciabili separatamente (EVO-002→EVO-008). Si parte da EVO-002 (infra). Deploy: Vercel collegato a GitHub, auto-deploy su merge su `main`.

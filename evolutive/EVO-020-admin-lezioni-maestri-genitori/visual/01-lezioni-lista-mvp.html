@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lezioni · Admin · Triono Racing — MVP EVO-020</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --navy-50:  #EEF1FA;
+    --navy-100: #D6DDF0;
+    --navy-200: #ADBAE0;
+    --navy-300: #7889C7;
+    --navy-500: #3C4F94;
+    --navy-700: #1F2D5A;
+    --navy-800: #131E47;
+    --navy-900: #050E3F;
+
+    --sky-100: #E4F0FB;
+    --sky-300: #94BFE4;
+    --sky-500: #3A82C8;
+    --sky-700: #1E5A95;
+
+    --grass-100: #E8F4DE;
+    --grass-300: #B0D894;
+    --grass-500: #5FAC36;
+    --grass-700: #3F7A1F;
+
+    --ember-100: #FCEFD6;
+    --ember-300: #F4C474;
+    --ember-500: #E09618;
+    --ember-600: #B97812;
+    --ember-700: #8B5A0E;
+
+    --flag-100: #FBDADA;
+    --flag-300: #E68585;
+    --flag-500: #C01818;
+    --flag-700: #8A0F0F;
+
+    --sun-100: #FDFBC9;
+    --sun-300: #F5EE7A;
+    --sun-500: #EFE63A;
+    --sun-700: #B5A926;
+
+    --ink: #0F1729;
+    --ink-muted: #5B6478;
+    --line: #E4E7EE;
+    --line-soft: #EEF0F4;
+    --bg-soft: #F7F8FB;
+    --bg-muted: #ECEEF3;
+
+    --f-sans: 'Inter', system-ui, sans-serif;
+    --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: var(--f-sans); color: var(--ink); background: var(--bg-soft); font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+  /* NAVBAR */
+  .navbar { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+  .nav-inner { max-width: 1280px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 24px; }
+  .nav-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+  .nav-logo-mark { width: 36px; height: 36px; background: var(--sun-500); color: var(--navy-900); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
+  .nav-logo-eyebrow { font-family: var(--f-mono); font-size: 9.5px; font-weight: 700; color: var(--sun-700); letter-spacing: 0.12em; text-transform: uppercase; line-height: 1; margin-bottom: 3px; }
+  .nav-logo-text { font-weight: 700; font-size: 15px; color: var(--ink); letter-spacing: -0.01em; line-height: 1.1; }
+  .nav-links { flex: 1; display: flex; gap: 2px; align-items: center; overflow-x: auto; }
+  .nav-link { text-decoration: none; padding: 7px 11px; border-radius: 7px; color: var(--ink-muted); font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .nav-link.active { background: var(--navy-50); color: var(--navy-700); font-weight: 600; }
+  .nav-actions { display: inline-flex; align-items: center; gap: 8px; }
+  .nav-iconbtn { width: 36px; height: 36px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-muted); cursor: pointer; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+
+  /* BREADCRUMB */
+  .breadcrumb { max-width: 1280px; margin: 0 auto; padding: 16px 24px 0; font-size: 12.5px; color: var(--ink-muted); display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--ink-muted); text-decoration: none; }
+  .breadcrumb .sep { color: var(--line); }
+  .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+  /* PAGE CONTAINER */
+  .page-container { max-width: 1280px; margin: 0 auto; padding: 24px 24px 64px; }
+
+  /* HEADER */
+  .adm-eyebrow { font-family: var(--f-mono); font-size: 10.5px; color: var(--sun-700); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px; }
+  .adm-page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+  .adm-page-h1 { font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.02em; color: var(--ink); }
+  .adm-page-sub { font-size: 14px; color: var(--ink-muted); margin: 6px 0 0; max-width: 720px; line-height: 1.5; }
+  .adm-page-actions { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; text-decoration: none; height: 36px; }
+  .btn-primary { background: var(--navy-700); color: #fff; border-color: var(--navy-700); }
+  .btn-outline { background: #fff; color: var(--ink); border-color: var(--line); }
+
+  /* KPI CARDS */
+  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+  .kpi-card {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 14px; padding: 16px 18px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .kpi-label {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ink-muted);
+  }
+  .kpi-value { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); line-height: 1.1; }
+  .kpi-value.success { color: var(--grass-700); }
+  .kpi-value.warning { color: var(--ember-700); }
+  .kpi-sub { font-size: 11.5px; color: var(--ink-muted); }
+
+  /* FILTERS */
+  .adm-filters {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 12px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .year-pills { display: inline-flex; gap: 3px; background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: 999px; padding: 3px; }
+  .year-pills button {
+    background: transparent; border: none;
+    padding: 5px 12px; border-radius: 999px;
+    font-size: 12.5px; font-weight: 600;
+    color: var(--ink-muted); cursor: pointer;
+    font-family: var(--f-mono);
+  }
+  .year-pills button.active { background: var(--navy-700); color: #fff; }
+  .select-pill {
+    appearance: none; background: var(--bg-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: 8px; padding: 7px 28px 7px 12px;
+    font-size: 12.5px; color: var(--ink); cursor: pointer;
+    font-family: inherit; font-weight: 500;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235B6478' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat; background-position: right 8px center;
+  }
+  .adm-search { flex: 1; display: flex; align-items: center; gap: 8px; background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: 8px; padding: 7px 12px; min-width: 220px; }
+  .adm-search input { flex: 1; border: none; outline: none; background: transparent; font-size: 13px; }
+  .adm-search .ico { color: var(--ink-muted); display: inline-flex; }
+  .adm-results-count { font-family: var(--f-mono); font-size: 12px; color: var(--ink-muted); flex-shrink: 0; padding: 0 4px; }
+
+  /* TABLE */
+  .adm-table-wrap { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(15,23,42,0.06); }
+  .adm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .adm-table thead th { background: var(--bg-soft); padding: 11px 14px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); text-align: left; border-bottom: 1px solid var(--line); }
+  .adm-table tbody td { padding: 12px 14px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+  .adm-table tbody tr:hover { background: var(--bg-soft); cursor: pointer; }
+  .adm-table tbody tr:last-child td { border-bottom: none; }
+
+  .date-cell .date-main { font-weight: 600; color: var(--ink); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .date-cell .date-sub { font-family: var(--f-mono); font-size: 10.5px; color: var(--ink-muted); text-transform: lowercase; margin-top: 1px; }
+
+  .argomento { font-weight: 600; color: var(--ink); font-size: 13.5px; letter-spacing: -0.005em; }
+
+  .maestri-chips { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+  .maestro-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--bg-soft); border: 1px solid var(--line-soft);
+    border-radius: 999px; padding: 2px 9px 2px 3px;
+    font-size: 11.5px; font-weight: 600; color: var(--ink);
+  }
+  .maestro-chip .av {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 8.5px; font-weight: 700; color: #fff;
+  }
+
+  .bambini-count {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--f-mono); font-weight: 600;
+    font-size: 13px; font-variant-numeric: tabular-nums;
+    color: var(--grass-700);
+  }
+  .bambini-count i { color: var(--ink-muted); }
+
+  .cell-action-btn { width: 28px; height: 28px; background: transparent; border: 1px solid transparent; border-radius: 6px; cursor: pointer; color: var(--ink-muted); display: inline-flex; align-items: center; justify-content: center; }
+  .cell-action-btn:hover { background: var(--bg-soft); border-color: var(--line); color: var(--ink); }
+
+  /* ANNOTATIONS */
+  .annotations { margin-top: 40px; background: var(--bg-muted); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; }
+  .annotations h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-muted); font-weight: 700; margin: 0 0 12px; }
+  .annotations ol { list-style: decimal; margin: 0; padding-left: 24px; font-size: 13px; color: var(--ink); line-height: 1.6; }
+  .annotations ol li { margin-bottom: 6px; }
+  .annotations strong { color: var(--navy-700); font-weight: 700; }
+  .annotations code { font-family: var(--f-mono); background: #fff; padding: 1px 5px; border-radius: 4px; font-size: 12px; color: var(--flag-700); }
+  .annotations .ko { color: var(--flag-700); font-weight: 700; }
+</style>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-mark">T</div>
+        <div>
+          <div class="nav-logo-eyebrow">Area Admin</div>
+          <div class="nav-logo-text">Triono Racing · Gestione</div>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="#" class="nav-link">Dashboard</a>
+        <a href="#" class="nav-link">Iscrizioni</a>
+        <a href="#" class="nav-link">Bambini</a>
+        <a href="#" class="nav-link">Pagamenti</a>
+        <a href="#" class="nav-link">Gare</a>
+        <a href="#" class="nav-link active">Lezioni</a>
+        <a href="#" class="nav-link">Presenze maestri</a>
+        <a href="#" class="nav-link">Genitori</a>
+        <a href="#" class="nav-link">Tariffe</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <span class="avatar" style="background:var(--sun-500);color:var(--navy-900)">AM</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== BREADCRUMB ===== -->
+  <div class="breadcrumb">
+    <a href="#">Admin</a><span class="sep">/</span><span class="current">Lezioni</span>
+  </div>
+
+  <!-- ===== PAGE CONTENT ===== -->
+  <main class="page-container">
+
+    <!-- AdminPageHeader -->
+    <div>
+      <div class="adm-eyebrow">Area Admin</div>
+      <div class="adm-page-head">
+        <div>
+          <h1 class="adm-page-h1">Lezioni · storico</h1>
+          <p class="adm-page-sub">Tutte le lezioni svolte dalla Scuola di Ciclismo. Le lezioni vengono registrate dai maestri dal portale.</p>
+        </div>
+        <div class="adm-page-actions">
+          <button class="btn btn-outline">
+            <i data-lucide="download" style="width:14px;height:14px"></i>
+            Esporta CSV
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI TOP -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Lezioni totali</div>
+        <div class="kpi-value">24</div>
+        <div class="kpi-sub">nel periodo filtrato</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Bambini-presenze totali</div>
+        <div class="kpi-value">187</div>
+        <div class="kpi-sub">somma presenze su tutte le lezioni</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Maestro più attivo</div>
+        <div class="kpi-value success">Bianchi · 9 lezioni</div>
+        <div class="kpi-sub">conteggio lezioni nel periodo</div>
+      </div>
+    </div>
+
+    <!-- AdminFilters -->
+    <div class="adm-filters">
+      <div class="year-pills">
+        <button>2024</button>
+        <button>2025</button>
+        <button class="active">2026</button>
+      </div>
+      <select class="select-pill">
+        <option>Maggio 2026</option>
+        <option>Aprile 2026</option>
+        <option>Marzo 2026</option>
+        <option>Tutti i mesi</option>
+      </select>
+      <select class="select-pill">
+        <option>Tutti i maestri</option>
+        <option>Bianchi Marco</option>
+        <option>Rossi Luca</option>
+        <option>Verdi Anna</option>
+        <option>Neri Stefano</option>
+      </select>
+      <div class="adm-search">
+        <span class="ico"><i data-lucide="search" style="width:14px;height:14px"></i></span>
+        <input type="text" placeholder="Cerca per nome bambino..." />
+      </div>
+      <span class="adm-results-count">12 / 24</span>
+    </div>
+
+    <!-- DataTable -->
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th style="width:120px">Data</th>
+            <th>Argomento</th>
+            <th style="width:260px">Maestri</th>
+            <th style="width:120px">N° bambini</th>
+            <th style="width:60px"></th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">28/05/2026</div>
+              <div class="date-sub">gio</div>
+            </td>
+            <td><div class="argomento">Cambio rapporti in salita</div></td>
+            <td>
+              <div class="maestri-chips">
+                <span class="maestro-chip"><span class="av" style="background:var(--sky-500)">BM</span>Bianchi</span>
+                <span class="maestro-chip"><span class="av" style="background:var(--ember-500)">RL</span>Rossi</span>
+              </div>
+            </td>
+            <td><span class="bambini-count"><i data-lucide="users" style="width:13px;height:13px"></i>12</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">26/05/2026</div>
+              <div class="date-sub">mar</div>
+            </td>
+            <td><div class="argomento">Tecnica di curva in MTB</div></td>
+            <td>
+              <div class="maestri-chips">
+                <span class="maestro-chip"><span class="av" style="background:var(--sky-500)">BM</span>Bianchi</span>
+              </div>
+            </td>
+            <td><span class="bambini-count"><i data-lucide="users" style="width:13px;height:13px"></i>9</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">23/05/2026</div>
+              <div class="date-sub">sab</div>
+            </td>
+            <td><div class="argomento">Allenamento sprint su pista</div></td>
+            <td>
+              <div class="maestri-chips">
+                <span class="maestro-chip"><span class="av" style="background:var(--ember-500)">RL</span>Rossi</span>
+                <span class="maestro-chip"><span class="av" style="background:var(--grass-500)">VA</span>Verdi</span>
+              </div>
+            </td>
+            <td><span class="bambini-count"><i data-lucide="users" style="width:13px;height:13px"></i>11</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">21/05/2026</div>
+              <div class="date-sub">gio</div>
+            </td>
+            <td><div class="argomento">Discesa tecnica su sterrato</div></td>
+            <td>
+              <div class="maestri-chips">
+                <span class="maestro-chip"><span class="av" style="background:var(--sky-500)">BM</span>Bianchi</span>
+                <span class="maestro-chip"><span class="av" style="background:var(--navy-700)">NS</span>Neri</span>
+              </div>
+            </td>
+            <td><span class="bambini-count"><i data-lucide="users" style="width:13px;height:13px"></i>8</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">19/05/2026</div>
+              <div class="date-sub">mar</div>
+            </td>
+            <td><div class="argomento">Equilibrio e abilità bici fissa</div></td>
+            <td>
+              <div class="maestri-chips">
+                <span class="maestro-chip"><span class="av" style="background:var(--grass-500)">VA</span>Verdi</span>
+              </div>
+            </td>
+            <td><span class="bambini-count"><i data-lucide="users" style="width:13px;height:13px"></i>7</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">16/05/2026</div>
+              <div class="date-sub">sab</div>
+            </td>
+            <td><div class="argomento">Uscita su strada · giro lungo Marmore</div></td>
+            <td>
+              <div class="maestri-chips">
+                <span class="maestro-chip"><span class="av" style="background:var(--sky-500)">BM</span>Bianchi</span>
+                <span class="maestro-chip"><span class="av" style="background:var(--ember-500)">RL</span>Rossi</span>
+                <span class="maestro-chip"><span class="av" style="background:var(--navy-700)">NS</span>Neri</span>
+              </div>
+            </td>
+            <td><span class="bambini-count"><i data-lucide="users" style="width:13px;height:13px"></i>10</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">14/05/2026</div>
+              <div class="date-sub">gio</div>
+            </td>
+            <td><div class="argomento">Pedalata efficiente: cadenza e respirazione</div></td>
+            <td>
+              <div class="maestri-chips">
+                <span class="maestro-chip"><span class="av" style="background:var(--sky-500)">BM</span>Bianchi</span>
+              </div>
+            </td>
+            <td><span class="bambini-count"><i data-lucide="users" style="width:13px;height:13px"></i>8</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">12/05/2026</div>
+              <div class="date-sub">mar</div>
+            </td>
+            <td><div class="argomento">Salita ripida · gestione del peso</div></td>
+            <td>
+              <div class="maestri-chips">
+                <span class="maestro-chip"><span class="av" style="background:var(--ember-500)">RL</span>Rossi</span>
+              </div>
+            </td>
+            <td><span class="bambini-count"><i data-lucide="users" style="width:13px;height:13px"></i>6</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">09/05/2026</div>
+              <div class="date-sub">sab</div>
+            </td>
+            <td><div class="argomento">Single track tecnico nel bosco</div></td>
+            <td>
+              <div class="maestri-chips">
+                <span class="maestro-chip"><span class="av" style="background:var(--sky-500)">BM</span>Bianchi</span>
+                <span class="maestro-chip"><span class="av" style="background:var(--navy-700)">NS</span>Neri</span>
+              </div>
+            </td>
+            <td><span class="bambini-count"><i data-lucide="users" style="width:13px;height:13px"></i>9</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">07/05/2026</div>
+              <div class="date-sub">gio</div>
+            </td>
+            <td><div class="argomento">Frenata di emergenza e controllo bici</div></td>
+            <td>
+              <div class="maestri-chips">
+                <span class="maestro-chip"><span class="av" style="background:var(--grass-500)">VA</span>Verdi</span>
+                <span class="maestro-chip"><span class="av" style="background:var(--ember-500)">RL</span>Rossi</span>
+              </div>
+            </td>
+            <td><span class="bambini-count"><i data-lucide="users" style="width:13px;height:13px"></i>11</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">05/05/2026</div>
+              <div class="date-sub">mar</div>
+            </td>
+            <td><div class="argomento">Manutenzione bici: catena e freni</div></td>
+            <td>
+              <div class="maestri-chips">
+                <span class="maestro-chip"><span class="av" style="background:var(--sky-500)">BM</span>Bianchi</span>
+              </div>
+            </td>
+            <td><span class="bambini-count"><i data-lucide="users" style="width:13px;height:13px"></i>7</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td class="date-cell">
+              <div class="date-main">02/05/2026</div>
+              <div class="date-sub">sab</div>
+            </td>
+            <td><div class="argomento">Tecnica del salto: piccoli ostacoli</div></td>
+            <td>
+              <div class="maestri-chips">
+                <span class="maestro-chip"><span class="av" style="background:var(--navy-700)">NS</span>Neri</span>
+                <span class="maestro-chip"><span class="av" style="background:var(--grass-500)">VA</span>Verdi</span>
+              </div>
+            </td>
+            <td><span class="bambini-count"><i data-lucide="users" style="width:13px;height:13px"></i>9</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Annotations -->
+    <div class="annotations">
+      <h3>Note di design · scope MVP EVO-020</h3>
+      <ol>
+        <li><strong>Scope filtri</strong>: Anno (pills, default anno corrente) + Mese (dropdown, default mese corrente) + Maestro (single select da <code>getAllMaestriAttivi()</code>) + Search bambino (debounced 300ms). Counter risultati a destra come pattern EVO-016/017/018/019.</li>
+        <li><strong class="ko">❌ NO filtro Corso</strong>: confermato da reference Cowork persistente — Triono ha <em>un solo corso</em> MTB/BDC combinato. Non aggiungere il filtro nemmeno disabled.</li>
+        <li><strong>KPI top</strong>: 3 metriche aggregate sul periodo filtrato. <em>"Maestro più attivo"</em> in <code>valueTone="success"</code> grass-700 per dare risalto al riconoscimento.</li>
+        <li><strong>Click riga</strong> → apre <code>LezioneDetailModal</code> read-only (no pagina dedicata, niente modifica/elimina in MVP — le lezioni sono di proprietà del maestro che le ha registrate dal portale).</li>
+        <li><strong>Maestri chips</strong>: lista compatta con avatar iniziali colorate (max 3 visibili, +N se più). Pattern coerente con cell-person di EVO-019 ma in formato chip pill.</li>
+        <li><strong>N° bambini</strong>: counter grass con icona <code>&lt;Users/&gt;</code>. Lezioni con 0 bambini sono filtrate dal portale lato maestro (errore di compilazione) — non dovrebbero apparire qui.</li>
+        <li><strong>DataTable</strong> (non card grid): coerente con altre liste admin EVO-016/017/018/019. Componente base <code>DataTable&lt;Lezione&gt;</code> riusato.</li>
+      </ol>
+    </div>
+
+  </main>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

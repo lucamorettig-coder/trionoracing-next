@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lezioni · Admin · Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="page" style="background:var(--bg-soft)">
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" style="text-decoration:none;color:inherit">
+        <div class="nav-logo-mark">T</div>
+        <div><div class="nav-logo-text">Triono Racing</div><div class="nav-logo-sub">Gestione</div></div>
+      </a>
+      <nav class="nav-links">
+        <a href="dashboard.html" class="nav-link">Home</a>
+        <a href="#" class="nav-link active" style="display:inline-flex;align-items:center;gap:4px">Gestione<i data-lucide="chevron-down" style="width:14px;height:14px"></i></a>
+        <a href="#" class="nav-link">Profilo</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <button class="nav-iconbtn nav-iconbtn-burger"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+        <a href="#" style="text-decoration:none;display:inline-flex"><span class="avatar avatar-sm" style="background:var(--sun-500);color:var(--navy-900)">AM</span></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb"><a href="dashboard.html">Admin</a><span class="sep">/</span><span class="current">Lezioni</span></div>
+
+  <div class="adm-page-head">
+    <div class="adm-page-head-row">
+      <div>
+        <h1 class="adm-page-h1">Lezioni · storico globale <span class="count">15 a maggio 2026</span></h1>
+        <p class="adm-page-sub">Storico di tutte le lezioni registrate dai maestri. Filtri per data, maestro, disciplina e bambino specifico.</p>
+      </div>
+      <div class="adm-page-actions">
+        <button class="btn btn-outline btn-sm"><i data-lucide="download" style="width:14px;height:14px"></i>Esporta CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-inner">
+
+    <div class="adm-kpi-strip">
+      <div class="adm-kpi"><div class="l">Lezioni · maggio</div><div class="v">15</div></div>
+      <div class="adm-kpi"><div class="l">Presenze totali</div><div class="v">122</div></div>
+      <div class="adm-kpi success"><div class="l">Media presenze</div><div class="v">8,1</div></div>
+      <div class="adm-kpi"><div class="l">Maestro più attivo</div><div class="v" style="font-size:16px">Andrea M.</div></div>
+    </div>
+
+    <div class="adm-filters">
+      <button class="adm-filter active"><span class="label">Mese</span>Maggio 2026<span class="clear"><i data-lucide="x" style="width:9px;height:9px"></i></span></button>
+      <button class="adm-filter"><span class="label">Maestro</span>Tutti<i data-lucide="chevron-down" style="width:13px;height:13px;color:var(--ink-muted)"></i></button>
+      <button class="adm-filter"><span class="label">Disciplina</span>Tutte<i data-lucide="chevron-down" style="width:13px;height:13px;color:var(--ink-muted)"></i></button>
+      <button class="adm-filter"><span class="label">Bambino</span>—<i data-lucide="chevron-down" style="width:13px;height:13px;color:var(--ink-muted)"></i></button>
+      <div class="adm-search">
+        <span class="ico"><i data-lucide="search" style="width:14px;height:14px"></i></span>
+        <input type="text" placeholder="Cerca argomento, note…" />
+      </div>
+      <span class="adm-results-count">15 / 67</span>
+    </div>
+
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Disciplina</th>
+            <th>Argomento</th>
+            <th>Maestri</th>
+            <th>Presenze</th>
+            <th>Note pub.</th>
+            <th>Note int.</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="tnum">GIO 16 mag · 17:00</td>
+            <td><span class="badge badge-success" style="font-size:10.5px">MTB</span></td>
+            <td><strong>Curva veloce in salita</strong></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span class="avatar avatar-sm" style="background:var(--ember-500);color:#fff;width:24px;height:24px;font-size:10px">AM</span>
+                <span class="avatar avatar-sm" style="background:var(--sky-500);color:#fff;width:24px;height:24px;font-size:10px;margin-left:-8px">MC</span>
+                <span class="t-muted" style="font-size:11px">Andrea + Marta</span>
+              </div>
+            </td>
+            <td><span style="background:var(--navy-700);color:#fff;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px">9</span></td>
+            <td><i data-lucide="check" style="width:14px;height:14px;color:var(--grass-600)"></i></td>
+            <td><i data-lucide="check" style="width:14px;height:14px;color:var(--ember-600)"></i></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="eye" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr>
+            <td class="tnum">MAR 14 mag · 17:00</td>
+            <td><span class="badge badge-info" style="font-size:10.5px">BDC</span></td>
+            <td><strong>Cambio marce in scioltezza</strong></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span class="avatar avatar-sm" style="background:var(--ember-500);color:#fff;width:24px;height:24px;font-size:10px">AM</span>
+                <span class="t-muted" style="font-size:11px">Andrea</span>
+              </div>
+            </td>
+            <td><span style="background:var(--navy-700);color:#fff;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px">7</span></td>
+            <td><span style="color:var(--ink-muted)">—</span></td>
+            <td><span style="color:var(--ink-muted)">—</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="eye" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr>
+            <td class="tnum">GIO 09 mag · 17:00</td>
+            <td><span class="badge badge-success" style="font-size:10.5px">MTB</span></td>
+            <td><strong>Equilibrio in sella · slalom</strong></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span class="avatar avatar-sm" style="background:var(--ember-500);color:#fff;width:24px;height:24px;font-size:10px">AM</span>
+                <span class="avatar avatar-sm" style="background:var(--sky-500);color:#fff;width:24px;height:24px;font-size:10px;margin-left:-8px">MC</span>
+                <span class="t-muted" style="font-size:11px">Andrea + Marta</span>
+              </div>
+            </td>
+            <td><span style="background:var(--navy-700);color:#fff;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px">11</span></td>
+            <td><i data-lucide="check" style="width:14px;height:14px;color:var(--grass-600)"></i></td>
+            <td><span style="color:var(--ink-muted)">—</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="eye" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr>
+            <td class="tnum">MAR 07 mag · 17:00</td>
+            <td><span class="badge badge-info" style="font-size:10.5px">BDC</span></td>
+            <td><strong>Postura e respirazione</strong></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span class="avatar avatar-sm" style="background:var(--ember-500);color:#fff;width:24px;height:24px;font-size:10px">AM</span>
+                <span class="t-muted" style="font-size:11px">Andrea</span>
+              </div>
+            </td>
+            <td><span style="background:var(--navy-700);color:#fff;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px">6</span></td>
+            <td><span style="color:var(--ink-muted)">—</span></td>
+            <td><i data-lucide="check" style="width:14px;height:14px;color:var(--ember-600)"></i></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="eye" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr>
+            <td class="tnum">SAB 04 mag · 09:30</td>
+            <td><span class="badge" style="font-size:10.5px;background:var(--ember-100);color:var(--ember-700)">JR</span></td>
+            <td><strong>Equilibrio base · giovaniss.</strong></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span class="avatar avatar-sm" style="background:var(--sky-500);color:#fff;width:24px;height:24px;font-size:10px">MC</span>
+                <span class="t-muted" style="font-size:11px">Marta</span>
+              </div>
+            </td>
+            <td><span style="background:var(--navy-700);color:#fff;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px">5</span></td>
+            <td><i data-lucide="check" style="width:14px;height:14px;color:var(--grass-600)"></i></td>
+            <td><span style="color:var(--ink-muted)">—</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="eye" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr>
+            <td class="tnum">GIO 02 mag · 17:00</td>
+            <td><span class="badge badge-success" style="font-size:10.5px">MTB</span></td>
+            <td><strong>Frenata anticipata · uscita lago</strong></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span class="avatar avatar-sm" style="background:var(--ember-500);color:#fff;width:24px;height:24px;font-size:10px">AM</span>
+                <span class="avatar avatar-sm" style="background:var(--sky-500);color:#fff;width:24px;height:24px;font-size:10px;margin-left:-8px">MC</span>
+                <span class="t-muted" style="font-size:11px">Andrea + Marta</span>
+              </div>
+            </td>
+            <td><span style="background:var(--navy-700);color:#fff;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px">10</span></td>
+            <td><i data-lucide="check" style="width:14px;height:14px;color:var(--grass-600)"></i></td>
+            <td><i data-lucide="check" style="width:14px;height:14px;color:var(--ember-600)"></i></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="eye" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="adm-pagination">
+        <span>1-6 di 15 a maggio · 67 lezioni totali 2026</span>
+        <div class="pages"><button>‹</button><button class="active">1</button><button>2</button><button>3</button><button>›</button></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand"><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;background:var(--sun-500);color:var(--navy-900);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px">T</div><div><div class="footer-brand-name">Triono Racing</div></div></div></div>
+      <div class="footer-col"><div class="footer-col-title">Gestione</div><ul><li><a href="#">Lezioni</a></li></ul></div>
+      <div class="footer-col"><div class="footer-col-title">Risorse</div><ul><li><a href="#">Export</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>Admin v2.0</span><span>© 2026</span></div>
+  </footer>
+
+</div>
+</template>
+
+<script src="../shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['Mockup Portale', 'Admin', 'Lezioni'],
+    title: 'Lezioni · storico globale admin',
+    route: '/portale/admin/lezioni',
+    statusBarTheme: 'dark',
+    desktopScale: 0.58,
+    stateLegend: { tag: 'Stato', items: [{ ref: 1, text: 'Filtro maggio 2026 · 6 lezioni miste (4 MTB + 1 BDC + 1 JR sabato) · 2 con note interne (icona ember)' }] },
+    annotations: [
+      { ref: 1, text: '<strong>KPI dashboard mese</strong>: lezioni totali + presenze + media + maestro più attivo. Quest\'ultimo dato è prezioso per pagamento maestri.' },
+      { ref: 2, text: '<strong>Tabella stile compact</strong> con disciplina come badge (MTB grass / BDC sky / JR ember). Permette filter visivo veloce.' },
+      { ref: 3, text: '<strong>Argomento bold</strong>: il dato più importante per riconoscere la lezione a colpo d\'occhio. Replicato dal pattern maestro.' },
+      { ref: 4, text: '<strong>Avatar stack maestri</strong>: pattern condiviso con gare-assegnate. Co-maestri mostrati con nome inline mono.' },
+      { ref: 5, text: '<strong>Presenze pillola navy</strong>: numero centrato. Click apre dettaglio con lista nominativa bambini presenti.' },
+      { ref: 6, text: '<strong>Note pubbliche vs interne</strong>: 2 colonne icone check colorate. Grass = note pubbliche presenti, ember = note interne presenti, em-dash = vuoto. L\'admin vede entrambe.' },
+      { ref: 7, text: '<strong>JR rule</strong>: lezione sabato 04 mag classificata «JR» (giovaniss. 5-7 anni) — corso separato dai MTB/BDC ufficiali. Pattern già esposto in dashboard admin corsi attivi.' },
+      { ref: 8, text: '<strong>Eye action</strong>: apre vista read-only della lezione con tutti i campi + audit log modifiche. Admin può eliminare (UX_DETTAGLIO_MAESTRO §2 — solo admin pu\u00f2 eliminare).' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>

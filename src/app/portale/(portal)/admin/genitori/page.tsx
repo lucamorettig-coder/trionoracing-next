@@ -1,20 +1,55 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
+import { Suspense } from "react";
+import { requireAdmin } from "@/lib/auth-admin";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
-import { getGenitoreByClerkId } from "@/lib/airtable-portale";
+import { ExportCSVButton } from "@/components/admin/ExportCSVButton";
+import { GenitoriDataTable } from "@/components/admin/genitori/GenitoriDataTable";
+import { GenitoriFilters } from "@/components/admin/genitori/GenitoriFilters";
+import { parseGenitoriFilters, getAllGenitori } from "@/lib/airtable-admin";
 
-export default async function GenitoriAdminPage() {
-  const { userId } = await auth();
-  if (!userId) redirect("/portale/login");
-  const genitore = await getGenitoreByClerkId(userId);
-  if (!genitore || genitore.fields.RUOLO !== "ADMIN") redirect("/portale");
+async function safe<T>(fn: () => Promise<T>): Promise<T | null> {
+  try {
+    return await fn();
+  } catch (err) {
+    console.error("[admin/genitori] fetch failed:", err);
+    return null;
+  }
+}
+
+interface PageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function GenitoriAdminPage({ searchParams }: PageProps) {
+  await requireAdmin();
+  const sp = await searchParams;
+  const params = new URLSearchParams();
+  for (const [k, v] of Object.entries(sp)) {
+    if (Array.isArray(v)) v.forEach((x) => params.append(k, x));
+    else if (v !== undefined) params.set(k, v);
+  }
+  const filters = parseGenitoriFilters(params);
+
+  const genitori = (await safe(() => getAllGenitori(filters))) ?? [];
 
   return (
-    <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-12 lg:py-16">
-      <AdminPageHeader eyebrow="Area Admin" title="Genitori" subtitle="Disponibile a breve." />
-      <div className="mt-6">
-        <Badge variant="warning">In costruzione (EVO-020)</Badge>
+    <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-10 lg:py-14">
+      <AdminPageHeader
+        eyebrow="Area Admin"
+        title="Genitori & Utenti"
+        subtitle="Gestione anagrafica utenti del portale. Cambio ruolo sincronizzato con Clerk."
+        action={
+          <ExportCSVButton entity="genitori" filters={filters as unknown as Record<string, unknown>} />
+        }
+      />
+
+      <div className="mt-4">
+        <Suspense fallback={null}>
+          <GenitoriFilters initial={filters} total={genitori.length} />
+        </Suspense>
+      </div>
+
+      <div className="mt-4">
+        <GenitoriDataTable rows={genitori} />
       </div>
     </div>
   );
