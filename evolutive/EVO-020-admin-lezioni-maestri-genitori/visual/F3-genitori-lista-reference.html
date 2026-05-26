@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Genitori · Admin · Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="page" style="background:var(--bg-soft)">
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" style="text-decoration:none;color:inherit">
+        <div class="nav-logo-mark">T</div>
+        <div><div class="nav-logo-text">Triono Racing</div><div class="nav-logo-sub">Gestione</div></div>
+      </a>
+      <nav class="nav-links">
+        <a href="dashboard.html" class="nav-link">Home</a>
+        <a href="#" class="nav-link active" style="display:inline-flex;align-items:center;gap:4px">Gestione<i data-lucide="chevron-down" style="width:14px;height:14px"></i></a>
+        <a href="#" class="nav-link">Profilo</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="search" style="width:18px;height:18px"></i></button>
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i><span class="dot-alert"></span></button>
+        <button class="nav-iconbtn nav-iconbtn-burger"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+        <a href="#" style="text-decoration:none;display:inline-flex"><span class="avatar avatar-sm avatar-sun" style="background:var(--sun-500);color:var(--navy-900)">AM</span></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb">
+    <a href="dashboard.html">Admin</a><span class="sep">/</span>
+    <span class="current">Genitori</span>
+  </div>
+
+  <div class="adm-page-head">
+    <div class="adm-page-head-row">
+      <div>
+        <h1 class="adm-page-h1">Genitori &amp; utenti <span class="count">52 totali</span></h1>
+        <p class="adm-page-sub">Anagrafica completa di tutti gli account portale. Cambia ruoli, gestisci collegamenti figli.</p>
+      </div>
+      <div class="adm-page-actions">
+        <button class="btn btn-outline btn-sm"><i data-lucide="download" style="width:14px;height:14px"></i>Esporta CSV</button>
+        <button class="btn btn-primary btn-sm"><i data-lucide="user-plus" style="width:14px;height:14px"></i>Invita utente</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-inner">
+
+    <div class="adm-kpi-strip">
+      <div class="adm-kpi"><div class="l">Totale account</div><div class="v">52</div></div>
+      <div class="adm-kpi"><div class="l">Genitori</div><div class="v">46</div></div>
+      <div class="adm-kpi"><div class="l">Maestri</div><div class="v">4</div></div>
+      <div class="adm-kpi"><div class="l">Admin</div><div class="v">2</div></div>
+      <div class="adm-kpi warn"><div class="l">Senza figli</div><div class="v">3</div></div>
+    </div>
+
+    <div class="adm-filters">
+      <button class="adm-filter"><span class="label">Ruolo</span>Tutti<i data-lucide="chevron-down" style="width:13px;height:13px;color:var(--ink-muted)"></i></button>
+      <button class="adm-filter"><span class="label">Figli</span>≥1<i data-lucide="chevron-down" style="width:13px;height:13px;color:var(--ink-muted)"></i></button>
+      <button class="adm-filter"><span class="label">Registrato</span>2026<i data-lucide="chevron-down" style="width:13px;height:13px;color:var(--ink-muted)"></i></button>
+      <div class="adm-search">
+        <span class="ico"><i data-lucide="search" style="width:14px;height:14px"></i></span>
+        <input type="text" placeholder="Cerca nome, email, telefono…" />
+      </div>
+      <span class="adm-results-count">52 / 52</span>
+    </div>
+
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th style="width:32px"><input type="checkbox" /></th>
+            <th>Utente</th>
+            <th>Email</th>
+            <th>Cellulare</th>
+            <th>Ruolo</th>
+            <th>Figli</th>
+            <th>Registrato</th>
+            <th>Ultimo accesso</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="cell-person"><span class="avatar avatar-navy">LR</span><div><div class="name">Luca Rossi</div><div class="meta">RSSLCU82A14L117K</div></div></div></td>
+            <td>luca.rossi@email.it</td>
+            <td class="tnum">+39 333 1234567</td>
+            <td><span class="badge badge-default" style="font-size:10.5px">Genitore</span></td>
+            <td>2</td>
+            <td class="tnum"><span class="t-muted">12 gen 2026</span></td>
+            <td class="tnum"><span class="t-muted">21 mag · oggi</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="settings" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="cell-person"><span class="avatar" style="background:var(--ember-500);color:#fff">AM</span><div><div class="name">Andrea Mancini</div><div class="meta">MNCNDR79G05L117S</div></div></div></td>
+            <td>andrea@trionoracing.it</td>
+            <td class="tnum">+39 320 9876543</td>
+            <td><div style="display:flex;gap:4px"><span class="badge badge-default" style="font-size:10.5px">Genitore</span><span class="badge badge-warning" style="font-size:10.5px">Maestro</span></div></td>
+            <td>1</td>
+            <td class="tnum"><span class="t-muted">5 set 2024</span></td>
+            <td class="tnum"><span class="t-muted">21 mag · 08:42</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="settings" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="cell-person"><span class="avatar avatar-sun" style="background:var(--sun-500);color:var(--navy-900)">AM</span><div><div class="name">Andrea Mariotti</div><div class="meta">MRTNDR78L23L117Z</div></div></div></td>
+            <td>admin@trionoracing.it</td>
+            <td class="tnum">+39 348 1357924</td>
+            <td><span class="badge badge-sun" style="font-size:10.5px">Admin</span></td>
+            <td>0</td>
+            <td class="tnum"><span class="t-muted">10 gen 2024</span></td>
+            <td class="tnum"><span class="t-muted">21 mag · 07:15</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="settings" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="cell-person"><span class="avatar avatar-navy">AM</span><div><div class="name">Anna Marini</div><div class="meta">MRNANN85R55L117U</div></div></div></td>
+            <td>anna.marini@email.it</td>
+            <td class="tnum">+39 339 2468013</td>
+            <td><span class="badge badge-default" style="font-size:10.5px">Genitore</span></td>
+            <td>1</td>
+            <td class="tnum"><span class="t-muted">22 gen 2026</span></td>
+            <td class="tnum"><span class="t-muted">19 mag · 3gg fa</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="settings" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr class="warn">
+            <td><input type="checkbox" /></td>
+            <td><div class="cell-person"><span class="avatar avatar-navy">SR</span><div><div class="name">Sara Rossi</div><div class="meta" style="color:var(--ember-700)">Invito pending · 15 mag</div></div></div></td>
+            <td>sara.rossi@email.it</td>
+            <td class="t-muted">—</td>
+            <td><span class="badge badge-warning" style="font-size:10.5px">Genitore · invito</span></td>
+            <td>0</td>
+            <td class="tnum"><span class="t-muted">—</span></td>
+            <td class="tnum"><span class="t-muted">mai</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn" title="Reinvia invito"><i data-lucide="send" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr class="warn">
+            <td><input type="checkbox" /></td>
+            <td><div class="cell-person"><span class="avatar avatar-navy">CR</span><div><div class="name">Carlo Rinaldi</div><div class="meta" style="color:var(--ember-700)">Registrato senza figli</div></div></div></td>
+            <td>carlo.rinaldi@email.it</td>
+            <td class="tnum">+39 333 7654321</td>
+            <td><span class="badge badge-default" style="font-size:10.5px">Genitore</span></td>
+            <td style="color:var(--ember-700);font-weight:600">0</td>
+            <td class="tnum"><span class="t-muted">20 mag 2026</span></td>
+            <td class="tnum"><span class="t-muted">20 mag · ieri</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn" title="Contatta"><i data-lucide="mail" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="cell-person"><span class="avatar" style="background:var(--ember-500);color:#fff">MC</span><div><div class="name">Marta Conti</div><div class="meta">CNTMRT81H44L117L</div></div></div></td>
+            <td>marta@trionoracing.it</td>
+            <td class="tnum">+39 347 1112233</td>
+            <td><span class="badge badge-warning" style="font-size:10.5px">Maestro</span></td>
+            <td>0</td>
+            <td class="tnum"><span class="t-muted">15 set 2025</span></td>
+            <td class="tnum"><span class="t-muted">16 mag · 5gg fa</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="settings" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="cell-person"><span class="avatar avatar-navy">RR</span><div><div class="name">Roberto Russo</div><div class="meta">RSSRBT78A14L117Y</div></div></div></td>
+            <td>roberto.russo@email.it</td>
+            <td class="tnum">+39 339 8765432</td>
+            <td><span class="badge badge-default" style="font-size:10.5px">Genitore</span></td>
+            <td>1</td>
+            <td class="tnum"><span class="t-muted">11 feb 2026</span></td>
+            <td class="tnum"><span class="t-muted">18 mag · 3gg fa</span></td>
+            <td><div class="cell-actions"><button class="cell-action-btn"><i data-lucide="settings" style="width:14px;height:14px"></i></button><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="adm-pagination">
+        <span>Riga 1-8 di 52 · 50 per pagina</span>
+        <div class="pages"><button>‹</button><button class="active">1</button><button>2</button><button>›</button></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand"><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;background:var(--sun-500);color:var(--navy-900);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px">T</div><div><div class="footer-brand-name">Triono Racing</div></div></div></div>
+      <div class="footer-col"><div class="footer-col-title">Gestione</div><ul><li><a href="#">Genitori</a></li><li><a href="#">Bambini</a></li></ul></div>
+      <div class="footer-col"><div class="footer-col-title">Risorse</div><ul><li><a href="#">Audit log</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>Admin v2.0</span><span>© 2026</span></div>
+  </footer>
+
+</div>
+</template>
+
+<script src="../shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['Mockup Portale', 'Admin', 'Genitori'],
+    title: 'Genitori · anagrafica utenti',
+    route: '/portale/admin/genitori',
+    statusBarTheme: 'dark',
+    desktopScale: 0.58,
+    stateLegend: { tag: 'Stato', items: [{ ref: 1, text: 'Tutti gli account · 1 invito pending · 1 genitore senza figli (onboarding incompleto)' }] },
+    annotations: [
+      { ref: 1, text: '<strong>KPI breakdown ruoli</strong>: totale + genitori + maestri + admin + warn «senza figli» (onboarding incompleto, candidato follow-up).' },
+      { ref: 2, text: '<strong>Avatar color-coded per ruolo</strong>: navy genitore · ember maestro · sun admin (matching Today\'s tasks dashboard). Multi-ruolo (Andrea Mancini = genitore + maestro) mostra colori multipli o l\'avatar primario.' },
+      { ref: 3, text: '<strong>Badge ruolo plurale</strong> in colonna Ruolo: se utente ha più cappelli, mostra 2-3 badge stacked. Pattern dual-role come da UX_REDESIGN §4.2.' },
+      { ref: 4, text: '<strong>Invito pending row</strong>: ember warn + meta sotto nome «Invito pending · 15 mag» + action send (reinvia). Pattern condiviso col flusso doppio genitore (figli-dettaglio tab Anagrafica).' },
+      { ref: 5, text: '<strong>«Registrato senza figli»</strong> row: ember warn + flag in colonna Figli (0 in ember-700) + action mail (contatta). Connesso al Today\'s tasks della dashboard.' },
+      { ref: 6, text: '<strong>Cambio ruolo</strong> (UX decision §6): action settings per riga apre modal «Cambia ruolo di {NOME}» con select + AlertDialog conferma. Audit logged.' },
+      { ref: 7, text: '<strong>Soft-disable account</strong>: action menu «Disabilita» (con conferma) preserva storia ma blocca login. NO hard delete: GDPR / fiscale.' },
+      { ref: 8, text: '<strong>Click riga</strong> apre dettaglio con tutti i campi anagrafici + figli collegati + iscrizioni + log eventi + CTA «Modifica come admin».' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>

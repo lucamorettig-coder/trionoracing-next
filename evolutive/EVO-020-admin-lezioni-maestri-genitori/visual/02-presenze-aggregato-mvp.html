@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Presenze maestri · aggregato · Admin · Triono Racing — MVP EVO-020</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --navy-50:  #EEF1FA;
+    --navy-100: #D6DDF0;
+    --navy-200: #ADBAE0;
+    --navy-300: #7889C7;
+    --navy-500: #3C4F94;
+    --navy-700: #1F2D5A;
+    --navy-800: #131E47;
+    --navy-900: #050E3F;
+
+    --sky-100: #E4F0FB;
+    --sky-300: #94BFE4;
+    --sky-500: #3A82C8;
+    --sky-700: #1E5A95;
+
+    --grass-100: #E8F4DE;
+    --grass-300: #B0D894;
+    --grass-500: #5FAC36;
+    --grass-700: #3F7A1F;
+
+    --ember-100: #FCEFD6;
+    --ember-300: #F4C474;
+    --ember-500: #E09618;
+    --ember-600: #B97812;
+    --ember-700: #8B5A0E;
+
+    --flag-100: #FBDADA;
+    --flag-300: #E68585;
+    --flag-500: #C01818;
+    --flag-700: #8A0F0F;
+
+    --sun-100: #FDFBC9;
+    --sun-300: #F5EE7A;
+    --sun-500: #EFE63A;
+    --sun-700: #B5A926;
+
+    --ink: #0F1729;
+    --ink-muted: #5B6478;
+    --line: #E4E7EE;
+    --line-soft: #EEF0F4;
+    --bg-soft: #F7F8FB;
+    --bg-muted: #ECEEF3;
+
+    --f-sans: 'Inter', system-ui, sans-serif;
+    --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: var(--f-sans); color: var(--ink); background: var(--bg-soft); font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+  /* NAVBAR */
+  .navbar { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+  .nav-inner { max-width: 1280px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 24px; }
+  .nav-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+  .nav-logo-mark { width: 36px; height: 36px; background: var(--sun-500); color: var(--navy-900); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
+  .nav-logo-eyebrow { font-family: var(--f-mono); font-size: 9.5px; font-weight: 700; color: var(--sun-700); letter-spacing: 0.12em; text-transform: uppercase; line-height: 1; margin-bottom: 3px; }
+  .nav-logo-text { font-weight: 700; font-size: 15px; color: var(--ink); letter-spacing: -0.01em; line-height: 1.1; }
+  .nav-links { flex: 1; display: flex; gap: 2px; align-items: center; overflow-x: auto; }
+  .nav-link { text-decoration: none; padding: 7px 11px; border-radius: 7px; color: var(--ink-muted); font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .nav-link.active { background: var(--navy-50); color: var(--navy-700); font-weight: 600; }
+  .nav-actions { display: inline-flex; align-items: center; gap: 8px; }
+  .nav-iconbtn { width: 36px; height: 36px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-muted); cursor: pointer; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+
+  /* BREADCRUMB */
+  .breadcrumb { max-width: 1280px; margin: 0 auto; padding: 16px 24px 0; font-size: 12.5px; color: var(--ink-muted); display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--ink-muted); text-decoration: none; }
+  .breadcrumb .sep { color: var(--line); }
+  .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+  /* PAGE CONTAINER */
+  .page-container { max-width: 1280px; margin: 0 auto; padding: 24px 24px 64px; }
+
+  /* HEADER */
+  .adm-eyebrow { font-family: var(--f-mono); font-size: 10.5px; color: var(--sun-700); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px; }
+  .adm-page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+  .adm-page-h1 { font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.02em; color: var(--ink); }
+  .adm-page-sub { font-size: 14px; color: var(--ink-muted); margin: 6px 0 0; max-width: 720px; line-height: 1.5; }
+  .adm-page-actions { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; text-decoration: none; height: 36px; }
+  .btn-primary { background: var(--navy-700); color: #fff; border-color: var(--navy-700); }
+  .btn-outline { background: #fff; color: var(--ink); border-color: var(--line); }
+
+  /* KPI CARDS */
+  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+  .kpi-card {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 14px; padding: 16px 18px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .kpi-card.kpi-warning { border-color: var(--ember-300); background: linear-gradient(180deg, #fff 0%, #fffaf0 100%); }
+  .kpi-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-muted); }
+  .kpi-value { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .kpi-value.success { color: var(--grass-700); }
+  .kpi-value.warning { color: var(--ember-700); }
+  .kpi-sub { font-size: 11.5px; color: var(--ink-muted); }
+  .kpi-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 6px;
+    font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    background: var(--ember-100); color: var(--ember-700);
+    align-self: flex-start;
+  }
+
+  /* FILTERS */
+  .adm-filters {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 12px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .year-pills { display: inline-flex; gap: 3px; background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: 999px; padding: 3px; }
+  .year-pills button { background: transparent; border: none; padding: 5px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: var(--ink-muted); cursor: pointer; font-family: var(--f-mono); }
+  .year-pills button.active { background: var(--navy-700); color: #fff; }
+  .select-pill {
+    appearance: none; background: var(--bg-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: 8px; padding: 7px 28px 7px 12px;
+    font-size: 12.5px; color: var(--ink); cursor: pointer;
+    font-family: inherit; font-weight: 500;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235B6478' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat; background-position: right 8px center;
+  }
+  .adm-search { flex: 1; display: flex; align-items: center; gap: 8px; background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: 8px; padding: 7px 12px; min-width: 220px; }
+  .adm-search input { flex: 1; border: none; outline: none; background: transparent; font-size: 13px; }
+  .adm-search .ico { color: var(--ink-muted); display: inline-flex; }
+  .adm-results-count { font-family: var(--f-mono); font-size: 12px; color: var(--ink-muted); flex-shrink: 0; padding: 0 4px; }
+
+  /* TABLE */
+  .adm-table-wrap { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(15,23,42,0.06); }
+  .adm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .adm-table thead th { background: var(--bg-soft); padding: 11px 14px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); text-align: left; border-bottom: 1px solid var(--line); }
+  .adm-table thead th.r { text-align: right; }
+  .adm-table tbody td { padding: 12px 14px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+  .adm-table tbody td.r { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .adm-table tbody tr:hover { background: var(--bg-soft); cursor: pointer; }
+  .adm-table tbody tr:last-child td { border-bottom: none; }
+
+  .cell-maestro { display: inline-flex; align-items: center; gap: 10px; }
+  .cell-maestro .photo {
+    width: 32px; height: 32px;
+    background: var(--navy-100); color: var(--navy-700);
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 11px;
+  }
+  .cell-maestro .name { font-weight: 600; color: var(--ink); font-size: 13px; }
+  .cell-maestro .qual { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+
+  .presenze-breakdown {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px;
+  }
+  .presenze-breakdown .total {
+    font-family: var(--f-mono); font-weight: 700;
+    font-size: 13px; color: var(--ink);
+  }
+  .presenze-breakdown .split {
+    color: var(--ink-muted); font-size: 11.5px;
+  }
+
+  .importo { color: var(--ink); }
+  .importo.muted { color: var(--ink-muted); font-weight: 500; }
+  .importo.success { color: var(--grass-700); }
+  .importo.warning { color: var(--ember-700); }
+
+  .residuo-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 7px; border-radius: 6px;
+    font-size: 10.5px; font-weight: 700;
+    background: var(--ember-100); color: var(--ember-700);
+    margin-left: 6px; vertical-align: middle;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pagato-sub {
+    font-size: 10.5px; color: var(--ink-muted);
+    margin-top: 2px; font-family: var(--f-mono);
+    font-weight: 500;
+  }
+
+  .row-cta {
+    color: var(--navy-700);
+    font-weight: 600; font-size: 12.5px;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .row-cta:hover { text-decoration: underline; }
+
+  /* ANNOTATIONS */
+  .annotations { margin-top: 40px; background: var(--bg-muted); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; }
+  .annotations h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-muted); font-weight: 700; margin: 0 0 12px; }
+  .annotations ol { list-style: decimal; margin: 0; padding-left: 24px; font-size: 13px; color: var(--ink); line-height: 1.6; }
+  .annotations ol li { margin-bottom: 6px; }
+  .annotations strong { color: var(--navy-700); font-weight: 700; }
+  .annotations code { font-family: var(--f-mono); background: #fff; padding: 1px 5px; border-radius: 4px; font-size: 12px; color: var(--flag-700); }
+</style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-mark">T</div>
+        <div>
+          <div class="nav-logo-eyebrow">Area Admin</div>
+          <div class="nav-logo-text">Triono Racing · Gestione</div>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="#" class="nav-link">Dashboard</a>
+        <a href="#" class="nav-link">Iscrizioni</a>
+        <a href="#" class="nav-link">Bambini</a>
+        <a href="#" class="nav-link">Pagamenti</a>
+        <a href="#" class="nav-link">Gare</a>
+        <a href="#" class="nav-link">Lezioni</a>
+        <a href="#" class="nav-link active">Presenze maestri</a>
+        <a href="#" class="nav-link">Genitori</a>
+        <a href="#" class="nav-link">Tariffe</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <span class="avatar" style="background:var(--sun-500);color:var(--navy-900)">AM</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="#">Admin</a><span class="sep">/</span><span class="current">Presenze maestri</span>
+  </div>
+
+  <!-- PAGE CONTENT -->
+  <main class="page-container">
+
+    <!-- AdminPageHeader -->
+    <div>
+      <div class="adm-eyebrow">Area Admin</div>
+      <div class="adm-page-head">
+        <div>
+          <h1 class="adm-page-h1">Presenze e rimborsi maestri</h1>
+          <p class="adm-page-sub">Vista aggregata mensile per maestro. Le presenze sono generate automaticamente da lezioni registrate e iscrizioni gare confermate.</p>
+        </div>
+        <div class="adm-page-actions">
+          <button class="btn btn-outline">
+            <i data-lucide="download" style="width:14px;height:14px"></i>
+            Esporta CSV presenze
+          </button>
+          <button class="btn btn-outline">
+            <i data-lucide="file-text" style="width:14px;height:14px"></i>
+            Esporta riepilogo contabile
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI TOP -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Totale dovuto · maggio</div>
+        <div class="kpi-value">1.260,00 €</div>
+        <div class="kpi-sub">somma importi presenze del periodo</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Totale pagato</div>
+        <div class="kpi-value success">780,00 €</div>
+        <div class="kpi-sub">61,9% del dovuto</div>
+      </div>
+      <div class="kpi-card kpi-warning">
+        <div class="kpi-label">Residuo da pagare</div>
+        <div class="kpi-value warning">480,00 €</div>
+        <span class="kpi-badge">5 maestri</span>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="adm-filters">
+      <select class="select-pill">
+        <option>Maggio 2026</option>
+        <option>Aprile 2026</option>
+        <option>Marzo 2026</option>
+      </select>
+      <div class="year-pills">
+        <button>2024</button>
+        <button>2025</button>
+        <button class="active">2026</button>
+      </div>
+      <div class="adm-search">
+        <span class="ico"><i data-lucide="search" style="width:14px;height:14px"></i></span>
+        <input type="text" placeholder="Cerca maestro per cognome..." />
+      </div>
+      <span class="adm-results-count">8 / 8</span>
+    </div>
+
+    <!-- TABLE AGGREGATO -->
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th>Maestro</th>
+            <th style="width:170px">N° presenze</th>
+            <th class="r" style="width:130px">Dovuto</th>
+            <th class="r" style="width:130px">Pagato</th>
+            <th class="r" style="width:170px">Residuo</th>
+            <th style="width:120px"></th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>
+              <div class="cell-maestro">
+                <div class="photo">BM</div>
+                <div>
+                  <div class="name">Bianchi Marco</div>
+                  <div class="qual">Aspirante MTB</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="presenze-breakdown">
+                <span class="total">14</span>
+                <span class="split">· 12 lezioni · 2 gare</span>
+              </div>
+            </td>
+            <td class="r"><span class="importo">460,00 €</span></td>
+            <td class="r">
+              <div class="importo">300,00 €</div>
+              <div class="pagato-sub">9 / 14</div>
+            </td>
+            <td class="r">
+              <span class="importo warning">160,00 €</span>
+              <span class="residuo-badge">5 da pagare</span>
+            </td>
+            <td><a href="#" class="row-cta">Dettaglio <i data-lucide="chevron-right" style="width:12px;height:12px"></i></a></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-maestro">
+                <div class="photo">RL</div>
+                <div>
+                  <div class="name">Rossi Luca</div>
+                  <div class="qual">Istruttore Strada · Tecnico FCI 2°</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="presenze-breakdown">
+                <span class="total">10</span>
+                <span class="split">· 10 lezioni</span>
+              </div>
+            </td>
+            <td class="r"><span class="importo">300,00 €</span></td>
+            <td class="r">
+              <div class="importo">300,00 €</div>
+              <div class="pagato-sub">10 / 10</div>
+            </td>
+            <td class="r"><span class="importo muted">0,00 €</span></td>
+            <td><a href="#" class="row-cta">Dettaglio <i data-lucide="chevron-right" style="width:12px;height:12px"></i></a></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-maestro">
+                <div class="photo">VA</div>
+                <div>
+                  <div class="name">Verdi Anna</div>
+                  <div class="qual">Tecnico FCI 1°</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="presenze-breakdown">
+                <span class="total">7</span>
+                <span class="split">· 6 lezioni · 1 gara</span>
+              </div>
+            </td>
+            <td class="r"><span class="importo">230,00 €</span></td>
+            <td class="r">
+              <div class="importo">180,00 €</div>
+              <div class="pagato-sub">6 / 7</div>
+            </td>
+            <td class="r">
+              <span class="importo warning">50,00 €</span>
+              <span class="residuo-badge">1 gara</span>
+            </td>
+            <td><a href="#" class="row-cta">Dettaglio <i data-lucide="chevron-right" style="width:12px;height:12px"></i></a></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-maestro">
+                <div class="photo">NS</div>
+                <div>
+                  <div class="name">Neri Stefano</div>
+                  <div class="qual">Aspirante MTB</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="presenze-breakdown">
+                <span class="total">5</span>
+                <span class="split">· 5 lezioni</span>
+              </div>
+            </td>
+            <td class="r"><span class="importo">150,00 €</span></td>
+            <td class="r">
+              <div class="importo">0,00 €</div>
+              <div class="pagato-sub">0 / 5</div>
+            </td>
+            <td class="r">
+              <span class="importo warning">150,00 €</span>
+              <span class="residuo-badge">5 da pagare</span>
+            </td>
+            <td><a href="#" class="row-cta">Dettaglio <i data-lucide="chevron-right" style="width:12px;height:12px"></i></a></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-maestro">
+                <div class="photo">CM</div>
+                <div>
+                  <div class="name">Cossio Marta</div>
+                  <div class="qual">Tecnico FCI 1°</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="presenze-breakdown">
+                <span class="total">3</span>
+                <span class="split">· 3 lezioni</span>
+              </div>
+            </td>
+            <td class="r"><span class="importo">90,00 €</span></td>
+            <td class="r">
+              <div class="importo">0,00 €</div>
+              <div class="pagato-sub">0 / 3</div>
+            </td>
+            <td class="r">
+              <span class="importo warning">90,00 €</span>
+              <span class="residuo-badge">3 da pagare</span>
+            </td>
+            <td><a href="#" class="row-cta">Dettaglio <i data-lucide="chevron-right" style="width:12px;height:12px"></i></a></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-maestro">
+                <div class="photo">AM</div>
+                <div>
+                  <div class="name">Mariotti Andrea</div>
+                  <div class="qual">Tecnico FCI 2°</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="presenze-breakdown">
+                <span class="total">2</span>
+                <span class="split">· 1 lezione · 1 gara</span>
+              </div>
+            </td>
+            <td class="r"><span class="importo">80,00 €</span></td>
+            <td class="r">
+              <div class="importo">0,00 €</div>
+              <div class="pagato-sub">0 / 2</div>
+            </td>
+            <td class="r">
+              <span class="importo warning">80,00 €</span>
+              <span class="residuo-badge">2 da pagare</span>
+            </td>
+            <td><a href="#" class="row-cta">Dettaglio <i data-lucide="chevron-right" style="width:12px;height:12px"></i></a></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-maestro">
+                <div class="photo">FG</div>
+                <div>
+                  <div class="name">Ferri Giorgio</div>
+                  <div class="qual">Istruttore Strada</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="presenze-breakdown">
+                <span class="total">2</span>
+                <span class="split">· 2 lezioni</span>
+              </div>
+            </td>
+            <td class="r"><span class="importo">60,00 €</span></td>
+            <td class="r">
+              <div class="importo">0,00 €</div>
+              <div class="pagato-sub">0 / 2</div>
+            </td>
+            <td class="r">
+              <span class="importo warning">60,00 €</span>
+              <span class="residuo-badge">2 da pagare</span>
+            </td>
+            <td><a href="#" class="row-cta">Dettaglio <i data-lucide="chevron-right" style="width:12px;height:12px"></i></a></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-maestro">
+                <div class="photo">EP</div>
+                <div>
+                  <div class="name">Esposito Paolo</div>
+                  <div class="qual">Aspirante</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="presenze-breakdown">
+                <span class="total">1</span>
+                <span class="split">· 1 lezione</span>
+              </div>
+            </td>
+            <td class="r"><span class="importo">30,00 €</span></td>
+            <td class="r">
+              <div class="importo">0,00 €</div>
+              <div class="pagato-sub">0 / 1</div>
+            </td>
+            <td class="r">
+              <span class="importo warning">30,00 €</span>
+              <span class="residuo-badge">1 da pagare</span>
+            </td>
+            <td><a href="#" class="row-cta">Dettaglio <i data-lucide="chevron-right" style="width:12px;height:12px"></i></a></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Annotations -->
+    <div class="annotations">
+      <h3>Note di design · scope MVP EVO-020</h3>
+      <ol>
+        <li><strong>Tabella ponte <code>PRESENZE_MAESTRI</code></strong>: ogni record rappresenta UNA presenza maestro su UNA lezione o UNA gara. Vista aggregata calcolata server-side con groupBy maestro + sum su <code>IMPORTO</code> e <code>IMPORTO * (PAGATO ? 1 : 0)</code>.</li>
+        <li><strong>Importi snapshot</strong>: il campo <code>IMPORTO</code> della presenza è uno snapshot della tariffa al momento dell'inserimento. Modifiche future alla tariffa del maestro <em>non sono retroattive</em>. Pattern coerente con EVO-018 (tariffe iscrizioni storiche).</li>
+        <li><strong>KPI "Residuo"</strong> in <code>valueTone="warning"</code> ember-700 con background gradient ember soft. Badge ember conteggio maestri con residuo &gt; 0. Critico se &gt; 500 € (qui 480 ma evidenziato comunque).</li>
+        <li><strong>Avatar iniziali</strong>: 32x32 navy-100 bg + navy-700 text (riuso pattern <code>cell-person</code> EVO-019). Niente foto reale in MVP — Triono non gestisce foto maestri.</li>
+        <li><strong>Row CTA "Dettaglio →"</strong>: link a <code>/admin/presenze-maestri/[maestroId]?mese=05&amp;anno=2026</code>. Query params mantengono il filtro periodo nella pagina drill-down.</li>
+        <li><strong>Export 2 separati</strong>: <em>CSV presenze</em> (riga per presenza, per importazione commercialista) + <em>Riepilogo contabile</em> (PDF aggregato mensile per maestro con totali e firma). Entrambi rispettano filtri correnti.</li>
+        <li><strong>Empty state</strong>: se nessuna presenza nel periodo, mostrare <code>&lt;ClipboardList/&gt;</code> + "Nessuna presenza nel periodo selezionato" + CTA "Aggiungi presenza manuale" (per coprire eventi storici pre-cutoff).</li>
+      </ol>
+    </div>
+
+  </main>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

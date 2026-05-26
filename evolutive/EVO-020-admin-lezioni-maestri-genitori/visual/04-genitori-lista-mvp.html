@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Genitori · Admin · Triono Racing — MVP EVO-020</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --navy-50:  #EEF1FA;
+    --navy-100: #D6DDF0;
+    --navy-200: #ADBAE0;
+    --navy-300: #7889C7;
+    --navy-500: #3C4F94;
+    --navy-700: #1F2D5A;
+    --navy-800: #131E47;
+    --navy-900: #050E3F;
+
+    --sky-100: #E4F0FB;
+    --sky-300: #94BFE4;
+    --sky-500: #3A82C8;
+    --sky-700: #1E5A95;
+
+    --grass-100: #E8F4DE;
+    --grass-300: #B0D894;
+    --grass-500: #5FAC36;
+    --grass-700: #3F7A1F;
+
+    --ember-100: #FCEFD6;
+    --ember-300: #F4C474;
+    --ember-500: #E09618;
+    --ember-700: #8B5A0E;
+
+    --flag-100: #FBDADA;
+    --flag-500: #C01818;
+    --flag-700: #8A0F0F;
+
+    --sun-100: #FDFBC9;
+    --sun-500: #EFE63A;
+    --sun-700: #B5A926;
+
+    --ink: #0F1729;
+    --ink-muted: #5B6478;
+    --line: #E4E7EE;
+    --line-soft: #EEF0F4;
+    --bg-soft: #F7F8FB;
+    --bg-muted: #ECEEF3;
+
+    --f-sans: 'Inter', system-ui, sans-serif;
+    --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: var(--f-sans); color: var(--ink); background: var(--bg-soft); font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+  /* NAVBAR */
+  .navbar { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+  .nav-inner { max-width: 1280px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 24px; }
+  .nav-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+  .nav-logo-mark { width: 36px; height: 36px; background: var(--sun-500); color: var(--navy-900); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
+  .nav-logo-eyebrow { font-family: var(--f-mono); font-size: 9.5px; font-weight: 700; color: var(--sun-700); letter-spacing: 0.12em; text-transform: uppercase; line-height: 1; margin-bottom: 3px; }
+  .nav-logo-text { font-weight: 700; font-size: 15px; color: var(--ink); letter-spacing: -0.01em; line-height: 1.1; }
+  .nav-links { flex: 1; display: flex; gap: 2px; align-items: center; overflow-x: auto; }
+  .nav-link { text-decoration: none; padding: 7px 11px; border-radius: 7px; color: var(--ink-muted); font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .nav-link.active { background: var(--navy-50); color: var(--navy-700); font-weight: 600; }
+  .nav-actions { display: inline-flex; align-items: center; gap: 8px; }
+  .nav-iconbtn { width: 36px; height: 36px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-muted); cursor: pointer; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+
+  /* BREADCRUMB */
+  .breadcrumb { max-width: 1280px; margin: 0 auto; padding: 16px 24px 0; font-size: 12.5px; color: var(--ink-muted); display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--ink-muted); text-decoration: none; }
+  .breadcrumb .sep { color: var(--line); }
+  .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+  /* PAGE CONTAINER */
+  .page-container { max-width: 1280px; margin: 0 auto; padding: 24px 24px 64px; }
+
+  /* HEADER */
+  .adm-eyebrow { font-family: var(--f-mono); font-size: 10.5px; color: var(--sun-700); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px; }
+  .adm-page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+  .adm-page-h1 { font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.02em; color: var(--ink); display: inline-flex; align-items: baseline; gap: 12px; }
+  .adm-page-h1 .count { font-family: var(--f-mono); font-size: 13px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0; background: var(--bg-muted); padding: 3px 8px; border-radius: 6px; }
+  .adm-page-sub { font-size: 14px; color: var(--ink-muted); margin: 6px 0 0; max-width: 720px; line-height: 1.5; }
+  .adm-page-actions { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; text-decoration: none; height: 36px; }
+  .btn-primary { background: var(--navy-700); color: #fff; border-color: var(--navy-700); }
+  .btn-outline { background: #fff; color: var(--ink); border-color: var(--line); }
+
+  /* FILTERS */
+  .adm-filters {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 12px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .ruolo-chips { display: inline-flex; gap: 4px; padding: 3px; background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: 999px; }
+  .ruolo-chip {
+    background: transparent; border: none;
+    padding: 5px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+    color: var(--ink-muted); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .ruolo-chip.on { color: #fff; }
+  .ruolo-chip.on.genitore { background: var(--sky-500); }
+  .ruolo-chip.on.maestro { background: var(--ember-500); }
+  .ruolo-chip.on.admin { background: var(--grass-500); }
+  .ruolo-chip .count {
+    background: rgba(255,255,255,0.25); font-family: var(--f-mono);
+    font-size: 10px; padding: 1px 5px; border-radius: 4px; font-weight: 600;
+  }
+  .ruolo-chip:not(.on) .count { background: var(--bg-muted); color: var(--ink-muted); }
+
+  .adm-search { flex: 1; display: flex; align-items: center; gap: 8px; background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: 8px; padding: 7px 12px; min-width: 220px; }
+  .adm-search input { flex: 1; border: none; outline: none; background: transparent; font-size: 13px; }
+  .adm-search .ico { color: var(--ink-muted); display: inline-flex; }
+
+  .toggle-mini {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; background: var(--bg-soft);
+    border: 1px solid var(--line-soft); border-radius: 8px;
+    font-size: 12.5px; color: var(--ink); cursor: pointer;
+    font-weight: 500;
+  }
+  .switch-mini {
+    width: 30px; height: 18px; background: var(--line);
+    border-radius: 999px; position: relative; flex-shrink: 0;
+  }
+  .switch-mini::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 14px; height: 14px; background: #fff; border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    transition: left 0.15s;
+  }
+  .switch-mini.on { background: var(--grass-500); }
+  .switch-mini.on::after { left: 14px; }
+
+  .adm-results-count { font-family: var(--f-mono); font-size: 12px; color: var(--ink-muted); flex-shrink: 0; padding: 0 4px; }
+
+  /* TABLE */
+  .adm-table-wrap { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(15,23,42,0.06); }
+  .adm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .adm-table thead th { background: var(--bg-soft); padding: 11px 14px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); text-align: left; border-bottom: 1px solid var(--line); }
+  .adm-table thead th.c { text-align: center; }
+  .adm-table tbody td { padding: 12px 14px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+  .adm-table tbody td.c { text-align: center; }
+  .adm-table tbody tr:hover { background: var(--bg-soft); cursor: pointer; }
+  .adm-table tbody tr:last-child td { border-bottom: none; }
+
+  .cell-person { display: inline-flex; align-items: center; gap: 10px; }
+  .cell-person .photo {
+    width: 32px; height: 32px;
+    background: var(--navy-100); color: var(--navy-700);
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 11px;
+  }
+  .cell-person .name { font-weight: 600; color: var(--ink); font-size: 13px; }
+  .cell-person .email {
+    font-size: 11.5px; color: var(--ink-muted);
+    text-decoration: none; display: block; margin-top: 2px;
+  }
+  .cell-person .email:hover { color: var(--navy-700); }
+
+  .tel { font-family: var(--f-mono); font-size: 12.5px; color: var(--ink); }
+  .tel:hover { color: var(--navy-700); cursor: pointer; }
+
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 6px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .badge-genitore { background: var(--sky-100); color: var(--sky-700); }
+  .badge-maestro { background: var(--ember-100); color: var(--ember-700); }
+  .badge-admin { background: var(--grass-100); color: var(--grass-700); }
+
+  .figli-count {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--f-mono); font-weight: 600;
+    font-size: 13px; font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .figli-count.zero { color: var(--ink-muted); }
+  .figli-count i { color: var(--ink-muted); }
+
+  .data-cell { font-family: var(--f-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--ink-muted); }
+
+  .cell-action-btn { width: 28px; height: 28px; background: transparent; border: 1px solid transparent; border-radius: 6px; cursor: pointer; color: var(--ink-muted); display: inline-flex; align-items: center; justify-content: center; }
+  .cell-action-btn:hover { background: var(--bg-soft); border-color: var(--line); color: var(--ink); }
+
+  /* ANNOTATIONS */
+  .annotations { margin-top: 40px; background: var(--bg-muted); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; }
+  .annotations h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-muted); font-weight: 700; margin: 0 0 12px; }
+  .annotations ol { list-style: decimal; margin: 0; padding-left: 24px; font-size: 13px; color: var(--ink); line-height: 1.6; }
+  .annotations ol li { margin-bottom: 6px; }
+  .annotations strong { color: var(--navy-700); font-weight: 700; }
+  .annotations code { font-family: var(--f-mono); background: #fff; padding: 1px 5px; border-radius: 4px; font-size: 12px; color: var(--flag-700); }
+  .annotations .ko { color: var(--flag-700); font-weight: 700; }
+</style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-mark">T</div>
+        <div>
+          <div class="nav-logo-eyebrow">Area Admin</div>
+          <div class="nav-logo-text">Triono Racing · Gestione</div>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="#" class="nav-link">Dashboard</a>
+        <a href="#" class="nav-link">Iscrizioni</a>
+        <a href="#" class="nav-link">Bambini</a>
+        <a href="#" class="nav-link">Pagamenti</a>
+        <a href="#" class="nav-link">Gare</a>
+        <a href="#" class="nav-link">Lezioni</a>
+        <a href="#" class="nav-link">Presenze maestri</a>
+        <a href="#" class="nav-link active">Genitori</a>
+        <a href="#" class="nav-link">Tariffe</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <span class="avatar" style="background:var(--sun-500);color:var(--navy-900)">AM</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="#">Admin</a><span class="sep">/</span><span class="current">Genitori</span>
+  </div>
+
+  <!-- PAGE CONTENT -->
+  <main class="page-container">
+
+    <!-- AdminPageHeader -->
+    <div>
+      <div class="adm-eyebrow">Area Admin</div>
+      <div class="adm-page-head">
+        <div>
+          <h1 class="adm-page-h1">
+            Utenti del portale
+            <span class="count">52 utenti</span>
+          </h1>
+          <p class="adm-page-sub">Tutti gli utenti registrati via Clerk (genitori, maestri, admin). Da qui puoi consultare anagrafica e cambiare ruolo.</p>
+        </div>
+        <div class="adm-page-actions">
+          <button class="btn btn-outline">
+            <i data-lucide="download" style="width:14px;height:14px"></i>
+            Esporta CSV
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="adm-filters">
+      <div class="ruolo-chips">
+        <button class="ruolo-chip on genitore">
+          <i data-lucide="user" style="width:12px;height:12px"></i>
+          Genitore <span class="count">42</span>
+        </button>
+        <button class="ruolo-chip on maestro">
+          <i data-lucide="user-cog" style="width:12px;height:12px"></i>
+          Maestro <span class="count">8</span>
+        </button>
+        <button class="ruolo-chip on admin">
+          <i data-lucide="shield" style="width:12px;height:12px"></i>
+          Admin <span class="count">2</span>
+        </button>
+      </div>
+      <div class="adm-search">
+        <span class="ico"><i data-lucide="search" style="width:14px;height:14px"></i></span>
+        <input type="text" placeholder="Cerca per nome, email o telefono..." />
+      </div>
+      <button class="toggle-mini">
+        <div class="switch-mini"></div>
+        Solo utenti con figli
+      </button>
+      <span class="adm-results-count">12 / 52</span>
+    </div>
+
+    <!-- TABLE -->
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th style="width:160px">Cellulare</th>
+            <th style="width:120px">Ruolo</th>
+            <th style="width:100px" class="c">N° figli</th>
+            <th style="width:140px">Registrato il</th>
+            <th style="width:60px"></th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>
+              <div class="cell-person">
+                <div class="photo" style="background:var(--grass-100);color:var(--grass-700)">ML</div>
+                <div>
+                  <div class="name">Moretti Luca</div>
+                  <a href="mailto:luca@example.it" class="email">luca@example.it</a>
+                </div>
+              </div>
+            </td>
+            <td><span class="tel">+39 348 1234567</span></td>
+            <td><span class="badge badge-admin">Admin</span></td>
+            <td class="c"><span class="figli-count zero">—</span></td>
+            <td class="data-cell">21/05/2026</td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-person">
+                <div class="photo" style="background:var(--ember-100);color:var(--ember-700)">BM</div>
+                <div>
+                  <div class="name">Bianchi Marco</div>
+                  <a href="mailto:bianchi@example.it" class="email">bianchi@example.it</a>
+                </div>
+              </div>
+            </td>
+            <td><span class="tel">+39 333 1234567</span></td>
+            <td><span class="badge badge-maestro">Maestro</span></td>
+            <td class="c"><span class="figli-count"><i data-lucide="users" style="width:13px;height:13px"></i>1</span></td>
+            <td class="data-cell">15/03/2026</td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-person">
+                <div class="photo">VA</div>
+                <div>
+                  <div class="name">Verdi Anna</div>
+                  <a href="mailto:verdi@example.it" class="email">verdi@example.it</a>
+                </div>
+              </div>
+            </td>
+            <td><span class="tel">+39 339 5556677</span></td>
+            <td><span class="badge badge-genitore">Genitore</span></td>
+            <td class="c"><span class="figli-count"><i data-lucide="users" style="width:13px;height:13px"></i>2</span></td>
+            <td class="data-cell">02/04/2026</td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-person">
+                <div class="photo" style="background:var(--ember-100);color:var(--ember-700)">RL</div>
+                <div>
+                  <div class="name">Rossi Luca</div>
+                  <a href="mailto:rossi.luca@example.it" class="email">rossi.luca@example.it</a>
+                </div>
+              </div>
+            </td>
+            <td><span class="tel">+39 335 7654321</span></td>
+            <td><span class="badge badge-maestro">Maestro</span></td>
+            <td class="c"><span class="figli-count zero">—</span></td>
+            <td class="data-cell">10/02/2026</td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-person">
+                <div class="photo">GS</div>
+                <div>
+                  <div class="name">Greco Sara</div>
+                  <a href="mailto:sara.greco@example.it" class="email">sara.greco@example.it</a>
+                </div>
+              </div>
+            </td>
+            <td><span class="tel">+39 347 8889900</span></td>
+            <td><span class="badge badge-genitore">Genitore</span></td>
+            <td class="c"><span class="figli-count"><i data-lucide="users" style="width:13px;height:13px"></i>1</span></td>
+            <td class="data-cell">28/03/2026</td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-person">
+                <div class="photo">CM</div>
+                <div>
+                  <div class="name">Costantini Marta</div>
+                  <a href="mailto:marta.cost@example.it" class="email">marta.cost@example.it</a>
+                </div>
+              </div>
+            </td>
+            <td><span class="tel">+39 333 4445566</span></td>
+            <td><span class="badge badge-genitore">Genitore</span></td>
+            <td class="c"><span class="figli-count"><i data-lucide="users" style="width:13px;height:13px"></i>1</span></td>
+            <td class="data-cell">18/03/2026</td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-person">
+                <div class="photo">PL</div>
+                <div>
+                  <div class="name">Pini Lara</div>
+                  <a href="mailto:lara.pini@example.it" class="email">lara.pini@example.it</a>
+                </div>
+              </div>
+            </td>
+            <td><span class="tel">+39 340 1112233</span></td>
+            <td><span class="badge badge-genitore">Genitore</span></td>
+            <td class="c"><span class="figli-count"><i data-lucide="users" style="width:13px;height:13px"></i>1</span></td>
+            <td class="data-cell">11/03/2026</td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-person">
+                <div class="photo">RB</div>
+                <div>
+                  <div class="name">Ricci Sandra</div>
+                  <a href="mailto:sandra.ricci@example.it" class="email">sandra.ricci@example.it</a>
+                </div>
+              </div>
+            </td>
+            <td><span class="tel">+39 345 7778899</span></td>
+            <td><span class="badge badge-genitore">Genitore</span></td>
+            <td class="c"><span class="figli-count"><i data-lucide="users" style="width:13px;height:13px"></i>3</span></td>
+            <td class="data-cell">05/03/2026</td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-person">
+                <div class="photo">MN</div>
+                <div>
+                  <div class="name">Marini Anna</div>
+                  <a href="mailto:anna.marini@example.it" class="email">anna.marini@example.it</a>
+                </div>
+              </div>
+            </td>
+            <td><span class="tel">+39 348 5556677</span></td>
+            <td><span class="badge badge-genitore">Genitore</span></td>
+            <td class="c"><span class="figli-count"><i data-lucide="users" style="width:13px;height:13px"></i>1</span></td>
+            <td class="data-cell">22/02/2026</td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-person">
+                <div class="photo">BG</div>
+                <div>
+                  <div class="name">Bianchi Giulia</div>
+                  <a href="mailto:giulia.bianchi@example.it" class="email">giulia.bianchi@example.it</a>
+                </div>
+              </div>
+            </td>
+            <td><span class="tel">+39 333 2223344</span></td>
+            <td><span class="badge badge-genitore">Genitore</span></td>
+            <td class="c"><span class="figli-count"><i data-lucide="users" style="width:13px;height:13px"></i>2</span></td>
+            <td class="data-cell">14/02/2026</td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-person">
+                <div class="photo">FS</div>
+                <div>
+                  <div class="name">Ferri Simone</div>
+                  <a href="mailto:simone.ferri@example.it" class="email">simone.ferri@example.it</a>
+                </div>
+              </div>
+            </td>
+            <td><span class="tel">+39 339 9990011</span></td>
+            <td><span class="badge badge-genitore">Genitore</span></td>
+            <td class="c"><span class="figli-count zero">—</span></td>
+            <td class="data-cell">07/02/2026</td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="cell-person">
+                <div class="photo">EP</div>
+                <div>
+                  <div class="name">Esposito Paolo</div>
+                  <a href="mailto:paolo.esp@example.it" class="email">paolo.esp@example.it</a>
+                </div>
+              </div>
+            </td>
+            <td><span class="tel">+39 347 4445566</span></td>
+            <td><span class="badge badge-genitore">Genitore</span></td>
+            <td class="c"><span class="figli-count"><i data-lucide="users" style="width:13px;height:13px"></i>1</span></td>
+            <td class="data-cell">28/01/2026</td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Annotations -->
+    <div class="annotations">
+      <h3>Note di design · scope MVP EVO-020</h3>
+      <ol>
+        <li><strong>Etichetta UI "Maestro"</strong> anche se il valore Airtable è <code>ISTRUTTORE</code>. Mapping deciso in DS-NOTES §3 — label umana coerente con linguaggio scuola di ciclismo. Stesso ragionamento del badge gioventù calcistica EVO-005.</li>
+        <li><strong>Multi-select chip ruolo</strong>: 3 chip filtri (Genitore sky · Maestro ember · Admin grass) tutti attivi di default, contatori inline. Click toggle on/off — pattern coerente con segmented control EVO-019 ma in versione "multi" colorata.</li>
+        <li><strong class="ko">❌ NO bulk</strong> in MVP: cambio ruolo è sensibile (transazione Airtable+Clerk), non vogliamo bulk accidentale. <em>Una richiesta alla volta</em>. Niente checkbox di selezione riga.</li>
+        <li><strong class="ko">❌ NO disabilita/elimina account</strong>: rinviato a EVO-008 (gestione lifecycle utenti Clerk). Il dropdown azioni mostra solo: <em>Apri dettaglio</em> | <em>Cambia ruolo</em>.</li>
+        <li><strong>Avatar colorate per ruolo</strong>: Admin grass-100 · Maestro ember-100 · Genitore navy-100 default. Iniziali cognome+nome (es. "ML" per Moretti Luca). Hint visivo veloce in tabella senza dover leggere il badge.</li>
+        <li><strong>Toggle "Solo con figli"</strong>: utile per nascondere account amministrativi/test (es. account admin senza figli, account creati ma mai associati). Default OFF per non sorprendere.</li>
+        <li><strong>Row click</strong> naviga a <code>/admin/genitori/[id]</code>. Il dropdown azioni è ridondante per "Apri dettaglio" (stessa azione) ma serve per "Cambia ruolo" senza navigare.</li>
+      </ol>
+    </div>
+
+  </main>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

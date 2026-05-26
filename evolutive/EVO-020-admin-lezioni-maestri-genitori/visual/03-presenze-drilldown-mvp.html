@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Presenze · Bianchi Marco · Admin · Triono Racing — MVP EVO-020</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --navy-50:  #EEF1FA;
+    --navy-100: #D6DDF0;
+    --navy-200: #ADBAE0;
+    --navy-300: #7889C7;
+    --navy-500: #3C4F94;
+    --navy-700: #1F2D5A;
+    --navy-800: #131E47;
+    --navy-900: #050E3F;
+
+    --sky-100: #E4F0FB;
+    --sky-300: #94BFE4;
+    --sky-500: #3A82C8;
+    --sky-700: #1E5A95;
+
+    --grass-100: #E8F4DE;
+    --grass-300: #B0D894;
+    --grass-500: #5FAC36;
+    --grass-700: #3F7A1F;
+
+    --ember-50:  #FEF7E8;
+    --ember-100: #FCEFD6;
+    --ember-300: #F4C474;
+    --ember-500: #E09618;
+    --ember-700: #8B5A0E;
+
+    --flag-100: #FBDADA;
+    --flag-300: #E68585;
+    --flag-500: #C01818;
+    --flag-700: #8A0F0F;
+
+    --sun-100: #FDFBC9;
+    --sun-500: #EFE63A;
+    --sun-700: #B5A926;
+
+    --ink: #0F1729;
+    --ink-muted: #5B6478;
+    --line: #E4E7EE;
+    --line-soft: #EEF0F4;
+    --bg-soft: #F7F8FB;
+    --bg-muted: #ECEEF3;
+
+    --f-sans: 'Inter', system-ui, sans-serif;
+    --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: var(--f-sans); color: var(--ink); background: var(--bg-soft); font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+  /* NAVBAR */
+  .navbar { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+  .nav-inner { max-width: 1280px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 24px; }
+  .nav-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+  .nav-logo-mark { width: 36px; height: 36px; background: var(--sun-500); color: var(--navy-900); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
+  .nav-logo-eyebrow { font-family: var(--f-mono); font-size: 9.5px; font-weight: 700; color: var(--sun-700); letter-spacing: 0.12em; text-transform: uppercase; line-height: 1; margin-bottom: 3px; }
+  .nav-logo-text { font-weight: 700; font-size: 15px; color: var(--ink); letter-spacing: -0.01em; line-height: 1.1; }
+  .nav-links { flex: 1; display: flex; gap: 2px; align-items: center; overflow-x: auto; }
+  .nav-link { text-decoration: none; padding: 7px 11px; border-radius: 7px; color: var(--ink-muted); font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .nav-link.active { background: var(--navy-50); color: var(--navy-700); font-weight: 600; }
+  .nav-actions { display: inline-flex; align-items: center; gap: 8px; }
+  .nav-iconbtn { width: 36px; height: 36px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-muted); cursor: pointer; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+
+  /* BREADCRUMB */
+  .breadcrumb { max-width: 1280px; margin: 0 auto; padding: 16px 24px 0; font-size: 12.5px; color: var(--ink-muted); display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--ink-muted); text-decoration: none; }
+  .breadcrumb .sep { color: var(--line); }
+  .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+  /* PAGE CONTAINER */
+  .page-container { max-width: 1280px; margin: 0 auto; padding: 24px 24px 64px; }
+
+  /* HEADER */
+  .adm-eyebrow { font-family: var(--f-mono); font-size: 10.5px; color: var(--sun-700); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px; }
+  .adm-page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
+  .adm-page-h1 { font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.02em; color: var(--ink); display: inline-flex; align-items: baseline; gap: 12px; }
+  .adm-page-h1 .periodo { font-family: var(--f-mono); font-size: 13px; font-weight: 500; color: var(--ink-muted); background: var(--bg-muted); padding: 3px 8px; border-radius: 6px; letter-spacing: 0; }
+  .adm-page-sub { font-size: 14px; color: var(--ink-muted); margin: 6px 0 0; line-height: 1.5; }
+  .adm-page-actions { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; text-decoration: none; height: 36px; }
+  .btn-primary { background: var(--navy-700); color: #fff; border-color: var(--navy-700); }
+  .btn-outline { background: #fff; color: var(--ink); border-color: var(--line); }
+  .btn-success { background: var(--grass-500); color: #fff; border-color: var(--grass-500); }
+  .btn-danger { background: var(--flag-500); color: #fff; border-color: var(--flag-500); }
+  .btn-ghost { background: transparent; color: var(--ink-muted); border-color: transparent; }
+  .btn-sm { height: 32px; padding: 6px 11px; font-size: 12.5px; }
+
+  /* MAESTRO HEADER CARD */
+  .maestro-card {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 14px; padding: 18px 22px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 18px;
+  }
+  .maestro-card .photo-lg {
+    width: 56px; height: 56px;
+    background: var(--navy-100); color: var(--navy-700);
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 18px;
+    flex-shrink: 0;
+  }
+  .maestro-card .info { flex: 1; }
+  .maestro-card .name { font-size: 18px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .maestro-card .qual { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; }
+  .maestro-card .tariffe {
+    margin-top: 6px;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--ink-muted);
+  }
+  .maestro-card .tariffe .pill {
+    background: var(--bg-muted); padding: 2px 8px; border-radius: 6px;
+    font-family: var(--f-mono); font-weight: 600; color: var(--ink);
+    font-size: 11.5px;
+  }
+
+  /* STATS COMPACT BAR */
+  .stats-compact {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 22px;
+    margin-bottom: 16px;
+    display: flex; gap: 32px; align-items: center;
+  }
+  .stat-item { display: flex; flex-direction: column; gap: 2px; }
+  .stat-item .label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-muted); }
+  .stat-item .val {
+    font-size: 18px; font-weight: 700; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-item .val.success { color: var(--grass-700); }
+  .stat-item .val.warning { color: var(--ember-700); }
+  .stat-divider { width: 1px; height: 30px; background: var(--line); }
+
+  /* BULK ACTION BAR */
+  .adm-bulk {
+    background: var(--navy-700); color: #fff;
+    border-radius: 12px; padding: 10px 16px;
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 6px 18px rgba(31,45,90,0.15);
+  }
+  .adm-bulk .count { font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
+  .adm-bulk .count .pill { background: var(--sun-500); color: var(--navy-900); padding: 2px 8px; border-radius: 6px; font-family: var(--f-mono); font-size: 11.5px; }
+  .adm-bulk .total-sel { font-family: var(--f-mono); font-size: 12.5px; color: rgba(255,255,255,0.85); font-weight: 600; }
+  .adm-bulk-actions { margin-left: auto; display: inline-flex; gap: 6px; align-items: center; }
+  .adm-bulk-actions .btn { font-size: 12.5px; height: 32px; }
+  .adm-bulk-close {
+    background: rgba(255,255,255,0.1); border: none; color: #fff;
+    width: 28px; height: 28px; border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; margin-left: 4px;
+  }
+
+  /* TABLE */
+  .adm-table-wrap { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(15,23,42,0.06); }
+  .adm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .adm-table thead th { background: var(--bg-soft); padding: 11px 14px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); text-align: left; border-bottom: 1px solid var(--line); }
+  .adm-table thead th.r { text-align: right; }
+  .adm-table tbody td { padding: 12px 14px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+  .adm-table tbody td.r { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .adm-table tbody tr.selected { background: var(--navy-50); }
+  .adm-table tbody tr:last-child td { border-bottom: none; }
+  .adm-table tbody tr.paid { opacity: 0.75; }
+
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .badge-neutral { background: var(--bg-muted); color: var(--ink); }
+  .badge-success { background: var(--grass-100); color: var(--grass-700); }
+  .badge-warning { background: var(--ember-100); color: var(--ember-700); }
+  .badge-info    { background: var(--sky-100); color: var(--sky-700); }
+
+  .evento-cell .ev-name { font-weight: 600; color: var(--ink); font-size: 13px; }
+  .evento-cell .ev-link {
+    font-size: 11px; color: var(--ink-muted);
+    display: inline-flex; align-items: center; gap: 3px;
+    margin-top: 2px;
+  }
+  .evento-cell .ev-link:hover { color: var(--navy-700); cursor: pointer; }
+
+  .data-cell { font-family: var(--f-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--ink); }
+
+  .add-bar {
+    margin-top: 14px;
+    display: flex; justify-content: flex-end;
+  }
+
+  .cell-action-btn { width: 28px; height: 28px; background: transparent; border: 1px solid transparent; border-radius: 6px; cursor: pointer; color: var(--ink-muted); display: inline-flex; align-items: center; justify-content: center; }
+  .cell-action-btn:hover { background: var(--bg-soft); border-color: var(--line); color: var(--ink); }
+  .cell-action-btn[disabled] { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+
+  input[type="checkbox"] { accent-color: var(--navy-700); width: 15px; height: 15px; cursor: pointer; }
+  input[type="checkbox"][disabled] { opacity: 0.35; cursor: not-allowed; }
+
+  /* ANNOTATIONS */
+  .annotations { margin-top: 40px; background: var(--bg-muted); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; }
+  .annotations h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-muted); font-weight: 700; margin: 0 0 12px; }
+  .annotations ol { list-style: decimal; margin: 0; padding-left: 24px; font-size: 13px; color: var(--ink); line-height: 1.6; }
+  .annotations ol li { margin-bottom: 6px; }
+  .annotations strong { color: var(--navy-700); font-weight: 700; }
+  .annotations code { font-family: var(--f-mono); background: #fff; padding: 1px 5px; border-radius: 4px; font-size: 12px; color: var(--flag-700); }
+
+  /* ===== MODAL ===== */
+  .modal-stack-wrap {
+    padding: 60px 24px 80px;
+    background: rgba(5,14,63,0.05);
+    border-top: 2px dashed var(--navy-200);
+    margin-top: 60px;
+  }
+  .modal-stack-label {
+    text-align: center;
+    font-family: var(--f-mono); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--navy-700); font-weight: 700;
+    margin-bottom: 24px;
+  }
+  .modal-row { display: flex; justify-content: center; margin-bottom: 36px; }
+  .modal-row-label {
+    text-align: center; font-family: var(--f-mono); font-size: 10.5px;
+    color: var(--ink-muted); font-weight: 600; margin-bottom: 10px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .modal-mock {
+    background: #fff;
+    border-radius: 18px;
+    width: 100%; max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .modal-mock.wide { max-width: 540px; }
+  .modal-head { padding: 22px 24px 16px; display: flex; gap: 14px; align-items: flex-start; }
+  .modal-icon { width: 44px; height: 44px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .modal-icon.grass { background: var(--grass-100); color: var(--grass-700); }
+  .modal-icon.navy { background: var(--navy-100); color: var(--navy-700); }
+  .modal-icon.ember { background: var(--ember-100); color: var(--ember-700); }
+  .modal-title { font-size: 17px; font-weight: 700; color: var(--ink); margin: 0 0 4px; letter-spacing: -0.01em; }
+  .modal-subtitle { font-size: 12.5px; color: var(--ink-muted); }
+  .modal-close { margin-left: auto; background: transparent; border: none; width: 32px; height: 32px; border-radius: 8px; color: var(--ink-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .modal-close:hover { background: var(--bg-soft); color: var(--ink); }
+  .modal-body { padding: 0 24px 16px; font-size: 13.5px; color: var(--ink); line-height: 1.55; }
+  .modal-body strong { color: var(--navy-700); font-weight: 700; }
+  .modal-footer {
+    padding: 16px 24px 22px;
+    display: flex; gap: 8px; justify-content: flex-end;
+    background: var(--bg-soft); border-top: 1px solid var(--line-soft);
+  }
+
+  /* Modal mini list */
+  .modal-mini-list {
+    background: var(--bg-soft); border: 1px solid var(--line);
+    border-radius: 10px; padding: 8px;
+    max-height: 180px; overflow-y: auto;
+    margin-bottom: 14px;
+  }
+  .modal-mini-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 6px;
+    font-size: 12.5px;
+  }
+  .modal-mini-row + .modal-mini-row { border-top: 1px solid var(--line-soft); }
+  .modal-mini-row .data { font-family: var(--f-mono); color: var(--ink-muted); font-size: 11.5px; width: 60px; }
+  .modal-mini-row .badge { font-size: 9px; padding: 1px 5px; }
+  .modal-mini-row .ev { flex: 1; color: var(--ink); font-weight: 500; }
+  .modal-mini-row .imp { font-family: var(--f-mono); font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  /* Modal totale */
+  .modal-totale-box {
+    background: var(--grass-100);
+    border: 1px solid var(--grass-300);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+  }
+  .modal-totale-box .lbl { font-size: 12px; font-weight: 600; color: var(--grass-700); text-transform: uppercase; letter-spacing: 0.05em; }
+  .modal-totale-box .val { font-size: 20px; font-weight: 800; color: var(--grass-700); font-variant-numeric: tabular-nums; }
+
+  /* Modal field */
+  .mfield { margin-bottom: 14px; }
+  .mfield label { display: block; font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+  .mfield .mfield-hint { font-size: 11px; color: var(--ink-muted); margin-top: 4px; }
+  .mfield input, .mfield select, .mfield textarea {
+    width: 100%; padding: 8px 11px;
+    border: 1px solid var(--line); border-radius: 8px;
+    background: #fff; font-size: 13px; color: var(--ink);
+    font-family: inherit; outline: none;
+  }
+  .mfield input:focus, .mfield select:focus { border-color: var(--navy-500); }
+  .mfield-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mfield-row .mfield { margin-bottom: 0; }
+
+  .ember-banner {
+    background: var(--ember-50);
+    border: 1px solid var(--ember-300);
+    border-left: 4px solid var(--ember-500);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px; color: var(--ember-700);
+    display: flex; gap: 8px; align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .ember-banner strong { color: var(--ember-700); }
+
+  .radio-group { display: flex; flex-direction: column; gap: 8px; }
+  .radio-opt {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border: 1px solid var(--line);
+    border-radius: 8px; background: #fff;
+    cursor: pointer;
+  }
+  .radio-opt.active { border-color: var(--navy-500); background: var(--navy-50); }
+  .radio-opt .radio-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%; border: 2px solid var(--line);
+    flex-shrink: 0;
+  }
+  .radio-opt.active .radio-dot { border-color: var(--navy-700); background: var(--navy-700); box-shadow: inset 0 0 0 3px #fff; }
+  .radio-opt .ropt-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+
+  .check-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; background: var(--bg-soft);
+    border: 1px solid var(--line); border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  .check-row .lbl-txt { font-size: 13px; font-weight: 600; color: var(--ink); flex: 1; }
+</style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-mark">T</div>
+        <div>
+          <div class="nav-logo-eyebrow">Area Admin</div>
+          <div class="nav-logo-text">Triono Racing · Gestione</div>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="#" class="nav-link">Dashboard</a>
+        <a href="#" class="nav-link">Iscrizioni</a>
+        <a href="#" class="nav-link">Bambini</a>
+        <a href="#" class="nav-link">Pagamenti</a>
+        <a href="#" class="nav-link">Gare</a>
+        <a href="#" class="nav-link">Lezioni</a>
+        <a href="#" class="nav-link active">Presenze maestri</a>
+        <a href="#" class="nav-link">Genitori</a>
+        <a href="#" class="nav-link">Tariffe</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <span class="avatar" style="background:var(--sun-500);color:var(--navy-900)">AM</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="#">Admin</a><span class="sep">/</span>
+    <a href="#">Presenze maestri</a><span class="sep">/</span>
+    <span class="current">Bianchi Marco</span>
+  </div>
+
+  <!-- PAGE CONTENT -->
+  <main class="page-container">
+
+    <!-- AdminPageHeader -->
+    <div>
+      <div class="adm-eyebrow">Area Admin</div>
+      <div class="adm-page-head">
+        <div>
+          <h1 class="adm-page-h1">
+            Bianchi Marco
+            <span class="periodo">maggio 2026</span>
+          </h1>
+          <p class="adm-page-sub">Dettaglio presenze del maestro per il periodo selezionato. Seleziona le presenze da segnare come pagate.</p>
+        </div>
+        <div class="adm-page-actions">
+          <button class="btn btn-outline">
+            <i data-lucide="arrow-left" style="width:14px;height:14px"></i>
+            Torna all'aggregato
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAESTRO CARD -->
+    <div class="maestro-card">
+      <div class="photo-lg">BM</div>
+      <div class="info">
+        <div class="name">Bianchi Marco</div>
+        <div class="qual">Aspirante MTB · iscritto FCI dal 2019</div>
+        <div class="tariffe">
+          Tariffe attuali:
+          <span class="pill">Lezione 30,00 €</span>
+          <span class="pill">Gara 50,00 €</span>
+        </div>
+      </div>
+      <button class="btn btn-outline">
+        <i data-lucide="edit-3" style="width:14px;height:14px"></i>
+        Modifica tariffa
+      </button>
+    </div>
+
+    <!-- STATS COMPACT -->
+    <div class="stats-compact">
+      <div class="stat-item">
+        <span class="label">Dovuto</span>
+        <span class="val">460,00 €</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="label">Pagato</span>
+        <span class="val success">300,00 €</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="label">Residuo</span>
+        <span class="val warning">160,00 €</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="label">Presenze</span>
+        <span class="val">14 <span style="font-size:12px;color:var(--ink-muted);font-weight:500">(9 pagate)</span></span>
+      </div>
+    </div>
+
+    <!-- BULK ACTION BAR -->
+    <div class="adm-bulk">
+      <input type="checkbox" checked />
+      <span class="count">
+        <span class="pill">3</span>
+        presenze selezionate
+      </span>
+      <span class="total-sel">· totale 90,00 €</span>
+      <div class="adm-bulk-actions">
+        <button class="btn btn-success btn-sm">
+          <i data-lucide="check" style="width:13px;height:13px"></i>
+          Segna 3 pagate
+        </button>
+        <button class="adm-bulk-close" title="Annulla selezione">
+          <i data-lucide="x" style="width:14px;height:14px"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLE PRESENZE -->
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th style="width:36px"><input type="checkbox" /></th>
+            <th style="width:90px">Tipo</th>
+            <th style="width:110px">Data</th>
+            <th>Evento</th>
+            <th class="r" style="width:110px">Importo</th>
+            <th style="width:170px">Stato</th>
+            <th style="width:50px"></th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- 3 SELEZIONATE da pagare -->
+          <tr class="selected">
+            <td><input type="checkbox" checked /></td>
+            <td><span class="badge badge-neutral">Lezione</span></td>
+            <td class="data-cell">28/05/2026</td>
+            <td class="evento-cell">
+              <div class="ev-name">Lezione MTB · Cambio rapporti in salita</div>
+              <div class="ev-link"><i data-lucide="external-link" style="width:11px;height:11px"></i> Apri lezione</div>
+            </td>
+            <td class="r">30,00 €</td>
+            <td><span class="badge badge-warning">Da pagare</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr class="selected">
+            <td><input type="checkbox" checked /></td>
+            <td><span class="badge badge-neutral">Lezione</span></td>
+            <td class="data-cell">26/05/2026</td>
+            <td class="evento-cell">
+              <div class="ev-name">Lezione MTB · Tecnica di curva</div>
+              <div class="ev-link"><i data-lucide="external-link" style="width:11px;height:11px"></i> Apri lezione</div>
+            </td>
+            <td class="r">30,00 €</td>
+            <td><span class="badge badge-warning">Da pagare</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr class="selected">
+            <td><input type="checkbox" checked /></td>
+            <td><span class="badge badge-neutral">Lezione</span></td>
+            <td class="data-cell">23/05/2026</td>
+            <td class="evento-cell">
+              <div class="ev-name">Lezione MTB · Allenamento sprint</div>
+              <div class="ev-link"><i data-lucide="external-link" style="width:11px;height:11px"></i> Apri lezione</div>
+            </td>
+            <td class="r">30,00 €</td>
+            <td><span class="badge badge-warning">Da pagare</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <!-- 6 NON SELEZIONATE da pagare -->
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><span class="badge badge-info">Gara</span></td>
+            <td class="data-cell">17/05/2026</td>
+            <td class="evento-cell">
+              <div class="ev-name">Gara XC · Coppa Umbria · Spoleto</div>
+              <div class="ev-link"><i data-lucide="external-link" style="width:11px;height:11px"></i> Apri gara</div>
+            </td>
+            <td class="r">50,00 €</td>
+            <td><span class="badge badge-warning">Da pagare</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><span class="badge badge-neutral">Lezione</span></td>
+            <td class="data-cell">21/05/2026</td>
+            <td class="evento-cell">
+              <div class="ev-name">Lezione MTB · Discesa tecnica</div>
+              <div class="ev-link"><i data-lucide="external-link" style="width:11px;height:11px"></i> Apri lezione</div>
+            </td>
+            <td class="r">30,00 €</td>
+            <td><span class="badge badge-warning">Da pagare</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><span class="badge badge-neutral">Lezione</span></td>
+            <td class="data-cell">16/05/2026</td>
+            <td class="evento-cell">
+              <div class="ev-name">Lezione MTB · Uscita su strada Marmore</div>
+              <div class="ev-link"><i data-lucide="external-link" style="width:11px;height:11px"></i> Apri lezione</div>
+            </td>
+            <td class="r">30,00 €</td>
+            <td><span class="badge badge-warning">Da pagare</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><span class="badge badge-neutral">Lezione</span></td>
+            <td class="data-cell">14/05/2026</td>
+            <td class="evento-cell">
+              <div class="ev-name">Lezione MTB · Cadenza e respirazione</div>
+              <div class="ev-link"><i data-lucide="external-link" style="width:11px;height:11px"></i> Apri lezione</div>
+            </td>
+            <td class="r">30,00 €</td>
+            <td><span class="badge badge-warning">Da pagare</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><span class="badge badge-neutral">Lezione</span></td>
+            <td class="data-cell">09/05/2026</td>
+            <td class="evento-cell">
+              <div class="ev-name">Lezione MTB · Single track nel bosco</div>
+              <div class="ev-link"><i data-lucide="external-link" style="width:11px;height:11px"></i> Apri lezione</div>
+            </td>
+            <td class="r">30,00 €</td>
+            <td><span class="badge badge-warning">Da pagare</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><span class="badge badge-neutral">Lezione</span></td>
+            <td class="data-cell">05/05/2026</td>
+            <td class="evento-cell">
+              <div class="ev-name">Lezione MTB · Manutenzione catena e freni</div>
+              <div class="ev-link"><i data-lucide="external-link" style="width:11px;height:11px"></i> Apri lezione</div>
+            </td>
+            <td class="r">30,00 €</td>
+            <td><span class="badge badge-warning">Da pagare</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <!-- 3 PAGATE (disabled checkbox) -->
+          <tr class="paid">
+            <td><input type="checkbox" disabled /></td>
+            <td><span class="badge badge-neutral">Lezione</span></td>
+            <td class="data-cell">12/05/2026</td>
+            <td class="evento-cell">
+              <div class="ev-name">Lezione MTB · Salita ripida</div>
+              <div class="ev-link"><i data-lucide="external-link" style="width:11px;height:11px"></i> Apri lezione</div>
+            </td>
+            <td class="r">30,00 €</td>
+            <td><span class="badge badge-success">Pagato 28/05/26</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr class="paid">
+            <td><input type="checkbox" disabled /></td>
+            <td><span class="badge badge-neutral">Lezione</span></td>
+            <td class="data-cell">07/05/2026</td>
+            <td class="evento-cell">
+              <div class="ev-name">Lezione MTB · Frenata di emergenza</div>
+              <div class="ev-link"><i data-lucide="external-link" style="width:11px;height:11px"></i> Apri lezione</div>
+            </td>
+            <td class="r">30,00 €</td>
+            <td><span class="badge badge-success">Pagato 28/05/26</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+          <tr class="paid">
+            <td><input type="checkbox" disabled /></td>
+            <td><span class="badge badge-neutral">Lezione</span></td>
+            <td class="data-cell">02/05/2026</td>
+            <td class="evento-cell">
+              <div class="ev-name">Lezione MTB · Tecnica del salto</div>
+              <div class="ev-link"><i data-lucide="external-link" style="width:11px;height:11px"></i> Apri lezione</div>
+            </td>
+            <td class="r">30,00 €</td>
+            <td><span class="badge badge-success">Pagato 28/05/26</span></td>
+            <td><button class="cell-action-btn"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Add bar bottom -->
+    <div class="add-bar">
+      <button class="btn btn-outline">
+        <i data-lucide="plus" style="width:14px;height:14px"></i>
+        Aggiungi presenza manuale
+      </button>
+    </div>
+
+    <!-- Annotations -->
+    <div class="annotations">
+      <h3>Note di design · scope MVP EVO-020</h3>
+      <ol>
+        <li><strong>BulkActionBar</strong> (riuso pattern EVO-018): visibile quando ≥1 riga selezionata. Mostra conteggio + totale aggregato a destra (90,00 €). Checkbox <em>disabled per presenze già pagate</em> (idempotenza visiva).</li>
+        <li><strong>Importi snapshot</strong>: l'<code>IMPORTO</code> mostrato è il valore al momento della creazione presenza. Se modifichi la tariffa con "Modifica tariffa" → solo le NUOVE presenze useranno la nuova tariffa.</li>
+        <li><strong>Stat compact bar</strong> sostituisce 3 KPICard verticali: pattern coerente per dettagli (vista più densa, no card grid).</li>
+        <li><strong>Pattern CRUD modal</strong>: 3 modali (segna pagate / modifica tariffa / aggiungi presenza). <code>AdminFormDialog</code> riuso EVO-017/018. AlertDialog NON necessario per queste azioni (non distruttive — pagamenti sono reversibili da admin).</li>
+        <li><strong>Aggiungi presenza manuale</strong>: caso eccezionale per eventi storici pre-cutoff EVO-020 (es. una gara di aprile 2026 svolta prima del go-live, da contabilizzare manualmente). Banner ember nel modal informativo.</li>
+        <li><strong>Riga link Evento</strong>: ev-link cliccabile apre la lezione o la gara originaria in nuova tab. Trasparenza completa sulla provenienza della presenza.</li>
+      </ol>
+    </div>
+
+    <!-- ========================= -->
+    <!-- ===== MODAL OVERLAY ===== -->
+    <!-- (mostrati statici sotto la pagina per documentazione visiva) -->
+    <!-- ========================= -->
+    <div class="modal-stack-wrap">
+      <div class="modal-stack-label">↓ Modal overlay (rendering documentale) ↓</div>
+
+      <!-- MODAL 1: Segna pagate -->
+      <div>
+        <div class="modal-row-label">Modal 1 · SegnaPagatePresenzeModal</div>
+        <div class="modal-row">
+          <div class="modal-mock">
+            <div class="modal-head">
+              <div class="modal-icon grass"><i data-lucide="check-check" style="width:22px;height:22px"></i></div>
+              <div style="flex:1">
+                <h2 class="modal-title">Segna 3 presenze come pagate</h2>
+                <div class="modal-subtitle">Bianchi Marco · maggio 2026</div>
+              </div>
+              <button class="modal-close"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+            </div>
+            <div class="modal-body">
+              <p style="margin:0 0 12px">Confermi il pagamento delle seguenti presenze?</p>
+
+              <div class="modal-mini-list">
+                <div class="modal-mini-row">
+                  <span class="data">28/05</span>
+                  <span class="badge badge-neutral">Lezione</span>
+                  <span class="ev">Cambio rapporti in salita</span>
+                  <span class="imp">30,00 €</span>
+                </div>
+                <div class="modal-mini-row">
+                  <span class="data">26/05</span>
+                  <span class="badge badge-neutral">Lezione</span>
+                  <span class="ev">Tecnica di curva</span>
+                  <span class="imp">30,00 €</span>
+                </div>
+                <div class="modal-mini-row">
+                  <span class="data">23/05</span>
+                  <span class="badge badge-neutral">Lezione</span>
+                  <span class="ev">Allenamento sprint</span>
+                  <span class="imp">30,00 €</span>
+                </div>
+              </div>
+
+              <div class="modal-totale-box">
+                <span class="lbl">Totale pagamento</span>
+                <span class="val">90,00 €</span>
+              </div>
+
+              <div class="mfield">
+                <label>Data pagamento</label>
+                <input type="date" value="2026-05-26" />
+                <div class="mfield-hint">Default oggi. Modifica solo se stai registrando un pagamento avvenuto in passato.</div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-outline">Annulla</button>
+              <button class="btn btn-success">
+                <i data-lucide="check" style="width:14px;height:14px"></i>
+                Conferma pagamento
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL 2: Modifica tariffa -->
+      <div>
+        <div class="modal-row-label">Modal 2 · ModificaTariffaMaestroModal</div>
+        <div class="modal-row">
+          <div class="modal-mock">
+            <div class="modal-head">
+              <div class="modal-icon navy"><i data-lucide="euro" style="width:22px;height:22px"></i></div>
+              <div style="flex:1">
+                <h2 class="modal-title">Tariffa rimborso · Bianchi Marco</h2>
+                <div class="modal-subtitle">Aspirante MTB</div>
+              </div>
+              <button class="modal-close"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+            </div>
+            <div class="modal-body">
+              <div class="mfield-row">
+                <div class="mfield">
+                  <label>Importo lezione (€)</label>
+                  <input type="text" value="30,00" />
+                </div>
+                <div class="mfield">
+                  <label>Importo gara (€)</label>
+                  <input type="text" value="50,00" />
+                </div>
+              </div>
+
+              <div class="ember-banner">
+                <i data-lucide="alert-triangle" style="width:14px;height:14px;flex-shrink:0;margin-top:1px"></i>
+                <div>
+                  <strong>La modifica non è retroattiva.</strong> Solo le nuove presenze useranno questa tariffa. Le presenze già registrate mantengono l'importo storico al momento dell'inserimento.
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-outline">Annulla</button>
+              <button class="btn btn-primary">
+                <i data-lucide="save" style="width:14px;height:14px"></i>
+                Salva tariffa
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL 3: Aggiungi presenza manuale -->
+      <div>
+        <div class="modal-row-label">Modal 3 · AggiungiPresenzaManualeModal</div>
+        <div class="modal-row">
+          <div class="modal-mock wide">
+            <div class="modal-head">
+              <div class="modal-icon ember"><i data-lucide="plus-circle" style="width:22px;height:22px"></i></div>
+              <div style="flex:1">
+                <h2 class="modal-title">Aggiungi presenza manuale</h2>
+                <div class="modal-subtitle">Per coprire eventi storici pre-cutoff EVO-020</div>
+              </div>
+              <button class="modal-close"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+            </div>
+            <div class="modal-body">
+
+              <div class="mfield">
+                <label>Tipo presenza</label>
+                <div class="radio-group" style="flex-direction:row">
+                  <div class="radio-opt" style="flex:1">
+                    <div class="radio-dot"></div>
+                    <span class="ropt-label">Lezione</span>
+                  </div>
+                  <div class="radio-opt active" style="flex:1">
+                    <div class="radio-dot"></div>
+                    <span class="ropt-label">Gara</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mfield">
+                <label>Gara</label>
+                <select>
+                  <option>Gara XC · Trofeo Marche · 15/04/2026</option>
+                  <option>Gara Strada · Coppa Don Bosco · 12/04/2026</option>
+                  <option>Nessuna (presenza scollegata)</option>
+                </select>
+              </div>
+
+              <div class="mfield-row">
+                <div class="mfield">
+                  <label>Maestro</label>
+                  <select disabled style="background:var(--bg-soft);color:var(--ink-muted)">
+                    <option>Bianchi Marco</option>
+                  </select>
+                  <div class="mfield-hint">Pre-compilato dal contesto pagina</div>
+                </div>
+                <div class="mfield">
+                  <label>Data presenza</label>
+                  <input type="date" value="2026-04-15" />
+                  <div class="mfield-hint">Pre-compilato dalla gara</div>
+                </div>
+              </div>
+
+              <div class="mfield">
+                <label>Importo (€)</label>
+                <input type="text" value="50,00" />
+                <div class="mfield-hint">Pre-compilato dalla tariffa gara del maestro. Modifica solo per override eccezionale.</div>
+              </div>
+
+              <div class="check-row">
+                <input type="checkbox" checked />
+                <span class="lbl-txt">Marca come già pagata</span>
+              </div>
+
+              <div class="mfield">
+                <label>Data pagamento</label>
+                <input type="date" value="2026-04-20" />
+              </div>
+
+              <div class="mfield">
+                <label>Note (opzionale)</label>
+                <textarea rows="2" placeholder="Es. rimborso pagato in contanti il giorno della gara">Rimborso pagato in contanti il giorno della gara</textarea>
+              </div>
+
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-outline">Annulla</button>
+              <button class="btn btn-primary">
+                <i data-lucide="plus" style="width:14px;height:14px"></i>
+                Aggiungi presenza
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

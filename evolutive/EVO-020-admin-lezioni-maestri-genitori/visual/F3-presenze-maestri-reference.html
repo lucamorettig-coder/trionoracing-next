@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Presenze maestri · Admin · Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+.maestro-row td { padding: 16px 14px; }
+.bar-cell { position: relative; width: 100%; height: 24px; }
+.bar-bg { position: absolute; inset: 0; background: var(--bg-muted); border-radius: 4px; }
+.bar-fill { position: absolute; top: 0; left: 0; bottom: 0; background: var(--navy-700); border-radius: 4px; }
+.bar-fill.warn { background: var(--ember-500); }
+.bar-fill.success { background: var(--grass-500); }
+.bar-label { position: absolute; top: 50%; right: 8px; transform: translateY(-50%); font-size: 11px; font-family: var(--f-mono); color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="page" style="background:var(--bg-soft)">
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" style="text-decoration:none;color:inherit">
+        <div class="nav-logo-mark">T</div>
+        <div><div class="nav-logo-text">Triono Racing</div><div class="nav-logo-sub">Gestione</div></div>
+      </a>
+      <nav class="nav-links">
+        <a href="dashboard.html" class="nav-link">Home</a>
+        <a href="#" class="nav-link active" style="display:inline-flex;align-items:center;gap:4px">Gestione<i data-lucide="chevron-down" style="width:14px;height:14px"></i></a>
+        <a href="#" class="nav-link">Profilo</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="nav-iconbtn"><i data-lucide="bell" style="width:18px;height:18px"></i></button>
+        <button class="nav-iconbtn nav-iconbtn-burger"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+        <a href="#" style="text-decoration:none;display:inline-flex"><span class="avatar avatar-sm" style="background:var(--sun-500);color:var(--navy-900)">AM</span></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb"><a href="dashboard.html">Admin</a><span class="sep">/</span><span class="current">Presenze maestri</span></div>
+
+  <div class="adm-page-head">
+    <div class="adm-page-head-row">
+      <div>
+        <h1 class="adm-page-h1">Presenze maestri</h1>
+        <p class="adm-page-sub">Aggregato lezioni per maestro / mese. Utile per pagamento compensi e verifica presenze contrattuali.</p>
+      </div>
+      <div class="adm-page-actions">
+        <button class="btn btn-outline btn-sm"><i data-lucide="download" style="width:14px;height:14px"></i>Esporta CSV</button>
+        <button class="btn btn-outline btn-sm"><i data-lucide="file-bar-chart" style="width:14px;height:14px"></i>Report annuale</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-inner">
+
+    <div class="adm-filters">
+      <button class="adm-filter active"><span class="label">Mese</span>Maggio 2026<i data-lucide="chevron-down" style="width:13px;height:13px;color:var(--ink-muted)"></i></button>
+      <button class="adm-filter"><span class="label">Anno</span>2026<i data-lucide="chevron-down" style="width:13px;height:13px;color:var(--ink-muted)"></i></button>
+      <div class="adm-filter-spacer"></div>
+      <span class="adm-results-count">4 maestri attivi</span>
+    </div>
+
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th>Maestro</th>
+            <th>Discipline</th>
+            <th>Lezioni mese</th>
+            <th>Ore stimate</th>
+            <th>Bambini cumulati</th>
+            <th>Compenso (€18/h)</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="maestro-row">
+            <td><div class="cell-person"><span class="avatar" style="background:var(--ember-500);color:#fff">AM</span><div><div class="name">Andrea Mancini</div><div class="meta">Capo-istruttore</div></div></div></td>
+            <td><div style="display:flex;gap:4px"><span class="badge badge-success" style="font-size:10px">MTB</span><span class="badge badge-info" style="font-size:10px">BDC</span></div></td>
+            <td>
+              <div class="bar-cell">
+                <div class="bar-bg"></div>
+                <div class="bar-fill" style="width:100%"></div>
+                <span class="bar-label" style="color:#fff">10 lez.</span>
+              </div>
+            </td>
+            <td class="num-right" style="font-weight:600">15,0 h</td>
+            <td class="num-right">81</td>
+            <td class="num-right" style="font-weight:700;color:var(--grass-700)">270,00 €</td>
+            <td><button class="cell-action-btn"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></button></td>
+          </tr>
+          <tr class="maestro-row">
+            <td><div class="cell-person"><span class="avatar" style="background:var(--sky-500);color:#fff">MC</span><div><div class="name">Marta Conti</div><div class="meta">Istruttore federale</div></div></div></td>
+            <td><div style="display:flex;gap:4px"><span class="badge badge-success" style="font-size:10px">MTB</span><span class="badge" style="font-size:10px;background:var(--ember-100);color:var(--ember-700)">JR</span></div></td>
+            <td>
+              <div class="bar-cell">
+                <div class="bar-bg"></div>
+                <div class="bar-fill" style="width:70%"></div>
+                <span class="bar-label" style="color:var(--ink)">7 lez.</span>
+              </div>
+            </td>
+            <td class="num-right" style="font-weight:600">10,5 h</td>
+            <td class="num-right">58</td>
+            <td class="num-right" style="font-weight:700;color:var(--grass-700)">189,00 €</td>
+            <td><button class="cell-action-btn"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></button></td>
+          </tr>
+          <tr class="maestro-row">
+            <td><div class="cell-person"><span class="avatar" style="background:var(--grass-500);color:#fff">RB</span><div><div class="name">Riccardo Bianchi</div><div class="meta">Aiuto-istruttore</div></div></div></td>
+            <td><div style="display:flex;gap:4px"><span class="badge badge-success" style="font-size:10px">MTB</span></div></td>
+            <td>
+              <div class="bar-cell">
+                <div class="bar-bg"></div>
+                <div class="bar-fill warn" style="width:30%"></div>
+                <span class="bar-label" style="color:var(--ink)">3 lez.</span>
+              </div>
+            </td>
+            <td class="num-right" style="font-weight:600">4,5 h</td>
+            <td class="num-right">22</td>
+            <td class="num-right" style="font-weight:700;color:var(--grass-700)">81,00 €</td>
+            <td><button class="cell-action-btn"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></button></td>
+          </tr>
+          <tr class="maestro-row warn">
+            <td><div class="cell-person"><span class="avatar" style="background:var(--navy-500);color:#fff">FT</span><div><div class="name">Federico Tonni</div><div class="meta">Stagista FCI</div></div></div></td>
+            <td><div style="display:flex;gap:4px"><span class="badge badge-info" style="font-size:10px">BDC</span></div></td>
+            <td>
+              <div class="bar-cell">
+                <div class="bar-bg"></div>
+                <div class="bar-fill warn" style="width:10%"></div>
+                <span class="bar-label" style="color:var(--ink)">1 lez.</span>
+              </div>
+            </td>
+            <td class="num-right" style="font-weight:600;color:var(--ember-700)">1,5 h</td>
+            <td class="num-right">7</td>
+            <td class="num-right" style="color:var(--ink-muted)">0,00 € · stagista</td>
+            <td><button class="cell-action-btn"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></button></td>
+          </tr>
+          <tr style="background:var(--navy-50);font-weight:700">
+            <td colspan="2" style="font-size:13px">Totale maggio 2026</td>
+            <td>
+              <div class="bar-cell">
+                <div class="bar-bg"></div>
+                <div class="bar-fill success" style="width:100%"></div>
+                <span class="bar-label" style="color:#fff">21 lez.</span>
+              </div>
+            </td>
+            <td class="num-right">31,5 h</td>
+            <td class="num-right">168</td>
+            <td class="num-right" style="color:var(--grass-700);font-size:15px">540,00 €</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Storico mesi precedenti -->
+    <div class="section-h" style="margin-top:32px">
+      <h2 style="font-size:16px">Andamento ultimi 6 mesi</h2>
+      <span class="t-mono t-muted" style="font-size:12px">lezioni × maestro</span>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;box-shadow:var(--sh-xs)">
+      <svg viewBox="0 0 600 180" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:180px">
+        <line x1="0" y1="40" x2="600" y2="40" stroke="#EEF0F5" stroke-width="1"/>
+        <line x1="0" y1="80" x2="600" y2="80" stroke="#EEF0F5" stroke-width="1"/>
+        <line x1="0" y1="120" x2="600" y2="120" stroke="#EEF0F5" stroke-width="1"/>
+        <polyline points="30,90 130,75 230,60 330,50 430,55 530,30" fill="none" stroke="#1F2D5A" stroke-width="2.5" stroke-linejoin="round"/>
+        <polyline points="30,120 130,110 230,100 330,95 430,90 530,75" fill="none" stroke="#3A82C8" stroke-width="2" stroke-linejoin="round"/>
+        <polyline points="30,140 130,135 230,130 330,128 430,135 530,140" fill="none" stroke="#5FAC36" stroke-width="2" stroke-linejoin="round"/>
+        <polyline points="30,160 130,158 230,155 330,153 430,160 530,165" fill="none" stroke="#5572A2" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="530" cy="30" r="4" fill="#1F2D5A"/>
+        <circle cx="530" cy="75" r="4" fill="#3A82C8"/>
+        <circle cx="530" cy="140" r="4" fill="#5FAC36"/>
+        <circle cx="530" cy="165" r="4" fill="#5572A2"/>
+      </svg>
+      <div style="display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:10.5px;color:var(--ink-muted);padding:0 4px;margin-top:6px">
+        <span>DIC</span><span>GEN</span><span>FEB</span><span>MAR</span><span>APR</span><span>MAG</span>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:14px;font-size:12px;flex-wrap:wrap">
+        <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--navy-700)"></span>Andrea M.</span>
+        <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--sky-500)"></span>Marta C.</span>
+        <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--grass-500)"></span>Riccardo B.</span>
+        <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--navy-400)"></span>Federico T.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand"><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;background:var(--sun-500);color:var(--navy-900);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px">T</div><div><div class="footer-brand-name">Triono Racing</div></div></div></div>
+      <div class="footer-col"><div class="footer-col-title">Gestione</div><ul><li><a href="#">Maestri</a></li></ul></div>
+      <div class="footer-col"><div class="footer-col-title">Risorse</div><ul><li><a href="#">Report</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>Admin v2.0</span><span>© 2026</span></div>
+  </footer>
+
+</div>
+</template>
+
+<script src="../shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['Mockup Portale', 'Admin', 'Presenze maestri'],
+    title: 'Presenze maestri · report mensile',
+    route: '/portale/admin/presenze-maestri',
+    statusBarTheme: 'dark',
+    desktopScale: 0.58,
+    stateLegend: { tag: 'Stato', items: [{ ref: 1, text: 'Maggio 2026 · 4 maestri attivi · 21 lezioni totali · 540 € compensi calcolati' }] },
+    annotations: [
+      { ref: 1, text: '<strong>Vista aggregata</strong> (non lista lezioni come admin/lezioni). Riga per maestro/mese con bar viz delle lezioni + ore + compenso teorico. Utile per pagamento mensile + verifica presenze contrattuali.' },
+      { ref: 2, text: '<strong>Bar cell custom</strong>: barra orizzontale 100% del top performer (navy), altri scalati proporzionalmente. Bar warn ember per &lt;5 lezioni (sotto-soglia contratto).' },
+      { ref: 3, text: '<strong>Compenso calcolato</strong>: ore × tariffa oraria (€18/h default). Stagisti hanno «0 €» in muted. La tariffa per maestro va in profilo/admin separato.' },
+      { ref: 4, text: '<strong>Riga totale</strong>: bg navy-50 con bar grass (rappresenta 100% mensile dei lezioni). Pattern di summary table riusato in pagamenti.' },
+      { ref: 5, text: '<strong>Chart 6 mesi</strong>: SVG linee multiple, una per maestro. Mostra trend di attività. Andrea capo-istruttore in alto.' },
+      { ref: 6, text: '<strong>Click su maestro</strong>: apre dettaglio con lista lezioni del mese + breakdown ore per disciplina + storico precedente.' },
+      { ref: 7, text: '<strong>Report annuale</strong>: CTA top-right per export PDF/CSV con tutti i mesi + tabella compensi + checklist obblighi contrattuali (minimo lezioni/mese)' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>
