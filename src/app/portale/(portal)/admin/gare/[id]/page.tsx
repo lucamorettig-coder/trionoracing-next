@@ -4,7 +4,6 @@ import { ChevronLeft, CheckCircle2 } from "lucide-react";
 import { requireAdmin } from "@/lib/auth-admin";
 import {
   getGaraByIdAdmin,
-  countIscrizioniByGara,
   getAllMaestriAttiviAdmin,
 } from "@/lib/airtable-admin";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
@@ -26,10 +25,8 @@ export default async function GaraDetailAdminPage({
   const gara = await getGaraByIdAdmin(id);
   if (!gara) notFound();
 
-  const [numIscrizioni, maestriAttivi] = await Promise.all([
-    countIscrizioniByGara(id).catch(() => 0),
-    getAllMaestriAttiviAdmin().catch(() => []),
-  ]);
+  const numIscrizioni = gara.iscrizioniGareIds.length;
+  const maestriAttivi = await getAllMaestriAttiviAdmin().catch(() => []);
 
   const assignedSet = new Set(gara.maestroAccompagnatoreIds);
   const maestriAssegnati = maestriAttivi.filter((m) => assignedSet.has(m.id));

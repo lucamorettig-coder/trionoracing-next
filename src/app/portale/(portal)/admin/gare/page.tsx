@@ -1,17 +1,12 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import { Plus, CheckCircle2 } from "lucide-react";
 import { requireAdmin } from "@/lib/auth-admin";
-import {
-  getAllGare,
-  parseGareFilters,
-  countIscrizioniByGara,
-} from "@/lib/airtable-admin";
+import { getAllGare, parseGareFilters } from "@/lib/airtable-admin";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { ExportCSVButton } from "@/components/admin/ExportCSVButton";
 import { Button } from "@/components/ui/button";
-import { GareFilters } from "@/components/admin/gare/GareFilters";
-import { GareDataTable, type GaraWithCounter } from "@/components/admin/gare/GareDataTable";
+import { GareTableWithFilters } from "@/components/admin/gare/GareTableWithFilters";
+import type { GaraWithCounter } from "@/components/admin/gare/GareDataTable";
 
 async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
   try {
@@ -39,15 +34,12 @@ export default async function GareAdminPage({
 
   const gareBase = await safe(() => getAllGare(filters), []);
 
-  // Counter iscrizioni per gara (in parallel, safe-wrapped). 1 round-trip extra
-  // per gara — accettabile sotto i 50 record. Se diventerà problematico, valutare
-  // un endpoint Airtable batch (es. View con count formula precalcolato).
-  const gare: GaraWithCounter[] = await Promise.all(
-    gareBase.map(async (g) => ({
-      ...g,
-      numIscrizioni: await safe(() => countIscrizioniByGara(g.id), 0),
-    })),
-  );
+  // Counter derivato dal record gara (campo ISCRIZIONI_GARE già fetchato).
+  // Niente N+1 / rate limit Airtable: il numero è la lunghezza dell'array linked.
+  const gare: GaraWithCounter[] = gareBase.map((g) => ({
+    ...g,
+    numIscrizioni: g.iscrizioniGareIds.length,
+  }));
 
   return (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-12 lg:py-16">
@@ -79,13 +71,13 @@ export default async function GareAdminPage({
         </div>
       )}
 
-      <div className="mt-6 mb-4">
-        <Suspense>
-          <GareFilters initial={filters} totalResults={gare.length} />
-        </Suspense>
+      <div className="mt-6">
+        <GareTableWithFilters
+          gare={gare}
+          toggle={filters.toggle}
+          initialSearch={filters.search ?? ""}
+        />
       </div>
-
-      <GareDataTable gare={gare} toggle={filters.toggle} />
     </div>
   );
 }

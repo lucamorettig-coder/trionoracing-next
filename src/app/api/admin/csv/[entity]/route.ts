@@ -7,7 +7,6 @@ import {
   getAllTitoli,
   getAllTariffe,
   getAllGare,
-  countIscrizioniByGara,
   getIscrizioniByGara,
   csvWriter,
 } from "@/lib/airtable-admin";
@@ -172,12 +171,10 @@ export async function POST(
     };
     const toggle: "future" | "passate" = filters.toggle === "passate" ? "passate" : "future";
     const gare = await getAllGare({ toggle, search: filters.search });
-    const enriched = await Promise.all(
-      gare.map(async (g) => ({
-        ...g,
-        numIscrizioni: await countIscrizioniByGara(g.id).catch(() => 0),
-      })),
-    );
+    const enriched = gare.map((g) => ({
+      ...g,
+      numIscrizioni: g.iscrizioniGareIds.length,
+    }));
     const csv = csvWriter(enriched, [
       { key: "id", label: "ID", accessor: (r) => r.id },
       { key: "data", label: "Data", accessor: (r) => r.data },

@@ -1256,6 +1256,8 @@ export interface Gara {
   comitatoRegionale: string | null;
   inEvidenza: boolean;
   maestroAccompagnatoreIds: string[];
+  /** IDs iscrizioni gara linkate. Permette `numIscrizioni = iscrizioniGareIds.length` senza round-trip extra (no N+1 / rate limit). */
+  iscrizioniGareIds: string[];
 }
 
 export interface GaraRecord {
@@ -1293,6 +1295,7 @@ export function mapGara(r: GaraRecord): Gara {
     comitatoRegionale: f.COMITATO_REGIONALE ?? null,
     inEvidenza: f.IN_EVIDENZA === true,
     maestroAccompagnatoreIds: f["Maestro Accompagnatore"] ?? [],
+    iscrizioniGareIds: f.ISCRIZIONI_GARE ?? [],
   };
 }
 
