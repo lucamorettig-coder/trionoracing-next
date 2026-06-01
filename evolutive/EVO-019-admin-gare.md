@@ -3,13 +3,15 @@
 - **ID**: EVO-019
 - **Slug**: admin-gare
 - **Data inizio**: 2026-05-26
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: pronta per implementazione
+- **Data fine**: 2026-05-26
+- **Stato**: completata
 - **Tipo**: nuova feature
 - **Area**: `/portale/admin/gare/*`
 - **Priorità**: 🟡 4 (post-MVP iscrizioni, parallelizzabile con EVO-020)
 - **Evolutiva ombrello**: [EVO-007 — Portale admin](EVO-007-portale-admin.md)
 - **Dipende da**: EVO-016 ✅ (DS primitivi + DataTable + scaffold admin), EVO-005 ✅ (schema `Gara`/`IscrizioneGara`, helper `tipoGaraStyle`)
+- **PR**: [#32](https://github.com/lucamorettig-coder/trionoracing-next/pull/32) — squash-merged commit `df12f32`
+- **URL produzione**: https://trionoracing-next.vercel.app/portale/admin/gare
 
 ---
 
@@ -323,3 +325,55 @@ Verificato: HTML standalone ben formato, CSS variables DS Triono inline, Tailwin
 
 ### [2026-05-26] Fase 7 — Prompt Claude Code completato
 Prompt autocontenuto salvato in `evolutive/EVO-019-admin-gare/prompt-claude-code.md` (~13 KB). Include WBS dettagliata, 11 criteri di accettazione, 15 step procedura end-to-end (branch → schema speculare → 7 commit incrementali → quality gates → smoke 11-step → PR feature → fermata pre-merge → squash merge dopo OK → verifica Vercel ~2min → `verify-implementation` → PR docs di chiusura `docs/evo-019-close`). Note esplicite: DEV/PROD schema sync obbligatorio, parsers server-only, toggle email inerte MVP, hard delete con guard count, bulk batch 10, JWT staleness, no auto-merge. Stato → "pronta per implementazione". Aggiornare memory.md.
+
+---
+
+## 8. Verifica e go-live (Fase 8 — 2026-05-26)
+
+### Esito complessivo
+✅ **APPROVATA** — tutti i criteri di accettazione (11) soddisfatti, lint 0 errors, build verde, smoke 11-step a-k completati in dev (con 5 round di fix iterativi applicati sul branch prima del merge).
+
+### Riferimenti deploy
+- **PR feature**: [#32](https://github.com/lucamorettig-coder/trionoracing-next/pull/32)
+- **Squash commit su main**: `df12f32` — "EVO-019: Admin Gare (CRUD manuale + workflow approvazione iscrizioni)"
+- **Deploy Vercel produzione**: `dpl_BxeuVJZGU7SjLwbLVWouTaYFT1DS` (BUILDING al momento della chiusura docs, atteso READY in ~2 min)
+- **URL live**: https://trionoracing-next.vercel.app/portale/admin/gare
+- **Branch feature**: `feat/evo-019-admin-gare` — eliminata post-merge
+- **Branch docs**: `docs/evo-019-close` (questo PR)
+
+### Tabella verifica per dimensione
+
+| Dimensione | Stato | Note |
+|---|---|---|
+| **Design system** | ✅ | Riuso `DataTable`, `BulkActionBar`, `AdminFormDialog`, `AdminPageHeader`, `ExportCSVButton`, `ConfirmDialog`, `Badge`, helper `tipoGaraStyle`/`statoIscrizioneGaraBadge` EVO-005. **Nuovo pattern locale**: `TipoGaraTile` pill orizzontale (`h-8 px-2.5 min-w-44px`) — promuovere in DS se altre liste con tipoGara emergeranno. **Action toggle inline ✓/✕** preferito al kebab DropdownMenu per flussi primari (approva/rifiuta è il loop critico admin gare). |
+| **Architettura** | ✅ | Rispetta convenzioni: route group `(portal)`, `requireAdmin()` su tutte le 5 pagine server, `safe()` wrapper su data fetch (lista), Server Actions in `actions.ts` con `"use server"` + **type exports in `actions-types.ts` separato** (Next 16 strict). Sottocartella per area `admin/gare/`. Parsers `parseGareFilters`/`parseGaraIscrizioniFilters` server-only. Counter iscrizioni derivato da `gara.iscrizioniGareIds.length` (no N+1). Pattern `key={prop}` remount per reset state senza setState-in-effect (regola React 19). |
+| **i18n** | n/a | Solo italiano. |
+| **SEO** | n/a | Area admin protetta. |
+| **Lint + Build** | ✅ | `npm run lint` 0 errors (8 warning preesistenti `<img>` su componenti `portale/figli/*` + `ui/card.tsx`, non touched in EVO-019). `npm run build` verde con 5 route admin/gare nuove. TypeScript clean. |
+| **Schema Airtable PROD+DEV speculare** | ✅ | `DESCRIZIONE` (multilineText) su PROD `appszpkU1aXb3xrFM` field `flddz8JWXzCdgtpWi` + DEV `app7FOqBdmmW0jBf5` field `fldEwZxljmBRze05q`. Verificato post-create via `get_table_schema`. |
+| **Smoke 11-step (a-k)** | ✅ | Eseguito in dev con feedback iterativo utente, 5 round di fix → tutti gli step finali verdi: login admin, lista DataTable + filtri Future/Passate, create nuova gara con DESCRIZIONE, modifica maestri assegnati, vetrina genitore mostra descrizione, lista iscrizioni gara, approve/reject singola + bulk, delete con guard. |
+
+### Iterazioni in branch (fix recepiti durante smoke)
+
+7 commit di fix dopo la prima implementazione, tutti su branch `feat/evo-019-admin-gare`:
+
+1. `2127c4c` **fix: rate-limit Airtable + filtri mese/regione/tipo** — expose `iscrizioniGareIds` su `Gara`, count via `.length` (no N+1 → no 429); aggiunti 3 filtri client-side con prefiltro mese corrente + Umbria su Future.
+2. `b03ac69` **fix: split actions-types + tile pill width** — `export type` da file `"use server"` rompeva Server Action registration (Next 16 strict: solo async fn exports). Spostato in `actions-types.ts`. Tile `TipoGaraTile` da quadrato 36px a pill orizzontale `h-8 px-2.5 min-w-44px` (no truncation "STRADA"/"ENDURO"/"ABILITÀ").
+3. `c72e633` **fix: toggle inline + nav + cleanup** — `IscrizioniGaraDataTable` kebab → bottoni inline ✓ grass / ✕ flag come azione primaria; `GareDataTable` kebab "Elimina" rimosso (azione già su dettaglio), pattern `onSelect+router.push` invece di `Link asChild`; 3 modal con callback `onSuccess` → `router.refresh()`.
+4. `1a05df0` **fix: infinite re-render loop su filtri** — `GareTableWithFilters` + `IscrizioniGaraFilters` `useEffect` con `setParam` (useCallback con `searchParams` in deps) → ogni `router.replace` cambiava searchParams → cambiava ref di setParam → ri-triggerava effect → main thread saturo bloccava click handler dei Link ("Torna al dettaglio non funziona"). Replica pattern PagamentiFilters: funzione inline + `useEffect` deps `[search]` con `eslint-disable-next-line react-hooks/exhaustive-deps`.
+5. `4a2a6f5` **fix: NavBar active state — match esatto per route indice** — `pathname.startsWith(link.href)` rendeva sia Dashboard (`/portale/admin`) sia Gare (`/portale/admin/gare`) attivi su `/portale/admin/gare/*`. Fix: route indice (`/portale`, `/portale/admin`) richiedono match esatto, altre voci `startsWith(href + "/")`. Applicato anche su `MobileMenu`.
+6. `cd8a3fa` **fix: setState-in-effect via key remount** — i due `useEffect` che re-sincronizzavano `mese`/`regione` su toggle Future/Passate violavano la nuova regola `react-hooks/set-state-in-effect` di React 19. Sostituiti con pattern canonico: parent passa `key={filters.toggle}` → forza remount completo con stato iniziale fresco.
+
+### Azioni manuali residue lato utente
+
+- **Backfill DESCRIZIONE su gare esistenti**: il campo è additivo retro-compatibile (genitore vede `gara.descrizione ?? gara.note` come fallback). Quando l'admin vuole migrare un record storico, basta aprire la gara su admin/gare/[id]/modifica → riempire Descrizione → salva. Vecchio contenuto in `Note` resta come backup, ma non viene mostrato al genitore se DESCRIZIONE è popolato.
+- **Eventuali admin con JWT stale**: workaround documentato EVO-016 (sign-out + sign-in dopo promozione ADMIN) se uno user appena promosso non vede `/portale/admin/gare`.
+- **Configurazione Make.com per notifiche genitore**: il toggle "Notifica genitore via email" è inerte in MVP (placeholder UI). Quando in futuro si vorranno notifiche reali su approve/reject iscrizione gara, si aprirà una evolutiva dedicata con webhook Make.com + template email.
+
+### Sblocchi e collegate
+
+- **Sblocca**: EVO-020 (lezioni/maestri/genitori) resta l'ultima sotto-evolutiva del cluster admin (EVO-007 ombrello). EVO-019 ha confermato che il pattern admin (sottocartella `admin/area/` + page server + Client components + Server Actions + CSV) scala bene anche per workflow complessi tipo approvazione iscrizioni. Per EVO-020 sono validi tutti i pattern emersi: `key={prop}` remount per reset state, type exports in file separato, action toggle inline per flussi primari, etc.
+- **Collegate**: La vista pubblica `/portale/gare` (EVO-005) ora consuma `gara.descrizione` con fallback retro-compatibile su `gara.note`. La vista dettaglio gara per maestro (`/portale/gare-assegnate/[id]`) resta `notFound()` come prima (out-of-scope EVO-019, parking lot per evolutiva dedicata).
+
+### [2026-05-26] Fase 8 — Chiusura
+PR feature mergeata, deploy Vercel produzione triggerato, scheda + memory + AGENTS pattern aggiornati in PR docs separata `docs/evo-019-close`. **Stato finale: completata, in produzione.**
