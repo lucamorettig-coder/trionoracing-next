@@ -12,19 +12,26 @@ import type {
   Bambino,
   Gara,
   GaraRecord,
+  Genitore,
   IscrizioneGara,
   IscrizioneGaraRecord,
   Iscrizione,
   Lezione,
+  Maestro,
+  PresenzaMaestro,
+  PresenzaTipo,
+  Ruolo,
   StatoIscrizioneGara,
   TitoloPagamento,
 } from "@/lib/airtable-portale";
 import {
   GARE_TABLE,
   calcCategoriaFCI,
+  createPresenzaMaestro,
   mapGara,
   mapIscrizioneGara,
 } from "@/lib/airtable-portale";
+import { clerkClient } from "@clerk/nextjs/server";
 
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TOKEN = process.env.AIRTABLE_TOKEN;
@@ -1180,4 +1187,671 @@ export async function getAllMaestriAttiviAdmin(): Promise<MaestroLite[]> {
       qualifica: m.fields.QUALIFICA ?? null,
       attivo: m.fields.ATTIVO === true,
     }));
+}
+
+// ─── EVO-020: Lezioni (A-8 admin storico) ───────────────────────────────────
+
+export interface LezioniAdminFilters {
+  anno?: number;
+  mese?: number;
+  maestroId?: string;
+  bambinoSearch?: string;
+}
+
+export function parseLezioniFilters(params: URLSearchParams): LezioniAdminFilters {
+  const anno = params.get("anno");
+  const mese = params.get("mese");
+  const maestroId = params.get("maestro");
+  const bambinoSearch = params.get("search");
+  return {
+    anno: anno && anno !== "all" ? parseInt(anno, 10) : undefined,
+    mese: mese && mese !== "all" ? parseInt(mese, 10) : undefined,
+    maestroId: maestroId && maestroId !== "all" ? maestroId : undefined,
+    bambinoSearch: bambinoSearch || undefined,
+  };
+}
+
+export async function getAllLezioni(filters?: LezioniAdminFilters): Promise<Lezione[]> {
+  const conditions: string[] = [];
+  if (filters?.anno) conditions.push(`YEAR({DATA})=${filters.anno}`);
+  if (filters?.mese) conditions.push(`MONTH({DATA})=${filters.mese}`);
+  const formula = conditions.length > 0 ? `AND(${conditions.join(",")})` : undefined;
+  let lezioni = await fetchAllPages<Lezione>("TABELLA_LEZIONI", {
+    filterByFormula: formula,
+    sort: [{ field: "DATA", direction: "desc" }],
+  });
+
+  // Filtro maestro: ARRAYJOIN su linked field non sicuro (bug noto AGENTS.md) —
+  // filtra in-memory sugli ID di MAESTRI_PRESENTI ∪ MAESTRO_COMPILATORE.
+  if (filters?.maestroId) {
+    const target = filters.maestroId;
+    lezioni = lezioni.filter((l) => {
+      const ids = new Set([
+        ...(l.fields.MAESTRI_PRESENTI ?? []),
+        ...(l.fields.MAESTRO_COMPILATORE ?? []),
+      ]);
+      return ids.has(target);
+    });
+  }
+
+  // Filtro search bambino: serve fetch nomi bambini delle lezioni filtrate
+  if (filters?.bambinoSearch) {
+    const q = filters.bambinoSearch.toLowerCase();
+    const allBambiniIds = Array.from(
+      new Set(lezioni.flatMap((l) => l.fields.BAMBINI_PRESENTI ?? [])),
+    );
+    if (allBambiniIds.length === 0) return [];
+    const cond = allBambiniIds.map((id) => `RECORD_ID()="${id}"`).join(",");
+    const bambini = await fetchAllPages<Bambino>("TABELLA_BAMBINI", {
+      filterByFormula: `OR(${cond})`,
+      fields: ["NOME_BAMBINO", "COGNOME_BAMBINO"],
+    });
+    const matching = new Set(
+      bambini
+        .filter(
+          (b) =>
+            (b.fields.NOME_BAMBINO ?? "").toLowerCase().includes(q) ||
+            (b.fields.COGNOME_BAMBINO ?? "").toLowerCase().includes(q),
+        )
+        .map((b) => b.id),
+    );
+    lezioni = lezioni.filter((l) =>
+      (l.fields.BAMBINI_PRESENTI ?? []).some((id) => matching.has(id)),
+    );
+  }
+  return lezioni;
+}
+
+export interface StatsLezioniResult {
+  lezioniTotali: number;
+  bambiniPresenzeTotali: number;
+  maestroPiuAttivo: {
+    id: string;
+    nome: string;
+    cognome: string;
+    count: number;
+  } | null;
+}
+
+export async function getStatsLezioni(
+  filters?: LezioniAdminFilters,
+): Promise<StatsLezioniResult> {
+  const lezioni = await getAllLezioni(filters);
+  const lezioniTotali = lezioni.length;
+  const bambiniPresenzeTotali = lezioni.reduce(
+    (s, l) => s + (l.fields.BAMBINI_PRESENTI?.length ?? 0),
+    0,
+  );
+  const countByMaestro: Record<string, number> = {};
+  for (const l of lezioni) {
+    const ids = new Set([
+      ...(l.fields.MAESTRI_PRESENTI ?? []),
+      ...(l.fields.MAESTRO_COMPILATORE ?? []),
+    ]);
+    for (const id of ids) countByMaestro[id] = (countByMaestro[id] ?? 0) + 1;
+  }
+  let topId: string | null = null;
+  let topCount = 0;
+  for (const [id, c] of Object.entries(countByMaestro)) {
+    if (c > topCount) {
+      topId = id;
+      topCount = c;
+    }
+  }
+  let maestroPiuAttivo: StatsLezioniResult["maestroPiuAttivo"] = null;
+  if (topId) {
+    try {
+      const m = await getMaestroByIdAdmin(topId);
+      if (m) {
+        maestroPiuAttivo = {
+          id: topId,
+          nome: m.fields.NOME_MAESTRO,
+          cognome: m.fields.COGNOME_MAESTRO,
+          count: topCount,
+        };
+      }
+    } catch {
+      // ignore — maestroPiuAttivo resta null
+    }
+  }
+  return { lezioniTotali, bambiniPresenzeTotali, maestroPiuAttivo };
+}
+
+export async function getAnniDisponibiliLezioni(): Promise<number[]> {
+  const lezioni = await fetchAllPages<Lezione>("TABELLA_LEZIONI", {
+    fields: ["DATA"],
+  });
+  const anni = new Set<number>();
+  for (const l of lezioni) {
+    if (l.fields.DATA) {
+      const y = parseInt(l.fields.DATA.slice(0, 4), 10);
+      if (!Number.isNaN(y)) anni.add(y);
+    }
+  }
+  if (anni.size === 0) anni.add(new Date().getFullYear());
+  return Array.from(anni).sort((a, b) => b - a);
+}
+
+export async function getLezioneByIdAdmin(id: string): Promise<Lezione | null> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/TABELLA_LEZIONI/${encodeURIComponent(id)}`,
+    { headers: { Authorization: `Bearer ${TOKEN}` }, cache: "no-store" },
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`[airtable-admin] getLezioneByIdAdmin ${id}: ${res.status}`);
+  return res.json() as Promise<Lezione>;
+}
+
+// ─── EVO-020: Presenze maestri (A-9 admin rimborsi) ─────────────────────────
+
+const PRESENZE_TABLE = "PRESENZE_MAESTRI";
+
+export interface PresenzeAdminFilters {
+  mese: number;
+  anno: number;
+  search?: string;
+}
+
+export function parsePresenzeFilters(params: URLSearchParams): PresenzeAdminFilters {
+  const now = new Date();
+  const meseRaw = params.get("mese");
+  const annoRaw = params.get("anno");
+  return {
+    mese: meseRaw ? parseInt(meseRaw, 10) : now.getMonth() + 1,
+    anno: annoRaw ? parseInt(annoRaw, 10) : now.getFullYear(),
+    search: params.get("search") ?? undefined,
+  };
+}
+
+export interface PresenzaAggregata {
+  maestroId: string;
+  maestroNome: string;
+  maestroCognome: string;
+  maestroQualifica: string | null;
+  nLezioni: number;
+  nGare: number;
+  dovuto: number;
+  pagato: number;
+  residuo: number;
+  presenzePagate: number;
+  presenzeTotali: number;
+}
+
+export async function getPresenzeAggregato(
+  filters: PresenzeAdminFilters,
+): Promise<PresenzaAggregata[]> {
+  const formula = `AND(YEAR({DATA})=${filters.anno},MONTH({DATA})=${filters.mese})`;
+  const presenze = await fetchAllPages<PresenzaMaestro>(PRESENZE_TABLE, {
+    filterByFormula: formula,
+  });
+  if (presenze.length === 0) return [];
+
+  const byMaestro = new Map<string, PresenzaMaestro[]>();
+  for (const p of presenze) {
+    const mId = p.fields.MAESTRO?.[0];
+    if (!mId) continue;
+    const list = byMaestro.get(mId) ?? [];
+    list.push(p);
+    byMaestro.set(mId, list);
+  }
+
+  const maestriIds = Array.from(byMaestro.keys());
+  const cond = maestriIds.map((id) => `RECORD_ID()="${id}"`).join(",");
+  const maestri = await fetchAllPages<Maestro>("TABELLA_MAESTRI", {
+    filterByFormula: `OR(${cond})`,
+    fields: ["NOME_MAESTRO", "COGNOME_MAESTRO", "QUALIFICA"],
+  });
+  const maestriById = new Map(maestri.map((m) => [m.id, m]));
+
+  let result: PresenzaAggregata[] = [];
+  for (const [mId, lista] of byMaestro.entries()) {
+    const m = maestriById.get(mId);
+    const dovuto = lista.reduce((s, p) => s + (p.fields.IMPORTO_DOVUTO ?? 0), 0);
+    const pagato = lista
+      .filter((p) => p.fields.PAGATO)
+      .reduce((s, p) => s + (p.fields.IMPORTO_DOVUTO ?? 0), 0);
+    result.push({
+      maestroId: mId,
+      maestroNome: m?.fields.NOME_MAESTRO ?? "",
+      maestroCognome: m?.fields.COGNOME_MAESTRO ?? "",
+      maestroQualifica: m?.fields.QUALIFICA ?? null,
+      nLezioni: lista.filter((p) => p.fields.TIPO === "lezione").length,
+      nGare: lista.filter((p) => p.fields.TIPO === "gara").length,
+      dovuto,
+      pagato,
+      residuo: dovuto - pagato,
+      presenzePagate: lista.filter((p) => p.fields.PAGATO).length,
+      presenzeTotali: lista.length,
+    });
+  }
+
+  result.sort((a, b) =>
+    a.maestroCognome.localeCompare(b.maestroCognome, "it") ||
+    a.maestroNome.localeCompare(b.maestroNome, "it"),
+  );
+
+  if (filters.search) {
+    const q = filters.search.toLowerCase();
+    result = result.filter(
+      (r) =>
+        r.maestroCognome.toLowerCase().includes(q) ||
+        r.maestroNome.toLowerCase().includes(q),
+    );
+  }
+  return result;
+}
+
+export interface PresenzaMaestroEnriched extends PresenzaMaestro {
+  eventoLabel: string;
+  eventoId: string | null;
+  eventoTipo: PresenzaTipo;
+}
+
+export async function getPresenzeMaestroPeriodo(
+  maestroId: string,
+  filters: PresenzeAdminFilters,
+): Promise<PresenzaMaestroEnriched[]> {
+  const maestro = await getMaestroByIdAdmin(maestroId);
+  if (!maestro) return [];
+  const allIds = maestro.fields.PRESENZE_MAESTRI ?? [];
+  if (allIds.length === 0) return [];
+
+  // Batch fetch + filter mese/anno in-memory (no SEARCH+ARRAYJOIN su linked)
+  const cond = allIds.map((id) => `RECORD_ID()="${id}"`).join(",");
+  const presenze = await fetchAllPages<PresenzaMaestro>(PRESENZE_TABLE, {
+    filterByFormula: `OR(${cond})`,
+  });
+  const filtered = presenze.filter((p) => {
+    const d = p.fields.DATA;
+    if (!d) return false;
+    const y = parseInt(d.slice(0, 4), 10);
+    const m = parseInt(d.slice(5, 7), 10);
+    return y === filters.anno && m === filters.mese;
+  });
+  if (filtered.length === 0) return [];
+
+  const lezioniIds = Array.from(
+    new Set(filtered.flatMap((p) => p.fields.LEZIONE ?? [])),
+  );
+  const gareIds = Array.from(
+    new Set(filtered.flatMap((p) => p.fields.GARA ?? [])),
+  );
+
+  const lezioniById = new Map<string, Lezione>();
+  if (lezioniIds.length > 0) {
+    const lc = lezioniIds.map((id) => `RECORD_ID()="${id}"`).join(",");
+    const lez = await fetchAllPages<Lezione>("TABELLA_LEZIONI", {
+      filterByFormula: `OR(${lc})`,
+      fields: ["DATA", "TIPO_SESSIONE", "NOTE_ATTIVITA"],
+    });
+    for (const l of lez) lezioniById.set(l.id, l);
+  }
+  const gareById = new Map<string, Gara>();
+  if (gareIds.length > 0) {
+    const gc = gareIds.map((id) => `RECORD_ID()="${id}"`).join(",");
+    const gareRec = await fetchAllPages<GaraRecord>(GARE_TABLE, {
+      filterByFormula: `OR(${gc})`,
+    });
+    for (const gr of gareRec) gareById.set(gr.id, mapGara(gr));
+  }
+
+  const enriched: PresenzaMaestroEnriched[] = filtered.map((p) => {
+    let eventoLabel = "—";
+    let eventoId: string | null = null;
+    if (p.fields.TIPO === "lezione") {
+      const lid = p.fields.LEZIONE?.[0];
+      if (lid) {
+        eventoId = lid;
+        const l = lezioniById.get(lid);
+        if (l?.fields.TIPO_SESSIONE) {
+          eventoLabel = l.fields.TIPO_SESSIONE;
+        } else {
+          eventoLabel = "Lezione";
+        }
+      } else {
+        eventoLabel = "Lezione (manuale)";
+      }
+    } else {
+      const gid = p.fields.GARA?.[0];
+      if (gid) {
+        eventoId = gid;
+        const g = gareById.get(gid);
+        if (g) eventoLabel = g.nomeGara;
+      } else {
+        eventoLabel = "Gara (manuale)";
+      }
+    }
+    return { ...p, eventoLabel, eventoId, eventoTipo: p.fields.TIPO };
+  });
+
+  enriched.sort((a, b) => {
+    const dCmp = (b.fields.DATA ?? "").localeCompare(a.fields.DATA ?? "");
+    if (dCmp !== 0) return dCmp;
+    const pa = a.fields.PAGATO ? 1 : 0;
+    const pb = b.fields.PAGATO ? 1 : 0;
+    return pa - pb;
+  });
+  return enriched;
+}
+
+export async function getMaestroByIdAdmin(id: string): Promise<Maestro | null> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/TABELLA_MAESTRI/${encodeURIComponent(id)}`,
+    { headers: { Authorization: `Bearer ${TOKEN}` }, cache: "no-store" },
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`[airtable-admin] getMaestroByIdAdmin ${id}: ${res.status}`);
+  return res.json() as Promise<Maestro>;
+}
+
+/**
+ * Bulk mark di N presenze come pagate. Loop batch da 10 (limite Airtable
+ * PATCH multi-record), idempotenza skip per record già PAGATO=true.
+ * Pattern coerente con `bulkUpdateIscrizioniGara` (EVO-019) e
+ * `bulkSegnaPagato` (EVO-018).
+ */
+export async function segnaPresenzePagate(
+  ids: string[],
+  dataPagamento: string,
+): Promise<{ updated: number; skipped: number }> {
+  requireEnv();
+  if (ids.length === 0) return { updated: 0, skipped: 0 };
+
+  const cond = ids.map((id) => `RECORD_ID()="${id}"`).join(",");
+  const presenze = await fetchAllPages<PresenzaMaestro>(PRESENZE_TABLE, {
+    filterByFormula: `OR(${cond})`,
+  });
+  const idsDaAggiornare = presenze
+    .filter((p) => !p.fields.PAGATO)
+    .map((p) => p.id);
+  const skipped = ids.length - idsDaAggiornare.length;
+  if (idsDaAggiornare.length === 0) return { updated: 0, skipped };
+
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < idsDaAggiornare.length; i += BATCH_SIZE) {
+    const batch = idsDaAggiornare.slice(i, i + BATCH_SIZE);
+    const records = batch.map((id) => ({
+      id,
+      fields: { PAGATO: true, DATA_PAGAMENTO: dataPagamento },
+    }));
+    const res = await fetch(`${API_BASE}/${BASE_ID}/${PRESENZE_TABLE}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ records }),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      throw new Error(
+        `[airtable-admin] segnaPresenzePagate batch ${i / BATCH_SIZE} failed: ${res.status} ${body}`,
+      );
+    }
+  }
+  return { updated: idsDaAggiornare.length, skipped };
+}
+
+export async function aggiornaTariffaMaestro(
+  maestroId: string,
+  tariffe: { lezione?: number; gara?: number },
+): Promise<void> {
+  requireEnv();
+  const fields: Record<string, number> = {};
+  if (tariffe.lezione !== undefined) fields.IMPORTO_RIMBORSO_LEZIONE = tariffe.lezione;
+  if (tariffe.gara !== undefined) fields.IMPORTO_RIMBORSO_GARA = tariffe.gara;
+  if (Object.keys(fields).length === 0) return;
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/TABELLA_MAESTRI/${encodeURIComponent(maestroId)}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ fields }),
+      cache: "no-store",
+    },
+  );
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(
+      `[airtable-admin] aggiornaTariffaMaestro ${maestroId} failed: ${res.status} ${body}`,
+    );
+  }
+}
+
+export interface AggiungiPresenzaManualeInput {
+  tipo: PresenzaTipo;
+  maestroId: string;
+  data: string;
+  importoDovuto: number;
+  lezioneId?: string;
+  garaId?: string;
+  pagato?: boolean;
+  dataPagamento?: string;
+  note?: string;
+}
+
+/**
+ * Aggiunta manuale di una presenza maestro (eventi storici pre-cutoff EVO-020
+ * o casi di backfill puntuale). Wrapper su createPresenzaMaestro per coerenza
+ * nominale lato Server Action. Idempotente (skip se record già esistente).
+ */
+export async function aggiungiPresenzaManuale(
+  input: AggiungiPresenzaManualeInput,
+): Promise<PresenzaMaestro | null> {
+  return createPresenzaMaestro(input);
+}
+
+// ─── EVO-020: Genitori (A-10 admin lista + dettaglio + cambio ruolo) ────────
+
+export interface GenitoriAdminFilters {
+  ruolo?: Ruolo[];
+  search?: string;
+  soloConFigli?: boolean;
+}
+
+export function parseGenitoriFilters(params: URLSearchParams): GenitoriAdminFilters {
+  const ruoloRaw = params.getAll("ruolo") as Ruolo[];
+  const search = params.get("search") ?? undefined;
+  const soloConFigli = params.get("conFigli") === "1";
+  return {
+    ruolo: ruoloRaw.length > 0 ? ruoloRaw : undefined,
+    search,
+    soloConFigli,
+  };
+}
+
+export async function getAllGenitori(filters?: GenitoriAdminFilters): Promise<Genitore[]> {
+  const conditions: string[] = [];
+  if (filters?.ruolo && filters.ruolo.length > 0) {
+    const ruoloOr = filters.ruolo.map((r) => `{RUOLO}="${r}"`).join(",");
+    conditions.push(`OR(${ruoloOr})`);
+  }
+  const formula = conditions.length > 0 ? `AND(${conditions.join(",")})` : undefined;
+
+  let genitori = await fetchAllPages<Genitore>("TABELLA_GENITORI", {
+    filterByFormula: formula,
+    sort: [
+      { field: "COGNOME_GENITORE", direction: "asc" },
+      { field: "NOME_GENITORE", direction: "asc" },
+    ],
+  });
+
+  if (filters?.soloConFigli) {
+    genitori = genitori.filter(
+      (g) => (g.fields.TABELLA_BAMBINI?.length ?? 0) > 0,
+    );
+  }
+
+  if (filters?.search) {
+    const q = filters.search.toLowerCase();
+    genitori = genitori.filter((g) => {
+      const nome = (g.fields.NOME_GENITORE ?? "").toLowerCase();
+      const cognome = (g.fields.COGNOME_GENITORE ?? "").toLowerCase();
+      const email = (g.fields.EMAIL_GENITORE ?? "").toLowerCase();
+      const cell = (g.fields.CELLULARE_GENITORE ?? "").toLowerCase();
+      return nome.includes(q) || cognome.includes(q) || email.includes(q) || cell.includes(q);
+    });
+  }
+  return genitori;
+}
+
+export async function getGenitoreByIdAdmin(id: string): Promise<Genitore | null> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/TABELLA_GENITORI/${encodeURIComponent(id)}`,
+    { headers: { Authorization: `Bearer ${TOKEN}` }, cache: "no-store" },
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`[airtable-admin] getGenitoreByIdAdmin ${id}: ${res.status}`);
+  return res.json() as Promise<Genitore>;
+}
+
+export interface DettaglioGenitoreResult {
+  genitore: Genitore;
+  figli: Bambino[];
+  iscrizioni: Iscrizione[];
+  titoli: TitoloPagamento[];
+}
+
+export async function getDettaglioGenitore(
+  id: string,
+): Promise<DettaglioGenitoreResult | null> {
+  const genitore = await getGenitoreByIdAdmin(id);
+  if (!genitore) return null;
+
+  // Figli: batch fetch dagli ID linkati sul genitore
+  const bambiniIds = genitore.fields.TABELLA_BAMBINI ?? [];
+  let figli: Bambino[] = [];
+  if (bambiniIds.length > 0) {
+    const cond = bambiniIds.map((bid) => `RECORD_ID()="${bid}"`).join(",");
+    figli = await fetchAllPages<Bambino>("TABELLA_BAMBINI", {
+      filterByFormula: `OR(${cond})`,
+      sort: [{ field: "NOME_BAMBINO", direction: "asc" }],
+    });
+  }
+
+  // Iscrizioni: via lookup GENITORE_RECORD_ID_LOOKUP (pattern EVO-013)
+  let iscrizioni: Iscrizione[] = [];
+  try {
+    iscrizioni = await fetchAllPages<Iscrizione>("TABELLA_ISCRIZIONI", {
+      filterByFormula: `FIND("${id}",ARRAYJOIN({GENITORE_RECORD_ID_LOOKUP},","))>0`,
+      sort: [{ field: "DATA_ISCRIZIONE", direction: "desc" }],
+    });
+  } catch (err) {
+    console.warn("[getDettaglioGenitore] iscrizioni fetch failed:", err);
+  }
+
+  // Titoli: batch fetch dagli ID linked sulle iscrizioni
+  const titoliIds = Array.from(
+    new Set(iscrizioni.flatMap((i) => i.fields.TITOLI_PAGAMENTO ?? [])),
+  );
+  let titoli: TitoloPagamento[] = [];
+  if (titoliIds.length > 0) {
+    const cond = titoliIds.map((tid) => `RECORD_ID()="${tid}"`).join(",");
+    titoli = await fetchAllPages<TitoloPagamento>("TITOLI_PAGAMENTO", {
+      filterByFormula: `OR(${cond})`,
+      sort: [{ field: "DATA_SCADENZA_PAGAMENTO", direction: "desc" }],
+    });
+  }
+
+  return { genitore, figli, iscrizioni, titoli };
+}
+
+/**
+ * Patch interno solo per RUOLO. Bypassa stripReadOnlyFields per evitare ciclo
+ * con `airtable-portale.updateGenitore`. Usato esclusivamente da
+ * `cambiaRuoloGenitore` per il flusso transazionale.
+ */
+async function patchGenitoreRuolo(id: string, ruolo: Ruolo): Promise<void> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/TABELLA_GENITORI/${encodeURIComponent(id)}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ fields: { RUOLO: ruolo } }),
+      cache: "no-store",
+    },
+  );
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(
+      `[airtable-admin] patchGenitoreRuolo ${id} failed: ${res.status} ${body}`,
+    );
+  }
+}
+
+/**
+ * Server Action transazionale Airtable+Clerk con rollback atomico.
+ *
+ * Flusso:
+ * 1. Read RUOLO precedente per rollback.
+ * 2. PATCH Airtable RUOLO = nuovoRuolo (Airtable autoritativo).
+ * 3. Try Clerk update publicMetadata.role con timeout 5s.
+ * 4. Catch Clerk error → rollback Airtable a RUOLO precedente + throw esplicito.
+ * 5. Catch rollback fail → throw critical "disallineati" (intervento manuale).
+ *
+ * Pattern nuovo del progetto EVO-020. Da promuovere in AGENTS.md a chiusura.
+ */
+export async function cambiaRuoloGenitore(
+  genitoreId: string,
+  nuovoRuolo: Ruolo,
+): Promise<void> {
+  const genitore = await getGenitoreByIdAdmin(genitoreId);
+  if (!genitore) throw new Error("Genitore non trovato");
+  const ruoloPrecedente = genitore.fields.RUOLO ?? "GENITORE";
+  const clerkUserId = genitore.fields.AUTH_USER_ID;
+  if (!clerkUserId) {
+    throw new Error(
+      "Utente senza AUTH_USER_ID — impossibile sincronizzare con Clerk",
+    );
+  }
+
+  if (ruoloPrecedente === nuovoRuolo) return; // No-op
+
+  // Step 1: Airtable first (autoritativo)
+  await patchGenitoreRuolo(genitoreId, nuovoRuolo);
+
+  // Step 2: Clerk con timeout esplicito 5s
+  try {
+    const client = await clerkClient();
+    await Promise.race<unknown>([
+      client.users.updateUserMetadata(clerkUserId, {
+        publicMetadata: { role: nuovoRuolo },
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Clerk timeout 5s")), 5000),
+      ),
+    ]);
+  } catch (clerkError) {
+    // Step 3: rollback Airtable
+    console.error(
+      "[cambiaRuoloGenitore] Clerk fail, rolling back Airtable:",
+      clerkError,
+    );
+    try {
+      await patchGenitoreRuolo(genitoreId, ruoloPrecedente);
+    } catch (rollbackError) {
+      console.error(
+        "[cambiaRuoloGenitore] ROLLBACK FAIL — manual intervention required:",
+        rollbackError,
+      );
+      throw new Error(
+        `Errore critico: Clerk e Airtable disallineati. Airtable=${nuovoRuolo}, Clerk=${ruoloPrecedente}. Contattare supporto.`,
+      );
+    }
+    const msg = clerkError instanceof Error ? clerkError.message : String(clerkError);
+    throw new Error(
+      `Cambio ruolo fallito su Clerk: ${msg}. Airtable ripristinato a ${ruoloPrecedente}.`,
+    );
+  }
 }

@@ -32,6 +32,7 @@ export interface Genitore {
     FLAG_PRIVACY: boolean;
     AUTH_USER_ID?: string;
     RUOLO?: Ruolo;
+    CREATED_AT?: string;
     TABELLA_BAMBINI?: string[];
   };
 }
@@ -49,6 +50,7 @@ export type GenitoreCreateInput = {
   CODICE_FISCALE_GENITORE?: string;
   VIA_RESIDENZA_GENITORE?: string;
   CITTA_RESIDENZA_GENITORE?: string;
+  CREATED_AT?: string;
 };
 
 const WRITABLE_FIELDS = new Set([
@@ -64,6 +66,7 @@ const WRITABLE_FIELDS = new Set([
   "FLAG_PRIVACY",
   "AUTH_USER_ID",
   "RUOLO",
+  "CREATED_AT",
 ]);
 
 function requireEnv(): void {
@@ -109,13 +112,17 @@ export function stripReadOnlyFields<T extends object>(
   ) as Partial<T>;
 }
 
-/** Crea un nuovo record in TABELLA_GENITORI. */
+/** Crea un nuovo record in TABELLA_GENITORI. Imposta CREATED_AT a oggi se non fornito (EVO-020). */
 export async function createGenitore(
   data: GenitoreCreateInput,
 ): Promise<Genitore> {
+  const fields = {
+    CREATED_AT: new Date().toISOString().slice(0, 10),
+    ...data,
+  };
   const res = await airtableFetch("TABELLA_GENITORI", {
     method: "POST",
-    body: JSON.stringify({ fields: stripReadOnlyFields(data) }),
+    body: JSON.stringify({ fields: stripReadOnlyFields(fields) }),
   });
   return res.json();
 }
@@ -879,6 +886,9 @@ export interface Maestro {
     LEZIONI_COME_COMPILATORE?: string[];
     GARE_ACCOMPAGNATE?: string[];
     "Gare Giovanili Umbria 2026"?: string[];
+    IMPORTO_RIMBORSO_LEZIONE?: number;
+    IMPORTO_RIMBORSO_GARA?: number;
+    PRESENZE_MAESTRI?: string[];
   };
 }
 
@@ -915,6 +925,8 @@ const MAESTRI_WRITABLE_FIELDS = new Set([
   "PUBLISHED",
   "NOTE",
   "UTENTE",
+  "IMPORTO_RIMBORSO_LEZIONE",
+  "IMPORTO_RIMBORSO_GARA",
 ]);
 
 export function stripMaestroReadOnlyFields<T extends object>(fields: T): Partial<T> {
@@ -1104,7 +1116,9 @@ export async function createLezione(
     method: "POST",
     body: JSON.stringify({ fields: stripLezioneReadOnlyFields(fields) }),
   });
-  return res.json();
+  const lezione: Lezione = await res.json();
+  await generatePresenzeForLezione(lezione);
+  return lezione;
 }
 
 /**
@@ -1431,4 +1445,190 @@ export async function createIscrizioneGara(
   });
   const r: IscrizioneGaraRecord = await res.json();
   return mapIscrizioneGara(r);
+}
+
+// ─── PRESENZE_MAESTRI (EVO-020) ──────────────────────────────────────────────
+
+export type PresenzaTipo = "lezione" | "gara";
+
+export interface PresenzaMaestro {
+  id: string;
+  createdTime?: string;
+  fields: {
+    DATA: string;
+    TIPO: PresenzaTipo;
+    MAESTRO: string[];
+    LEZIONE?: string[];
+    GARA?: string[];
+    IMPORTO_DOVUTO: number;
+    PAGATO?: boolean;
+    DATA_PAGAMENTO?: string;
+    NOTE?: string;
+  };
+}
+
+const PRESENZE_WRITABLE_FIELDS = new Set([
+  "DATA",
+  "TIPO",
+  "MAESTRO",
+  "LEZIONE",
+  "GARA",
+  "IMPORTO_DOVUTO",
+  "PAGATO",
+  "DATA_PAGAMENTO",
+  "NOTE",
+]);
+
+export function stripPresenzaReadOnlyFields<T extends object>(fields: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(fields).filter(([k]) => PRESENZE_WRITABLE_FIELDS.has(k)),
+  ) as Partial<T>;
+}
+
+export interface CreatePresenzaMaestroInput {
+  tipo: PresenzaTipo;
+  maestroId: string;
+  data: string;
+  importoDovuto: number;
+  lezioneId?: string;
+  garaId?: string;
+  pagato?: boolean;
+  dataPagamento?: string;
+  note?: string;
+}
+
+/**
+ * Cerca una presenza maestro esistente per (maestro, tipo, evento).
+ * Usa inverse field `PRESENZE_MAESTRI` su TABELLA_MAESTRI (no SEARCH+ARRAYJOIN
+ * su linked records — bug noto AGENTS.md). Ritorna null se non trovata.
+ */
+export async function getPresenzaMaestroByEvento(
+  maestroId: string,
+  tipo: PresenzaTipo,
+  eventoId: string,
+): Promise<PresenzaMaestro | null> {
+  const res = await airtableFetch(`TABELLA_MAESTRI/${maestroId}`);
+  const maestro: Maestro = await res.json();
+  const ids = maestro.fields.PRESENZE_MAESTRI ?? [];
+  if (ids.length === 0) return null;
+  const records = await fetchRecordsByIds<PresenzaMaestro>("PRESENZE_MAESTRI", ids);
+  const linkField = tipo === "lezione" ? "LEZIONE" : "GARA";
+  return (
+    records.find((r) => {
+      const linked = r.fields[linkField] ?? [];
+      return r.fields.TIPO === tipo && linked.includes(eventoId);
+    }) ?? null
+  );
+}
+
+/**
+ * Crea un record PRESENZE_MAESTRI. Idempotente: se esiste già un record per
+ * (maestro, tipo, evento) ritorna null senza creare un duplicato. Importo
+ * snapshot dalla tariffa del maestro al momento della chiamata.
+ */
+export async function createPresenzaMaestro(
+  input: CreatePresenzaMaestroInput,
+): Promise<PresenzaMaestro | null> {
+  const eventoId = input.tipo === "lezione" ? input.lezioneId : input.garaId;
+  if (eventoId) {
+    const existing = await getPresenzaMaestroByEvento(
+      input.maestroId,
+      input.tipo,
+      eventoId,
+    );
+    if (existing) return null;
+  }
+  const fields: Partial<PresenzaMaestro["fields"]> = {
+    DATA: input.data,
+    TIPO: input.tipo,
+    MAESTRO: [input.maestroId],
+    IMPORTO_DOVUTO: input.importoDovuto,
+  };
+  if (input.lezioneId) fields.LEZIONE = [input.lezioneId];
+  if (input.garaId) fields.GARA = [input.garaId];
+  if (input.pagato !== undefined) fields.PAGATO = input.pagato;
+  if (input.dataPagamento) fields.DATA_PAGAMENTO = input.dataPagamento;
+  if (input.note) fields.NOTE = input.note;
+  const res = await airtableFetch("PRESENZE_MAESTRI", {
+    method: "POST",
+    body: JSON.stringify({ fields: stripPresenzaReadOnlyFields(fields) }),
+  });
+  return res.json();
+}
+
+/**
+ * Hook best-effort non-bloccante: genera un record PRESENZE_MAESTRI per ogni
+ * maestro presente alla lezione (MAESTRI_PRESENTI ∪ MAESTRO_COMPILATORE,
+ * dedupe). Importo snapshot da TABELLA_MAESTRI.IMPORTO_RIMBORSO_LEZIONE.
+ * Errori per singolo maestro loggati come warning, non re-thrown.
+ */
+export async function generatePresenzeForLezione(lezione: Lezione): Promise<void> {
+  try {
+    const data = lezione.fields.DATA;
+    if (!data) return;
+    const maestriIds = Array.from(
+      new Set([
+        ...(lezione.fields.MAESTRI_PRESENTI ?? []),
+        ...(lezione.fields.MAESTRO_COMPILATORE ?? []),
+      ]),
+    );
+    for (const maestroId of maestriIds) {
+      try {
+        const res = await airtableFetch(`TABELLA_MAESTRI/${maestroId}`);
+        const maestro: Maestro = await res.json();
+        const importo = maestro.fields.IMPORTO_RIMBORSO_LEZIONE ?? 0;
+        await createPresenzaMaestro({
+          tipo: "lezione",
+          maestroId,
+          lezioneId: lezione.id,
+          data,
+          importoDovuto: importo,
+        });
+      } catch (err) {
+        console.warn(
+          `[generatePresenzeForLezione] maestro ${maestroId} skipped:`,
+          err,
+        );
+      }
+    }
+  } catch (err) {
+    console.warn("[generatePresenzeForLezione] outer failure:", err);
+  }
+}
+
+/**
+ * Hook best-effort: genera un record PRESENZE_MAESTRI tipo "gara" per ogni
+ * maestro accompagnatore. Idempotente (skip se esiste già). Importo snapshot
+ * da TABELLA_MAESTRI.IMPORTO_RIMBORSO_GARA. Usato dalle Server Action admin
+ * createGaraAction / updateGaraAction (EVO-019 → EVO-020 hook).
+ */
+export async function generatePresenzeForGara(
+  garaId: string,
+  data: string,
+  maestriIds: string[],
+): Promise<void> {
+  try {
+    const dedup = Array.from(new Set(maestriIds));
+    for (const maestroId of dedup) {
+      try {
+        const res = await airtableFetch(`TABELLA_MAESTRI/${maestroId}`);
+        const maestro: Maestro = await res.json();
+        const importo = maestro.fields.IMPORTO_RIMBORSO_GARA ?? 0;
+        await createPresenzaMaestro({
+          tipo: "gara",
+          maestroId,
+          garaId,
+          data,
+          importoDovuto: importo,
+        });
+      } catch (err) {
+        console.warn(
+          `[generatePresenzeForGara] maestro ${maestroId} skipped:`,
+          err,
+        );
+      }
+    }
+  } catch (err) {
+    console.warn("[generatePresenzeForGara] outer failure:", err);
+  }
 }
