@@ -37,10 +37,7 @@ export function DisabilitaAccountButton({ genitore }: Props) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
-    const res = await disabilitaAccountAction(
-      genitore.id,
-      genitore.fields.AUTH_USER_ID,
-    );
+    const res = await disabilitaAccountAction(genitore.id);
     setSubmitting(false);
     if (!res.ok) {
       setError(res.error);

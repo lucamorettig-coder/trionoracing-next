@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Worktree agente (git-ignored): contiene checkout + build .next di altre
+    // sessioni, non è codice sorgente lintabile.
+    ".claude/**",
   ]),
 ]);
 

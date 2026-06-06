@@ -42,10 +42,7 @@ export function RiabilitaAccountButton({ genitore }: Props) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
-    const res = await riabilitaAccountAction(
-      genitore.id,
-      genitore.fields.AUTH_USER_ID,
-    );
+    const res = await riabilitaAccountAction(genitore.id);
     setSubmitting(false);
     if (!res.ok) {
       setError(res.error);

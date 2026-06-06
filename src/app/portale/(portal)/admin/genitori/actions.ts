@@ -34,12 +34,11 @@ export async function cambiaRuoloAction(
  * Guard: solo ADMIN + mai self-disable (verifica server-side autoritativa su
  * AUTH_USER_ID letto da Airtable dentro disabilitaAccountGenitore).
  *
- * `authUserId` è passato dalla UI solo per coerenza/log; il guard non si fida
- * di questo valore — confronta il record reale con l'admin corrente.
+ * Il guard self-disable è autoritativo server-side: confronta l'admin corrente
+ * con l'AUTH_USER_ID letto dal record reale (dentro disabilitaAccountGenitore).
  */
 export async function disabilitaAccountAction(
   genitoreId: string,
-  _authUserId?: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   await requireAdmin();
   const { userId } = await auth();
@@ -61,7 +60,6 @@ export async function disabilitaAccountAction(
 /** Riabilita un account (EVO-008). Clerk unbanUser + reset log Airtable. */
 export async function riabilitaAccountAction(
   genitoreId: string,
-  _authUserId?: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   await requireAdmin();
   try {
