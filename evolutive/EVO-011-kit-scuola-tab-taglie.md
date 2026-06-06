@@ -4,7 +4,7 @@
 - **Slug**: kit-scuola-tab-taglie
 - **Data inizio**: 2026-05-23
 - **Data fine**: _da compilare a chiusura_
-- **Stato**: in pianificazione (sbloccata da EVO-010 ✅ il 2026-05-23 — resta da coordinare con il branch `evo-004-portale-iscrizioni`)
+- **Stato**: in PR (2026-06-06 — branch `feat/evo-011-kit-scuola-tab-taglie`, in attesa di OK utente per il merge. EVO-004 + EVO-010 già in `main`, dipendenze/coordinamento branch risolti)
 - **Tipo**: arricchimento visivo (modifica feature esistente)
 - **Area**: area autenticata (`/portale/iscrizioni/[id]` — tab "Taglie")
 - **Priorità**: media (segue il ciclo di EVO-004)
@@ -87,19 +87,44 @@ Refactor di `<TagliaSelect>` da `<label>` semplice a layout flex `[thumbnail][la
 
 ## 5. Verifica coerenza
 
-_Da compilare a fine fase 5._
+_Completata [2026-06-06]._
+
+| Dimensione | Esito | Nota |
+|---|---|---|
+| Design system | ✅ | Nessun token nuovo. Riuso `next/image fill object-contain` + `bg-bg-soft` + `rounded-[var(--radius-xl)]` da `SezioneKitScuola`. Thumbnail piccole accanto al select. |
+| Architettura | ✅ | Solo refactor di `TabTaglie.tsx` (client). Nessuna modifica a stato, API o schema. Consuma `KIT_SCUOLA` + `cloudinaryOptimized` da `src/lib/kit-scuola.ts`. |
+| i18n | ✅ n/a | Portale solo IT. |
+| SEO | ✅ n/a | Area autenticata non indicizzata. |
+| Microcopy | ⚠️→fix | Link guida taglie oggi `https://trionoracing.it` generico → puntare a `/la-scuola#kit-scuola` (verificare esistenza anchor; fallback `/la-scuola`). |
+
+**Dipendenze già soddisfatte**: `src/lib/kit-scuola.ts` in `main` (con helper `cloudinaryOptimized` + mapping `campoTaglia`); `next.config.ts` autorizza già `res.cloudinary.com/duezeronove/**`.
 
 ---
 
 ## 6. UX/UI
 
-_Da compilare a fine fase 6._
+_Completata [2026-06-06] — percorso (b) skill `design:design-system`._
+
+- **Mockup**: [`visual/tab-taglie-mockup.html`](EVO-011-kit-scuola-tab-taglie/visual/tab-taglie-mockup.html) — due stati (da-confermare / confermate). Box colorati = placeholder delle immagini Cloudinary reali (validazione layout).
+- **Layout**: riga `[thumbnail 84px][label + select]` per maglia e pantaloncino. Caso "Taglia tuta" = label full-width + 2 thumbnail (felpa + pantalone-felpa) affiancate sopra un select unico → la rottura di griglia comunica "misura unica per due capi".
+
+### Esito `design:design-critique`
+
+Nessun blocker. Correzioni recepite nel prompt Claude Code:
+1. **Chevron sui select** — `appearance:none` toglie l'indicatore dropdown → aggiungere `ChevronDown` (lucide) posizionata assoluta a destra del select.
+2. **`alt` reali + `<label htmlFor>`** — collegare ogni select alla label (`htmlFor`/`id`) e usare `capo.alt` da `kit-scuola.ts` come alt delle thumbnail.
+3. **Gap verticale uniforme** 16px tra tutte le righe incluso il blocco tuta.
+- Confermati buoni: touch target select 44px ✅, contrasto colori ✅, riuso linguaggio visivo pubblico ✅, distinzione "tuta" giustificata ✅.
 
 ---
 
 ## 7. Prompt per Claude Code
 
-_Da compilare a fine fase 7._
+_Compilato [2026-06-06]._ Vedi [`EVO-011-kit-scuola-tab-taglie/prompt-claude-code.md`](EVO-011-kit-scuola-tab-taglie/prompt-claude-code.md) (anche mostrato in chat).
+
+### Deploy: pattern del progetto
+
+Vercel collegato a GitHub (`lucamorettig-coder/trionoracing-next`). Pattern: branch dedicato → PR → merge su `main` → deploy automatico. Mai push diretto su `main`, mai merge senza OK utente.
 
 ---
 
@@ -116,3 +141,20 @@ _Da compilare in fase 8._
 EVO-009 ombrello, EVO-011 = arricchimento TabTaglie portale. Fasi 1-4 ereditate dall'ombrello (vedi `EVO-009-kit-scuola.md`). Bloccata in attesa di:
 1. Completamento e merge di EVO-010 in `main`
 2. Aggiornamento del branch `evo-004-portale-iscrizioni` con `main`
+
+### [2026-06-06] Ripresa + implementazione (dipendenze risolte)
+
+EVO-004 + EVO-010 entrambe già in `main`: la dipendenza/coordinamento branch è caduta, si è lavorato da branch fresco `feat/evo-011-kit-scuola-tab-taglie`.
+
+**Scoperta in implementazione (oltre lo scope visivo originale)**: le opzioni delle 3 singleSelect Airtable `TABELLA_ISCRIZIONI` non erano `XS–XXL` come hardcoded nel codice, ma:
+- `TAGLIA_MAGLIA` / `TAGLIA_PANTALONCINO` → `5XS, 4XS, 3XS, 2XS, XS`
+- `TAGLIA_TUTA` → `110/120, 130/140`
+
+→ bug latente: salvare i valori vecchi avrebbe dato 422 `INVALID_MULTIPLE_CHOICE_OPTIONS`. Fix: nuova const `TAGLIE_PER_CAMPO` in `kit-scuola.ts` (mirror schema Airtable, single source of truth) consumata da `TabTaglie`.
+
+**Decisioni utente in iterazione**:
+- Foto: usare le 4 Cloudinary già in `kit-scuola.ts` (rese piccole via `cloudinaryOptimized(url, 200)`); nessun asset nuovo.
+- Taglie: hardcode mirror come TS const (non fetch dinamico).
+- **Microcopy "guida taglie" RIMOSSO** su richiesta utente (la riga 24/34/98 della scheda — link `/la-scuola#kit-scuola` — non è stata implementata; `SezioneKitScuola.tsx` resta intatta, nessun anchor aggiunto).
+
+Fix design-critique applicati: chevron `ChevronDown` sui select `appearance-none`, `<label htmlFor>` + `alt` reali, gap verticale uniforme, difesa valore legacy nelle option. Quality gate (typecheck/lint/build) puliti.
