@@ -71,11 +71,10 @@ const STEPS: readonly Step[] = [
   },
 ] as const;
 
-// Foto reale di bambini in bici al ciclodromo durante una lezione di prova.
-// TODO EVO-022: sostituire con la foto definitiva fornita dall'utente.
-const FOTO_PROVA_SRC = "/photos/scuola/lezione-ciclodromo.jpg";
+// Foto reale: allievi in maglia Triono in sella alle bici, di spalle, al tramonto.
+const FOTO_PROVA_SRC = "/photos/scuola/sezione-come-iscriversi.jpg";
 const FOTO_PROVA_ALT =
-  "Bambini in bici al ciclodromo durante una lezione di prova della scuola di ciclismo Triono.";
+  "Giovani allievi in maglia Triono in sella alle bici su un sentiero al tramonto, durante una lezione della scuola di ciclismo.";
 
 /* ============================================================
    Mockup illustrati — "disegno della UI, non screenshot"
