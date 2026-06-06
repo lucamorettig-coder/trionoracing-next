@@ -34,6 +34,11 @@ export interface Genitore {
     RUOLO?: Ruolo;
     CREATED_AT?: string;
     TABELLA_BAMBINI?: string[];
+    // EVO-008 — migrazione Supabase → Clerk + lifecycle account
+    LEGACY_SUPABASE_ID?: string;
+    DATA_MIGRAZIONE?: string;
+    ACCOUNT_DISABILITATO?: boolean;
+    DATA_DISABILITAZIONE?: string;
   };
 }
 
@@ -67,6 +72,11 @@ const WRITABLE_FIELDS = new Set([
   "AUTH_USER_ID",
   "RUOLO",
   "CREATED_AT",
+  // EVO-008
+  "LEGACY_SUPABASE_ID",
+  "DATA_MIGRAZIONE",
+  "ACCOUNT_DISABILITATO",
+  "DATA_DISABILITAZIONE",
 ]);
 
 function requireEnv(): void {
@@ -159,6 +169,29 @@ export async function updateGenitoreAuthUserId(
   await airtableFetch(`TABELLA_GENITORI/${airtableId}`, {
     method: "PATCH",
     body: JSON.stringify({ fields: { AUTH_USER_ID: clerkUserId } }),
+  });
+}
+
+/**
+ * Aggiorna lo stato lifecycle "account disabilitato" di un genitore (EVO-008).
+ * Set DATA_DISABILITAZIONE a oggi quando disabilitato=true, la pulisce (null)
+ * quando si riabilita. Airtable è solo log: il blocco autoritativo è su Clerk
+ * (banUser/unbanUser), quindi questa write è non-critica (vedi disabilitaAccountGenitore).
+ */
+export async function updateGenitoreAccountDisabilitato(
+  airtableId: string,
+  disabilitato: boolean,
+): Promise<void> {
+  await airtableFetch(`TABELLA_GENITORI/${airtableId}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      fields: {
+        ACCOUNT_DISABILITATO: disabilitato,
+        DATA_DISABILITAZIONE: disabilitato
+          ? new Date().toISOString().slice(0, 10)
+          : null,
+      },
+    }),
   });
 }
 
