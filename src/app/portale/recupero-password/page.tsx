@@ -63,7 +63,7 @@ function CodeInput({
   }
 
   return (
-    <div className="flex gap-2">
+    <div className="grid grid-cols-6 gap-2">
       {Array.from({ length: LENGTH }, (_, i) => (
         <input
           key={i}
@@ -81,7 +81,7 @@ function CodeInput({
           onKeyDown={(e) => handleKeyDown(i, e)}
           onPaste={handlePaste}
           className={cn(
-            "h-14 flex-1 rounded-[12px] border-[1.5px] text-center font-mono text-[22px] font-bold text-ink outline-none transition-colors",
+            "h-14 w-full min-w-0 rounded-[12px] border-[1.5px] text-center font-mono text-[22px] font-bold text-ink outline-none transition-colors",
             "focus:border-navy-700",
             value[i] ? "border-navy-700 bg-navy-50 text-navy-900" : "border-line bg-white",
             invalid && "border-flag-500",
