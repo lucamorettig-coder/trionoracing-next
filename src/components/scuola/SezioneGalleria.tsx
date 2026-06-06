@@ -5,25 +5,28 @@ import { SectionHeader } from "@/components/ui/section-header";
 // sito/immagini). Servite via next/image (host già abilitato in next.config
 // images.remotePatterns → res.cloudinary.com/duezeronove/**).
 // Per aggiornare la galleria: carica su Cloudinary e aggiungi il public_id qui.
-// `aspect` varia l'altezza del tile per dare ritmo masonry (crop portrait/quadrato:
-// niente landscape che taglierebbe i soggetti). Stesso pattern di BachecaFoto (amatori).
+//
+// Layout: CSS Grid (non columns-masonry, che non permette tile multi-colonna).
+// `orient: "l"` → foto orizzontale che occupa 2 colonne (aspect 3:2); "p" →
+// verticale su 1 colonna (aspect 3:4). Le due altezze combaciano (≈ 1.33× la
+// larghezza colonna) così le righe si impacchettano senza buchi con grid-flow-dense.
 const CLD = "https://res.cloudinary.com/duezeronove/image/upload/sito/immagini";
 
-const photos: Array<{ id: string; alt: string; aspect: string }> = [
-  { id: "scuola-01", aspect: "aspect-[3/4]", alt: "Fila di giovani allievi della Scuola Triono in sella alle bici al Ciclodromo Renato Perona, luce del tramonto, maestri accanto" },
-  { id: "scuola-02", aspect: "aspect-square", alt: "La squadra giovanile Triono festeggia con la coppa al ciclodromo, un bambino alza le braccia al cielo" },
-  { id: "scuola-03", aspect: "aspect-[4/5]", alt: "Bambino di spalle in divisa Triono osserva un compagno pedalare sulla pista del ciclodromo" },
-  { id: "scuola-04", aspect: "aspect-[3/4]", alt: "Partenza di una gara di cross country giovanile: piccoli atleti su mountain bike e pubblico a bordo percorso" },
-  { id: "scuola-05", aspect: "aspect-[4/5]", alt: "Due piccoli allievi Triono pedalano insieme tra i birilli della pista del ciclodromo" },
-  { id: "scuola-06", aspect: "aspect-[3/4]", alt: "Premiazione sul podio di una gara giovanile del Comitato FCI Umbria, allievi Triono con le medaglie" },
-  { id: "scuola-07", aspect: "aspect-square", alt: "Foto di gruppo di allievi della Scuola Triono in sella alle bici insieme ai maestri, giornata di sole" },
-  { id: "scuola-08", aspect: "aspect-[4/5]", alt: "Giovani allievi Triono in mountain bike sul tracciato di cross country tra le colline, luce del mattino" },
-  { id: "scuola-09", aspect: "aspect-[3/4]", alt: "Allievo della Scuola Triono su bici da strada percorre la pista del Ciclodromo Renato Perona tra i coni" },
-  { id: "scuola-10", aspect: "aspect-[4/5]", alt: "Giovane atleta Triono affronta in mountain bike il tracciato di cross country delimitato dalle transenne" },
-  { id: "scuola-11", aspect: "aspect-[3/4]", alt: "Squadra giovanile Triono in tenuta invernale insieme al maestro prima di una gara di cross country" },
-  { id: "scuola-12", aspect: "aspect-[4/5]", alt: "Giovane allievo sorridente in sella alla mountain bike sul percorso di gara" },
-  { id: "scuola-13", aspect: "aspect-[3/4]", alt: "Bambini schierati alla partenza di una gara giovanile su prato, genitori e pubblico intorno" },
-  { id: "scuola-14", aspect: "aspect-[4/5]", alt: "Allievo della Scuola Triono in mountain bike su un tracciato di cross country invernale, colline sullo sfondo" },
+const photos: Array<{ id: string; orient: "l" | "p"; alt: string }> = [
+  { id: "scuola-01", orient: "l", alt: "Fila di giovani allievi della Scuola Triono in sella alle bici al Ciclodromo Renato Perona, luce del tramonto, maestri accanto" },
+  { id: "scuola-03", orient: "p", alt: "Bambino di spalle in divisa Triono osserva un compagno pedalare sulla pista del ciclodromo" },
+  { id: "scuola-04", orient: "p", alt: "Partenza di una gara di cross country giovanile: piccoli atleti su mountain bike e pubblico a bordo percorso" },
+  { id: "scuola-05", orient: "p", alt: "Due piccoli allievi Triono pedalano insieme tra i birilli della pista del ciclodromo" },
+  { id: "scuola-06", orient: "p", alt: "Premiazione sul podio di una gara giovanile del Comitato FCI Umbria, allievi Triono con le medaglie" },
+  { id: "scuola-02", orient: "l", alt: "La squadra giovanile Triono festeggia con la coppa al ciclodromo, un bambino alza le braccia al cielo" },
+  { id: "scuola-08", orient: "p", alt: "Giovani allievi Triono in mountain bike sul tracciato di cross country tra le colline, luce del mattino" },
+  { id: "scuola-10", orient: "p", alt: "Giovane atleta Triono affronta in mountain bike il tracciato di cross country delimitato dalle transenne" },
+  { id: "scuola-11", orient: "p", alt: "Squadra giovanile Triono in tenuta invernale insieme al maestro prima di una gara di cross country" },
+  { id: "scuola-12", orient: "p", alt: "Giovane allievo sorridente in sella alla mountain bike sul percorso di gara" },
+  { id: "scuola-07", orient: "l", alt: "Foto di gruppo di allievi della Scuola Triono in sella alle bici insieme ai maestri, giornata di sole" },
+  { id: "scuola-13", orient: "p", alt: "Bambini schierati alla partenza di una gara giovanile su prato, genitori e pubblico intorno" },
+  { id: "scuola-09", orient: "l", alt: "Allievo della Scuola Triono su bici da strada percorre la pista del Ciclodromo Renato Perona tra i coni" },
+  { id: "scuola-14", orient: "p", alt: "Allievo della Scuola Triono in mountain bike su un tracciato di cross country invernale, colline sullo sfondo" },
 ];
 
 export function SezioneGalleria() {
@@ -38,19 +41,23 @@ export function SezioneGalleria() {
           />
         </div>
 
-        {/* Masonry: CSS columns + break-inside-avoid, altezze variabili per tile */}
-        <div className="mt-12 columns-1 sm:columns-2 lg:columns-3 gap-4 lg:gap-5">
+        {/* Grid con tile orizzontali su 2 colonne (foto landscape) e verticali su 1.
+            grid-flow-row-dense impacchetta riempiendo i buchi. */}
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 grid-flow-row-dense">
           {photos.map((p) => (
-            <div key={p.id} className="mb-4 lg:mb-5 break-inside-avoid reveal">
-              <div
-                className={`photo-house relative ${p.aspect} rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-200`}
-              >
+            <div
+              key={p.id}
+              className={`reveal ${p.orient === "l" ? "sm:col-span-2 aspect-[3/2]" : "aspect-[3/4]"}`}
+            >
+              <div className="photo-house relative w-full h-full rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-200">
                 <Image
                   src={`${CLD}/${p.id}.jpg`}
                   alt={p.alt}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  sizes={p.orient === "l"
+                    ? "(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 66vw"
+                    : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"}
                 />
               </div>
             </div>
