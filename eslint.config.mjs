@@ -15,6 +15,9 @@ const eslintConfig = defineConfig([
     // Worktree agente (git-ignored): contiene checkout + build .next di altre
     // sessioni, non è codice sorgente lintabile.
     ".claude/**",
+    // Documentazione evolutive: include bundle di handoff Claude Design
+    // (prototipi .jsx di reference, non codice di produzione).
+    "evolutive/**",
   ]),
 ]);
 
