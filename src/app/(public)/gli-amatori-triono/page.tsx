@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   },
 };
 
+// ISR: AmatoriHero e CtaFinale leggono gli sfondi video da Airtable. Con
+// revalidate l'admin vede il cambio entro ~10 min senza deploy. EVO-021.
+export const revalidate = 600;
+
 export default function AmatoriPage() {
   return (
     <>
