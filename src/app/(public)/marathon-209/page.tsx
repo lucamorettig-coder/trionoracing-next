@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
     };
   }
   return {
-    title: ed.metaTitle ?? `${ed.nome} — Marathon MTB Triono Racing`,
+    title: ed.metaTitle ?? `${ed.nome} · Marathon MTB Triono Racing`,
     description: ed.metaDescription ?? ed.descrizione,
     alternates: { canonical: "/marathon-209" },
     openGraph: {

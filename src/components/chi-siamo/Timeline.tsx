@@ -15,7 +15,7 @@ const milestones = [
         <p className="mt-4">
           In breve tempo, Triono Racing diventa un nome riconosciuto e stimato nell&apos;ambito
           ciclistico ternano. La comunità cresce rapidamente, attirando ciclisti di ogni
-          livello — dalla domenica mattina in sella fino agli atleti che ambiscono a traguardi
+          livello, dalla domenica mattina in sella fino agli atleti che ambiscono a traguardi
           competitivi.
         </p>
       </>
@@ -51,7 +51,7 @@ const milestones = [
     title: "Al Ciclodromo Renato Perona di Terni",
     body: (
       <p>
-        Oggi la Scuola opera con due corsi settimanali al Ciclodromo Renato Perona di Terni —
+        Oggi la Scuola opera con due corsi settimanali al Ciclodromo Renato Perona di Terni:
         bici da strada il martedì, mountain bike il giovedì. La squadra amatori continua a
         crescere, la Marathon 209 prepara la sua sesta edizione il 28 giugno 2026 ad Arrone.
       </p>

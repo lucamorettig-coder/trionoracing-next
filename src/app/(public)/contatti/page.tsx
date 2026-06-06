@@ -7,7 +7,7 @@ import { ContactForm } from "@/components/contatti/ContactForm";
 import { CalendarDays, MapPin, Mail } from "@/components/ui/icons";
 
 export const metadata: Metadata = {
-  title: "Contatti — Triono Racing",
+  title: "Contatti · Triono Racing",
   description:
     "Scrivici per iscrivere tuo figlio alla Scuola di Ciclismo, per il tesseramento amatori, per la Marathon 209 o per qualsiasi altra richiesta. Ti rispondiamo entro 2–3 giorni.",
   alternates: { canonical: "/contatti" },

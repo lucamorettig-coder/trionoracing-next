@@ -66,7 +66,7 @@ export function OrganizationJsonLd() {
       {
         "@type": "LocalBusiness",
         "@id": LOCAL_BUSINESS_ID,
-        name: "Scuola di Ciclismo Triono — ASD CIEMME",
+        name: "Scuola di Ciclismo Triono · ASD CIEMME",
         email: CONTACT_EMAIL,
         url: SITE_URL,
         logo: absUrl("/assets/logo-triono-racing.png"),
@@ -213,7 +213,7 @@ export function EventJsonLd({ edizione }: { edizione?: EventEdizioneShape }) {
     "@type": "SportsEvent",
     "@id": absUrl("/marathon-209#event"),
     name: edizione.nome
-      ? `Marathon MTB 209 — ${edizione.nome}`
+      ? `Marathon MTB 209 · ${edizione.nome}`
       : "Marathon MTB 209",
     description:
       edizione.descrizione ||

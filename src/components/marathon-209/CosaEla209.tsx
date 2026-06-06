@@ -36,7 +36,7 @@ export function CosaEla209({ edizione }: Props) {
             <CardIcon color="sun"><BikeIcon /></CardIcon>
             <CardTitle>Aperta a tutti</CardTitle>
             <CardBody>
-              Per atleti agonisti, amatori esperti, appassionati di lungo respiro. Niente categorie elite-only — c&apos;è spazio per chi pedala con la testa e con le gambe.
+              Per atleti agonisti, amatori esperti, appassionati di lungo respiro. Niente categorie elite-only: c&apos;è spazio per chi pedala con la testa e con le gambe.
             </CardBody>
           </CardContent>
         </Card>

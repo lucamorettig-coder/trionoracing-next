@@ -9,7 +9,7 @@ export function SezioneValori() {
         <SectionHeader
           eyebrow="Cosa ci muove"
           title="Equilibrio tra competizione e passione."
-          subtitle="Non siamo solo un team agonistico. Siamo una comunità di pari che si ritrova sulla bici per condividere strada, fatica e traguardi — qualunque sia il livello."
+          subtitle="Non siamo solo un team agonistico. Siamo una comunità di pari che si ritrova sulla bici per condividere strada, fatica e traguardi, qualunque sia il livello."
         />
       </div>
 

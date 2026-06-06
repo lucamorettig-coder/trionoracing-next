@@ -16,7 +16,7 @@ const steps = [
   {
     n: "03",
     title: "Calendario gare",
-    body: "Insieme decidiamo quali gare fare nella stagione. Ognuno sceglie il proprio livello — dalle gran fondo amatoriali alle gare federali.",
+    body: "Insieme decidiamo quali gare fare nella stagione. Ognuno sceglie il proprio livello, dalle gran fondo amatoriali alle gare federali.",
   },
 ];
 
@@ -28,7 +28,7 @@ export function ComeUnirsi() {
           <SectionHeader
             eyebrow="Come unirsi"
             title="Tre passi per entrare in squadra."
-            subtitle="Niente provini, niente selezioni — solo passione per le due ruote e voglia di pedalare in compagnia."
+            subtitle="Niente provini, niente selezioni: solo passione per le due ruote e voglia di pedalare in compagnia."
           />
         </div>
 

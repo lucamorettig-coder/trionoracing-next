@@ -8,11 +8,11 @@ import { SectionHeader } from "@/components/ui/section-header";
  * conteggiato (edizione saltata — verifica con Luca, vedi PR description).
  */
 const editions = [
-  { year: "2021", note: "1ª edizione — Arrone (TR)" },
+  { year: "2021", note: "1ª edizione, Arrone (TR)" },
   { year: "2022", note: "2ª edizione" },
   { year: "2023", note: "3ª edizione" },
   { year: "2024", note: "4ª edizione" },
-  { year: "2026", note: "5ª edizione — 28 giugno", highlight: true },
+  { year: "2026", note: "5ª edizione, 28 giugno", highlight: true },
 ];
 
 export function Edizioni() {

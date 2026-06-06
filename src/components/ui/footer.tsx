@@ -35,7 +35,7 @@ export function Footer({ onNewsletterSubmit }: FooterProps) {
               style={{ filter: "brightness(0) invert(1)" }}
             />
             <p className="mt-5 text-white/70 text-sm max-w-[320px]">
-              ASD CIEMME · Triono Racing — Scuola di ciclismo, squadra amatori e Marathon MTB
+              ASD CIEMME · Triono Racing. Scuola di ciclismo, squadra amatori e Marathon MTB
               dal 2015.
             </p>
             <div className="mt-6 flex gap-2">
