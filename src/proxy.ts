@@ -17,6 +17,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 const isPortalePublic = createRouteMatcher([
   "/portale/login(.*)",
   "/portale/registrati(.*)",
+  "/portale/recupero-password(.*)",
 ]);
 
 // Tutte le route portale (incluse quelle pubbliche — filtro sopra)

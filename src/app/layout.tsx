@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Anton } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { itIT } from "@clerk/localizations";
 import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
@@ -30,7 +31,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ClerkProvider afterSignOutUrl="/">
+    <ClerkProvider afterSignOutUrl="/" localization={itIT}>
       <html
         lang="it"
         className={`${inter.variable} ${anton.variable} h-full antialiased`}

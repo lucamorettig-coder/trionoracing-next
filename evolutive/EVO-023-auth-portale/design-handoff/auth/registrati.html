@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Registrati · Portale Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+.auth-page { min-height: 100%; display: flex; flex-direction: column; background: var(--bg); }
+.auth-split { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.auth-brand {
+  background: var(--navy-900); color: #fff;
+  padding: 24px 20px 28px;
+  position: relative; overflow: hidden;
+}
+.auth-brand-inner { position: relative; z-index: 2; }
+.auth-brand-logo { display: flex; align-items: center; gap: 10px; }
+.auth-brand-logo .mark {
+  width: 36px; height: 36px;
+  background: var(--sun-500); color: var(--navy-900);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px;
+}
+.auth-brand-logo .name { font-weight: 800; font-size: 15px; letter-spacing: -0.01em; line-height: 1.1; }
+.auth-brand-logo .sub {
+  font-family: var(--f-mono); font-size: 10px; color: rgba(255,255,255,.55);
+  letter-spacing: 0.06em; text-transform: uppercase; margin-top: 1px;
+}
+.auth-brand-headline {
+  font-size: 26px; font-weight: 700; line-height: 1.15;
+  letter-spacing: -0.015em; margin: 18px 0 6px;
+}
+.auth-brand-headline .accent { color: var(--sun-500); }
+.auth-brand-tag {
+  font-size: 13.5px; color: rgba(255,255,255,.72); line-height: 1.55; max-width: 420px;
+}
+.auth-brand-features { display: none; }
+
+.auth-form-wrap {
+  flex: 1; padding: 28px 20px 36px; background: var(--bg);
+  display: flex; flex-direction: column;
+}
+.auth-card { width: 100%; max-width: 460px; margin: 0 auto; }
+.auth-eyebrow {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--sky-600); margin-bottom: 8px;
+}
+.auth-h1 {
+  font-size: 26px; font-weight: 700; letter-spacing: -0.015em;
+  color: var(--ink); margin: 0 0 8px; line-height: 1.15;
+}
+.auth-sub {
+  font-size: 14.5px; color: var(--ink-muted); line-height: 1.55; margin: 0 0 24px;
+}
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@container page (min-width: 900px) { .form-row.two { grid-template-columns: 1fr 1fr; } }
+
+.field-with-icon { position: relative; }
+.field-with-icon .field { padding-left: 42px; }
+.field-with-icon .ico {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--ink-muted); pointer-events: none;
+}
+.field-with-icon .toggle-eye {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--ink-muted); cursor: pointer; padding: 4px;
+}
+
+.invite-banner {
+  background: var(--sun-50);
+  border: 1px solid var(--sun-100);
+  border-left: 4px solid var(--sun-500);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  display: flex; gap: 10px;
+  font-size: 13px; color: var(--ink); line-height: 1.5;
+  margin-bottom: 18px;
+}
+.invite-banner strong { color: var(--navy-900); }
+.invite-banner i { flex-shrink: 0; color: var(--sun-700); margin-top: 1px; }
+
+.pwd-rules {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  font-family: var(--f-mono);
+}
+.pwd-rule { display: flex; align-items: center; gap: 5px; }
+.pwd-rule.ok { color: var(--grass-700); }
+.pwd-rule i { width: 11px; height: 11px; flex-shrink: 0; }
+
+.checkbox-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 12.5px; color: var(--ink); line-height: 1.5; cursor: pointer;
+}
+.checkbox-row input {
+  width: 16px; height: 16px; accent-color: var(--navy-700);
+  margin: 2px 0 0; cursor: pointer; flex-shrink: 0;
+}
+.checkbox-row a { color: var(--sky-600); font-weight: 600; text-decoration: none; }
+
+.auth-divider {
+  position: relative; text-align: center; margin: 20px 0 8px;
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted);
+}
+.auth-divider::before, .auth-divider::after {
+  content: ''; position: absolute; top: 50%;
+  width: calc(50% - 28px); height: 1px; background: var(--line);
+}
+.auth-divider::before { left: 0; }
+.auth-divider::after  { right: 0; }
+.auth-social { display: flex; flex-direction: column; gap: 8px; }
+.btn-social {
+  background: #fff; border: 1.5px solid var(--line);
+  color: var(--ink); font-weight: 500; font-size: 14.5px;
+  padding: 11px 18px; border-radius: var(--r-md);
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  cursor: pointer; transition: all .15s;
+}
+.btn-social:hover { background: var(--bg-soft); border-color: var(--navy-200); }
+
+.auth-foot { margin-top: 22px; font-size: 13.5px; color: var(--ink-muted); text-align: center; }
+.auth-foot a { color: var(--navy-700); font-weight: 600; text-decoration: none; }
+
+.brand-pattern {
+  position: absolute; inset: 0;
+  background-image: url('../assets/pattern.svg');
+  background-size: 220px 220px; background-repeat: repeat;
+  opacity: 0.65;
+}
+.brand-pattern::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(5,14,63,0.65) 0%, rgba(5,14,63,0.92) 60%, rgba(5,14,63,1) 100%);
+}
+.auth-brand-foot { display: none; }
+
+@container page (min-width: 900px) {
+  .auth-split { flex-direction: row; min-height: 780px; }
+  .auth-brand {
+    flex: 1; padding: 56px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .auth-brand-headline { font-size: 52px; margin-top: 96px; line-height: 1.0; letter-spacing: -0.02em; }
+  .auth-brand-tag { font-size: 17px; line-height: 1.55; max-width: 480px; margin-top: 14px; }
+  .auth-brand-foot {
+    display: block;
+    font-family: var(--f-mono); font-size: 11.5px;
+    color: rgba(255,255,255,.5); letter-spacing: 0.04em;
+  }
+  .auth-brand-foot strong { color: var(--sun-500); }
+  .auth-brand-features { display: flex; flex-direction: column; gap: 18px; margin-top: 48px; }
+  .auth-brand-feature {
+    display: flex; gap: 14px; align-items: flex-start;
+    color: rgba(255,255,255,.85); font-size: 14.5px; line-height: 1.45;
+  }
+  .auth-brand-feature .ico {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    color: var(--sun-500); flex-shrink: 0;
+  }
+  .auth-brand-feature .title { color: #fff; font-weight: 600; margin-bottom: 2px; }
+  .auth-brand-logo .mark { width: 44px; height: 44px; font-size: 22px; }
+  .auth-brand-logo .name { font-size: 18px; }
+
+  .auth-form-wrap { flex: 1.05; padding: 56px 64px; justify-content: center; }
+  .auth-h1 { font-size: 36px; letter-spacing: -0.02em; }
+  .auth-sub { font-size: 15.5px; margin-bottom: 28px; }
+}
+</style>
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="auth-page">
+  <div class="auth-split">
+
+    <!-- LEFT BRAND -->
+    <div class="auth-brand">
+      <div class="brand-pattern"></div>
+      <div class="auth-brand-inner">
+        <div class="auth-brand-logo">
+          <div class="mark">T</div>
+          <div>
+            <div class="name">Triono Racing</div>
+            <div class="sub">Portale famiglie</div>
+          </div>
+        </div>
+
+        <h1 class="auth-brand-headline">
+          Unisciti<br/>alla squadra<span class="accent">.</span>
+        </h1>
+        <p class="auth-brand-tag">
+          Crea un account per iscrivere i tuoi figli ai corsi, gestire i certificati e prenotare le gare.
+        </p>
+
+        <div class="auth-brand-features">
+          <div class="auth-brand-feature">
+            <div class="ico"><i data-lucide="user-plus" style="width:18px;height:18px"></i></div>
+            <div>
+              <div class="title">1. Crea l'account</div>
+              <div>Solo 3 campi: email, password, nome.</div>
+            </div>
+          </div>
+          <div class="auth-brand-feature">
+            <div class="ico"><i data-lucide="baby" style="width:18px;height:18px"></i></div>
+            <div>
+              <div class="title">2. Aggiungi tuo figlio</div>
+              <div>Anagrafica, certificato medico e foto.</div>
+            </div>
+          </div>
+          <div class="auth-brand-feature">
+            <div class="ico"><i data-lucide="check-circle" style="width:18px;height:18px"></i></div>
+            <div>
+              <div class="title">3. Iscrivilo al corso</div>
+              <div>Paga la prima rata e siete in pista.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-brand-foot">
+        <strong>ASD CIEMME</strong> · Terni · Stagione 2026 / 2027
+      </div>
+    </div>
+
+    <!-- RIGHT FORM -->
+    <div class="auth-form-wrap">
+      <div class="auth-card">
+
+        <!-- Invite banner (visible only with ?inviteToken=...) -->
+        <div class="invite-banner">
+          <i data-lucide="mail-check" style="width:18px;height:18px"></i>
+          <div>
+            <strong>Sei stato invitato da Anna Bianchi</strong> a collegarti come secondo genitore di <strong>Marco Bianchi</strong>. Completa la registrazione: collegheremo tuo profilo a Marco automaticamente.
+          </div>
+        </div>
+
+        <div class="auth-eyebrow">Crea il tuo account</div>
+        <h2 class="auth-h1">Ciao! Cominciamo.</h2>
+        <p class="auth-sub">
+          Bastano 3 campi. Aggiungerai i dati di tuo figlio nello step successivo.
+        </p>
+
+        <form class="auth-form" onsubmit="return false">
+
+          <div class="form-row two">
+            <div>
+              <label class="label" for="firstname">Nome</label>
+              <input type="text" id="firstname" class="field" placeholder="Luca" value="Luca" autocomplete="given-name" />
+            </div>
+            <div>
+              <label class="label" for="lastname">Cognome</label>
+              <input type="text" id="lastname" class="field" placeholder="Rossi" value="Rossi" autocomplete="family-name" />
+            </div>
+          </div>
+
+          <div>
+            <label class="label" for="email">Email</label>
+            <div class="field-with-icon">
+              <span class="ico"><i data-lucide="mail" style="width:18px;height:18px"></i></span>
+              <input type="email" id="email" class="field" placeholder="luca.rossi@email.it" value="luca.rossi@email.it" autocomplete="email" />
+            </div>
+            <p class="helper">Useremo questa email per le notifiche di scadenze e ricevute pagamento.</p>
+          </div>
+
+          <div>
+            <label class="label" for="password">Password</label>
+            <div class="field-with-icon">
+              <span class="ico"><i data-lucide="lock" style="width:18px;height:18px"></i></span>
+              <input type="password" id="password" class="field" placeholder="Scegli una password" value="••••••••••" autocomplete="new-password" />
+              <button type="button" class="toggle-eye" aria-label="Mostra password">
+                <i data-lucide="eye" style="width:18px;height:18px"></i>
+              </button>
+            </div>
+            <div class="pwd-rules">
+              <div class="pwd-rule ok"><i data-lucide="check" style="width:11px;height:11px"></i>Almeno 8 caratteri</div>
+              <div class="pwd-rule ok"><i data-lucide="check" style="width:11px;height:11px"></i>Una maiuscola</div>
+              <div class="pwd-rule ok"><i data-lucide="check" style="width:11px;height:11px"></i>Un numero</div>
+              <div class="pwd-rule"><i data-lucide="circle" style="width:11px;height:11px"></i>Un carattere speciale</div>
+            </div>
+          </div>
+
+          <label class="checkbox-row">
+            <input type="checkbox" checked />
+            <span>Accetto la <a href="#">privacy policy</a> e i <a href="#">termini di servizio</a> di Triono Racing / ASD CIEMME.</span>
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" />
+            <span>Voglio ricevere comunicazioni e novità via email (opzionale).</span>
+          </label>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:8px">
+            Crea il mio account
+            <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
+          </button>
+        </form>
+
+        <div class="auth-divider">oppure</div>
+
+        <div class="auth-social">
+          <button class="btn-social">
+            <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 01-1.8 2.72v2.26h2.92c1.71-1.57 2.68-3.88 2.68-6.62z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.92v2.32A8.997 8.997 0 009 18z" fill="#34A853"/>
+              <path d="M3.97 10.72A5.41 5.41 0 013.68 9c0-.6.1-1.18.29-1.72V4.96H.92A8.997 8.997 0 000 9c0 1.45.35 2.83.92 4.04l3.05-2.32z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A8.997 8.997 0 00.92 4.96l3.05 2.32C4.68 5.16 6.66 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+            Registrati con Google
+          </button>
+        </div>
+
+        <div class="auth-foot">
+          Hai già un account? <a href="login.html">Accedi</a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+</template>
+
+<script src="../shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['Mockup Portale', 'Auth', 'Registrati'],
+    title: 'Registrati',
+    route: '/portale/registrati',
+    statusBarTheme: 'dark',
+    desktopScale: 0.6,
+    stateLegend: {
+      tag: 'Stato rappresentato',
+      items: [
+        { ref: 1, text: 'Form pieno + invito secondo genitore attivo (banner sun)' },
+        { ref: 2, text: 'Password con 3/4 regole soddisfatte (1 mancante)' },
+        { ref: 3, text: 'Stati error / email duplicata non mostrati' }
+      ]
+    },
+    annotations: [
+      { ref: 1, text: '<strong>Form gestito da Clerk</strong> con appearance Triono. I 3 campi + checkbox sono quelli mostrati a Clerk via <code>&lt;SignUp /&gt;</code>; nome/cognome vanno in <code>publicMetadata</code>. Webhook <code>user.created</code> crea il record Airtable.' },
+      { ref: 2, text: '<strong>Banner invito secondo genitore</strong> (in alto, sun): visibile solo se URL contiene <code>?inviteToken=...</code>. Il backend valida il token e, dopo registrazione, collega questo profilo al bambino indicato. Se invito scaduto: banner flag + CTA «Chiedi un nuovo invito».' },
+      { ref: 3, text: '<strong>Password rules live</strong>: 4 regole mostrate sotto il campo, ognuna passa da grigia a grass-700 in real-time mentre l\'utente digita. Validate da Clerk (<code>passwordValidator</code>).' },
+      { ref: 4, text: '<strong>Email duplicata</strong> (non mostrato): submit con email già in uso → field error rosso + helper «Questa email è già registrata. <a>Accedi</a> o <a>recupera la password</a>.»' },
+      { ref: 5, text: '<strong>3-step features (desktop)</strong>: il brand panel comunica l\'intero onboarding (account → aggiungi figlio → iscrivi) per ridurre l\'ansia del genitore prima di iniziare.' },
+      { ref: 6, text: '<strong>Post-registrazione</strong>: redirect a <code>/portale?welcome=true</code> con modal «Benvenuto! Iniziamo aggiungendo tuo figlio» + CTA «Aggiungi figlio» (UX_REDESIGN §7.1).' },
+      { ref: 7, text: '<strong>SSO Google</strong>: registrazione veloce. In caso di SSO, lo step «nome/cognome» viene popolato dai claim di Google; il form non riappare.' },
+      { ref: 8, text: '<strong>Marketing opt-in separato</strong>: 2 checkbox distinti (privacy obbligatoria + marketing opzionale) per conformità GDPR. La privacy è pre-checked solo come stato visivo del mockup, in produzione resta unchecked di default.' }
+    ]
+  });
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>
