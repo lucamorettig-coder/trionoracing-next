@@ -212,7 +212,37 @@ Vedi [`prompt-claude-code.md`](EVO-022-scuola-come-iscriversi/prompt-claude-code
 
 ## 8. Verifica e go-live
 
-_Da compilare in fase 8 dopo che Claude Code ha completato l'intero ciclo._
+- **URL produzione**: https://trionoracing-next.vercel.app/la-scuola (dominio pubblico: https://trionoracing.it/la-scuola)
+- **Pull Request**: [#50](https://github.com/lucamorettig-coder/trionoracing-next/pull/50)
+- **Commit di merge**: `9a82f04` (squash)
+- **Data go-live**: 2026-06-06
+- **Report verifica**: [`verifica.md`](EVO-022-scuola-come-iscriversi/verifica.md)
+
+### Esito sintetico
+
+| Dimensione | Stato | Note |
+|------------|-------|------|
+| Design system | ✅ | Pattern + token DS riusati; unico custom `#F2E89A` (sun-200 inesistente); stepper confinato al componente. |
+| Localizzazione (i18n) | ✅ n/a | Solo IT. |
+| SEO | ✅ | Title/canonical intatti in prod; nessuna nuova route; mockup `aria-hidden`, foto con `alt`. |
+| Fedeltà ai visual | ✅ | Variante A del handoff; desktop/mobile confermati. |
+| Criteri di accettazione | ✅ | Tutti soddisfatti (ordine funnel, link, heading, copy, reduced-motion). |
+| Smoke test dev | ✅ | OK utente su `localhost:3001`. |
+| Smoke test produzione | ✅ | HTTP 200, contenuti + link + SEO verificati. |
+
+### Apprendimenti riusabili (riportati anche in AGENTS.md)
+
+- ESLint: ignorare `evolutive/**` (i bundle di handoff Claude Design contengono prototipi `.jsx` non-sorgente).
+- Worktree: symlink `node_modules` dal repo principale + copia `.env.local` per far girare dev/build/lint.
+- Scala `sun` del DS incompleta (50/100/500/600/700) → per intermedi usare arbitrary hex.
+- `.reveal` (scroll-driven, reduced-motion safe) preferito a client IntersectionObserver per entrate di sezione.
+- Mockup illustrati inline `aria-hidden` come alternativa privacy-safe agli screenshot reali.
+- Preview MCP può bloccarsi su `chrome-error://` → fallback verifica via curl SSR + smoke utente.
+
+### Debiti aperti / follow-up
+
+- **Foto step 01**: placeholder `public/photos/scuola/lezione-ciclodromo.jpg` (TODO nel codice) → sostituire con la foto reale.
+- **Area contatti dedicata**: candidata a evolutiva futura.
 
 ---
 
@@ -293,3 +323,10 @@ _Da compilare in fase 8 dopo che Claude Code ha completato l'intero ciclo._
 - Quality gate: **typecheck ✅ · lint ✅ (0 errori) · build ✅** (`/la-scuola` resta `○ Static` ISR 10m, 48/48 pagine).
 - Smoke dev su `localhost:3001/la-scuola`: contenuti SSR, ordine funnel, link verificati; **OK utente**.
 - Nota tooling: il preview MCP (browser interno) restava bloccato su `chrome-error://` e non rinavigava → self-check visivo saltato, verifica funzionale via curl + smoke utente.
+
+### [2026-06-06] Fase 8 — Consolidamento e go-live
+
+- Merge PR #50 (squash `9a82f04`); deploy produzione verificato (HTTP 200, contenuti + link + SEO ok) ~45s dopo il merge.
+- `verifica.md` prodotto (report manuale, struttura `verify-implementation`). Esito: ✅ coerente, scostamenti accettabili (foto placeholder, ambient ridotte).
+- `AGENTS.md` aggiornato con i pattern riusabili EVO-022; `memory.md` stato → completata.
+- **Evolutiva chiusa.**
