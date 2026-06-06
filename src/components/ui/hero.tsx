@@ -3,18 +3,22 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
+import { VideoBackdrop } from "./video-backdrop";
 
 /**
  * Hero — Triono Racing
  *
- * Due varianti:
- *  - "video"   : video ambient muto loop di sottofondo + overlay scrim
- *  - "pattern" : sfondo pattern brand (assets/pattern.svg) — niente video
+ * Sfondo:
+ *  - se `videoSrc` è presente (o variant "video") → video ambient muto loop +
+ *    overlay navy (via <VideoBackdrop>, riusato anche dalle CTA — EVO-021)
+ *  - altrimenti (variant "pattern") → sfondo pattern brand (assets/pattern.svg)
  *
- * Entrambe supportano: eyebrow, title (ReactNode per <br/>), subtitle, 2 CTA.
+ * Le `stats` (colonna "In numeri") sono indipendenti dallo sfondo: si possono
+ * mostrare sia sopra il pattern sia sopra il video.
  *
- * Accessibilità: il video è decorativo (aria-hidden), il testo è il vero contenuto.
- * Su `prefers-reduced-motion`, il video viene messo in pausa.
+ * Supporta: eyebrow, title (ReactNode per <br/>), subtitle, 2 CTA, stats.
+ * Accessibilità: il video è decorativo (aria-hidden); su `prefers-reduced-motion`
+ * viene messo in pausa (gestito da <VideoBackdrop>).
  */
 type CTA = { label: string; href: string };
 
@@ -46,15 +50,9 @@ export function Hero({
   className,
   stats,
 }: HeroProps) {
-  const videoRef = React.useRef<HTMLVideoElement | null>(null);
-
-  React.useEffect(() => {
-    if (variant !== "video" || !videoRef.current) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) videoRef.current.pause();
-  }, [variant]);
-
   const isCenter = align === "center";
+  const hasStats = !!stats?.length;
+  const useVideo = !!videoSrc || variant === "video";
 
   return (
     <section
@@ -65,33 +63,8 @@ export function Hero({
       )}
     >
       {/* BG layer */}
-      {variant === "video" ? (
-        <div className="absolute inset-0">
-          {videoSrc ? (
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              src={videoSrc}
-              poster={posterSrc}
-              autoPlay
-              muted
-              loop
-              playsInline
-              aria-hidden
-            />
-          ) : (
-            <div className="w-full h-full bg-navy-900" aria-hidden />
-          )}
-          {/* scrim */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(5,14,63,0.35) 0%, rgba(5,14,63,0.4) 40%, rgba(5,14,63,0.85) 100%)",
-            }}
-            aria-hidden
-          />
-        </div>
+      {useVideo ? (
+        <VideoBackdrop videoSrc={videoSrc} posterSrc={posterSrc} overlay="hero" />
       ) : (
         <div className="absolute inset-0 bg-navy-900" aria-hidden>
           <div className="absolute inset-0 pattern-navy" />
@@ -108,14 +81,14 @@ export function Hero({
         <div
           className={cn(
             "w-full max-w-[1280px] mx-auto px-6 lg:px-14 py-14 lg:py-20",
-            variant === "pattern" && stats?.length ? "grid lg:grid-cols-12 gap-10 items-center" : ""
+            hasStats ? "grid lg:grid-cols-12 gap-10 items-center" : ""
           )}
         >
           <div
             className={cn(
               "text-white",
               isCenter ? "text-center mx-auto max-w-[760px]" : "max-w-[760px]",
-              variant === "pattern" && stats?.length ? "lg:col-span-7" : ""
+              hasStats ? "lg:col-span-7" : ""
             )}
           >
             {eyebrow && (
@@ -164,8 +137,8 @@ export function Hero({
             )}
           </div>
 
-          {/* Stats column (variant pattern, optional) */}
-          {variant === "pattern" && stats?.length ? (
+          {/* Stats column (optional, indipendente dallo sfondo) */}
+          {hasStats ? (
             <div className="hidden lg:block lg:col-span-5">
               <div className="text-white">
                 <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/60 mb-4">
