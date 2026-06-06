@@ -7,7 +7,7 @@ export function SezioneMaestri() {
       <div className="reveal">
         <SectionHeader
           eyebrow="I nostri maestri"
-          title="9 maestri federali, una sola passione."
+          title="5 maestri federali, una sola passione."
           subtitle="Tecnici qualificati FCI, ognuno con esperienza in pista, su strada o in MTB. Il loro obiettivo: trasmettere la passione per il ciclismo attraverso il gioco."
         />
       </div>

@@ -28,7 +28,7 @@ export function SezioneScuola() {
           <CardContent>
             <CardIcon color="sky"><WheelIcon /></CardIcon>
             <CardTitle>Tecnica progressiva</CardTitle>
-            <CardBody>Equilibrio, frenata, curva, condotta in gruppo. Programma adattato all&apos;età, a partire dai 5 anni.</CardBody>
+            <CardBody>Equilibrio, frenata, curva, condotta in gruppo. Programma adattato all&apos;età, a partire dai 4 anni.</CardBody>
           </CardContent>
         </Card>
         <Card className="reveal reveal-delay-3">
