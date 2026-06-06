@@ -1,8 +1,8 @@
+import Image from "next/image";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MountainIcon, MapPin, CalendarDays } from "@/components/ui/icons";
-import { PhotoPlaceholder } from "@/components/home/PhotoPlaceholder";
 
 export function SezioneMarathon() {
   return (
@@ -30,12 +30,15 @@ export function SezioneMarathon() {
         </div>
 
         <div className="lg:col-span-5 reveal reveal-delay-2">
-          <PhotoPlaceholder
-            aspect="portrait"
-            tone="dark"
-            caption="Marathon MTB 209 — partenza o tratto tecnico"
-            description="Atleti in MTB lungo il percorso 209, preferibilmente alla partenza ad Arrone o in un tratto panoramico/tecnico. Formato verticale 4:5 da affiancare al testo desktop."
-          />
+          <div className="photo-house relative aspect-[4/5] rounded-[var(--radius-2xl)] shadow-[var(--shadow-md)]">
+            <Image
+              src="/photos/marathon/cover-209.jpg"
+              alt="Atleta in mountain bike sul percorso tecnico della Marathon MTB 209"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 40vw"
+            />
+          </div>
         </div>
       </div>
     </section>
