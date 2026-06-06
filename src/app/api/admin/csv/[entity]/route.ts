@@ -10,10 +10,12 @@ import {
   getIscrizioniByGara,
   getAllLezioni,
   getAllGenitori,
+  getUtentiMigrati,
   getPresenzeAggregato,
   fetchAllPages,
   parseLezioniFilters,
   parseGenitoriFilters,
+  parseMigrazioneFilters,
   parsePresenzeFilters,
   csvWriter,
 } from "@/lib/airtable-admin";
@@ -27,6 +29,7 @@ const KNOWN_ENTITIES = new Set([
   "presenze-maestri",
   "presenze-riepilogo",
   "genitori",
+  "migrazione",
   "tariffe",
   "gare",
   "iscrizioni-gara",
@@ -373,6 +376,35 @@ export async function POST(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="genitori-${new Date().toISOString().slice(0, 10)}.csv"`,
+      },
+    });
+  }
+
+  if (entity === "migrazione") {
+    const body = await _req.clone().json().catch(() => ({} as Record<string, unknown>));
+    const f = (body?.filters ?? {}) as Record<string, unknown>;
+    const params = new URLSearchParams();
+    if (f.statoLogin) params.set("stato", String(f.statoLogin));
+    if (f.search) params.set("search", String(f.search));
+    const filters = parseMigrazioneFilters(params);
+    const utenti = await getUtentiMigrati(filters);
+    const csv = csvWriter(utenti, [
+      { key: "email", label: "Email", accessor: (r) => r.fields.EMAIL_GENITORE ?? "" },
+      { key: "nome", label: "Nome", accessor: (r) => r.fields.NOME_GENITORE ?? "" },
+      { key: "cognome", label: "Cognome", accessor: (r) => r.fields.COGNOME_GENITORE ?? "" },
+      { key: "ruolo", label: "Ruolo", accessor: (r) => r.fields.RUOLO ?? "GENITORE" },
+      { key: "data_migrazione", label: "Data migrazione", accessor: (r) => r.fields.DATA_MIGRAZIONE ?? "" },
+      {
+        key: "stato_login",
+        label: "Stato login",
+        accessor: (r) => ((r.fields.AUTH_USER_ID ?? "").length > 0 ? "Clerk creato" : "Mai loggato"),
+      },
+      { key: "supabase_id", label: "Supabase ID", accessor: (r) => r.fields.LEGACY_SUPABASE_ID ?? "" },
+    ]);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="migrazione-${new Date().toISOString().slice(0, 10)}.csv"`,
       },
     });
   }

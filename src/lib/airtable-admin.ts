@@ -1928,3 +1928,81 @@ export async function riabilitaAccountGenitore(genitoreId: string): Promise<void
     );
   }
 }
+
+// ─── EVO-008: Monitoraggio migrazione ───────────────────────────────────────
+
+export interface KPIMigrazioneResult {
+  migratiTotali: number;
+  conLogin: number;
+  maiLoggati: number;
+}
+
+/**
+ * KPI migrazione. `conLogin` usa `AUTH_USER_ID != BLANK()` come PROXY: il
+ * webhook Clerk `user.created` setta AUTH_USER_ID in cascade DALL'IMPORT, non
+ * al primo login reale dell'utente — quindi il proxy misura "utente Clerk
+ * creato / record collegato", non "ha fatto login". La UI etichetta di
+ * conseguenza ("Con utente Clerk creato"). Per un proxy "primo login reale"
+ * servirebbe leggere lastSignInAt da Clerk per utente (costoso) o un campo
+ * ULTIMO_ACCESSO scritto dal layout (bonus, non implementato in EVO-008).
+ */
+export async function getKPIMigrazione(): Promise<KPIMigrazioneResult> {
+  const migrati = await fetchAllPages<Genitore>("TABELLA_GENITORI", {
+    filterByFormula: "{LEGACY_SUPABASE_ID}!=BLANK()",
+    fields: ["LEGACY_SUPABASE_ID", "AUTH_USER_ID"],
+  });
+  const conLogin = migrati.filter(
+    (g) => (g.fields.AUTH_USER_ID ?? "").length > 0,
+  ).length;
+  return {
+    migratiTotali: migrati.length,
+    conLogin,
+    maiLoggati: migrati.length - conLogin,
+  };
+}
+
+export interface MigrazioneAdminFilters {
+  statoLogin?: "loggato" | "non_loggato";
+  search?: string;
+}
+
+export function parseMigrazioneFilters(
+  params: URLSearchParams,
+): MigrazioneAdminFilters {
+  const raw = params.get("stato");
+  const statoLogin =
+    raw === "loggato" || raw === "non_loggato" ? raw : undefined;
+  const search = params.get("search") ?? undefined;
+  return { statoLogin, search };
+}
+
+/**
+ * Utenti migrati (LEGACY_SUPABASE_ID valorizzato), ordinati per DATA_MIGRAZIONE
+ * desc, con filtro stato login (proxy AUTH_USER_ID) + search email/nome.
+ */
+export async function getUtentiMigrati(
+  filters?: MigrazioneAdminFilters,
+): Promise<Genitore[]> {
+  let genitori = await fetchAllPages<Genitore>("TABELLA_GENITORI", {
+    filterByFormula: "{LEGACY_SUPABASE_ID}!=BLANK()",
+    sort: [{ field: "DATA_MIGRAZIONE", direction: "desc" }],
+  });
+
+  if (filters?.statoLogin === "loggato") {
+    genitori = genitori.filter((g) => (g.fields.AUTH_USER_ID ?? "").length > 0);
+  } else if (filters?.statoLogin === "non_loggato") {
+    genitori = genitori.filter((g) => (g.fields.AUTH_USER_ID ?? "").length === 0);
+  }
+
+  if (filters?.search) {
+    const q = filters.search.toLowerCase();
+    genitori = genitori.filter((g) => {
+      const nome = (g.fields.NOME_GENITORE ?? "").toLowerCase();
+      const cognome = (g.fields.COGNOME_GENITORE ?? "").toLowerCase();
+      const email = (g.fields.EMAIL_GENITORE ?? "").toLowerCase();
+      return nome.includes(q) || cognome.includes(q) || email.includes(q);
+    });
+  }
+
+  return genitori;
+}
