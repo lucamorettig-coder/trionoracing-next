@@ -9,12 +9,12 @@ import { CtaScuola } from "@/components/scuola/CtaScuola";
 import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "La Scuola di Ciclismo Triono — Terni · ASD CIEMME",
+  title: "La Scuola di Ciclismo Triono a Terni · ASD CIEMME",
   description:
     "Scuola di ciclismo per bambini a partire da 5 anni di età al Ciclodromo Renato Perona di Terni. Maestri federali, 2 corsi a settimana: bici da strada (martedì) e mountain bike (giovedì). Carta UNESCO 1992.",
   alternates: { canonical: "/la-scuola" },
   openGraph: {
-    title: "La Scuola di Ciclismo Triono — Terni",
+    title: "La Scuola di Ciclismo Triono a Terni",
     description:
       "Maestri federali, gruppi piccoli, ambiente sicuro. Iscrizioni aperte alla Scuola di Ciclismo.",
     url: "/la-scuola",

@@ -6,7 +6,7 @@ export function ScuolaHero() {
       variant="pattern"
       eyebrow="Scuola di Ciclismo · dal 2022"
       title={<>Imparare il ciclismo,<br />in sicurezza.</>}
-      subtitle="Una scuola per bambini a partire da 5 anni di età, guidata da maestri federali. Due corsi a settimana — strada e mountain bike — al Ciclodromo Renato Perona di Terni."
+      subtitle="Una scuola per bambini a partire da 5 anni di età, guidata da maestri federali. Due corsi a settimana, strada e mountain bike, al Ciclodromo Renato Perona di Terni."
       primaryCta={{ label: "Iscrivi tuo figlio", href: "/contatti?motivo=scuola" }}
       secondaryCta={{ label: "Scrivici", href: "mailto:info@trionoracing.it" }}
       stats={[

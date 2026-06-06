@@ -8,11 +8,11 @@ import { CtaFinale } from "@/components/home/CtaFinale";
 import { OrganizationJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "Triono Racing — Scuola di Ciclismo a Terni · ASD CIEMME",
+  title: "Triono Racing, Scuola di Ciclismo a Terni · ASD CIEMME",
   description:
     "Scuola di ciclismo per bambini a partire da 5 anni di età, al Ciclodromo Renato Perona di Terni. Maestri federali, strada e MTB, due volte a settimana. Triono Racing dal 2015.",
   openGraph: {
-    title: "Triono Racing — Scuola di Ciclismo a Terni",
+    title: "Triono Racing, Scuola di Ciclismo a Terni",
     description:
       "Maestri federali, gruppi piccoli per età, ambiente sicuro. Iscrizioni aperte alla Scuola di Ciclismo Triono.",
     url: "/",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
         url: "/og/home.jpg",
         width: 1200,
         height: 630,
-        alt: "Triono Racing — Scuola di Ciclismo",
+        alt: "Triono Racing, Scuola di Ciclismo",
       },
     ],
   },

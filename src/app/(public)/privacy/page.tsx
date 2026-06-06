@@ -112,18 +112,18 @@ export default function PrivacyPage() {
           <p>I tuoi dati sono trattati da questi <em>responsabili esterni</em> in qualità di processor:</p>
           <ul className="list-disc pl-6 space-y-2 mt-3">
             <li>
-              <strong>Vercel Inc.</strong> (USA) — hosting del sito web. Trasferimento extra-UE
+              <strong>Vercel Inc.</strong> (USA): hosting del sito web. Trasferimento extra-UE
               su base di Standard Contractual Clauses (SCC).
             </li>
             <li>
-              <strong>Airtable Inc.</strong> (USA) — database dei contatti e delle iscrizioni.
+              <strong>Airtable Inc.</strong> (USA): database dei contatti e delle iscrizioni.
               Trasferimento extra-UE su base SCC.
             </li>
             <li>
-              <strong>Clerk Inc.</strong> (USA) — autenticazione area riservata. SCC.
+              <strong>Clerk Inc.</strong> (USA): autenticazione area riservata. SCC.
             </li>
             <li>
-              <strong>Google LLC</strong> (USA) — embed mappa per pagina home (sezione Come
+              <strong>Google LLC</strong> (USA): embed mappa per pagina home (sezione Come
               raggiungerci). Quando carichi la pagina, Google riceve il tuo IP.
             </li>
           </ul>

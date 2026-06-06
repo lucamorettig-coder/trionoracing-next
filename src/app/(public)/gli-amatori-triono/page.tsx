@@ -7,12 +7,12 @@ import { CtaFinale } from "@/components/home/CtaFinale";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "Gli Amatori Triono Racing — squadra ciclistica Terni · ASD CIEMME",
+  title: "Gli Amatori Triono Racing, squadra ciclistica a Terni · ASD CIEMME",
   description:
-    "La comunità degli amatori e degli agonisti Triono Racing: strada, mountain bike, gare regionali e nazionali. Tesseramento aperto. ASD CIEMME — Terni, Umbria.",
+    "La comunità degli amatori e degli agonisti Triono Racing: strada, mountain bike, gare regionali e nazionali. Tesseramento aperto. ASD CIEMME, Terni, Umbria.",
   alternates: { canonical: "/gli-amatori-triono" },
   openGraph: {
-    title: "Gli Amatori Triono Racing — Terni",
+    title: "Gli Amatori Triono Racing, Terni",
     description:
       "Una comunità di ciclisti che condividono allenamenti, gare e maglia. Tesseramento aperto.",
     url: "/gli-amatori-triono",

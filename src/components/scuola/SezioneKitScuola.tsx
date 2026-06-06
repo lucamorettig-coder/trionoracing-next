@@ -59,7 +59,7 @@ export function SezioneKitScuola() {
             </h2>
             <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-ink-muted">
               Quattro capi che vanno dalla pedalata alla merenda. Il kit Triono è
-              incluso nell&apos;iscrizione — riconoscibile da lontano in gruppo, come
+              incluso nell&apos;iscrizione, riconoscibile da lontano in gruppo, come
               davanti al bar dopo la lezione.
             </p>
           </div>
@@ -68,7 +68,7 @@ export function SezioneKitScuola() {
             <p className="font-semibold text-ink">Kit Scuola 2026</p>
             <p>04 capi</p>
             <p>1 identità</p>
-            <p>ASD CIEMME — Terni</p>
+            <p>ASD CIEMME · Terni</p>
           </div>
         </div>
 
@@ -86,7 +86,7 @@ export function SezioneKitScuola() {
             <div className="reveal reveal-delay-3 photo-bg-navy rounded-[var(--radius-xl)] text-white">
               <div className="p-8 lg:p-10">
                 <p className="text-xs font-semibold uppercase tracking-wider text-sky-300">
-                  — Il senso del kit
+                  Il senso del kit
                 </p>
                 <p className="mt-4 text-xl font-semibold leading-snug lg:text-2xl">
                   Quando indossi i colori del team,{" "}
