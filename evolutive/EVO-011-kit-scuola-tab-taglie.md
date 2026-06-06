@@ -3,8 +3,8 @@
 - **ID**: EVO-011
 - **Slug**: kit-scuola-tab-taglie
 - **Data inizio**: 2026-05-23
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: in PR (2026-06-06 — branch `feat/evo-011-kit-scuola-tab-taglie`, in attesa di OK utente per il merge. EVO-004 + EVO-010 già in `main`, dipendenze/coordinamento branch risolti)
+- **Data fine**: 2026-06-06
+- **Stato**: completata (PR #37 mergeata, deploy produzione READY)
 - **Tipo**: arricchimento visivo (modifica feature esistente)
 - **Area**: area autenticata (`/portale/iscrizioni/[id]` — tab "Taglie")
 - **Priorità**: media (segue il ciclo di EVO-004)
@@ -130,7 +130,27 @@ Vercel collegato a GitHub (`lucamorettig-coder/trionoracing-next`). Pattern: bra
 
 ## 8. Verifica e go-live
 
-_Da compilare in fase 8._
+_Chiusa [2026-06-06]._
+
+- **Esito**: ✅ coerente. Implementazione allineata al prompt + correzioni in iterazione (taglie reali dallo schema, micro foto da `kit-scuola.ts`, microcopy rimosso su richiesta utente, fix design-critique).
+- **PR**: [#37](https://github.com/lucamorettig-coder/trionoracing-next/pull/37) — squash merge, commit `2ff3110`.
+- **Deploy produzione**: Vercel `dpl_5ksZ2MA…` stato **READY**, target production.
+- **URL**: https://trionoracing-next.vercel.app/portale/iscrizioni/[id] → tab "Taglie" (area autenticata).
+
+### Verifica per dimensione
+
+| Dimensione | Esito | Nota |
+|---|---|---|
+| Funzionale | ✅ | 3 select con opzioni corrette dallo schema; "Taglia tuta" con misura unica + 2 foto. |
+| Bug latente | ✅ risolto | Opzioni `XS–XXL` hardcoded → 422 al salvataggio. Allineate a `5XS–XS` / `110/120`–`130/140` via `TAGLIE_PER_CAMPO`. |
+| Design system | ✅ | Solo token esistenti; riuso `next/image fill object-contain` + `bg-bg-soft`. Nessun token nuovo. |
+| Architettura | ✅ | Refactor isolato di `TabTaglie.tsx` + additivo su `kit-scuola.ts`. Nessuna modifica a stato/API/schema. |
+| A11y | ✅ | `<label htmlFor>`, `alt` reali, chevron sui select, touch target 44px. |
+| Quality gate | ✅ | typecheck + lint + build puliti (sul codice reale dopo fix del mismatch worktree/repo). |
+
+### Nota di processo
+
+Durante la sessione gli edit sono inizialmente finiti nel repo principale (path assoluto su `main`) invece che nel worktree del branch feature; i primi quality gate/dev server giravano quindi sul codice non modificato. Risolto spostando le modifiche sul branch via `git stash` (object store condiviso tra worktree) e rieseguendo i gate sul codice reale. Lezione → in CLAUDE.md/AGENTS.md.
 
 ---
 
