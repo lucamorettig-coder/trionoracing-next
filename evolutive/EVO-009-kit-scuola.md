@@ -3,8 +3,8 @@
 - **ID**: EVO-009
 - **Slug**: kit-scuola
 - **Data inizio**: 2026-05-23
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: ombrello
+- **Data fine**: 2026-06-06
+- **Stato**: ombrello — chiuso (EVO-010 ✅ 2026-05-23 + EVO-011 ✅ 2026-06-06, entrambe le sotto-evolutive completate)
 - **Tipo**: nuova feature (sezione pubblica) + arricchimento visivo (size picker portale)
 - **Area**: cross-cutting — `/la-scuola` (sito pubblico) + `TabTaglie` (`/portale/iscrizioni/[id]` su branch `evo-004-portale-iscrizioni`)
 - **Priorità**: alta
