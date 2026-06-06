@@ -31,6 +31,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
+// ISR: la home è sostanzialmente statica, ma CtaFinale legge lo sfondo video
+// da Airtable (slot "home-cta"). Con revalidate l'admin vede il cambio entro
+// ~10 min senza deploy. Allineato al pattern di /marathon-209.
+export const revalidate = 600;
+
 export default function HomePage() {
   return (
     <>
