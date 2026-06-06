@@ -77,6 +77,23 @@ export const KIT_SCUOLA: readonly CapoKit[] = [
 ] as const;
 
 /**
+ * Opzioni singleSelect Airtable per ciascun campo taglia — mirror dello schema
+ * TABELLA_ISCRIZIONI (base PROD `appszpkU1aXb3xrFM`, verificato 2026-06-06).
+ *
+ * Maglia e pantaloncino condividono il set taglie tecniche bambino (5XS→XS);
+ * la tuta (felpa + pantalone, misura unica) usa le altezze 110/120 e 130/140.
+ *
+ * ⚠️ Mantenere allineato se l'admin modifica le choices su Airtable: un valore
+ * non presente fra le choices produce 422 `INVALID_MULTIPLE_CHOICE_OPTIONS` al
+ * salvataggio (PATCH `/api/portale/iscrizioni/[id]`).
+ */
+export const TAGLIE_PER_CAMPO: Record<CampoTagliaAirtable, readonly string[]> = {
+  TAGLIA_MAGLIA: ["5XS", "4XS", "3XS", "2XS", "XS"],
+  TAGLIA_PANTALONCINO: ["5XS", "4XS", "3XS", "2XS", "XS"],
+  TAGLIA_TUTA: ["110/120", "130/140"],
+} as const;
+
+/**
  * Helper opzionale: applica trasformazioni Cloudinary inline a una URL per
  * ridurre payload (q_auto, f_auto, w_*). Usato dai componenti che renderizzano
  * thumbnail invece dell'immagine full-res.
