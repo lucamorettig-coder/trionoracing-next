@@ -7,7 +7,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 // Per aggiornare la galleria: carica su Cloudinary e aggiungi il public_id qui.
 // `aspect` varia l'altezza del tile per dare ritmo masonry (crop portrait/quadrato:
 // niente landscape che taglierebbe i soggetti). Stesso pattern di BachecaFoto (amatori).
-const CLD = "https://res.cloudinary.com/duezeronove/image/upload";
+const CLD = "https://res.cloudinary.com/duezeronove/image/upload/sito/immagini";
 
 const photos: Array<{ id: string; alt: string; aspect: string }> = [
   { id: "scuola-01", aspect: "aspect-[3/4]", alt: "Fila di giovani allievi della Scuola Triono in sella alle bici al Ciclodromo Renato Perona, luce del tramonto, maestri accanto" },
