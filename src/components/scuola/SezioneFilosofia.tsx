@@ -20,7 +20,7 @@ export function SezioneFilosofia() {
           </p>
           <p>
             Questi principi ci guidano nell&apos;offrire un ambiente sano, divertente e
-            inclusivo per i bambini a partire dai 5 anni di età, dove il gioco e il piacere
+            inclusivo per i bambini a partire dai 4 anni di età, dove il gioco e il piacere
             dell&apos;attività sportiva sono prioritari.
           </p>
           <p className="border-l-4 border-sun-500 pl-6 py-1 text-navy-900 font-semibold">

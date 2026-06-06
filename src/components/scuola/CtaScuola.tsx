@@ -1,10 +1,24 @@
 import { SectionHeader } from "@/components/ui/section-header";
 import { Button } from "@/components/ui/button";
+import { VideoBackdrop } from "@/components/ui/video-backdrop";
+import { getSfondoVideo, cloudinaryVideoOptimized } from "@/lib/sfondi-video";
+import { cn } from "@/lib/utils";
 
-export function CtaScuola() {
+export async function CtaScuola() {
+  // Sfondo video gestito da Airtable (slot "scuola-cta"). Se assente/non attivo →
+  // fallback allo sfondo statico `.photo-bg-navy` (zero regressione). EVO-021.
+  const sfondo = await getSfondoVideo("scuola-cta");
+
   return (
-    <section className="relative photo-bg-navy text-white overflow-hidden">
-      <div className="relative max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32 text-center reveal">
+    <section className={cn("relative text-white overflow-hidden", !sfondo && "photo-bg-navy")}>
+      {sfondo && (
+        <VideoBackdrop
+          videoSrc={cloudinaryVideoOptimized(sfondo.videoUrl, 1600)}
+          posterSrc={sfondo.posterUrl}
+          overlay="cta"
+        />
+      )}
+      <div className="relative z-[1] max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32 text-center reveal">
         <SectionHeader
           eyebrow="Iscrizioni aperte"
           title={<span className="text-white">Inizia il percorso ciclistico di tuo figlio.</span>}

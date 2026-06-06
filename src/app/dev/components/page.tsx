@@ -219,7 +219,7 @@ export default function ComponentsDevPage() {
             secondaryCta={{ label: "Scopri la Scuola", href: "#" }}
             stats={[
               { value: "18", label: "anni di scuola", highlight: true },
-              { value: "9", label: "maestri federali" },
+              { value: "5", label: "maestri federali" },
               { value: "120+", label: "iscritti 2026" },
               { value: "45", label: "gare nel 2026" },
             ]}

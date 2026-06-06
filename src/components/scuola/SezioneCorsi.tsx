@@ -8,8 +8,8 @@ export function SezioneCorsi() {
     <section className="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
       <div className="reveal">
         <SectionHeader
-          eyebrow="I nostri corsi"
-          title="Due corsi, una sede, un solo principio: imparare divertendosi."
+          eyebrow="Le lezioni"
+          title="Due lezioni, una sede, un solo principio: imparare divertendosi."
           subtitle="Strada e mountain bike, due lezioni a settimana di un'ora e mezza. Stessi maestri, stessi gruppi, stesso ambiente protetto al ciclodromo."
         />
       </div>
