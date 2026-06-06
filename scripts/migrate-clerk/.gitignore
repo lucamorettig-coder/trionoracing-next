@@ -1,0 +1,3 @@
+# Dump utenti Supabase + report migrazione — contengono hash password e PII.
+# MAI committare. Conservati solo localmente.
+output/

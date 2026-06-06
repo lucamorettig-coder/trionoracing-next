@@ -2,10 +2,12 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { UserCheck, Phone, Mail, Calendar, MapPin, IdCard } from "lucide-react";
+import { UserCheck, Phone, Mail, Calendar, MapPin, IdCard, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CambiaRuoloModal } from "./CambiaRuoloModal";
+import { DisabilitaAccountButton } from "./DisabilitaAccountButton";
+import { RiabilitaAccountButton } from "./RiabilitaAccountButton";
 import { ruoloBadge } from "./GenitoriDataTable";
 import { formatEUR, formatDateIT } from "@/lib/portale-utils";
 import type {
@@ -42,6 +44,31 @@ export function DettaglioGenitoreCard({ genitore, figli, iscrizioni, titoli }: P
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Banner account disabilitato (EVO-008) */}
+      {f.ACCOUNT_DISABILITATO && (
+        <div className="bg-flag-50 border-l-4 border-flag-500 rounded-[var(--radius-md)] px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-2.5">
+            <UserX size={18} className="text-flag-500 shrink-0 mt-0.5" />
+            <div className="text-sm text-ink">
+              <span className="font-semibold">Account disabilitato</span>
+              {f.DATA_DISABILITAZIONE && (
+                <span className="text-ink-muted">
+                  {" "}
+                  il {formatDateIT(f.DATA_DISABILITAZIONE)}
+                </span>
+              )}
+              <span className="text-ink-muted">
+                {" "}
+                — l&apos;utente non può accedere al portale.
+              </span>
+            </div>
+          </div>
+          <div className="shrink-0">
+            <RiabilitaAccountButton genitore={genitore} />
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-white border border-line rounded-[var(--radius-lg)] p-6 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 shadow-[var(--shadow-xs)]">
         <div className="flex flex-col gap-2">
@@ -77,7 +104,7 @@ export function DettaglioGenitoreCard({ genitore, figli, iscrizioni, titoli }: P
             {ruoloBadge(f.RUOLO)}
           </div>
         </div>
-        <div className="shrink-0">
+        <div className="shrink-0 flex flex-wrap items-center gap-2">
           <Button
             type="button"
             variant="primary"
@@ -87,6 +114,7 @@ export function DettaglioGenitoreCard({ genitore, figli, iscrizioni, titoli }: P
             <UserCheck size={16} />
             Cambia ruolo
           </Button>
+          {!f.ACCOUNT_DISABILITATO && <DisabilitaAccountButton genitore={genitore} />}
         </div>
       </header>
 
