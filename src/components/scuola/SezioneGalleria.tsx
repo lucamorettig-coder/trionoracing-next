@@ -38,9 +38,10 @@ export function SezioneGalleria() {
           />
         </div>
 
-        <div className="mt-12 grid sm:grid-cols-2 gap-5">
-          {photos.map((p, i) => (
-            <div key={p.src} className={`reveal reveal-delay-${i + 1}`}>
+        {/* Masonry: CSS columns + break-inside-avoid, altezze variabili (video/square) */}
+        <div className="mt-12 columns-1 sm:columns-2 gap-5">
+          {photos.map((p) => (
+            <div key={p.src} className="mb-5 break-inside-avoid reveal">
               <div
                 className={`photo-house relative ${
                   p.aspect === "video" ? "aspect-video" : "aspect-square"
