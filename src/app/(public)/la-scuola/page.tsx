@@ -5,6 +5,7 @@ import { SezioneFilosofia } from "@/components/scuola/SezioneFilosofia";
 import { SezioneKitScuola } from "@/components/scuola/SezioneKitScuola";
 import { SezioneMaestri } from "@/components/scuola/SezioneMaestri";
 import { SezioneGalleria } from "@/components/scuola/SezioneGalleria";
+import { SezioneComeIscriversi } from "@/components/scuola/SezioneComeIscriversi";
 import { CtaScuola } from "@/components/scuola/CtaScuola";
 import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
@@ -39,6 +40,7 @@ export default function LaScuolaPage() {
       <SezioneKitScuola />
       <SezioneMaestri />
       <SezioneGalleria />
+      <SezioneComeIscriversi />
       <CtaScuola />
     </>
   );

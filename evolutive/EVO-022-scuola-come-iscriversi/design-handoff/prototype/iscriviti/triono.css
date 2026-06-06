@@ -1,0 +1,178 @@
+/* =============================================================
+   Triono Racing · tokens + utilities per la sezione
+   "Cosa occorre per iscriversi" (EVO-022)
+   Estratto dal Design System Triono v0.1
+   ============================================================= */
+
+:root {
+  /* NAVY */
+  --navy-50:#EEF1F8; --navy-100:#D7DEED; --navy-200:#AFBCDA; --navy-300:#8298BF;
+  --navy-400:#5572A2; --navy-500:#34528A; --navy-600:#1F3D75; --navy-700:#1F2D5A;
+  --navy-800:#11215A; --navy-900:#050E3F; --navy-950:#020730;
+  /* SKY */
+  --sky-50:#EEF6FD; --sky-100:#D6EAFB; --sky-200:#ADD4F7; --sky-300:#7FB8EC;
+  --sky-400:#5099DE; --sky-500:#3A82C8; --sky-600:#2A6BA9; --sky-700:#225589;
+  /* SEMANTIC */
+  --grass-50:#F0F8EB; --grass-100:#DAEFCD; --grass-500:#5FAC36; --grass-600:#4F932B; --grass-700:#3F7522;
+  --ember-50:#FDF4E5; --ember-100:#FCE4BD; --ember-500:#E09618; --ember-600:#BC7E12; --ember-700:#8E5F0E;
+  --flag-50:#FBEAEA; --flag-100:#F4C3C3; --flag-500:#C01818; --flag-600:#9D1414; --flag-700:#791010;
+  --sun-50:#FFFCE4; --sun-100:#FCF6AC; --sun-500:#EFE63A; --sun-600:#C3BB1E; --sun-700:#8C8615;
+  /* NEUTRI */
+  --bg:#FFFFFF; --bg-soft:#FAFBFD; --bg-muted:#F2F4F9;
+  --line:#E4E7EF; --line-soft:#EEF0F5; --ink:#14193A; --ink-muted:#6B7388;
+  /* RADIUS */
+  --r-xs:4px; --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px; --r-2xl:28px; --r-pill:9999px;
+  /* SHADOWS (tinta navy) */
+  --sh-xs:0 1px 2px rgba(20,25,58,.04);
+  --sh-sm:0 2px 6px rgba(20,25,58,.06),0 1px 2px rgba(20,25,58,.04);
+  --sh-md:0 8px 20px rgba(20,25,58,.08),0 2px 6px rgba(20,25,58,.04);
+  --sh-lg:0 20px 40px rgba(20,25,58,.10),0 4px 12px rgba(20,25,58,.05);
+  --sh-hero:0 40px 80px rgba(5,14,63,.18);
+  /* FONT */
+  --f-sans:'Inter',system-ui,-apple-system,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+
+/* ===== Eyebrow ===== */
+.tr-eyebrow{
+  display:inline-flex; align-items:center; gap:12px;
+  font-family:var(--f-sans);
+  font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--sky-600);
+}
+.tr-eyebrow::before{content:''; width:28px; height:2px; background:currentColor; display:inline-block;}
+.tr-eyebrow.on-navy{color:var(--sun-500);}
+
+/* ===== Buttons ===== */
+.tr-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  font-family:var(--f-sans); font-weight:600; font-size:16px; line-height:1.1;
+  padding:15px 26px; border-radius:var(--r-lg);
+  border:1.5px solid transparent; cursor:pointer; white-space:nowrap;
+  text-decoration:none; transition:all .18s cubic-bezier(.4,0,.2,1);
+}
+.tr-btn-lg{font-size:17px; padding:18px 32px;}
+.tr-btn-primary{background:var(--navy-700); color:#fff; border-color:var(--navy-700);}
+.tr-btn-primary:hover{background:var(--navy-900); border-color:var(--navy-900); box-shadow:0 8px 20px rgba(20,25,58,.16);}
+.tr-btn-sun{background:var(--sun-500); color:var(--navy-900); border-color:var(--sun-500);}
+.tr-btn-sun:hover{background:var(--sun-600); border-color:var(--sun-600);}
+.tr-btn-onnavy{background:#fff; color:var(--navy-900); border-color:#fff;}
+.tr-btn-onnavy:hover{background:var(--sun-500); border-color:var(--sun-500);}
+
+/* ===== Pattern (navy scuro, fade da sx) ===== */
+.tr-pattern{
+  position:absolute; inset:0; pointer-events:none;
+  background-image:url('../assets/pattern.svg');
+  background-size:240px 240px; background-repeat:repeat;
+  opacity:.32;
+  -webkit-mask-image:linear-gradient(105deg,#000 0%,#000 28%,rgba(0,0,0,.45) 70%,transparent 100%);
+          mask-image:linear-gradient(105deg,#000 0%,#000 28%,rgba(0,0,0,.45) 70%,transparent 100%);
+}
+
+/* ===== Photo placeholder a strisce (fallback) ===== */
+.tr-photo-ph{
+  background-color:var(--bg-soft);
+  background-image:repeating-linear-gradient(45deg,
+    var(--bg-soft) 0,var(--bg-soft) 11px,
+    rgba(31,45,90,.05) 11px,rgba(31,45,90,.05) 13px);
+  border:1.5px dashed rgba(31,45,90,.20);
+  color:var(--ink-muted); font-family:var(--f-mono);
+  font-size:12px; letter-spacing:.04em; text-transform:uppercase;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+}
+
+/* ===== Mono number pill ===== */
+.tr-numpill{
+  font-family:var(--f-mono); font-weight:600; letter-spacing:.08em;
+  color:var(--navy-500);
+}
+
+/* image-slot fallback look while empty */
+image-slot{ background:var(--bg-soft); }
+
+/* =============================================================
+   Entrate al scroll — motion DS Triono
+   Base = stato finale visibile (print / reduced-motion mostrano il
+   contenuto). L'animazione parte da nascosto solo quando il root ha
+   .tr-playing E il motion è consentito.
+   ============================================================= */
+@media (prefers-reduced-motion: no-preference){
+  .tr-anim.tr-arm .a-item, .tr-anim.tr-arm .a-pop{ opacity:0; }
+  .tr-anim.tr-arm .a-line{ transform:scaleX(0); }
+  .tr-anim.tr-playing .a-item{
+    animation:trFadeUp .62s cubic-bezier(.16,1,.3,1) both;
+    animation-delay:var(--d,0s);
+  }
+  .tr-anim.tr-playing .a-pop{
+    animation:trPop .54s cubic-bezier(.34,1.56,.64,1) both;
+    animation-delay:var(--d,0s);
+  }
+  .tr-anim.tr-playing .a-line{
+    transform:scaleX(0); transform-origin:left center;
+    animation:trLine .8s cubic-bezier(.16,1,.3,1) both;
+    animation-delay:var(--d,0s);
+  }
+  /* safety: dopo la finestra d'entrata, fissa lo stato finale visibile
+     (protegge da ambienti che mettono in pausa il clock delle animazioni) */
+  .tr-anim.tr-done .a-item, .tr-anim.tr-done .a-pop{ opacity:1; transform:none; animation:none; }
+  .tr-anim.tr-done .a-line{ transform:none; animation:none; }
+}
+@keyframes trFadeUp{ from{opacity:0; transform:translateY(18px);} to{opacity:1; transform:none;} }
+@keyframes trPop{ from{opacity:0; transform:scale(.5);} to{opacity:1; transform:scale(1);} }
+@keyframes trLine{ from{transform:scaleX(0);} to{transform:scaleX(1);} }
+
+/* =============================================================
+   Ambient — micro-animazioni continue (sottili, gated)
+   ============================================================= */
+@media (prefers-reduced-motion: no-preference){
+  /* luce che scorre lungo il connettore = senso di percorso */
+  .tr-anim .a-line::after{
+    content:''; position:absolute; top:-1px; bottom:-1px; left:0; width:80px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent);
+    border-radius:2px;
+    animation:trFlow 4.2s cubic-bezier(.45,0,.2,1) 1.3s infinite;
+  }
+  .tr-pulse{ animation:trPulse 2.6s ease-in-out infinite; transform-origin:center; }
+  .tr-plus{ animation:trPulse 2.2s ease-in-out infinite; transform-origin:center; }
+  .tr-nudge{ animation:trNudge 1.7s cubic-bezier(.4,0,.2,1) infinite; }
+  .tr-cta{ animation:trBreath 3.6s ease-in-out infinite; }
+  .tr-drift{ animation:trDrift 60s linear infinite; }
+  /* nodi numerati: leggero respiro, scaglionato */
+  .tr-node{ animation:trBob 4s ease-in-out infinite; }
+  .tr-node:nth-child(2){ animation-delay:.5s; }
+  .tr-node:nth-child(3){ animation-delay:1s; }
+  .tr-node:nth-child(4){ animation-delay:1.5s; }
+}
+/* hover lift sulle card (interazione "durante") */
+.tr-card{ transition:box-shadow .24s cubic-bezier(.4,0,.2,1), transform .24s cubic-bezier(.4,0,.2,1); will-change:transform; }
+.tr-card:hover{ transform:translateY(-6px); box-shadow:var(--sh-lg); }
+.tr-card-ic{ transition:transform .26s cubic-bezier(.34,1.56,.64,1), background .24s ease, color .24s ease; }
+.tr-card:hover .tr-card-ic{ transform:scale(1.1) rotate(-5deg); }
+.tr-card-title{ transition:color .22s ease; }
+.tr-card:hover .tr-card-title{ color:var(--navy-600); }
+.tr-card-mock{ transition:transform .3s cubic-bezier(.16,1,.3,1); transform-origin:center bottom; }
+.tr-card:hover .tr-card-mock{ transform:scale(1.03); }
+
+@keyframes trFlow{ 0%{left:-80px; opacity:0;} 14%{opacity:.65;} 86%{opacity:.65;} 100%{left:100%; opacity:0;} }
+@keyframes trPulse{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.07);} }
+@keyframes trNudge{ 0%,100%{transform:translateX(0);} 50%{transform:translateX(4px);} }
+@keyframes trBreath{ 0%,100%{box-shadow:0 12px 28px rgba(5,14,63,.4);} 50%{box-shadow:0 18px 40px rgba(5,14,63,.58);} }
+@keyframes trDrift{ from{background-position:0 0;} to{background-position:240px 240px;} }
+@keyframes trBob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-3px);} }
+
+/* Replay control (solo anteprima canvas) */
+.tr-replay{
+  position:absolute; top:26px; right:80px; z-index:5;
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:var(--f-mono); font-size:11px; font-weight:600;
+  letter-spacing:.06em; text-transform:uppercase;
+  color:var(--navy-700); background:#fff;
+  border:1px solid var(--line); border-radius:var(--r-pill);
+  padding:8px 14px; cursor:pointer; box-shadow:var(--sh-xs);
+  transition:all .18s cubic-bezier(.4,0,.2,1);
+}
+.tr-replay:hover{ border-color:var(--navy-300); box-shadow:var(--sh-sm); }
+.tr-replay svg{ transition:transform .5s cubic-bezier(.16,1,.3,1); }
+.tr-replay:hover svg{ transform:rotate(-180deg); }
