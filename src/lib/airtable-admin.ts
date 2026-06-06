@@ -30,6 +30,7 @@ import {
   createPresenzaMaestro,
   mapGara,
   mapIscrizioneGara,
+  updateGenitoreAccountDisabilitato,
 } from "@/lib/airtable-portale";
 import { clerkClient } from "@clerk/nextjs/server";
 
@@ -1852,6 +1853,78 @@ export async function cambiaRuoloGenitore(
     const msg = clerkError instanceof Error ? clerkError.message : String(clerkError);
     throw new Error(
       `Cambio ruolo fallito su Clerk: ${msg}. Airtable ripristinato a ${ruoloPrecedente}.`,
+    );
+  }
+}
+
+// ─── EVO-008: Disabilita / Riabilita account (lifecycle admin) ──────────────
+
+/**
+ * Disabilita un account: Clerk `banUser` (autoritativo per il blocco login) +
+ * log su Airtable (ACCOUNT_DISABILITATO=true, DATA_DISABILITAZIONE=oggi).
+ *
+ * A differenza di `cambiaRuoloGenitore` NON serve rollback transazionale: lo
+ * stato di blocco è autoritativo su Clerk. Se il PATCH Airtable fallisce, il
+ * login è comunque bloccato → log warn non-bloccante, l'admin può ritentare.
+ *
+ * Guard self-disable AUTORITATIVO server-side: l'AUTH_USER_ID viene letto dal
+ * record Airtable (non dal client), così un client manomesso non può aggirarlo.
+ */
+export async function disabilitaAccountGenitore(
+  genitoreId: string,
+  currentClerkUserId: string | null,
+): Promise<void> {
+  const genitore = await getGenitoreByIdAdmin(genitoreId);
+  if (!genitore) throw new Error("Genitore non trovato");
+  const authUserId = genitore.fields.AUTH_USER_ID;
+  if (!authUserId) {
+    throw new Error(
+      "Utente senza account Clerk collegato — impossibile disabilitare.",
+    );
+  }
+  if (currentClerkUserId && authUserId === currentClerkUserId) {
+    throw new Error("Non puoi disabilitare il tuo stesso account.");
+  }
+
+  // Clerk first (autoritativo per il blocco)
+  const client = await clerkClient();
+  await client.users.banUser(authUserId);
+
+  // Airtable log — non-critico
+  try {
+    await updateGenitoreAccountDisabilitato(genitoreId, true);
+  } catch (err) {
+    console.warn(
+      "[disabilitaAccountGenitore] Clerk ban OK ma PATCH Airtable fallito:",
+      err,
+    );
+  }
+}
+
+/**
+ * Riabilita un account: Clerk `unbanUser` + reset log Airtable
+ * (ACCOUNT_DISABILITATO=false, DATA_DISABILITAZIONE vuota). Speculare a
+ * `disabilitaAccountGenitore`; PATCH Airtable non-critico.
+ */
+export async function riabilitaAccountGenitore(genitoreId: string): Promise<void> {
+  const genitore = await getGenitoreByIdAdmin(genitoreId);
+  if (!genitore) throw new Error("Genitore non trovato");
+  const authUserId = genitore.fields.AUTH_USER_ID;
+  if (!authUserId) {
+    throw new Error(
+      "Utente senza account Clerk collegato — impossibile riabilitare.",
+    );
+  }
+
+  const client = await clerkClient();
+  await client.users.unbanUser(authUserId);
+
+  try {
+    await updateGenitoreAccountDisabilitato(genitoreId, false);
+  } catch (err) {
+    console.warn(
+      "[riabilitaAccountGenitore] Clerk unban OK ma PATCH Airtable fallito:",
+      err,
     );
   }
 }
