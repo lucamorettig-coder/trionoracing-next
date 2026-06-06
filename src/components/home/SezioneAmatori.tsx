@@ -1,6 +1,6 @@
+import Image from "next/image";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Card, CardContent, CardTitle, CardBody } from "@/components/ui/card";
-import { PhotoPlaceholder } from "@/components/home/PhotoPlaceholder";
 
 export function SezioneAmatori() {
   return (
@@ -41,11 +41,15 @@ export function SezioneAmatori() {
         </div>
 
         <div className="mt-10 reveal reveal-delay-3">
-          <PhotoPlaceholder
-            aspect="wide"
-            caption="Squadra Triono Racing al traguardo"
-            description="Foto di gruppo del team amatori con maglia ufficiale, in occasione di una gara o di un raduno. Orientamento ultra-wide 21:9 per dare respiro panoramico."
-          />
+          <div className="photo-house relative aspect-[3/2] rounded-[var(--radius-2xl)] shadow-[var(--shadow-md)]">
+            <Image
+              src="/photos/amatori/squadra-amatori.jpg"
+              alt="La squadra amatori Triono Racing in maglia ufficiale, in sella alle mountain bike lungo una strada"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1280px"
+            />
+          </div>
         </div>
       </div>
     </section>
