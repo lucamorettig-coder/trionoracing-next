@@ -24,7 +24,7 @@ type OverlayPreset = "cta" | "hero" | "solid";
 
 const OVERLAYS: Record<OverlayPreset, string> = {
   cta: "linear-gradient(180deg, rgba(5,14,63,0.55) 0%, rgba(5,14,63,0.72) 55%, rgba(5,14,63,0.88) 100%)",
-  hero: "linear-gradient(180deg, rgba(5,14,63,0.35) 0%, rgba(5,14,63,0.40) 40%, rgba(5,14,63,0.85) 100%)",
+  hero: "linear-gradient(180deg, rgba(5,14,63,0.50) 0%, rgba(5,14,63,0.58) 40%, rgba(5,14,63,0.88) 100%)",
   solid: "linear-gradient(180deg, rgba(5,14,63,0.82) 0%, rgba(5,14,63,0.90) 60%, rgba(5,14,63,0.96) 100%)",
 };
 
