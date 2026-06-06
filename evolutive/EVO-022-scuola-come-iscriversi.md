@@ -283,3 +283,13 @@ _Da compilare in fase 8 dopo che Claude Code ha completato l'intero ciclo._
 - Rilevato pattern deploy: Vercel + GitHub, branch `main`, branch→PR→merge→deploy auto; `gh` disponibile.
 - Salvato `EVO-022-scuola-come-iscriversi/prompt-claude-code.md` (ciclo end-to-end completo, fonte design = `design-handoff/README.md`).
 - Stato evolutiva → **pronta per implementazione**.
+
+### [2026-06-06] Implementazione + quality gate + smoke dev
+
+- Branch `evo-022-scuola-come-iscriversi`. NEW `src/components/scuola/SezioneComeIscriversi.tsx` (Server Component, variante A); mount in `la-scuola/page.tsx` dopo Galleria, prima di CtaScuola.
+- Mockup inline (`MockRegister/MockIscrizione/MockCheckout`) `aria-hidden`; entrata `.reveal`/`reveal-delay` (reduced-motion safe); CTA sun → `/portale/iscrizioni`; link soft step 01 → `/contatti?motivo=scuola`; foto step 01 placeholder `public/photos/scuola/lezione-ciclodromo.jpg` (TODO swap reale).
+- **Fix lint cross-cutting**: aggiunto `evolutive/**` agli ignore di `eslint.config.mjs` (i prototipi `.jsx` del handoff Claude Design non sono sorgente lintabile — usano `TrIcon`/setState-in-effect).
+- Token: `sun-200` inesistente nel DS → usato custom `#F2E89A` (bordo card invito, come da handoff).
+- Quality gate: **typecheck ✅ · lint ✅ (0 errori) · build ✅** (`/la-scuola` resta `○ Static` ISR 10m, 48/48 pagine).
+- Smoke dev su `localhost:3001/la-scuola`: contenuti SSR, ordine funnel, link verificati; **OK utente**.
+- Nota tooling: il preview MCP (browser interno) restava bloccato su `chrome-error://` e non rinavigava → self-check visivo saltato, verifica funzionale via curl + smoke utente.
