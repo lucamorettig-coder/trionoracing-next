@@ -274,13 +274,21 @@ Vedi [`prompt-claude-code.md`](EVO-008-migrazione-clerk/prompt-claude-code.md). 
 _Da compilare in fase 8 dopo che Claude Code ha completato l'intero ciclo + esecuzione script migrazione in coordinamento con l'utente._
 
 - **URL produzione**: `https://trionoracing-next.vercel.app/portale/admin/migrazione` + `https://trionoracing-next.vercel.app/portale/admin/genitori/[id]` (banner + bottoni)
-- **Pull Request**: _da compilare_
-- **Commit di merge**: _da compilare_
-- **Data go-live**: _da compilare_
-- **Data esecuzione migrazione**: _da compilare_
+- **Pull Request**: [#39](https://github.com/lucamorettig-coder/trionoracing-next/pull/39) (squash)
+- **Commit di merge**: `5474fb1`
+- **Deploy produzione**: `dpl_AASfpLDonEeXRFmVQ2sH4CkhZZbS` — READY (2026-06-06)
+- **Data go-live (codice)**: 2026-06-06
+- **Data esecuzione migrazione**: _da compilare — Step I-bis, finestra coordinata_
 - **Numero utenti migrati**: _da compilare_
 - **Report verifica**: [`verifica.md`](EVO-008-migrazione-clerk/verifica.md)
 - **Report migrazione**: `scripts/migrate-clerk/output/migration-report-{ISO}.json` (gitignored, conservato localmente)
+
+### Stato
+
+Codice **mergeato e in produzione** (2026-06-06). Quality gate + smoke automatico
+dev/prod OK. **Manca solo** (per natura, fuori dal merge): smoke UI interattivo e
+l'esecuzione coordinata degli script di migrazione (export → dry-run → pilot →
+full run) con `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` da aggiungere a `.env.local`.
 
 ### Apprendimenti riusabili
 
