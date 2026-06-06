@@ -4,7 +4,7 @@
 - **Slug**: auth-portale
 - **Data inizio**: 2026-06-06
 - **Data fine**: _da compilare a chiusura_
-- **Stato**: in implementazione
+- **Stato**: in PR
 - **Tipo**: refactoring UX (restyle) + nuova feature (pagina recupero password)
 - **Area**: area auth (portale, fuori dal route group autenticato)
 - **Priorità**: media
@@ -190,7 +190,7 @@ Non applicabile come handoff separato: l'implementazione è eseguita direttament
 _Da compilare in fase 8 dopo il ciclo completo._
 
 - **URL produzione**: _{url}_
-- **Pull Request**: _{link}_
+- **Pull Request**: [#53](https://github.com/lucamorettig-coder/trionoracing-next/pull/53)
 - **Commit di merge**: _{hash}_
 - **Data go-live**: _{YYYY-MM-DD}_
 
@@ -206,3 +206,6 @@ _Da compilare in fase 8 dopo il ciclo completo._
 
 ### [2026-06-06] Fasi 0-5 + kick-off implementazione
 Bootstrap, requisiti (3 domande utente), ambito, as-is, WBS e verifica coerenza consolidati in sessione. Design già fornito da Claude Design (Fase 6 = ricreazione fedele, skip generazione). Utente ha scelto "Implementa ora" → si procede direttamente su branch `feat/evo-023-auth-portale`.
+
+### [2026-06-07] Implementazione + smoke + PR
+Implementate le 3 pagine. **Scoperta**: `@clerk/nextjs ^7` usa la Future API di Clerk (`useSignIn` → `{ signIn, fetchStatus }`, metodi che ritornano `{ error }`, `signIn.finalize()` al posto di `setActive`) — la pagina recupero è scritta su questa API (`create → resetPasswordEmailCode.sendCode/verifyCode/submitPassword → finalize`). Quality gate verdi (tsc/eslint/build). Smoke dev su :3010: login OK, recupero step 1→2 (invio email Clerk) OK; **fix** durante smoke: celle OTP traboccavano (flex min-width:auto) → grid `grid-cols-6` + input `w-full min-w-0`. PR [#53](https://github.com/lucamorettig-coder/trionoracing-next/pull/53) aperta verso `main` (in attesa OK merge). Stato → in PR.
