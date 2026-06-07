@@ -8,6 +8,7 @@ import {
   getGareFuture,
   getIscrizioniGareByGenitore,
 } from "@/lib/airtable-portale";
+import BackLink from "@/components/portale/BackLink";
 import FiltriGare from "@/components/portale/gare/FiltriGare";
 import CardIscrizioneGara from "@/components/portale/gare/CardIscrizioneGara";
 import { formatDateIT } from "@/lib/portale-utils";
@@ -46,6 +47,7 @@ export default async function GarePage() {
   if (gare.length === 0) {
     return (
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12">
+        <BackLink href="/portale" label="Torna alla dashboard" />
         <h1 className="text-2xl lg:text-3xl font-bold text-ink mb-2">Calendario gare</h1>
         <p className="text-ink-muted text-sm max-w-[540px]">
           Gare giovanili a cui i tuoi figli possono partecipare. Sezione &quot;In evidenza&quot; = gare ufficiali della scuola.
@@ -63,6 +65,7 @@ export default async function GarePage() {
 
   return (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12">
+      <BackLink href="/portale" label="Torna alla dashboard" />
       <h1 className="text-2xl lg:text-3xl font-bold text-ink mb-2">Calendario gare</h1>
       <p className="text-ink-muted text-sm max-w-[540px]">
         Gare giovanili a cui i tuoi figli possono partecipare. Sezione &quot;In evidenza&quot; = gare ufficiali della scuola.
