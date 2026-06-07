@@ -1,6 +1,7 @@
 import { SectionHeader } from "@/components/ui/section-header";
 import { Button } from "@/components/ui/button";
 import { MapPin, ArrowUpRight } from "@/components/ui/icons";
+import { MapEmbed } from "./MapEmbed";
 
 const LAT = 42.550632;
 const LNG = 12.636542;
@@ -23,16 +24,7 @@ export function ComeRaggiungerci() {
         <div className="mt-12 grid lg:grid-cols-12 gap-8 items-stretch">
           <div className="lg:col-span-7 reveal reveal-delay-1">
             <div className="rounded-[var(--radius-2xl)] overflow-hidden border border-navy-100 shadow-sm h-full min-h-[360px]">
-              <iframe
-                title="Mappa Ciclodromo Renato Perona, Terni"
-                src={EMBED_URL}
-                width="100%"
-                height="100%"
-                style={{ border: 0, display: "block", minHeight: 360 }}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                allowFullScreen
-              />
+              <MapEmbed embedUrl={EMBED_URL} />
             </div>
           </div>
 
