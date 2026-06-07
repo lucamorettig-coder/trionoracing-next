@@ -28,7 +28,7 @@
 | EVO-020 | admin-lezioni-maestri-genitori | Admin lezioni A-8 + presenze maestri A-9 con **gestione rimborsi maestri** (nuova tabella PRESENZE_MAESTRI) + genitori A-10 + cambio ruolo **Clerk-sync transazionale con rollback** | 2026-05-26 | 2026-05-26 | completata | https://trionoracing-next.vercel.app/portale/admin/lezioni | [link](evolutive/EVO-020-admin-lezioni-maestri-genitori.md) |
 | EVO-022 | scuola-come-iscriversi | Sezione informativa "Cosa occorre per iscriversi" su /la-scuola (funnel 4 step + mockup illustrati + CTA → /portale/iscrizioni) | 2026-06-06 | 2026-06-06 | completata | https://trionoracing-next.vercel.app/la-scuola | [link](evolutive/EVO-022-scuola-come-iscriversi.md) |
 | EVO-023 | auth-portale | Restyle pagine auth portale (login + registrati split-screen brand panel su `<SignIn>`/`<SignUp>` Clerk + appearance raffinata + localizzazione IT) + **nuova** pagina recupero-password custom a step | 2026-06-06 | — | in PR | — | [link](evolutive/EVO-023-auth-portale.md) |
-| EVO-024 | privacy-condizioni-analytics | Documenti legali GDPR: Privacy da bozza→definitiva + **nuova** Condizioni di Servizio (sito+portale) + **nuovo** banner cookie consent custom (Consent Mode v2) + Google Analytics 4 (`G-RMGEYC52J0`) post-consenso | 2026-06-07 | — | pronta per implementazione | — | [link](evolutive/EVO-024-privacy-condizioni-analytics.md) |
+| EVO-024 | privacy-condizioni-analytics | Documenti legali GDPR: Privacy da bozza→definitiva + **nuova** Condizioni di Servizio (sito+portale) + **nuovo** banner cookie consent custom (Consent Mode v2) + Google Analytics 4 (`G-RMGEYC52J0`) post-consenso | 2026-06-07 | 2026-06-07 | completata | https://trionoracing-next.vercel.app | [link](evolutive/EVO-024-privacy-condizioni-analytics.md) |
 
 ## Stati possibili
 
@@ -43,6 +43,9 @@
 - **ombrello** — evolutiva contenitore con sotto-evolutive collegate
 
 ## Cronologia narrativa
+
+**2026-06-07 — EVO-024 completata e in produzione (Privacy/Cookie/Condizioni + cookie consent + GA4)**
+Pianificazione (Fasi 1-7) in questa sessione via `evolutive-workflow`, implementazione in sessione dedicata (PR #56 `ae1c57e`), chiusura (Fase 8) qui. Live su https://trionoracing-next.vercel.app. Deliverable: 3 documenti legali definitivi in-house GDPR-structured (`/privacy` riscritta, `/cookie` aggiornata, **nuova** `/condizioni` con dati reali titolare A.S.D. CIEMME — P.IVA 01535700551, sede Via Cavour 1 Terni, rappr. Giorgio Roselli, email unificata `trionoracingteam@hotmail.com`), pagine da bozza→`index:true` + sitemap. **Motore di consenso custom nuovo del progetto** (`src/lib/consent.ts` + `src/components/consent/*`): banner non bloccante anti dark-pattern + **Google Consent Mode v2** (default `denied` via `beforeInteractive`, GA4 `G-RMGEYC52J0` montato `afterInteractive` **solo a consenso**), nuovo micro-primitivo `Switch`, gating Google Maps (placeholder click-to-load), stato via `useSyncExternalStore` (no flash SSR, lint-clean). **Bonus**: tabella Airtable `Impostazioni Sito` + `src/lib/site-settings.ts` (SAFE+ISR, pattern EVO-021) → contatti Scuola editabili senza deploy. Testi legali redatti a monte in `content/` (separazione redazione/wiring). Verifica ✅ coerente (nessun ❌), 9/9 criteri, smoke dev+prod ok. **Promemoria utente**: impostare `NEXT_PUBLIC_GA_MEASUREMENT_ID=G-RMGEYC52J0` su Vercel (Prod+Preview) + redeploy per attivare GA (`NEXT_PUBLIC_*` inlined a build-time). 12 pattern nuovi in AGENTS.md. Validazione legale finale resta al titolare.
 
 **2026-06-06 — Kick-off EVO-008 + pianificazione completata (Fasi 0-7)**
 Ripresa di EVO-008 (era "in pianificazione" dal 2026-05-21 come ultimo tassello Fase 3 portale, mai avviata). Fasi 0-7 chiuse in sessione. Sintesi:

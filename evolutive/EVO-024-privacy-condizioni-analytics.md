@@ -243,7 +243,29 @@ Testi legali pre-redatti (alta qualità, dati reali) in [`content/`](EVO-024-pri
 
 ## 8. Verifica e go-live
 
-_Da compilare in fase 8._
+- **URL produzione:** https://trionoracing-next.vercel.app — `/privacy` · `/cookie` · `/condizioni` · `/contatti` · `/` tutte 200.
+- **Pull Request:** [#56](https://github.com/lucamorettig-coder/trionoracing-next/pull/56) (squash merge `ae1c57e` su `main`).
+- **Commit pianificazione:** PR [#54](https://github.com/lucamorettig-coder/trionoracing-next/pull/54) `4f1d29f` (docs).
+- **Data go-live:** 2026-06-07.
+- **Report verifica:** [`verifica.md`](EVO-024-privacy-condizioni-analytics/verifica.md).
+
+### Esito sintetico
+
+| Dimensione | Stato | Note |
+|------------|-------|------|
+| Design system | ✅ | Token/primitivi esistenti + nuovo micro-primitivo `Switch`; 6 vincoli `DS-NOTES-consent.md` rispettati. |
+| Localizzazione (i18n) | ✅ n/a | IT-only. |
+| SEO | ✅ | 3 legali `index:true` + canonical + Breadcrumb; sitemap +3; rimossi banner "Bozza". |
+| Architettura | ✅ | `src/lib/consent.ts` + `src/components/consent/*`; Consent Mode default `denied` (`beforeInteractive`), GA `afterInteractive` gated; stato via `useSyncExternalStore`. |
+| Fedeltà ai visual | ✅ | Banner/modal/placeholder Maps coerenti col mockup. |
+| Criteri di accettazione | ✅ | 9/9. |
+| Smoke test dev | ✅ | banner / rifiuto=0 Google / accetto=GA+`_ga` / preferenze / Maps gating / 3 pagine / email. |
+| Smoke test produzione | ✅ | 200, no "Bozza", consent-mode default denied, GA assente pre-consenso, sitemap ok. |
+
+**Esito complessivo: ✅ coerente, nessun ❌.** Unica nota operativa: impostare `NEXT_PUBLIC_GA_MEASUREMENT_ID` su Vercel (vedi §Note del report) — degrado sicuro se assente.
+
+### Bonus emerso in implementazione
+Tabella Airtable **`Impostazioni Sito`** (key→value, PROD+DEV) + helper `src/lib/site-settings.ts` (SAFE + ISR, pattern `sfondi-video.ts` EVO-021): contatti/info del sito (es. telefono Scuola `329 204 0821`, referente) **editabili senza deploy** (visibili in ~5-10 min via ISR).
 
 ---
 
@@ -287,3 +309,13 @@ _Da compilare in fase 8._
 ### [2026-06-07] Fase 7 — Prompt Claude Code generato → stato "pronta per implementazione"
 - Redatti i 3 testi legali completi in `content/` (privacy/cookie/condizioni) con dati reali del titolare.
 - `prompt-claude-code.md` (~17 KB) autocontenuto: WBS 5 macro / 17 task, spec tecnica motore consenso + Consent Mode v2 + GA gating + Maps gating, ciclo end-to-end A-K, criteri accettazione verificabili, pattern deploy + nota env build-time.
+
+### [2026-06-07] Implementazione (sessione dedicata) — PR #56 mergeata
+- Branch `evo-024-...` → 8 commit → PR [#56](https://github.com/lucamorettig-coder/trionoracing-next/pull/56) squash merge `ae1c57e`. Integrato anche il fix #55 (clerk-webhook secret rename) nel branch prima della PR.
+- Live su https://trionoracing-next.vercel.app. Smoke dev + smoke prod ✅.
+
+### [2026-06-07] Fase 8 — Consolidamento completato
+- Letto `verifica.md` (✅ coerente, nessun ❌). Sezione 8 compilata.
+- `memory.md` → stato **completata** + data fine + URL. Aggiunto record narrativo.
+- `AGENTS.md` aggiornato con i pattern EVO-024 (consent engine + Consent Mode v2, anti dark-pattern, gating terze parti, env build-time, `Switch` DS, dati legali centralizzati, `Impostazioni Sito`/`site-settings.ts`, `useSyncExternalStore`).
+- Promemoria residuo utente: env `NEXT_PUBLIC_GA_MEASUREMENT_ID=G-RMGEYC52J0` su Vercel (Prod+Preview) + redeploy per attivare GA (post-consenso).
