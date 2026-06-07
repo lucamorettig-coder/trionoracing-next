@@ -1138,6 +1138,65 @@ export async function getLezioneById(id: string): Promise<Lezione | null> {
 }
 
 /**
+ * Cerca le lezioni già registrate per una stessa sessione (stesso giorno +
+ * stesso TIPO_SESSIONE — che già codifica la disciplina MTB/BDC). Usata per
+ * rilevare duplicati quando un maestro carica una presenza per una lezione che
+ * un altro maestro (o l'admin) ha già caricato. Query globale su tutte le
+ * lezioni, non limitata a quelle del maestro corrente. Ritorna [] su errore.
+ */
+export async function getLezioniConflitto(
+  data: string,
+  tipo: TipoSessione,
+): Promise<Lezione[]> {
+  if (!data || !tipo) return [];
+  try {
+    const formula = encodeURIComponent(
+      `AND(DATETIME_FORMAT({DATA},'YYYY-MM-DD')="${data}", {TIPO_SESSIONE}="${tipo}")`,
+    );
+    const res = await airtableFetch(`TABELLA_LEZIONI?filterByFormula=${formula}`);
+    const json = await res.json();
+    return (json.records ?? []) as Lezione[];
+  } catch (err) {
+    console.warn("[getLezioniConflitto] query failed:", err);
+    return [];
+  }
+}
+
+/**
+ * Aggiunge un maestro fra i MAESTRI_PRESENTI di una lezione esistente
+ * (idempotente) e rigenera la sua presenza via `generatePresenzeForLezione`
+ * (a sua volta idempotente). Usata quando un maestro sceglie "Aggiungimi a
+ * questa lezione" invece di crearne una duplicata. Ritorna la lezione aggiornata.
+ */
+export async function addMaestroToLezione(
+  lezioneId: string,
+  maestroId: string,
+): Promise<Lezione> {
+  const existing = await getLezioneById(lezioneId);
+  if (!existing) throw new Error("Lezione non trovata");
+
+  const presenti = new Set(existing.fields.MAESTRI_PRESENTI ?? []);
+  if (presenti.has(maestroId)) {
+    // Già presente: assicura comunque l'esistenza della presenza (idempotente).
+    await generatePresenzeForLezione(existing);
+    return existing;
+  }
+
+  presenti.add(maestroId);
+  const res = await airtableFetch(`TABELLA_LEZIONI/${lezioneId}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      fields: stripLezioneReadOnlyFields({
+        MAESTRI_PRESENTI: Array.from(presenti),
+      }),
+    }),
+  });
+  const updated: Lezione = await res.json();
+  await generatePresenzeForLezione(updated);
+  return updated;
+}
+
+/**
  * Crea una nuova lezione.
  * Set automatici: MAESTRO_COMPILATORE = [maestroCompilatoreId],
  * DATA_COMPILAZIONE = now (ISO), PUBLISHED = true.

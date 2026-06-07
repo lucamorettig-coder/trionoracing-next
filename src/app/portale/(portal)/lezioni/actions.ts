@@ -10,12 +10,16 @@ import {
   getMaestroByGenitoreId,
   getGaraById,
   generatePresenzeForGara,
+  getLezioniConflitto,
+  addMaestroToLezione,
+  getAllMaestriAttivi,
   ATTIVITA_SVOLTE_VALUES,
   TIPO_SESSIONE_VALUES,
   type AttivitaSvolta,
   type Lezione,
   type TipoSessione,
 } from "@/lib/airtable-portale";
+import type { LezioneConflittoDTO } from "./actions-types";
 
 interface CurrentMaestro {
   maestroId: string;
@@ -136,6 +140,63 @@ export async function actionCaricaPresenza(formData: FormData): Promise<void> {
   revalidatePath("/portale/lezioni");
   revalidatePath("/portale");
   redirect("/portale/lezioni?success=1");
+}
+
+/**
+ * Rileva lezioni già caricate per la stessa sessione (stesso giorno + stesso
+ * TIPO_SESSIONE). Chiamata dal form quando data + tipo sono selezionati, per
+ * proporre al maestro di aggiungersi a una lezione esistente invece di crearne
+ * un duplicato. Ritorna [] se non c'è conflitto o se l'utente non è maestro.
+ */
+export async function checkConflittoLezione(
+  data: string,
+  tipo: string,
+): Promise<LezioneConflittoDTO[]> {
+  if (!data || !TIPO_SET.has(tipo)) return [];
+  let maestroId: string;
+  try {
+    ({ maestroId } = await getCurrentMaestro());
+  } catch {
+    return [];
+  }
+
+  const lezioni = await getLezioniConflitto(data, tipo as TipoSessione);
+  if (lezioni.length === 0) return [];
+
+  const maestri = await getAllMaestriAttivi();
+  const nomeById = new Map(
+    maestri.map((m) => [
+      m.id,
+      `${m.fields.NOME_MAESTRO} ${m.fields.COGNOME_MAESTRO}`.trim(),
+    ]),
+  );
+
+  return lezioni.map((l) => ({
+    id: l.id,
+    tipoLabel: l.fields.TIPO_SESSIONE ?? "",
+    nBambini: l.fields.BAMBINI_PRESENTI?.length ?? 0,
+    compilatoriNomi: (l.fields.MAESTRO_COMPILATORE ?? []).map(
+      (id) => nomeById.get(id) ?? "Maestro",
+    ),
+    giaPresente: (l.fields.MAESTRI_PRESENTI ?? []).includes(maestroId),
+  }));
+}
+
+/**
+ * "Aggiungimi a questa lezione": aggiunge il maestro corrente ai presenti di una
+ * lezione esistente (idempotente) invece di crearne una duplicata, poi
+ * reindirizza al dettaglio. `JOIN_LEZIONE_ID` arriva dal bottone formAction.
+ */
+export async function actionJoinLezione(formData: FormData): Promise<void> {
+  const lezioneId = String(formData.get("JOIN_LEZIONE_ID") ?? "").trim();
+  if (!lezioneId) redirect("/portale/lezioni/nuova?error=missing-lezione");
+  const { maestroId } = await getCurrentMaestro();
+
+  await addMaestroToLezione(lezioneId, maestroId);
+  revalidatePath("/portale/lezioni");
+  revalidatePath(`/portale/lezioni/${lezioneId}`);
+  revalidatePath("/portale");
+  redirect(`/portale/lezioni/${lezioneId}?joined=1`);
 }
 
 /** Aggiorna una lezione esistente (guard 30gg + ownership lato libreria). */
