@@ -74,7 +74,7 @@ export default async function LezioniPage({ searchParams }: SearchParams) {
         <Button asChild variant="primary" size="md">
           <Link href="/portale/lezioni/nuova">
             <Plus className="w-4 h-4" />
-            Registra lezione
+            Carica presenza
           </Link>
         </Button>
       </header>
@@ -82,7 +82,7 @@ export default async function LezioniPage({ searchParams }: SearchParams) {
       {success && (
         <div className="flex items-center gap-3 rounded-[var(--radius-lg)] border border-grass-100 bg-grass-50 text-grass-700 px-4 py-3">
           <CheckCircle2 className="w-5 h-5 shrink-0" />
-          <p className="text-sm font-medium">Lezione salvata con successo.</p>
+          <p className="text-sm font-medium">Presenza salvata con successo.</p>
         </div>
       )}
 
@@ -97,7 +97,7 @@ export default async function LezioniPage({ searchParams }: SearchParams) {
           <Button asChild variant="primary" size="md" className="mt-2">
             <Link href="/portale/lezioni/nuova">
               <Plus className="w-4 h-4" />
-              Registra lezione
+              Carica presenza
             </Link>
           </Button>
         </div>

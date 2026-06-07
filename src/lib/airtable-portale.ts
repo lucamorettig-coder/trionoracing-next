@@ -1355,6 +1355,18 @@ export async function getGareFuture(today: string): Promise<Gara[]> {
   return data.records.map(mapGara);
 }
 
+/**
+ * Tutte le gare (future + passate), ordinate per data decrescente. Usato dal
+ * selettore gara nel form "Carica presenza" (EVO-025): per registrare presenze
+ * spesso serve una gara già passata.
+ */
+export async function getAllGareForSelector(): Promise<Gara[]> {
+  const path = `${encodeURIComponent(GARE_TABLE)}?sort[0][field]=Data&sort[0][direction]=desc&pageSize=100`;
+  const res = await airtableFetch(path);
+  const data: { records: GaraRecord[] } = await res.json();
+  return data.records.map(mapGara);
+}
+
 /** Singola gara per ID. Null se non trovata. */
 export async function getGaraById(garaId: string): Promise<Gara | null> {
   try {

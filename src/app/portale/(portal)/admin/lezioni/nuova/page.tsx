@@ -1,22 +1,24 @@
 import {
   getAllMaestriAttivi,
   getBambiniAttiviPerDisciplina,
+  getAllGareForSelector,
 } from "@/lib/airtable-portale";
 import { requireAdmin } from "@/lib/auth-admin";
-import FormLezione from "@/components/portale/lezioni/FormLezione";
+import FormCaricaPresenza from "@/components/portale/presenze/FormCaricaPresenza";
 import BackLink from "@/components/portale/BackLink";
 import { actionCreateLezioneAdmin } from "../actions";
 
 export const metadata = {
-  title: "Registra lezione · Admin · Portale Triono Racing",
+  title: "Carica presenza · Admin · Portale Triono Racing",
 };
 
-export default async function NuovaLezioneAdminPage() {
+export default async function NuovaPresenzaAdminPage() {
   await requireAdmin();
 
-  const [maestri, bambini] = await Promise.all([
+  const [maestri, bambini, gare] = await Promise.all([
     getAllMaestriAttivi(),
     getBambiniAttiviPerDisciplina(),
+    getAllGareForSelector(),
   ]);
 
   return (
@@ -26,20 +28,20 @@ export default async function NuovaLezioneAdminPage() {
         Area Admin
       </p>
       <h1 className="text-2xl lg:text-3xl font-bold text-ink mt-1 mb-2">
-        Registra una lezione
+        Carica presenza
       </h1>
       <p className="text-ink-muted text-sm mb-8 max-w-[640px]">
-        Registra una lezione tenuta dai maestri. Seleziona i maestri presenti:
-        le presenze maestro verranno generate automaticamente.
+        Registra una lezione o la presenza a una gara. Le presenze maestro
+        vengono scritte sulla tabella presenze con il rimborso corretto.
       </p>
 
-      <FormLezione
+      <FormCaricaPresenza
         action={actionCreateLezioneAdmin}
         maestri={maestri}
         bambini={bambini}
+        gare={gare}
         currentMaestroId=""
         admin
-        submitLabel="Salva lezione"
         cancelHref="/portale/admin/lezioni"
       />
     </div>

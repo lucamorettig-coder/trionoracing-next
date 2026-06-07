@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth-admin";
 import {
   createLezione,
+  getGaraById,
+  generatePresenzeForGara,
   ATTIVITA_SVOLTE_VALUES,
   TIPO_SESSIONE_VALUES,
   type AttivitaSvolta,
@@ -52,8 +54,28 @@ function parseLezioneFromForm(formData: FormData): Partial<Lezione["fields"]> {
  */
 export async function actionCreateLezioneAdmin(formData: FormData): Promise<void> {
   await requireAdmin();
-  const fields = parseLezioneFromForm(formData);
+  const modo = String(formData.get("MODO") ?? "lezione").trim();
 
+  if (modo === "gara") {
+    const garaId = String(formData.get("GARA_ID") ?? "").trim();
+    if (!garaId) redirect("/portale/admin/lezioni/nuova?error=missing-gara");
+    const maestri = formData
+      .getAll("MAESTRI_PRESENTI")
+      .map(String)
+      .filter(Boolean);
+    if (maestri.length === 0) {
+      redirect("/portale/admin/lezioni/nuova?error=missing-maestro");
+    }
+    const gara = await getGaraById(garaId);
+    if (!gara) redirect("/portale/admin/lezioni/nuova?error=gara-not-found");
+    await generatePresenzeForGara(garaId, gara.data, maestri);
+    revalidatePath("/portale/admin/lezioni");
+    revalidatePath("/portale/admin/presenze-maestri");
+    redirect("/portale/admin/lezioni?success=1");
+  }
+
+  // modo lezione
+  const fields = parseLezioneFromForm(formData);
   if (!fields.DATA) {
     redirect("/portale/admin/lezioni/nuova?error=missing-data");
   }

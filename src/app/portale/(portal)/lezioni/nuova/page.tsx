@@ -1,22 +1,22 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import {
   getGenitoreByClerkId,
   getMaestroByGenitoreId,
   getAllMaestriAttivi,
   getBambiniAttiviPerDisciplina,
+  getAllGareForSelector,
 } from "@/lib/airtable-portale";
-import FormLezione from "@/components/portale/lezioni/FormLezione";
+import FormCaricaPresenza from "@/components/portale/presenze/FormCaricaPresenza";
 import SezioneMaestroNonCollegato from "@/components/portale/lezioni/SezioneMaestroNonCollegato";
-import { actionCreateLezione } from "../actions";
+import BackLink from "@/components/portale/BackLink";
+import { actionCaricaPresenza } from "../actions";
 
 export const metadata = {
-  title: "Nuova lezione · Portale Triono Racing",
+  title: "Carica presenza · Portale Triono Racing",
 };
 
-export default async function NuovaLezionePage() {
+export default async function NuovaPresenzaPage() {
   const { userId } = await auth();
   if (!userId) redirect("/portale/login");
 
@@ -32,39 +32,33 @@ export default async function NuovaLezionePage() {
     );
   }
 
-  const [maestri, bambini] = await Promise.all([
+  const [maestri, bambini, gare] = await Promise.all([
     getAllMaestriAttivi(),
-    // Default: tutti i bambini attivi (no filtro disciplina). Filtro UX-only
-    // si applica con un selettore in pagina futuro — per ora mostriamo tutti.
     getBambiniAttiviPerDisciplina(),
+    getAllGareForSelector(),
   ]);
 
   return (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12">
-      <Link
-        href="/portale/lezioni"
-        className="inline-flex items-center gap-1 text-sm text-ink-muted hover:text-navy-700 mb-4"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Torna alle lezioni
-      </Link>
+      <BackLink href="/portale/lezioni" label="Torna alle lezioni" />
       <p className="text-eyebrow uppercase tracking-widest text-ink-muted font-mono">
         Area maestro
       </p>
       <h1 className="text-2xl lg:text-3xl font-bold text-ink mt-1 mb-2">
-        Registra una nuova lezione
+        Carica presenza
       </h1>
       <p className="text-ink-muted text-sm mb-8 max-w-[640px]">
-        Compila i campi per tracciare la lezione. Le note pubbliche saranno
-        visibili ai genitori nell&apos;area riservata.
+        Registra una lezione oppure la tua presenza a una gara. Le note pubbliche
+        della lezione saranno visibili ai genitori.
       </p>
 
-      <FormLezione
-        action={actionCreateLezione}
+      <FormCaricaPresenza
+        action={actionCaricaPresenza}
         maestri={maestri}
         bambini={bambini}
+        gare={gare}
         currentMaestroId={maestro.id}
-        submitLabel="Salva lezione"
+        cancelHref="/portale/lezioni"
       />
     </div>
   );
