@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Check } from "@/components/ui/icons";
+import { CONTACT_EMAIL } from "@/lib/seo";
 
 type Motivo = "Scuola di Ciclismo" | "Tesseramento Amatori" | "Marathon 209" | "Altro";
 
@@ -114,10 +115,10 @@ export function ContactForm() {
           Abbiamo ricevuto la tua richiesta. Ti rispondiamo entro 2–3 giorni dall&apos;email
           che hai indicato. In caso di urgenze, scrivici direttamente a{" "}
           <a
-            href="mailto:info@trionoracing.it"
+            href={`mailto:${CONTACT_EMAIL}`}
             className="font-semibold text-navy-700 underline underline-offset-4"
           >
-            info@trionoracing.it
+            {CONTACT_EMAIL}
           </a>
           .
         </p>
