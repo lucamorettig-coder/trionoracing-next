@@ -219,19 +219,35 @@ async function main(): Promise<void> {
         await withRetry(() => clerk.users.banUser(newUser.id), "banUser");
       }
 
-      // 6. Tag Airtable
-      const tag = await tagGenitoreAsMigrated(email, u.id, false);
+      // 6. Tag Airtable — best-effort non-bloccante.
+      // L'utente Clerk è già creato (step 4) e non vogliamo rollback cross-sistema:
+      // se il PATCH Airtable fallisce, log warn e prosegui — l'admin può
+      // ritaggare manualmente o eseguire un secondo run idempotente.
+      // Pattern: EVO-020 generatePresenzeForLezione.
+      let tagged = false;
+      let tagReason: string | undefined;
+      try {
+        const tag = await tagGenitoreAsMigrated(email, u.id, false);
+        tagged = tag.tagged;
+        tagReason = tag.reason;
+      } catch (tagErr) {
+        const msg = tagErr instanceof Error ? tagErr.message : String(tagErr);
+        console.warn(
+          `   ⚠️ tag Airtable fallito (utente Clerk ${newUser.id} resta valido): ${msg}`,
+        );
+        tagReason = "tag-error";
+      }
 
       results.push({
         email,
         status: "created",
         clerkId: newUser.id,
         banned: isBanned,
-        tagged: tag.tagged,
-        tagReason: tag.reason,
+        tagged,
+        tagReason,
       });
       console.log(
-        `${prefix} → creato ${newUser.id} (role=${role}, banned=${isBanned}, tagged=${tag.tagged})`,
+        `${prefix} → creato ${newUser.id} (role=${role}, banned=${isBanned}, tagged=${tagged})`,
       );
 
       // 7. Rate limiting: Clerk ~20 req/s, Airtable 5 req/s
