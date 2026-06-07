@@ -96,6 +96,27 @@ export async function deleteGaraAction(id: string): Promise<DeleteGaraActionResu
   }
 }
 
+/**
+ * EVO-025: toggle "in evidenza" leggero, azionabile inline dalla DataTable gare.
+ * Patch del solo campo IN_EVIDENZA (whitelist `stripGaraReadOnly`) — niente form
+ * completo, niente hook presenze. Idempotente lato Airtable.
+ */
+export async function toggleInEvidenzaAction(
+  id: string,
+  value: boolean,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  await requireAdmin();
+  try {
+    await updateGara(id, { IN_EVIDENZA: value });
+    revalidatePath("/portale/admin/gare");
+    revalidatePath("/portale/gare");
+    return { ok: true };
+  } catch (err) {
+    console.error("[evo-025] toggleInEvidenzaAction", err);
+    return { ok: false, error: err instanceof Error ? err.message : "Errore sconosciuto" };
+  }
+}
+
 export async function approvaIscrizioneAction(id: string): Promise<void> {
   await requireAdmin();
   await updateIscrizioneGara(id, "Confermata");

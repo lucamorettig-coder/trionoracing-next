@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Login · Portale Triono Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+/* ============================================================
+   Page-scoped layout (container-query driven, NOT viewport)
+   ============================================================ */
+
+.auth-page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* === Mobile default (<900cqi) === */
+.auth-split { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.auth-brand {
+  background: var(--navy-900);
+  color: #fff;
+  padding: 24px 20px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.auth-brand-inner { position: relative; z-index: 2; }
+.auth-brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0;
+}
+.auth-brand-logo .mark {
+  width: 36px; height: 36px;
+  background: var(--sun-500);
+  color: var(--navy-900);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px;
+}
+.auth-brand-logo .name {
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.auth-brand-logo .sub {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: rgba(255,255,255,.55);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+.auth-brand-headline {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  margin: 18px 0 6px;
+}
+.auth-brand-headline .accent { color: var(--sun-500); }
+.auth-brand-tag {
+  font-size: 13.5px;
+  color: rgba(255,255,255,.72);
+  line-height: 1.55;
+  max-width: 420px;
+}
+.auth-brand-features { display: none; }
+
+.auth-form-wrap {
+  flex: 1;
+  padding: 28px 20px 36px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+.auth-eyebrow {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sky-600);
+  margin-bottom: 8px;
+}
+.auth-h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin: 0 0 8px;
+  line-height: 1.15;
+}
+.auth-sub {
+  font-size: 14.5px;
+  color: var(--ink-muted);
+  line-height: 1.55;
+  margin: 0 0 24px;
+}
+
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+.auth-field { display: flex; flex-direction: column; }
+.auth-row-between { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.field-with-icon { position: relative; }
+.field-with-icon .field { padding-left: 42px; }
+.field-with-icon .ico {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-muted);
+  pointer-events: none;
+}
+.field-with-icon .toggle-eye {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  cursor: pointer;
+  padding: 4px;
+}
+.checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); cursor: pointer; }
+.checkbox-row input { width: 16px; height: 16px; accent-color: var(--navy-700); margin: 0; cursor: pointer; }
+.forgot-link {
+  font-size: 12.5px;
+  color: var(--sky-600);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.forgot-link:hover { color: var(--navy-700); }
+
+.auth-divider {
+  position: relative;
+  text-align: center;
+  margin: 20px 0 8px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: calc(50% - 28px);
+  height: 1px;
+  background: var(--line);
+}
+.auth-divider::before { left: 0; }
+.auth-divider::after  { right: 0; }
+
+.auth-social { display: flex; flex-direction: column; gap: 8px; }
+.btn-social {
+  background: #fff;
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  font-weight: 500;
+  font-size: 14.5px;
+  padding: 11px 18px;
+  border-radius: var(--r-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-social:hover { background: var(--bg-soft); border-color: var(--navy-200); }
+
+.auth-foot {
+  margin-top: 22px;
+  font-size: 13.5px;
+  color: var(--ink-muted);
+  text-align: center;
+}
+.auth-foot a { color: var(--navy-700); font-weight: 600; text-decoration: none; }
+.auth-foot a:hover { text-decoration: underline; }
+
+.auth-legal {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  line-height: 1.55;
+  text-align: center;
+}
+.auth-legal a { color: var(--ink-muted); text-decoration: underline; text-decoration-color: var(--line); }
+.auth-legal a:hover { color: var(--navy-700); }
+
+/* Brand panel — feature pills (desktop only) */
+.brand-stats {
+  display: none;
+}
+.brand-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: url('../assets/pattern.svg');
+  background-size: 220px 220px;
+  background-repeat: repeat;
+  opacity: 0.65;
+}
+.brand-pattern::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(5,14,63,0.65) 0%, rgba(5,14,63,0.92) 60%, rgba(5,14,63,1) 100%);
+}
+.auth-brand-foot {
+  display: none;
+}
+
+/* Marker labels for annotations (numbered yellow pins) */
+.marker-pin {
+  position: absolute;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--sun-500);
+  color: var(--navy-900);
+  font-family: var(--f-mono);
+  font-weight: 700;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1.5px var(--navy-900), 0 2px 6px rgba(0,0,0,.2);
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* ============================================================
+   Desktop (>=900cqi) — split 1:1 with brand panel on the left
+   ============================================================ */
+@container page (min-width: 900px) {
+  .auth-split { flex-direction: row; min-height: 720px; }
+  .auth-brand {
+    flex: 1.1;
+    padding: 56px 56px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .auth-brand-headline { font-size: 56px; margin-top: 96px; line-height: 1.0; letter-spacing: -0.02em; }
+  .auth-brand-tag { font-size: 17px; line-height: 1.55; max-width: 480px; margin-top: 14px; }
+  .auth-brand-foot {
+    display: block;
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    color: rgba(255,255,255,.5);
+    letter-spacing: 0.04em;
+  }
+  .auth-brand-foot strong { color: var(--sun-500); font-weight: 700; }
+  .auth-brand-features {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 48px;
+  }
+  .auth-brand-feature {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    color: rgba(255,255,255,.85);
+    font-size: 14.5px;
+    line-height: 1.45;
+  }
+  .auth-brand-feature .ico {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--sun-500);
+    flex-shrink: 0;
+  }
+  .auth-brand-feature .title { color: #fff; font-weight: 600; margin-bottom: 2px; }
+  .auth-brand-logo .mark { width: 44px; height: 44px; font-size: 22px; }
+  .auth-brand-logo .name { font-size: 18px; }
+
+  .auth-form-wrap {
+    flex: 1;
+    padding: 56px 64px;
+    align-items: center;
+    justify-content: center;
+  }
+  .auth-h1 { font-size: 36px; letter-spacing: -0.02em; }
+  .auth-sub { font-size: 15.5px; margin-bottom: 32px; }
+  .auth-form { gap: 16px; }
+}
+</style>
+
+</head>
+<body>
+
+<div id="mount"></div>
+
+<template id="page-content">
+<div class="auth-page">
+  <div class="auth-split">
+
+    <!-- LEFT: brand panel -->
+    <div class="auth-brand">
+      <div class="brand-pattern"></div>
+      <div class="auth-brand-inner">
+        <div class="auth-brand-logo">
+          <div class="mark">T</div>
+          <div>
+            <div class="name">Triono Racing</div>
+            <div class="sub">Portale famiglie</div>
+          </div>
+        </div>
+
+        <h1 class="auth-brand-headline">
+          Bentornato<br/>nella squadra<span class="accent">.</span>
+        </h1>
+        <p class="auth-brand-tag">
+          Accedi al portale per gestire iscrizioni, certificati, pagamenti e gare di tuo figlio.
+        </p>
+
+        <div class="auth-brand-features">
+          <div class="auth-brand-feature">
+            <div class="ico"><i data-lucide="users-round" style="width:18px;height:18px"></i></div>
+            <div>
+              <div class="title">Una squadra, un portale</div>
+              <div>Genitori, maestri e segreteria nello stesso spazio.</div>
+            </div>
+          </div>
+          <div class="auth-brand-feature">
+            <div class="ico"><i data-lucide="shield-check" style="width:18px;height:18px"></i></div>
+            <div>
+              <div class="title">Pagamenti sicuri</div>
+              <div>SumUp Card Widget + ricevuta automatica.</div>
+            </div>
+          </div>
+          <div class="auth-brand-feature">
+            <div class="ico"><i data-lucide="calendar-check" style="width:18px;height:18px"></i></div>
+            <div>
+              <div class="title">Tutto in un colpo d'occhio</div>
+              <div>Certificati, rate e gare con stato sempre visibile.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-brand-foot">
+        <strong>ASD CIEMME</strong> · Terni · Stagione 2026 / 2027
+      </div>
+    </div>
+
+    <!-- RIGHT: form -->
+    <div class="auth-form-wrap">
+      <div class="auth-card">
+        <div class="auth-eyebrow">Accedi al portale</div>
+        <h2 class="auth-h1">Ciao, ben tornato.</h2>
+        <p class="auth-sub">
+          Inserisci email e password per entrare. Se sei nuovo, <a href="#" style="color:var(--sky-600);font-weight:600;text-decoration:none">crea un account</a>.
+        </p>
+
+        <form class="auth-form" onsubmit="return false">
+          <div class="auth-field">
+            <label class="label" for="email">Email</label>
+            <div class="field-with-icon">
+              <span class="ico"><i data-lucide="mail" style="width:18px;height:18px"></i></span>
+              <input type="email" id="email" class="field" placeholder="luca.rossi@email.it" value="luca.rossi@email.it" autocomplete="email" />
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <div class="auth-row-between" style="margin-bottom:6px">
+              <label class="label" for="password" style="margin:0">Password</label>
+              <a href="recupero-password.html" class="forgot-link">Password dimenticata?</a>
+            </div>
+            <div class="field-with-icon">
+              <span class="ico"><i data-lucide="lock" style="width:18px;height:18px"></i></span>
+              <input type="password" id="password" class="field" placeholder="••••••••" value="••••••••••" autocomplete="current-password" />
+              <button type="button" class="toggle-eye" aria-label="Mostra password">
+                <i data-lucide="eye" style="width:18px;height:18px"></i>
+              </button>
+            </div>
+          </div>
+
+          <label class="checkbox-row" style="margin-top:4px">
+            <input type="checkbox" checked />
+            <span>Resta connesso su questo dispositivo</span>
+          </label>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:8px">
+            Accedi
+            <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
+          </button>
+        </form>
+
+        <div class="auth-divider">oppure</div>
+
+        <div class="auth-social">
+          <button class="btn-social">
+            <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 01-1.8 2.72v2.26h2.92c1.71-1.57 2.68-3.88 2.68-6.62z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.92v2.32A8.997 8.997 0 009 18z" fill="#34A853"/>
+              <path d="M3.97 10.72A5.41 5.41 0 013.68 9c0-.6.1-1.18.29-1.72V4.96H.92A8.997 8.997 0 000 9c0 1.45.35 2.83.92 4.04l3.05-2.32z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A8.997 8.997 0 00.92 4.96l3.05 2.32C4.68 5.16 6.66 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+            Continua con Google
+          </button>
+          <button class="btn-social">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.7 6.4c-.1.1-1.8 1-1.8 3 0 2.4 2 3.2 2.1 3.2 0 .1-.3 1.2-1.1 2.3-.7.9-1.4 1.9-2.5 1.9s-1.4-.6-2.7-.6c-1.2 0-1.7.6-2.7.6-1.1 0-1.8-1-2.5-2C2.5 13.4 1.7 11 1.7 8.8c0-3.6 2.3-5.5 4.6-5.5 1.2 0 2.2.8 3 .8.7 0 1.9-.8 3.2-.8.5 0 2.3.1 3.2 1.8-.1.1-1.9 1.1-1.9 3.4zM11.4 1.8c.6-.7 1-1.6 1-2.5 0-.1 0-.3 0-.4-1 0-2.1.6-2.8 1.4-.5.6-1 1.5-1 2.5 0 .1 0 .3 0 .3.1 0 .2 0 .3 0 .9 0 2-.6 2.5-1.3z"/>
+            </svg>
+            Continua con Apple
+          </button>
+        </div>
+
+        <div class="auth-foot">
+          Non hai un account? <a href="registrati.html">Registrati</a>
+        </div>
+
+        <div class="auth-legal">
+          Accedendo accetti i nostri <a href="#">termini di servizio</a> e l'<a href="#">informativa privacy</a>.<br/>
+          <span style="opacity:0.6">Triono Racing è gestita da <strong>ASD CIEMME</strong> · C.F. 91065830550 · Terni</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+</template>
+
+<script src="../shared/page-shell.js"></script>
+<script>
+  mountMockup({
+    crumb: ['Mockup Portale', 'Auth', 'Login'],
+    title: 'Login',
+    route: '/portale/login',
+    statusBarTheme: 'dark',
+    desktopScale: 0.62,
+    stateLegend: {
+      tag: 'Stato rappresentato',
+      items: [
+        { ref: 1, text: 'Email pre-compilata + password mascherata (stato pieno)' },
+        { ref: 2, text: 'Brand panel con feature pills (solo desktop)' },
+        { ref: 3, text: 'Stati error/loading non mostrati — vedere note' }
+      ]
+    },
+    annotations: [
+      { ref: 1, text: '<strong>Auth provider:</strong> Clerk con appearance Triono (<code>lib/clerk-appearance.ts</code>). Lo stile renderizzato è quello finale che produce il componente <code>&lt;SignIn /&gt;</code> di Clerk, non un form custom.' },
+      { ref: 2, text: '<strong>Mobile:</strong> il brand panel diventa header compatto (40% altezza) con solo logo + headline ridotta. Le 3 feature card sono nascoste. Form occupa il resto.' },
+      { ref: 3, text: '<strong>Desktop:</strong> split 1.1 : 1, brand a sinistra full-bleed con pattern Triono + radial gradient navy-900. Le 3 feature card riassumono il valore del portale.' },
+      { ref: 4, text: '<strong>Stato error</strong> (non mostrato): campo password con bordo flag-500, helper sotto «Email o password non corretta. <a>Hai dimenticato la password?</a>».' },
+      { ref: 5, text: '<strong>Stato loading</strong> (submit): bottone disabled con spinner inline + testo «Accesso in corso…». Tutti i campi disabled.' },
+      { ref: 6, text: '<strong>Social SSO:</strong> Google e Apple sono i due provider configurati in Clerk. Magic link via email è disponibile come fallback nella pagina recupero password.' },
+      { ref: 7, text: '<strong>Microcopy:</strong> tono caldo, «tu» informale come da DS §00.3. «Ciao, ben tornato» invece di «Login» / «Sign in».' },
+      { ref: 8, text: '<strong>Pattern brand:</strong> usato in versione scura con gradient radial sfumato (non orizzontale come da DS default — variante adatta a split-screen).' }
+    ]
+  });
+
+  // initialize lucide icons after content is in DOM
+  setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+</script>
+
+</body>
+</html>
