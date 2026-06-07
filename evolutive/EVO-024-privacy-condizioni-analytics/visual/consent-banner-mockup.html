@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EVO-024 · Cookie Consent — Mockup DS Triono Racing</title>
+<style>
+  :root{
+    --navy-50:#EEF1F8; --navy-100:#D7DEED; --navy-200:#AFBCDA; --navy-700:#1F2D5A; --navy-900:#050E3F;
+    --sky-500:#3A82C8; --sky-600:#2A6BA9;
+    --grass-500:#5FAC36; --grass-600:#4F932B;
+    --sun-500:#EFE63A; --sun-600:#C3BB1E;
+    --bg:#FFFFFF; --bg-soft:#FAFBFD; --bg-muted:#F2F4F9;
+    --line:#E4E7EF; --ink:#14193A; --ink-muted:#6B7388;
+    --radius-md:12px; --radius-lg:16px; --radius-pill:9999px;
+    --shadow-md:0 8px 20px rgba(20,25,58,.08),0 2px 6px rgba(20,25,58,.04);
+    --shadow-lg:0 20px 40px rgba(20,25,58,.10),0 4px 12px rgba(20,25,58,.05);
+    --shadow-up:0 -12px 32px rgba(20,25,58,.10);
+    --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg-soft);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .page{max-width:1000px;margin:0 auto;padding:40px 24px 220px}
+  h1{font-size:24px;margin:0 0 4px} .sub{color:var(--ink-muted);margin:0 0 28px;font-size:14px}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--sky-600);margin:36px 0 12px;font-weight:800}
+  .frame{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-lg);padding:0;overflow:hidden;box-shadow:var(--shadow-md)}
+  .label{font-size:12px;color:var(--ink-muted);padding:8px 14px;background:var(--bg-soft);border-bottom:1px solid var(--line)}
+
+  /* ===== BUTTONS (mirror DS) ===== */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;line-height:1;
+    height:44px;padding:0 20px;font-size:15px;border-radius:var(--radius-lg);border:1.5px solid transparent;cursor:pointer;
+    transition:all .2s cubic-bezier(.4,0,.2,1);font-family:inherit;white-space:nowrap}
+  .btn:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(31,45,90,.2)}
+  .btn-sm{height:40px;padding:0 16px;font-size:14px;border-radius:var(--radius-md)}
+  .btn-sun{background:var(--sun-500);color:var(--navy-900);border-color:var(--sun-500)}
+  .btn-sun:hover{background:var(--sun-600);border-color:var(--sun-600)}
+  .btn-navy{background:var(--navy-700);color:#fff;border-color:var(--navy-700)}
+  .btn-navy:hover{background:var(--navy-900);border-color:var(--navy-900)}
+  .btn-outline{background:transparent;color:var(--navy-700);border-color:var(--navy-200)}
+  .btn-outline:hover{border-color:var(--navy-700);background:var(--navy-50)}
+  .btn-ghost{background:transparent;color:var(--navy-700);border-color:transparent}
+  .btn-ghost:hover{background:var(--navy-50)}
+  .link{color:var(--sky-600);text-decoration:underline;text-underline-offset:2px}
+  .link:hover{color:var(--navy-700)}
+
+  /* ===== BANNER ===== */
+  .banner{background:var(--bg);border-top:1px solid var(--line);box-shadow:var(--shadow-up)}
+  .banner-inner{max-width:1280px;margin:0 auto;padding:18px 24px;display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .banner-text{flex:1;min-width:280px;font-size:14px;color:var(--ink)}
+  .banner-text strong{color:var(--navy-900)}
+  .banner-text .meta{color:var(--ink-muted)}
+  .banner-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .cookie-ico{width:26px;height:26px;flex:none;color:var(--navy-700);vertical-align:-6px;margin-right:8px}
+
+  /* ===== TOGGLE ===== */
+  .switch{position:relative;width:44px;height:24px;flex:none;border:none;padding:0;border-radius:var(--radius-pill);background:var(--navy-200);cursor:pointer;transition:background .18s}
+  .switch:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(31,45,90,.2)}
+  .switch[aria-checked="true"]{background:var(--grass-500)}
+  .switch[disabled]{cursor:not-allowed;background:var(--grass-500);opacity:.55}
+  .knob{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .18s}
+  .switch[aria-checked="true"] .knob{left:22px}
+
+  /* ===== MODAL ===== */
+  .overlay{background:rgba(5,14,63,.45);border-radius:var(--radius-lg);padding:40px 20px;display:flex;justify-content:center}
+  .modal{width:100%;max-width:520px;background:var(--bg);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);overflow:hidden}
+  .modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 24px 14px}
+  .modal-head h3{margin:0;font-size:19px;color:var(--navy-900)}
+  .modal-head p{margin:6px 0 0;font-size:13px;color:var(--ink-muted)}
+  .x{border:none;background:transparent;cursor:pointer;color:var(--ink-muted);font-size:22px;line-height:1;padding:4px}
+  .cat{display:flex;gap:14px;align-items:flex-start;padding:16px 24px;border-top:1px solid var(--line)}
+  .cat:first-of-type{border-top:1px solid var(--line)}
+  .cat-body{flex:1}
+  .cat-body .t{font-weight:700;font-size:14px;color:var(--navy-900);display:flex;align-items:center;gap:8px}
+  .cat-body .d{font-size:13px;color:var(--ink-muted);margin-top:3px}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:var(--radius-pill);background:var(--navy-100);color:var(--navy-700)}
+  .badge.stat{background:#FCF6AC;color:#8C8615}
+  .modal-foot{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:16px 24px 20px;background:var(--bg-soft);border-top:1px solid var(--line)}
+
+  /* ===== MAPS PLACEHOLDER ===== */
+  .maps{position:relative;height:280px;border-radius:var(--radius-lg);border:1px solid var(--line);background:
+     repeating-linear-gradient(45deg,var(--bg-muted),var(--bg-muted) 14px,#EDF0F6 14px,#EDF0F6 28px);
+     display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:24px}
+  .maps .mico{width:46px;height:46px;color:var(--ink-muted)}
+  .maps .mt{font-weight:700;color:var(--navy-900)}
+  .maps .md{font-size:13px;color:var(--ink-muted);max-width:360px}
+
+  .note{font-size:12px;color:var(--ink-muted);margin-top:10px}
+  @media(max-width:560px){
+    .banner-inner{flex-direction:column;align-items:stretch}
+    .banner-actions{flex-direction:column}
+    .banner-actions .btn{width:100%}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>EVO-024 · Cookie Consent — Mockup DS</h1>
+  <p class="sub">Banner + modal preferenze + placeholder Maps. Token reali Triono Racing. Clicca "Personalizza" per aprire il modal; i toggle e i bottoni sono interattivi.</p>
+
+  <!-- BANNER -->
+  <h2>1 · Banner primo accesso (fixed bottom)</h2>
+  <div class="frame">
+    <div class="label">Desktop — barra full-width ancorata in basso. Accetta e Rifiuta hanno pari prominenza (no dark pattern).</div>
+    <div class="banner" role="dialog" aria-label="Preferenze cookie">
+      <div class="banner-inner">
+        <div class="banner-text">
+          <svg class="cookie-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5Z"/><circle cx="9" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="14" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1" fill="currentColor" stroke="none"/></svg>
+          <strong>Rispettiamo la tua privacy.</strong>
+          Usiamo cookie tecnici necessari e, solo col tuo consenso, Google Analytics per statistiche anonime e Google Maps.
+          <span class="meta">Dettagli nella <a class="link" href="#">Cookie policy</a> e nell'<a class="link" href="#">Informativa privacy</a>.</span>
+        </div>
+        <div class="banner-actions">
+          <button class="btn btn-sun btn-sm">Accetta tutti</button>
+          <button class="btn btn-navy btn-sm">Rifiuta</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('m').style.display='flex'">Personalizza</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="note">Mobile: i 3 bottoni diventano full-width in colonna (riduci la finestra per vedere).</p>
+
+  <!-- MODAL -->
+  <h2>2 · Modal preferenze (riusa Dialog)</h2>
+  <div class="frame">
+    <div class="label">Aperto da "Personalizza" o da "Preferenze cookie" nel footer.</div>
+    <div class="overlay" id="m" style="display:flex">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt">
+        <div class="modal-head">
+          <div>
+            <h3 id="mt">Preferenze cookie</h3>
+            <p>Scegli quali cookie attivare. Puoi cambiare idea in ogni momento da "Preferenze cookie" nel footer.</p>
+          </div>
+          <button class="x" aria-label="Chiudi" onclick="document.getElementById('m').style.display='none'">×</button>
+        </div>
+
+        <div class="cat">
+          <div class="cat-body">
+            <div class="t">Necessari <span class="badge">Sempre attivi</span></div>
+            <div class="d">Sessione di login (Clerk), sicurezza e funzionamento del sito. Non richiedono consenso.</div>
+          </div>
+          <button class="switch" role="switch" aria-checked="true" aria-label="Necessari (sempre attivi)" disabled><span class="knob"></span></button>
+        </div>
+
+        <div class="cat">
+          <div class="cat-body">
+            <div class="t">Statistici <span class="badge stat">Google Analytics</span></div>
+            <div class="d">Misurazione anonima delle visite (IP anonimizzato) per migliorare il sito.</div>
+          </div>
+          <button class="switch" role="switch" aria-checked="false" aria-label="Statistici Google Analytics" onclick="t(this)"><span class="knob"></span></button>
+        </div>
+
+        <div class="cat">
+          <div class="cat-body">
+            <div class="t">Mappe <span class="badge stat">Google Maps</span></div>
+            <div class="d">Mostra la mappa "Come raggiungerci" sulla home. Google riceve il tuo IP.</div>
+          </div>
+          <button class="switch" role="switch" aria-checked="false" aria-label="Mappe Google Maps" onclick="t(this)"><span class="knob"></span></button>
+        </div>
+
+        <!-- Footer senza bias: Rifiuta/Accetta pari peso (outline), Salva = primario -->
+        <div class="modal-foot">
+          <button class="btn btn-outline btn-sm">Rifiuta tutti</button>
+          <button class="btn btn-outline btn-sm">Accetta tutti</button>
+          <button class="btn btn-sun btn-sm">Salva preferenze</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAPS -->
+  <h2>3 · Placeholder Google Maps (click-to-load)</h2>
+  <div class="frame" style="padding:20px">
+    <div class="maps">
+      <svg class="mico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      <div class="mt">Mappa non caricata</div>
+      <div class="md">Per vedere la mappa "Come raggiungerci" accetta i cookie di Google Maps.</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
+        <button class="btn btn-outline btn-sm">Carica la mappa</button>
+        <a class="link" href="#" style="font-size:13px">Gestisci preferenze</a>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">Mockup statico di reference per l'implementazione (EVO-024). I colori, raggi, ombre e bottoni rispecchiano <code>src/app/globals.css</code> e <code>src/components/ui/button.tsx</code>.</p>
+</div>
+<script>
+  function t(el){ el.setAttribute('aria-checked', el.getAttribute('aria-checked')==='true' ? 'false':'true'); }
+</script>
+</body>
+</html>
