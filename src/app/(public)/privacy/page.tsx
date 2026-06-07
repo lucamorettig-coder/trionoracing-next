@@ -206,6 +206,36 @@ export default function PrivacyPage() {
             utilizzati. L&apos;ultima revisione è del <strong>{LAST_REVISION}</strong>.
           </p>
         </Section>
+
+        <Section title="11. Cancellazione dati da accesso social (Facebook)" id="cancellazione-dati">
+          <p>
+            Se hai effettuato l&apos;accesso tramite Facebook, puoi richiedere la cancellazione
+            dei dati associati al tuo account in due modi:
+          </p>
+          <ul className="list-disc pl-6 space-y-1.5 mt-2">
+            <li>
+              <strong>Dall&apos;area riservata</strong>: accedi a{" "}
+              <Link href="/portale" className="text-navy-700 underline underline-offset-2">
+                /portale
+              </Link>{" "}
+              e cancella il tuo account dalle impostazioni del profilo.
+            </li>
+            <li>
+              <strong>Via e-mail</strong>: scrivi a{" "}
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="text-navy-700 underline underline-offset-2 font-semibold"
+              >
+                {CONTACT_EMAIL}
+              </a>{" "}
+              con oggetto &quot;Cancellazione dati&quot;: elaboriamo la richiesta entro 30 giorni.
+            </li>
+          </ul>
+          <p>
+            A seguito della cancellazione, i dati personali vengono rimossi dai nostri sistemi,
+            fatto salvo quanto richiesto da obblighi di legge (cfr. §8).
+          </p>
+        </Section>
       </div>
 
       <div className="mt-16 pt-8 border-t border-navy-100 flex flex-wrap items-center justify-between gap-4 reveal">
@@ -223,9 +253,17 @@ export default function PrivacyPage() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+  id,
+}: {
+  title: string;
+  children: React.ReactNode;
+  id?: string;
+}) {
   return (
-    <section>
+    <section id={id}>
       <h2 className="text-2xl font-bold text-navy-900 leading-tight mb-3">{title}</h2>
       <div className="text-ink leading-relaxed space-y-3">{children}</div>
     </section>
