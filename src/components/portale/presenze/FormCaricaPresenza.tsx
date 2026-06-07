@@ -5,11 +5,12 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { TIPO_SESSIONE_VALUES, type TipoSessione } from "@/lib/airtable-portale";
-import { tipoSessioneStyle, formatDateIT } from "@/lib/portale-utils";
+import { tipoSessioneStyle } from "@/lib/portale-utils";
 import type { Bambino, Gara, Maestro } from "@/lib/airtable-portale";
 import AttivitaChips from "@/components/portale/lezioni/AttivitaChips";
 import MaestriSelector from "@/components/portale/lezioni/MaestriSelector";
 import BambiniSelector from "@/components/portale/lezioni/BambiniSelector";
+import GaraPicker from "./GaraPicker";
 
 type Modo = "lezione" | "gara";
 
@@ -224,22 +225,7 @@ export default function FormCaricaPresenza({
                 Nessuna gara disponibile nel calendario.
               </p>
             ) : (
-              <select
-                name="GARA_ID"
-                required
-                defaultValue=""
-                className="w-full h-11 px-3 rounded-[var(--radius-md)] border border-line bg-white text-sm focus:outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-700/10"
-              >
-                <option value="" disabled>
-                  Seleziona una gara…
-                </option>
-                {gare.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {formatDateIT(g.data)} · {g.nomeGara}
-                    {g.luogo ? ` · ${g.luogo}` : ""}
-                  </option>
-                ))}
-              </select>
+              <GaraPicker gare={gare} />
             )}
           </fieldset>
 
