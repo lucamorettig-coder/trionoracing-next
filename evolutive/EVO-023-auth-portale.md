@@ -3,8 +3,8 @@
 - **ID**: EVO-023
 - **Slug**: auth-portale
 - **Data inizio**: 2026-06-06
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: in PR
+- **Data fine**: 2026-06-07
+- **Stato**: completata
 - **Tipo**: refactoring UX (restyle) + nuova feature (pagina recupero password)
 - **Area**: area auth (portale, fuori dal route group autenticato)
 - **Priorità**: media
@@ -187,18 +187,39 @@ Non applicabile come handoff separato: l'implementazione è eseguita direttament
 
 ## 8. Verifica e go-live
 
-_Da compilare in fase 8 dopo il ciclo completo._
+- **URL produzione**: https://trionoracing-next.vercel.app/portale/login (+ `/portale/registrati`, `/portale/recupero-password`)
+- **Pull Request**: [#53](https://github.com/lucamorettig-coder/trionoracing-next/pull/53) (squash-merge)
+- **Commit di merge**: `eb39a58`
+- **Data go-live**: 2026-06-07
 
-- **URL produzione**: _{url}_
-- **Pull Request**: [#53](https://github.com/lucamorettig-coder/trionoracing-next/pull/53)
-- **Commit di merge**: _{hash}_
-- **Data go-live**: _{YYYY-MM-DD}_
+### Esito sintetico
 
-### Azioni manuali lato utente (Clerk Dashboard)
+| Dimensione | Stato | Note |
+|------------|-------|------|
+| Design system | ✅ | Token DS, `<Button>`, `pattern.svg` riusati; nessun hex hardcoded. Brand panel su misura allineato ai token. |
+| Localizzazione (i18n) | ✅ | Clerk localizzato IT (`itIT`); stringhe app inline IT. |
+| SEO | ✅ | `robots: { index: false }` su login/registrati; recupero `noindex` di fatto (route auth). |
+| Fedeltà ai visual | ✅ ~90% | Brand panel 100% fedele; form Clerk segue il rendering prebuilt (delta accettato come da scelta). |
+| Criteri di accettazione | ✅ | 3 pagine live, split-screen + recupero custom funzionante. |
+| Smoke test dev | ✅ | Login OK, invio email recupero OK, OTP/step 3 OK dopo fix celle. |
+| Smoke test produzione | ✅ | 3 route 200 in prod, contenuti nuovi verificati via curl. |
+
+### Apprendimenti riusabili (riportati anche in AGENTS.md)
+
+- **Clerk Future API** è il default degli hook in `@clerk/nextjs ^7` (`useSignIn`/`useSignUp` → `{ signIn, fetchStatus }`; metodi `{ error }`; `signIn.finalize()`; flusso reset `create → resetPasswordEmailCode.sendCode/verifyCode/submitPassword`). Verificare i tipi installati prima di scrivere flussi custom (MCP/docs mostrano la legacy).
+- **Split-screen auth** (`AuthSplitLayout` + `AuthBrandPanel` + `AuthHeading`) attorno ai prebuilt Clerk + appearance "card nuda" (`header: "hidden"`, `cardBox/card` trasparenti, social `bottom`, `formFieldAction__forgotPassword: "hidden"`).
+- **Route auth pubblica** → aggiungere a `isPortalePublic` in `proxy.ts`.
+- **Celle uguali (OTP)** → `grid grid-cols-N` (`minmax(0,1fr)`) + `w-full min-w-0`, mai `flex flex-1` (min-width:auto degli `<input>` → overflow).
+
+### Azioni manuali lato utente (Clerk Dashboard) — residue
 
 - Abilitare **solo Google** come social provider (disabilitare Apple se attivo).
 - (Opzionale) Abilitare **Legal consent** per la checkbox termini/privacy in registrazione.
 - Verificare che il template email di reset password sia brandizzato Triono.
+
+### Nota integrazione EVO-024
+
+EVO-024 (mergiata subito dopo) ha costruito sopra le modifiche EVO-023: `layout.tsx` ora ha sia `localization={itIT}` sia il `ConsentProvider`/Consent Mode; `recupero-password/page.tsx` usa `CONTACT_EMAIL` da `@/lib/seo` per il mailto segreteria. Nessun conflitto, modifiche complementari.
 
 ---
 
@@ -209,3 +230,6 @@ Bootstrap, requisiti (3 domande utente), ambito, as-is, WBS e verifica coerenza 
 
 ### [2026-06-07] Implementazione + smoke + PR
 Implementate le 3 pagine. **Scoperta**: `@clerk/nextjs ^7` usa la Future API di Clerk (`useSignIn` → `{ signIn, fetchStatus }`, metodi che ritornano `{ error }`, `signIn.finalize()` al posto di `setActive`) — la pagina recupero è scritta su questa API (`create → resetPasswordEmailCode.sendCode/verifyCode/submitPassword → finalize`). Quality gate verdi (tsc/eslint/build). Smoke dev su :3010: login OK, recupero step 1→2 (invio email Clerk) OK; **fix** durante smoke: celle OTP traboccavano (flex min-width:auto) → grid `grid-cols-6` + input `w-full min-w-0`. PR [#53](https://github.com/lucamorettig-coder/trionoracing-next/pull/53) aperta verso `main` (in attesa OK merge). Stato → in PR.
+
+### [2026-06-07] Fase 8 — merge + go-live + consolidamento
+PR #53 squash-merged (`eb39a58`). Deploy produzione verificato (3 route auth 200, contenuti nuovi via curl). Consolidamento doc-only su branch `docs/evo-023-consolidamento`: §8 compilata, 4 pattern in AGENTS.md, `memory.md` → completata. Nota: nel frattempo EVO-024 è stata mergiata e ha costruito sopra EVO-023 (layout `itIT`+ConsentProvider, recupero `CONTACT_EMAIL`) senza conflitti. Stato → completata.
