@@ -24,6 +24,10 @@ interface Props {
   submitLabel?: string;
   /** Mostrato come hidden input `id` (modalità update). */
   lezioneId?: string;
+  /** Modalità admin: nessun maestro forzato, copy adattata, banner informativo. */
+  admin?: boolean;
+  /** Href della CTA "Annulla" (default area maestro). */
+  cancelHref?: string;
 }
 
 const oggiISO = () => new Date().toISOString().slice(0, 10);
@@ -37,6 +41,8 @@ export default function FormLezione({
   readOnly = false,
   submitLabel = "Salva lezione",
   lezioneId,
+  admin = false,
+  cancelHref = "/portale/lezioni",
 }: Props) {
   const f = lezione?.fields;
   const [tipo, setTipo] = useState<TipoSessione | "">(
@@ -50,6 +56,16 @@ export default function FormLezione({
       aria-label="Form lezione"
     >
       {lezioneId && <input type="hidden" name="id" value={lezioneId} />}
+
+      {admin && (
+        <div
+          role="note"
+          className="rounded-[var(--radius-md)] bg-ember-50 border border-ember-100 border-l-[3px] border-l-ember-500 px-4 py-3 text-[13px] text-ember-700"
+        >
+          Stai registrando una lezione <strong className="text-ink">come admin</strong>.
+          Seleziona il/i maestro/i che l&apos;hanno effettivamente tenuta.
+        </div>
+      )}
 
       {/* Sezione 1 — Quando + tipo */}
       <fieldset className="space-y-4" disabled={readOnly}>
@@ -119,12 +135,14 @@ export default function FormLezione({
       <fieldset className="space-y-3" disabled={readOnly}>
         <legend className="text-lg font-bold text-ink mb-1">Chi ha tenuto la lezione</legend>
         <p className="text-xs text-ink-muted">
-          Sei sempre incluso. Aggiungi i co-maestri presenti per la continuità di team.
+          {admin
+            ? "Seleziona il/i maestro/i che hanno tenuto la lezione."
+            : "Sei sempre incluso. Aggiungi i co-maestri presenti per la continuità di team."}
         </p>
         <MaestriSelector
           maestri={maestri}
-          currentMaestroId={currentMaestroId}
-          defaultValue={f?.MAESTRI_PRESENTI ?? [currentMaestroId]}
+          currentMaestroId={admin ? "" : currentMaestroId}
+          defaultValue={f?.MAESTRI_PRESENTI ?? (admin ? [] : [currentMaestroId])}
           disabled={readOnly}
         />
       </fieldset>
@@ -198,7 +216,7 @@ export default function FormLezione({
             {submitLabel}
           </Button>
           <Button asChild variant="ghost" size="md">
-            <Link href="/portale/lezioni">Annulla</Link>
+            <Link href={cancelHref}>Annulla</Link>
           </Button>
         </div>
       )}

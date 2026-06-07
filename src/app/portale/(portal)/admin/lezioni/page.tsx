@@ -1,7 +1,9 @@
 import { Suspense } from "react";
-import { BookOpen, Users, Award } from "lucide-react";
+import Link from "next/link";
+import { BookOpen, Users, Award, Plus, Trophy, CheckCircle2 } from "lucide-react";
 import { requireAdmin } from "@/lib/auth-admin";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { Button } from "@/components/ui/button";
 import { KPICard } from "@/components/admin/KPICard";
 import { ExportCSVButton } from "@/components/admin/ExportCSVButton";
 import { LezioniFilters } from "@/components/admin/lezioni/LezioniFilters";
@@ -94,9 +96,30 @@ export default async function LezioniAdminPage({ searchParams }: PageProps) {
         title="Lezioni"
         subtitle="Storico delle lezioni registrate dai maestri."
         action={
-          <ExportCSVButton entity="lezioni" filters={filters as unknown as Record<string, unknown>} />
+          <div className="flex items-center gap-2 flex-wrap">
+            <ExportCSVButton entity="lezioni" filters={filters as unknown as Record<string, unknown>} />
+            <Button asChild variant="outline" size="sm">
+              <Link href="/portale/admin/gare/nuova">
+                <Trophy size={14} aria-hidden />
+                Registra gara
+              </Link>
+            </Button>
+            <Button asChild variant="primary" size="sm">
+              <Link href="/portale/admin/lezioni/nuova">
+                <Plus size={14} aria-hidden />
+                Registra lezione
+              </Link>
+            </Button>
+          </div>
         }
       />
+
+      {sp.success === "1" && (
+        <div className="mt-4 rounded-[var(--radius-md)] bg-grass-50 border border-grass-100 px-4 py-3 text-[13px] text-grass-700 flex items-center gap-2">
+          <CheckCircle2 size={16} aria-hidden />
+          Lezione registrata correttamente.
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 mb-4">
         <KPICard
