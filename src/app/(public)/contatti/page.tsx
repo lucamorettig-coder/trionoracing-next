@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/contatti" },
 };
 
+// ISR: i contatti Scuola sono gestiti da Airtable (getSiteSettings) → la pagina
+// si rigenera ogni 5 min così le modifiche dell'admin appaiono senza deploy. EVO-024.
+export const revalidate = 300;
+
 export default async function ContattiPage() {
   // Contatti Scuola gestiti da Airtable (chiavi "scuola-telefono"/"scuola-referente"). EVO-024.
   const settings = await getSiteSettings();
