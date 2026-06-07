@@ -7,6 +7,7 @@ import { useSignIn } from "@clerk/nextjs";
 import { ArrowLeft, ArrowRight, Mail, MailCheck, Lock, Check, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { CONTACT_EMAIL } from "@/lib/seo";
 
 /* ─────────────────────────────────────────────────────────────
    Regole password (live) — stesse della registrazione
@@ -488,7 +489,7 @@ export default function RecuperoPasswordPage() {
         <div className="mx-auto w-full max-w-[580px] px-2 text-center text-[13px] text-ink-muted">
           Continui a non ricevere l&apos;email?{" "}
           <a
-            href="mailto:info@trionoracing.it?subject=Recupero%20accesso%20portale"
+            href={`mailto:${CONTACT_EMAIL}?subject=Recupero%20accesso%20portale`}
             className="font-semibold text-sky-600 hover:text-navy-700"
           >
             Contatta la segreteria

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { CONTACT_EMAIL } from "@/lib/seo";
 
 /**
  * POST /api/contatti
@@ -63,7 +64,7 @@ export async function POST(req: Request) {
   if (!AIRTABLE_BASE_ID || !AIRTABLE_TOKEN) {
     console.error("[contatti] Missing Airtable env vars");
     return NextResponse.json(
-      { error: "Servizio non configurato. Scrivici a info@trionoracing.it" },
+      { error: `Servizio non configurato. Scrivici a ${CONTACT_EMAIL}` },
       { status: 503 },
     );
   }
