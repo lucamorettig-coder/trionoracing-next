@@ -7,12 +7,16 @@ import {
   createLezione,
   getGaraById,
   generatePresenzeForGara,
+  getLezioniConflitto,
+  addMaestriToLezione,
+  getAllMaestriAttivi,
   ATTIVITA_SVOLTE_VALUES,
   TIPO_SESSIONE_VALUES,
   type AttivitaSvolta,
   type Lezione,
   type TipoSessione,
 } from "@/lib/airtable-portale";
+import type { LezioneConflittoDTO } from "../../lezioni/actions-types";
 
 const TIPO_SET = new Set<string>(TIPO_SESSIONE_VALUES);
 const ATTIVITA_SET = new Set<string>(ATTIVITA_SVOLTE_VALUES);
@@ -90,5 +94,60 @@ export async function actionCreateLezioneAdmin(formData: FormData): Promise<void
   await createLezione(fields, maestri[0]);
   revalidatePath("/portale/admin/lezioni");
   revalidatePath("/portale/admin/presenze-maestri");
+  redirect("/portale/admin/lezioni?success=1");
+}
+
+/**
+ * Rileva lezioni già caricate per la stessa sessione (stesso giorno + tipo).
+ * Variante admin di `checkConflittoLezione`: nessun "maestro corrente", quindi
+ * `giaPresente` è sempre false. Mostra l'avviso anti-duplicato nel form admin.
+ */
+export async function checkConflittoLezioneAdmin(
+  data: string,
+  tipo: string,
+): Promise<LezioneConflittoDTO[]> {
+  await requireAdmin();
+  if (!data || !TIPO_SET.has(tipo)) return [];
+
+  const lezioni = await getLezioniConflitto(data, tipo as TipoSessione);
+  if (lezioni.length === 0) return [];
+
+  const maestri = await getAllMaestriAttivi();
+  const nomeById = new Map(
+    maestri.map((m) => [
+      m.id,
+      `${m.fields.NOME_MAESTRO} ${m.fields.COGNOME_MAESTRO}`.trim(),
+    ]),
+  );
+
+  return lezioni.map((l) => ({
+    id: l.id,
+    tipoLabel: l.fields.TIPO_SESSIONE ?? "",
+    nBambini: l.fields.BAMBINI_PRESENTI?.length ?? 0,
+    compilatoriNomi: (l.fields.MAESTRO_COMPILATORE ?? []).map(
+      (id) => nomeById.get(id) ?? "Maestro",
+    ),
+    giaPresente: false,
+  }));
+}
+
+/**
+ * "Aggiungi i maestri selezionati a questa lezione" (admin): aggiunge i maestri
+ * scelti nel form ai presenti di una lezione esistente, invece di crearne una
+ * duplicata. `JOIN_LEZIONE_ID` dal bottone formAction; `MAESTRI_PRESENTI` dal form.
+ */
+export async function actionJoinLezioneAdmin(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const lezioneId = String(formData.get("JOIN_LEZIONE_ID") ?? "").trim();
+  if (!lezioneId) redirect("/portale/admin/lezioni/nuova?error=missing-lezione");
+  const maestri = formData
+    .getAll("MAESTRI_PRESENTI")
+    .map(String)
+    .filter(Boolean);
+
+  await addMaestriToLezione(lezioneId, maestri);
+  revalidatePath("/portale/admin/lezioni");
+  revalidatePath("/portale/admin/presenze-maestri");
+  revalidatePath(`/portale/lezioni/${lezioneId}`);
   redirect("/portale/admin/lezioni?success=1");
 }

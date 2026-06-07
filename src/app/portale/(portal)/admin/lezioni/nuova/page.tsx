@@ -6,7 +6,11 @@ import {
 import { requireAdmin } from "@/lib/auth-admin";
 import FormCaricaPresenza from "@/components/portale/presenze/FormCaricaPresenza";
 import BackLink from "@/components/portale/BackLink";
-import { actionCreateLezioneAdmin } from "../actions";
+import {
+  actionCreateLezioneAdmin,
+  checkConflittoLezioneAdmin,
+  actionJoinLezioneAdmin,
+} from "../actions";
 
 export const metadata = {
   title: "Carica presenza · Admin · Portale Triono Racing",
@@ -43,6 +47,8 @@ export default async function NuovaPresenzaAdminPage() {
         currentMaestroId=""
         admin
         cancelHref="/portale/admin/lezioni"
+        checkConflitto={checkConflittoLezioneAdmin}
+        joinAction={actionJoinLezioneAdmin}
       />
     </div>
   );

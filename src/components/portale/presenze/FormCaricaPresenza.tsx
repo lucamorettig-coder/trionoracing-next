@@ -219,9 +219,9 @@ export default function FormCaricaPresenza({
                       : "Lezioni già caricate per questo giorno"}
                   </p>
                   <p className="text-[13px] text-ember-700">
-                    Per evitare doppioni, aggiungiti alla lezione esistente invece
-                    di crearne una nuova. Crea una lezione separata solo se è
-                    davvero un&apos;altra sessione.
+                    {admin
+                      ? "Per evitare doppioni, aggiungi i maestri selezionati alla lezione esistente invece di crearne una nuova. Crea una lezione separata solo se è davvero un'altra sessione."
+                      : "Per evitare doppioni, aggiungiti alla lezione esistente invece di crearne una nuova. Crea una lezione separata solo se è davvero un'altra sessione."}
                   </p>
                 </div>
               </div>
@@ -260,7 +260,9 @@ export default function FormCaricaPresenza({
                           value={c.id}
                           className="shrink-0"
                         >
-                          Aggiungimi a questa lezione
+                          {admin
+                            ? "Aggiungi i maestri selezionati"
+                            : "Aggiungimi a questa lezione"}
                         </Button>
                       )
                     )}

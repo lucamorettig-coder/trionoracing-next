@@ -1172,17 +1172,31 @@ export async function addMaestroToLezione(
   lezioneId: string,
   maestroId: string,
 ): Promise<Lezione> {
+  return addMaestriToLezione(lezioneId, [maestroId]);
+}
+
+/**
+ * Versione multi-maestro di `addMaestroToLezione`: aggiunge un insieme di
+ * maestri ai presenti di una lezione (idempotente, un solo PATCH) e rigenera
+ * le presenze. Usata dal flusso admin "Aggiungi i maestri selezionati alla
+ * lezione esistente". Se nessun maestro è nuovo, rigenera comunque (idempotente).
+ */
+export async function addMaestriToLezione(
+  lezioneId: string,
+  maestriIds: string[],
+): Promise<Lezione> {
   const existing = await getLezioneById(lezioneId);
   if (!existing) throw new Error("Lezione non trovata");
 
   const presenti = new Set(existing.fields.MAESTRI_PRESENTI ?? []);
-  if (presenti.has(maestroId)) {
-    // Già presente: assicura comunque l'esistenza della presenza (idempotente).
+  const nuovi = maestriIds.filter((id) => id && !presenti.has(id));
+  if (nuovi.length === 0) {
+    // Nessun nuovo maestro: assicura comunque le presenze (idempotente).
     await generatePresenzeForLezione(existing);
     return existing;
   }
 
-  presenti.add(maestroId);
+  nuovi.forEach((id) => presenti.add(id));
   const res = await airtableFetch(`TABELLA_LEZIONI/${lezioneId}`, {
     method: "PATCH",
     body: JSON.stringify({
