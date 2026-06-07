@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Instagram, Facebook, Youtube } from "lucide-react";
 import { Button } from "./button";
+import { LEGAL } from "@/lib/seo";
+import { CookiePreferencesButton } from "@/components/consent/CookiePreferencesButton";
 
 /**
  * Footer — Triono Racing
@@ -99,10 +101,15 @@ export function Footer({ onNewsletterSubmit }: FooterProps) {
         </div>
 
         <div className="mt-12 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs text-white/55">
-          <div>© {new Date().getFullYear()} ASD CIEMME · Triono Racing · P.IVA TBD</div>
-          <div className="flex gap-5">
+          <div suppressHydrationWarning>
+            © {new Date().getFullYear()} ASD CIEMME · Triono Racing · P.IVA {LEGAL.vat} · C.F.{" "}
+            {LEGAL.taxCode}
+          </div>
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
             <Link href="/privacy" className="hover:text-white">Privacy</Link>
             <Link href="/cookie" className="hover:text-white">Cookie</Link>
+            <Link href="/condizioni" className="hover:text-white">Condizioni</Link>
+            <CookiePreferencesButton />
             <Link href="/contatti" className="hover:text-white">Contatti</Link>
           </div>
         </div>

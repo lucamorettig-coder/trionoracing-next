@@ -24,6 +24,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/chi-siamo", priority: 0.7, changeFrequency: "yearly" },
     { path: "/gli-amatori-triono", priority: 0.7, changeFrequency: "monthly" },
     { path: "/contatti", priority: 0.6, changeFrequency: "monthly" },
+    { path: "/privacy", priority: 0.3, changeFrequency: "yearly" },
+    { path: "/cookie", priority: 0.3, changeFrequency: "yearly" },
+    { path: "/condizioni", priority: 0.3, changeFrequency: "yearly" },
   ];
 
   return routes.map((r) => ({

@@ -5,6 +5,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { ContactForm } from "@/components/contatti/ContactForm";
 import { CalendarDays, MapPin, Mail } from "@/components/ui/icons";
+import { CONTACT_EMAIL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Contatti · Triono Racing",
@@ -44,10 +45,10 @@ export default function ContattiPage() {
                 <Mail className="w-4 h-4" /> Scrivici subito
               </div>
               <a
-                href="mailto:info@trionoracing.it"
-                className="text-2xl font-bold leading-tight hover:underline underline-offset-4"
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="text-2xl font-bold leading-tight hover:underline underline-offset-4 break-all"
               >
-                info@trionoracing.it
+                {CONTACT_EMAIL}
               </a>
               <p className="mt-3 text-sm text-white/70">
                 Per richieste urgenti o se preferisci scriverci direttamente.
