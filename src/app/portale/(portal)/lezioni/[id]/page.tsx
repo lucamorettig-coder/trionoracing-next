@@ -17,7 +17,7 @@ import { actionUpdateLezione } from "../actions";
 
 interface Params {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ success?: string }>;
+  searchParams: Promise<{ success?: string; joined?: string }>;
 }
 
 export default async function LezioneDettaglioPage({ params, searchParams }: Params) {
@@ -82,10 +82,14 @@ export default async function LezioneDettaglioPage({ params, searchParams }: Par
           : "Modifica i campi per aggiornare la lezione."}
       </p>
 
-      {sp.success && (
+      {(sp.success || sp.joined) && (
         <div className="flex items-center gap-3 rounded-[var(--radius-lg)] border border-grass-100 bg-grass-50 text-grass-700 px-4 py-3 mb-6">
           <CheckCircle2 className="w-5 h-5 shrink-0" />
-          <p className="text-sm font-medium">Lezione aggiornata con successo.</p>
+          <p className="text-sm font-medium">
+            {sp.joined
+              ? "Sei stato aggiunto a questa lezione."
+              : "Lezione aggiornata con successo."}
+          </p>
         </div>
       )}
 

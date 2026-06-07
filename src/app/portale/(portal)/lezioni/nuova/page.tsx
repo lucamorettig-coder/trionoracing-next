@@ -10,7 +10,11 @@ import {
 import FormCaricaPresenza from "@/components/portale/presenze/FormCaricaPresenza";
 import SezioneMaestroNonCollegato from "@/components/portale/lezioni/SezioneMaestroNonCollegato";
 import BackLink from "@/components/portale/BackLink";
-import { actionCaricaPresenza } from "../actions";
+import {
+  actionCaricaPresenza,
+  checkConflittoLezione,
+  actionJoinLezione,
+} from "../actions";
 
 export const metadata = {
   title: "Carica presenza · Portale Triono Racing",
@@ -59,6 +63,8 @@ export default async function NuovaPresenzaPage() {
         gare={gare}
         currentMaestroId={maestro.id}
         cancelHref="/portale/lezioni"
+        checkConflitto={checkConflittoLezione}
+        joinAction={actionJoinLezione}
       />
     </div>
   );
