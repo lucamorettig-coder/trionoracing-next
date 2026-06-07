@@ -36,9 +36,15 @@ function authHeaders(): Record<string, string> {
   };
 }
 
-/** Cerca il record genitore per email (case-sensitive sul valore Airtable). */
+/**
+ * Cerca il record genitore per email (case-insensitive: LOWER lato Airtable).
+ * L'email in input è già normalizzata a lowercase dal chiamante; Airtable salva
+ * il valore "as-typed" dall'utente in iscrizione (può essere CamelCase). Senza
+ * LOWER, un genitore con `Mario.Rossi@Gmail.com` su Airtable verrebbe perso e
+ * `getRoleFromAirtable` ricadrebbe su 'GENITORE' silenziosamente.
+ */
 async function findGenitoreByEmail(email: string): Promise<GenitoreRecord | null> {
-  const formula = encodeURIComponent(`{EMAIL_GENITORE}="${email}"`);
+  const formula = encodeURIComponent(`LOWER({EMAIL_GENITORE})="${email}"`);
   const url = `${baseUrl()}/TABELLA_GENITORI?filterByFormula=${formula}&maxRecords=1`;
   const res = await fetch(url, { headers: authHeaders() });
   if (!res.ok) {
