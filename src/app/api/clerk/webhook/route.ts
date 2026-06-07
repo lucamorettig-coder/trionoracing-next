@@ -20,9 +20,14 @@ interface ClerkUserCreatedEvent {
 }
 
 export async function POST(req: NextRequest) {
-  const secret = process.env.CLERK_WEBHOOK_SECRET;
+  // L'env su Vercel (PROD + Preview) e in .env.local è CLERK_WEBHOOK_SIGNING_SECRET
+  // (nome standard Svix). Il nome breve CLERK_WEBHOOK_SECRET era un disallineamento
+  // di EVO-002 → il webhook tirava 500 da sempre. Il lazy sync in
+  // src/app/portale/(portal)/layout.tsx copriva il caso "user.created", ma altri
+  // eventi Clerk (es. user.updated, user.deleted) andavano persi.
+  const secret = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
   if (!secret) {
-    throw new Error("[clerk-webhook] CLERK_WEBHOOK_SECRET non configurato");
+    throw new Error("[clerk-webhook] CLERK_WEBHOOK_SIGNING_SECRET non configurato");
   }
 
   const rawBody = await req.text();
@@ -47,7 +52,13 @@ export async function POST(req: NextRequest) {
   }
 
   const clerkUserId = evt.data.id;
-  const email = evt.data.email_addresses[0]?.email_address ?? "";
+  // Normalizza email a lowercase: Clerk solitamente la passa già normalizzata,
+  // ma Airtable salva EMAIL_GENITORE "as-typed" e `getGenitoreByEmail` fa un
+  // confronto case-sensitive. Coerente con il fix di EVO-008 (airtable-tag.ts
+  // usa LOWER(...) lato Airtable). Senza questo normalize, una sola lettera
+  // maiuscola farebbe ricadere il webhook nel branch `createGenitore` invece di
+  // aggiornare il record genitore esistente.
+  const email = (evt.data.email_addresses[0]?.email_address ?? "").toLowerCase();
   const firstName = evt.data.first_name ?? "";
   const lastName = evt.data.last_name ?? "";
 
