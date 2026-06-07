@@ -117,6 +117,27 @@ export async function toggleInEvidenzaAction(
   }
 }
 
+/**
+ * EVO-025: assegnazione maestri alla gara — azione snella dal dettaglio gara
+ * (non più dal form di modifica). Patch solo "Maestro Accompagnatore" + hook
+ * generazione PRESENZE_MAESTRI (idempotente) per i maestri assegnati.
+ */
+export async function assegnaMaestriGaraAction(
+  garaId: string,
+  maestriIds: string[],
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  await requireAdmin();
+  try {
+    await updateGara(garaId, { "Maestro Accompagnatore": maestriIds });
+    await hookGeneratePresenzeGara(garaId);
+    await revalidateGareAdmin(garaId);
+    return { ok: true };
+  } catch (err) {
+    console.error("[evo-025] assegnaMaestriGaraAction", err);
+    return { ok: false, error: err instanceof Error ? err.message : "Errore sconosciuto" };
+  }
+}
+
 export async function approvaIscrizioneAction(id: string): Promise<void> {
   await requireAdmin();
   await updateIscrizioneGara(id, "Confermata");

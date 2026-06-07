@@ -1,16 +1,11 @@
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { requireAdmin } from "@/lib/auth-admin";
-import { getAllMaestriAttiviAdmin } from "@/lib/airtable-admin";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { GaraForm } from "@/components/admin/gare/GaraForm";
 
 export default async function NuovaGaraPage() {
   await requireAdmin();
-  const maestri = await getAllMaestriAttiviAdmin().catch((err) => {
-    console.error("[admin/gare/nuova] maestri", err);
-    return [];
-  });
 
   return (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-12 lg:py-16">
@@ -27,7 +22,7 @@ export default async function NuovaGaraPage() {
         subtitle="Crea una gara solo se serve un inserimento eccezionale (non già presente da sync FCI/Make.com)."
       />
       <div className="mt-8">
-        <GaraForm maestri={maestri} />
+        <GaraForm />
       </div>
     </div>
   );

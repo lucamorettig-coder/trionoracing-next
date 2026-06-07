@@ -8,6 +8,7 @@ import {
 } from "@/lib/airtable-admin";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { DettaglioGaraAdmin } from "@/components/admin/gare/DettaglioGaraAdmin";
+import GaraTabs from "@/components/admin/gare/GaraTabs";
 
 export default async function GaraDetailAdminPage({
   params,
@@ -26,9 +27,6 @@ export default async function GaraDetailAdminPage({
 
   const numIscrizioni = gara.iscrizioniGareIds.length;
   const maestriAttivi = await getAllMaestriAttiviAdmin().catch(() => []);
-
-  const assignedSet = new Set(gara.maestroAccompagnatoreIds);
-  const maestriAssegnati = maestriAttivi.filter((m) => assignedSet.has(m.id));
 
   return (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-12 lg:py-16">
@@ -59,10 +57,14 @@ export default async function GaraDetailAdminPage({
       )}
 
       <div className="mt-6">
+        <GaraTabs garaId={gara.id} numIscrizioni={numIscrizioni} />
+      </div>
+
+      <div className="mt-6">
         <DettaglioGaraAdmin
           gara={gara}
           numIscrizioni={numIscrizioni}
-          maestriAssegnati={maestriAssegnati}
+          maestri={maestriAttivi}
         />
       </div>
     </div>
