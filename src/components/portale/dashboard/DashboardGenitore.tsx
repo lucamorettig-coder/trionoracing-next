@@ -95,6 +95,59 @@ export default function DashboardGenitore({
       </section>
 
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12 space-y-10">
+        {/* Prossime scadenze — sopra "I miei figli" quando presenti (EVO-025) */}
+        {scadenzeVisible.length > 0 && (
+          <section>
+            <h2 className="text-xl font-bold text-ink mb-4">Prossime scadenze</h2>
+            <div className="bg-white border border-line rounded-[var(--radius-xl)] divide-y divide-line shadow-[var(--shadow-sm)]">
+              {scadenzeVisible.map((s, idx) => {
+                const isScaduto = s.giorni < 0;
+                const isCert = s.kind === 'cert';
+                const iconBg = isScaduto ? 'bg-flag-100 text-flag-700' : 'bg-ember-100 text-ember-700';
+
+                const title = isCert
+                  ? `Certificato medico di ${s.bambinoNome}`
+                  : `${s.titoloLabel ?? 'Pagamento'} · ${s.bambinoNome}${s.importo !== undefined ? ` · €${s.importo}` : ''}`;
+
+                const subtitle = isScaduto
+                  ? isCert
+                    ? `Scaduto da ${Math.abs(s.giorni)} ${Math.abs(s.giorni) === 1 ? 'giorno' : 'giorni'} · blocco iscrizione ${anno}`
+                    : `Scaduto il ${formatDateIT(s.dataScadenza)}`
+                  : `Tra ${s.giorni} ${s.giorni === 1 ? 'giorno' : 'giorni'} · scadenza ${formatDateIT(s.dataScadenza)}`;
+
+                const ctaLabel = isCert ? 'Carica certificato' : 'Paga con SumUp';
+                const ctaHref = isCert
+                  ? `/portale/figli/${s.bambinoId}#certificato`
+                  : `/portale/iscrizioni/${s.iscrizioneId}/checkout?titolo=${s.titoloId}`;
+
+                return (
+                  <div key={idx} className="flex items-center gap-4 px-5 py-4">
+                    <div className={`w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center shrink-0 ${iconBg}`}>
+                      {isCert ? <Stethoscope className="w-5 h-5" /> : <Euro className="w-5 h-5" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-ink truncate">{title}</p>
+                      <p className="text-xs text-ink-muted">{subtitle}</p>
+                    </div>
+                    <Button asChild variant={isCert ? "secondary" : "primary"} size="sm" className="shrink-0">
+                      <Link href={ctaHref}>{ctaLabel}</Link>
+                    </Button>
+                  </div>
+                );
+              })}
+              {scadenzeCount > 5 && (
+                <div className="px-5 py-3">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/portale/iscrizioni?stato=da_pagare">
+                      Vedi tutte le scadenze ({scadenzeCount})
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
         {/* I miei figli */}
         {bambini.length > 0 && (
           <section>
@@ -120,63 +173,6 @@ export default function DashboardGenitore({
                 <Plus className="w-6 h-6" />
                 <span className="text-sm font-semibold">Aggiungi figlio</span>
               </Link>
-            </div>
-          </section>
-        )}
-
-        {/* Prossime scadenze */}
-        {scadenzeVisible.length > 0 && (
-          <section>
-            <h2 className="text-xl font-bold text-ink mb-4">Prossime scadenze</h2>
-            <div className="bg-white border border-line rounded-[var(--radius-xl)] divide-y divide-line shadow-[var(--shadow-sm)]">
-              {scadenzeVisible.map((s, idx) => {
-                const isScaduto = s.giorni < 0;
-                const isCert = s.kind === 'cert';
-                const iconBg = isScaduto ? 'bg-flag-100 text-flag-700' : 'bg-ember-100 text-ember-700';
-
-                const title = isCert
-                  ? `Certificato medico di ${s.bambinoNome}`
-                  : `${s.titoloLabel ?? 'Pagamento'} · ${s.bambinoNome}${s.importo !== undefined ? ` · €${s.importo}` : ''}`;
-
-                const subtitle = isScaduto
-                  ? isCert
-                    ? `Scaduto da ${Math.abs(s.giorni)} ${Math.abs(s.giorni) === 1 ? 'giorno' : 'giorni'} · blocco iscrizione ${anno}`
-                    : `Scaduto il ${formatDateIT(s.dataScadenza)}`
-                  : `Tra ${s.giorni} ${s.giorni === 1 ? 'giorno' : 'giorni'} · scadenza ${formatDateIT(s.dataScadenza)}`;
-
-                const ctaLabel = isCert ? 'Carica nuovo certificato →' : 'Paga con SumUp →';
-                const ctaHref = isCert
-                  ? `/portale/figli/${s.bambinoId}#certificato`
-                  : `/portale/iscrizioni/${s.iscrizioneId}/checkout?titolo=${s.titoloId}`;
-
-                return (
-                  <div key={idx} className="flex items-center gap-4 px-5 py-4">
-                    <div className={`w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center shrink-0 ${iconBg}`}>
-                      {isCert ? <Stethoscope className="w-5 h-5" /> : <Euro className="w-5 h-5" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-ink truncate">{title}</p>
-                      <p className="text-xs text-ink-muted">{subtitle}</p>
-                    </div>
-                    <Link
-                      href={ctaHref}
-                      className="text-sm font-semibold text-navy-700 hover:text-navy-900 shrink-0"
-                    >
-                      {ctaLabel}
-                    </Link>
-                  </div>
-                );
-              })}
-              {scadenzeCount > 5 && (
-                <div className="px-5 py-3">
-                  <Link
-                    href="/portale/iscrizioni?stato=da_pagare"
-                    className="text-sm font-semibold text-navy-700 underline underline-offset-2 hover:text-navy-900"
-                  >
-                    Vedi tutte le scadenze ({scadenzeCount}) →
-                  </Link>
-                </div>
-              )}
             </div>
           </section>
         )}
@@ -224,12 +220,11 @@ export default function DashboardGenitore({
               })}
               {garaRichiesteAttive.length > garaRichiesteVisible.length && (
                 <div className="px-5 py-3">
-                  <Link
-                    href="/portale/gare"
-                    className="text-sm font-semibold text-navy-700 underline underline-offset-2 hover:text-navy-900"
-                  >
-                    Vedi tutte ({garaRichiesteAttive.length}) →
-                  </Link>
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/portale/gare">
+                      Vedi tutte ({garaRichiesteAttive.length})
+                    </Link>
+                  </Button>
                 </div>
               )}
             </div>

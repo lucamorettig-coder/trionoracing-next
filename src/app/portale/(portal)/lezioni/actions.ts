@@ -8,6 +8,8 @@ import {
   updateLezione,
   getGenitoreByClerkId,
   getMaestroByGenitoreId,
+  getGaraById,
+  generatePresenzeForGara,
   ATTIVITA_SVOLTE_VALUES,
   TIPO_SESSIONE_VALUES,
   type AttivitaSvolta,
@@ -85,6 +87,47 @@ export async function actionCreateLezione(formData: FormData): Promise<void> {
   }
 
   // Aggiunge sempre il maestro corrente fra i presenti se non già incluso.
+  const presenti = new Set(fields.MAESTRI_PRESENTI ?? []);
+  presenti.add(maestroId);
+  fields.MAESTRI_PRESENTI = Array.from(presenti);
+
+  await createLezione(fields, maestroId);
+  revalidatePath("/portale/lezioni");
+  revalidatePath("/portale");
+  redirect("/portale/lezioni?success=1");
+}
+
+/**
+ * EVO-025: "Carica presenza" maestro — gestisce sia lezione sia gara.
+ * - modo "lezione": crea una lezione (come `actionCreateLezione`).
+ * - modo "gara": seleziona una gara esistente e scrive PRESENZE_MAESTRI tipo
+ *   "gara" (rimborso gara) per i maestri presenti. Il maestro corrente è sempre
+ *   incluso.
+ */
+export async function actionCaricaPresenza(formData: FormData): Promise<void> {
+  const { maestroId } = await getCurrentMaestro();
+  const modo = String(formData.get("MODO") ?? "lezione").trim();
+
+  if (modo === "gara") {
+    const garaId = String(formData.get("GARA_ID") ?? "").trim();
+    if (!garaId) redirect("/portale/lezioni/nuova?error=missing-gara");
+    const maestri = new Set(
+      formData.getAll("MAESTRI_PRESENTI").map(String).filter(Boolean),
+    );
+    maestri.add(maestroId);
+    const gara = await getGaraById(garaId);
+    if (!gara) redirect("/portale/lezioni/nuova?error=gara-not-found");
+    await generatePresenzeForGara(garaId, gara.data, Array.from(maestri));
+    revalidatePath("/portale/lezioni");
+    revalidatePath("/portale");
+    redirect("/portale/lezioni?success=1");
+  }
+
+  // modo lezione
+  const fields = parseLezioneFromForm(formData);
+  if (!fields.DATA) redirect("/portale/lezioni/nuova?error=missing-data");
+  if (!fields.TIPO_SESSIONE) redirect("/portale/lezioni/nuova?error=missing-tipo");
+
   const presenti = new Set(fields.MAESTRI_PRESENTI ?? []);
   presenti.add(maestroId);
   fields.MAESTRI_PRESENTI = Array.from(presenti);

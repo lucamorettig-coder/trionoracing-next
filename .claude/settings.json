@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ffmpeg -version)",
+      "mcp__claude_ai_Airtable__create_table"
+    ]
+  }
+}

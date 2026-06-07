@@ -24,8 +24,10 @@ export default function MaestriSelector({
   defaultValue,
   disabled = false,
 }: Props) {
-  const initial = new Set(defaultValue ?? [currentMaestroId]);
-  initial.add(currentMaestroId);
+  const initial = new Set(
+    (defaultValue ?? (currentMaestroId ? [currentMaestroId] : [])).filter(Boolean),
+  );
+  if (currentMaestroId) initial.add(currentMaestroId);
   const [selected, setSelected] = useState<Set<string>>(initial);
 
   function toggle(id: string) {

@@ -13,6 +13,7 @@ import { ExportCSVButton } from "@/components/admin/ExportCSVButton";
 import { Badge } from "@/components/ui/badge";
 import { IscrizioniGaraFilters } from "@/components/admin/gare/IscrizioniGaraFilters";
 import { IscrizioniGaraDataTable } from "@/components/admin/gare/IscrizioniGaraDataTable";
+import GaraTabs from "@/components/admin/gare/GaraTabs";
 import { formatDataLongIT } from "@/components/admin/gare/gare-helpers";
 import type { StatoIscrizioneGara } from "@/lib/airtable-portale";
 
@@ -59,11 +60,11 @@ export default async function IscrizioniGaraAdminPage({
   return (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-12 lg:py-16">
       <Link
-        href={`/portale/admin/gare/${id}`}
+        href="/portale/admin/gare"
         className="inline-flex items-center gap-1 text-[13px] text-ink-muted hover:text-ink mb-4"
       >
         <ChevronLeft size={14} aria-hidden />
-        Torna al dettaglio
+        Torna a Gare
       </Link>
       <AdminPageHeader
         eyebrow={`Iscrizioni · ${formatDataLongIT(gara.data)}`}
@@ -77,6 +78,10 @@ export default async function IscrizioniGaraAdminPage({
           />
         }
       />
+
+      <div className="mt-6">
+        <GaraTabs garaId={id} numIscrizioni={gara.iscrizioniGareIds.length} />
+      </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <Badge variant="warning" size="md">

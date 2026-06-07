@@ -4,16 +4,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TipoGaraTile, formatDataLongIT } from "./gare-helpers";
 import { EliminaGaraButton } from "./EliminaGaraButton";
+import AssegnaMaestriGara from "./AssegnaMaestriGara";
 import type { Gara } from "@/lib/airtable-portale";
 import type { MaestroLite } from "@/lib/airtable-admin";
 
 interface Props {
   gara: Gara;
   numIscrizioni: number;
-  maestriAssegnati: MaestroLite[];
+  /** Tutti i maestri attivi selezionabili per l'assegnazione. */
+  maestri: MaestroLite[];
 }
 
-export function DettaglioGaraAdmin({ gara, numIscrizioni, maestriAssegnati }: Props) {
+export function DettaglioGaraAdmin({ gara, numIscrizioni, maestri }: Props) {
+  const assignedIds = gara.maestroAccompagnatoreIds;
+  const numAssegnati = assignedIds.length;
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
@@ -53,12 +57,6 @@ export function DettaglioGaraAdmin({ gara, numIscrizioni, maestriAssegnati }: Pr
           </div>
         </div>
         <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0 w-full sm:w-auto">
-          <Button asChild variant="primary" size="md">
-            <Link href={`/portale/admin/gare/${gara.id}/iscrizioni`}>
-              <Users size={14} aria-hidden />
-              Gestisci iscrizioni ({numIscrizioni})
-            </Link>
-          </Button>
           <Button asChild variant="outline" size="md">
             <Link href={`/portale/admin/gare/${gara.id}/modifica`}>
               <Pencil size={14} aria-hidden />
@@ -124,27 +122,16 @@ export function DettaglioGaraAdmin({ gara, numIscrizioni, maestriAssegnati }: Pr
         </dl>
       </section>
 
-      {/* Maestri assegnati */}
+      {/* Maestri assegnati — assegnazione inline (EVO-025) */}
       <section className="bg-white border border-line rounded-[var(--radius-lg)] p-5 lg:p-6">
-        <h2 className="text-[13px] font-bold uppercase tracking-wide text-ink-muted mb-3">
-          Maestri assegnati ({maestriAssegnati.length})
+        <h2 className="text-[13px] font-bold uppercase tracking-wide text-ink-muted mb-1">
+          Maestri assegnati ({numAssegnati})
         </h2>
-        {maestriAssegnati.length === 0 ? (
-          <p className="text-[13px] text-ink-muted italic">
-            Nessun maestro assegnato.
-          </p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {maestriAssegnati.map((m) => (
-              <Badge key={m.id} variant="default" size="md">
-                {m.cognome} {m.nome}
-                {m.qualifica && (
-                  <span className="text-navy-700/70 ml-1 text-[11px]">· {m.qualifica}</span>
-                )}
-              </Badge>
-            ))}
-          </div>
-        )}
+        <p className="text-[12px] text-ink-muted mb-3">
+          Clicca un maestro per assegnarlo/rimuoverlo, poi salva. L&apos;assegnazione
+          genera le presenze maestro per questa gara.
+        </p>
+        <AssegnaMaestriGara garaId={gara.id} maestri={maestri} assignedIds={assignedIds} />
       </section>
     </div>
   );

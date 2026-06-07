@@ -29,6 +29,7 @@
 | EVO-022 | scuola-come-iscriversi | Sezione informativa "Cosa occorre per iscriversi" su /la-scuola (funnel 4 step + mockup illustrati + CTA → /portale/iscrizioni) | 2026-06-06 | 2026-06-06 | completata | https://trionoracing-next.vercel.app/la-scuola | [link](evolutive/EVO-022-scuola-come-iscriversi.md) |
 | EVO-023 | auth-portale | Restyle pagine auth portale (login + registrati split-screen brand panel su `<SignIn>`/`<SignUp>` Clerk + appearance raffinata + localizzazione IT) + **nuova** pagina recupero-password custom a step | 2026-06-06 | 2026-06-07 | completata | https://trionoracing-next.vercel.app/portale/login | [link](evolutive/EVO-023-auth-portale.md) |
 | EVO-024 | privacy-condizioni-analytics | Documenti legali GDPR: Privacy da bozza→definitiva + **nuova** Condizioni di Servizio (sito+portale) + **nuovo** banner cookie consent custom (Consent Mode v2) + Google Analytics 4 (`G-RMGEYC52J0`) post-consenso | 2026-06-07 | 2026-06-07 | completata | https://trionoracing-next.vercel.app | [link](evolutive/EVO-024-privacy-condizioni-analytics.md) |
+| EVO-025 | portale-qa-ux-polish | Portale QA/UX polish post-produzione (mobile genitori + admin) — 8 fix da "Check trionoracing.it" | 2026-06-07 | — | pronta per implementazione | — | [link](evolutive/EVO-025-portale-qa-ux-polish.md) |
 
 ## Stati possibili
 

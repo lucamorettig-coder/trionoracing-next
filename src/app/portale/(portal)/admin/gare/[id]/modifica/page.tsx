@@ -2,10 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { requireAdmin } from "@/lib/auth-admin";
-import {
-  getGaraByIdAdmin,
-  getAllMaestriAttiviAdmin,
-} from "@/lib/airtable-admin";
+import { getGaraByIdAdmin } from "@/lib/airtable-admin";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { GaraForm } from "@/components/admin/gare/GaraForm";
 
@@ -16,10 +13,7 @@ export default async function ModificaGaraPage({
 }) {
   await requireAdmin();
   const { id } = await params;
-  const [gara, maestri] = await Promise.all([
-    getGaraByIdAdmin(id),
-    getAllMaestriAttiviAdmin().catch(() => []),
-  ]);
+  const gara = await getGaraByIdAdmin(id);
   if (!gara) notFound();
 
   return (
@@ -37,7 +31,7 @@ export default async function ModificaGaraPage({
         subtitle={gara.nomeGara}
       />
       <div className="mt-8">
-        <GaraForm initial={gara} maestri={maestri} />
+        <GaraForm initial={gara} />
       </div>
     </div>
   );

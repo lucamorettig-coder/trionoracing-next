@@ -1033,8 +1033,23 @@ export async function getMaestroByEmail(email: string): Promise<Maestro | null> 
 export async function getMaestroByGenitoreId(
   genitoreRecordId: string,
 ): Promise<Maestro | null> {
-  const res = await airtableFetch(`TABELLA_GENITORI/${genitoreRecordId}`);
-  const genitore: Genitore = await res.json();
+  // Fonte di verità del collegamento: il link `UTENTE` sul record maestro.
+  // L'email del maestro (campo EMAIL) può differire da EMAIL_GENITORE — sono
+  // record distinti — quindi NON ci si può affidare all'email per il match
+  // (bug EVO-025: maestro già collegato via UTENTE ma con email diversa veniva
+  // mostrato come "non collegato"). Si scansiona la tabella maestri (piccola) e
+  // si matcha su UTENTE. Niente filterByFormula ARRAYJOIN (bug noto AGENTS.md).
+  const res = await airtableFetch(`TABELLA_MAESTRI?pageSize=100`);
+  const data: { records: Maestro[] } = await res.json();
+  const byUtente = data.records.find((m) =>
+    (m.fields.UTENTE ?? []).includes(genitoreRecordId),
+  );
+  if (byUtente) return byUtente;
+
+  // Fallback (maestro non ancora linkato via UTENTE): match per email
+  // genitore↔maestro. La lazy-sync popolerà poi UTENTE.
+  const gres = await airtableFetch(`TABELLA_GENITORI/${genitoreRecordId}`);
+  const genitore: Genitore = await gres.json();
   const email = genitore.fields.EMAIL_GENITORE;
   if (!email) return null;
   const maestro = await getMaestroByEmail(email);
@@ -1350,6 +1365,18 @@ export function mapGara(r: GaraRecord): Gara {
 export async function getGareFuture(today: string): Promise<Gara[]> {
   const formula = encodeURIComponent(`DATETIME_DIFF({Data},"${today}",'days')>=0`);
   const path = `${encodeURIComponent(GARE_TABLE)}?filterByFormula=${formula}&sort[0][field]=Data&sort[0][direction]=asc&pageSize=100`;
+  const res = await airtableFetch(path);
+  const data: { records: GaraRecord[] } = await res.json();
+  return data.records.map(mapGara);
+}
+
+/**
+ * Tutte le gare (future + passate), ordinate per data decrescente. Usato dal
+ * selettore gara nel form "Carica presenza" (EVO-025): per registrare presenze
+ * spesso serve una gara già passata.
+ */
+export async function getAllGareForSelector(): Promise<Gara[]> {
+  const path = `${encodeURIComponent(GARE_TABLE)}?sort[0][field]=Data&sort[0][direction]=desc&pageSize=100`;
   const res = await airtableFetch(path);
   const data: { records: GaraRecord[] } = await res.json();
   return data.records.map(mapGara);

@@ -9,6 +9,7 @@ import {
 } from "@/lib/airtable-portale";
 import { Button } from "@/components/ui/button";
 import IscrizioniLista from "@/components/portale/iscrizioni/IscrizioniLista";
+import BackLink from "@/components/portale/BackLink";
 
 interface PageProps {
   searchParams: Promise<{ anno?: string; figlio?: string }>;
@@ -32,6 +33,7 @@ export default async function IscrizioniPage({ searchParams }: PageProps) {
 
   return (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12">
+      <BackLink href="/portale" label="Torna alla dashboard" />
       <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-ink">Iscrizioni</h1>

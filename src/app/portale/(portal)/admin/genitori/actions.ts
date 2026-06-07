@@ -46,7 +46,6 @@ export async function disabilitaAccountAction(
     await disabilitaAccountGenitore(genitoreId, userId);
     revalidatePath("/portale/admin/genitori");
     revalidatePath(`/portale/admin/genitori/${genitoreId}`);
-    revalidatePath("/portale/admin/migrazione");
     return { ok: true };
   } catch (err) {
     console.error("[evo-008] disabilitaAccountAction", err);
@@ -66,7 +65,6 @@ export async function riabilitaAccountAction(
     await riabilitaAccountGenitore(genitoreId);
     revalidatePath("/portale/admin/genitori");
     revalidatePath(`/portale/admin/genitori/${genitoreId}`);
-    revalidatePath("/portale/admin/migrazione");
     return { ok: true };
   } catch (err) {
     console.error("[evo-008] riabilitaAccountAction", err);

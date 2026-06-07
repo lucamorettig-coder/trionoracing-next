@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getGenitoreByClerkId } from "@/lib/airtable-portale";
 import ProfiloGenitoreForm from "@/components/portale/ProfiloGenitoreForm";
+import BackLink from "@/components/portale/BackLink";
 
 export default async function ProfiloPage() {
   const { userId } = await auth();
@@ -12,6 +13,7 @@ export default async function ProfiloPage() {
 
   return (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12">
+      <BackLink href="/portale" label="Torna alla dashboard" />
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-ink">Il tuo profilo</h1>
         <p className="text-ink-muted text-sm mt-1">Gestisci i tuoi dati e le impostazioni dell&apos;account.</p>

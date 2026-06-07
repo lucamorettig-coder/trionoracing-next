@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TipoGaraTile, formatDataGara } from "./gare-helpers";
+import { toggleInEvidenzaAction } from "@/app/portale/(portal)/admin/gare/actions";
 import type { Gara } from "@/lib/airtable-portale";
 
 interface Props {
@@ -25,6 +26,28 @@ export interface GaraWithCounter extends Gara {
 
 export function GareDataTable({ gare, toggle }: Props) {
   const router = useRouter();
+  const [, startTransition] = React.useTransition();
+  // Override ottimistici inEvidenza per id (rollback su errore action).
+  const [overrides, setOverrides] = React.useState<Record<string, boolean>>({});
+  const [errore, setErrore] = React.useState<string | null>(null);
+
+  const isInEvidenza = (r: GaraWithCounter) =>
+    overrides[r.id] ?? r.inEvidenza ?? false;
+
+  function handleToggleEvidenza(r: GaraWithCounter) {
+    const prev = isInEvidenza(r);
+    const next = !prev;
+    setErrore(null);
+    setOverrides((o) => ({ ...o, [r.id]: next })); // ottimistico
+    startTransition(async () => {
+      const res = await toggleInEvidenzaAction(r.id, next);
+      if (!res.ok) {
+        // rollback
+        setOverrides((o) => ({ ...o, [r.id]: prev }));
+        setErrore("Impossibile aggiornare l'evidenza. Riprova.");
+      }
+    });
+  }
 
   const columns: ColumnDef<GaraWithCounter>[] = [
     {
@@ -108,16 +131,30 @@ export function GareDataTable({ gare, toggle }: Props) {
     },
     {
       key: "in_evidenza",
-      label: "★",
-      width: "48px",
+      label: "In evidenza",
+      width: "96px",
       align: "center",
-      accessor: (r) => (r.inEvidenza ? 1 : 0),
-      cellRenderer: (r) =>
-        r.inEvidenza ? (
-          <Star size={16} className="text-sun-500 fill-sun-500 inline" />
-        ) : (
-          <span className="text-ink-muted text-[12px]">—</span>
-        ),
+      accessor: (r) => (isInEvidenza(r) ? 1 : 0),
+      cellRenderer: (r) => {
+        const on = isInEvidenza(r);
+        return (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleToggleEvidenza(r);
+            }}
+            aria-pressed={on}
+            aria-label={on ? "Togli evidenza" : "Metti in evidenza"}
+            className="inline-flex items-center justify-center w-9 h-9 rounded-[var(--radius-md)] hover:bg-bg-muted transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-navy-700/20"
+          >
+            <Star
+              size={16}
+              className={on ? "text-sun-500 fill-sun-500" : "text-ink-muted"}
+            />
+          </button>
+        );
+      },
     },
     {
       key: "azioni",
@@ -165,6 +202,15 @@ export function GareDataTable({ gare, toggle }: Props) {
   ];
 
   return (
+    <>
+      {errore && (
+        <div
+          role="alert"
+          className="mb-3 rounded-[var(--radius-md)] bg-flag-50 border border-flag-200 px-4 py-2.5 text-[13px] text-flag-700"
+        >
+          {errore}
+        </div>
+      )}
     <DataTable
       columns={columns}
       data={gare}
@@ -186,5 +232,6 @@ export function GareDataTable({ gare, toggle }: Props) {
         </div>
       }
     />
+    </>
   );
 }

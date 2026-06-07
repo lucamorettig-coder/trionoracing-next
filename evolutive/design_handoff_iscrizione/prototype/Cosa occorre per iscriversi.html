@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>EVO-022 · Cosa occorre per iscriversi — /la-scuola</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="iscriviti/triono.css">
+<style>
+  html, body { margin: 0; font-family: 'Inter', system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" fill="#1F2D5A"/>
+    <g fill="none" stroke="#EFE63A" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="34" cy="62" r="11"/><circle cx="66" cy="62" r="11"/>
+      <path d="M34 62 44 44h14l-10 18M44 44l8 0M58 44l6 18"/>
+    </g>
+  </svg>
+</template>
+
+<script src="iscriviti/image-slot.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="iscriviti/design-canvas.jsx"></script>
+<script type="text/babel" src="iscriviti/mockups.jsx"></script>
+<script type="text/babel" src="iscriviti/sections.jsx"></script>
+<script type="text/babel" src="iscriviti/mobile.jsx"></script>
+<script type="text/babel" src="iscriviti/detail.jsx"></script>
+
+<script type="text/babel">
+  const { DesignCanvas, DCSection, DCArtboard } = window;
+
+  function AltNotes() {
+    const rows = window.TR_STEPS.map((s) => ({ n: s.n, t: s.title, alt: s.alt }));
+    return (
+      <div style={{ width: 720, background: '#fff', border: '1px solid var(--line)', borderRadius: 'var(--r-xl)', padding: '32px 34px', fontFamily: 'var(--f-sans)', color: 'var(--ink)', boxSizing: 'border-box' }}>
+        <span className="tr-eyebrow">SEO · contenuto</span>
+        <h3 style={{ margin: '14px 0 4px', fontSize: 22, fontWeight: 700, letterSpacing: '-.01em' }}>Descrizioni alt suggerite</h3>
+        <p style={{ margin: '0 0 18px', fontSize: 13.5, color: 'var(--ink-muted)' }}>
+          Gerarchia: la sezione usa <strong>un solo H2</strong>; i titoli dei 4 step sono <strong>H3</strong>.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {rows.map((r) => (
+            <div key={r.n} style={{ display: 'grid', gridTemplateColumns: '34px 130px 1fr', gap: 14, alignItems: 'baseline', paddingBottom: 12, borderBottom: '1px solid var(--line-soft)' }}>
+              <span style={{ fontFamily: 'var(--f-mono)', fontSize: 12, fontWeight: 700, color: 'var(--navy-500)' }}>{r.n}</span>
+              <span style={{ fontSize: 13.5, fontWeight: 600 }}>{r.t}</span>
+              <span style={{ fontFamily: 'var(--f-mono)', fontSize: 12, lineHeight: 1.5, color: 'var(--ink-muted)' }}>alt: “{r.alt}”</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function App() {
+    return (
+      <DesignCanvas>
+        <DCSection
+          id="desktop"
+          title="Cosa occorre per iscriversi — desktop"
+          subtitle="EVO-022 · direzione A · timeline orizzontale 01→04 · sezione tra la galleria foto e la CTA finale del sito">
+          <DCArtboard id="desk-a" label="Percorso chiaro · card + connettore numerato" width={1440} height={1400}>
+            <DirectionA />
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="mobile"
+          title="Cosa occorre per iscriversi — mobile"
+          subtitle="390px · 4 step impilati con connettore verticale · CTA a piena larghezza in fondo">
+          <DCArtboard id="mob-a" label="Card + rail numerato" width={390} height={2250}>
+            <MobileA />
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="dettaglio"
+          title="Dettaglio stile mockup illustrato"
+          subtitle="Spec dei frame stilizzati degli step 02–04 — checkout ingrandito, nessun dato reale">
+          <DCArtboard id="detail" label="Stile mockup · checkout" width={1160} height={760}>
+            <MockupDetail />
+          </DCArtboard>
+          <DCArtboard id="alt" label="Note SEO · alt text + heading" width={720} height={440}>
+            <AltNotes />
+          </DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

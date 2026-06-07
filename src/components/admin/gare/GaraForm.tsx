@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { GARA_CLASSI } from "@/lib/airtable-portale";
 import { createGaraAction, updateGaraAction } from "@/app/portale/(portal)/admin/gare/actions";
 import type { Gara } from "@/lib/airtable-portale";
-import type { MaestroLite } from "@/lib/airtable-admin";
 
 const TIPI_GARA = [
   "Strada Giovanile",
@@ -20,10 +19,9 @@ const TIPI_GARA = [
 
 interface Props {
   initial?: Gara;
-  maestri: MaestroLite[];
 }
 
-export function GaraForm({ initial, maestri }: Props) {
+export function GaraForm({ initial }: Props) {
   const router = useRouter();
   const editing = !!initial;
 
@@ -38,15 +36,8 @@ export function GaraForm({ initial, maestri }: Props) {
   const [idGaraFci, setIdGaraFci] = React.useState(initial?.idGaraFci ?? "");
   const [linkFci, setLinkFci] = React.useState(initial?.linkFci ?? "");
   const [comitato, setComitato] = React.useState(initial?.comitatoRegionale ?? "");
-  const [maestriSel, setMaestriSel] = React.useState<string[]>(
-    initial?.maestroAccompagnatoreIds ?? [],
-  );
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-
-  const toggleMaestro = (id: string) => {
-    setMaestriSel((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +66,6 @@ export function GaraForm({ initial, maestri }: Props) {
         "ID Gara FCI": idGaraFci.trim() || undefined,
         "Link FCI": linkFci.trim() || undefined,
         COMITATO_REGIONALE: comitato.trim() || undefined,
-        "Maestro Accompagnatore": maestriSel,
       };
 
       const result = editing
@@ -262,40 +252,9 @@ export function GaraForm({ initial, maestri }: Props) {
         </Field>
       </Section>
 
-      <Section title="Maestri assegnati">
-        {maestri.length === 0 ? (
-          <p className="text-[13px] text-ink-muted">
-            Nessun maestro attivo disponibile.
-          </p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {maestri.map((m) => {
-              const selected = maestriSel.includes(m.id);
-              return (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => toggleMaestro(m.id)}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[12.5px] transition-colors ${
-                    selected
-                      ? "bg-navy-700 border-navy-700 text-white"
-                      : "bg-white border-line text-ink-muted hover:border-navy-700 hover:text-ink"
-                  }`}
-                >
-                  <span className="font-semibold">
-                    {m.cognome} {m.nome}
-                  </span>
-                  {m.qualifica && (
-                    <span className={selected ? "text-white/70 text-[11px]" : "text-ink-muted text-[11px]"}>
-                      · {m.qualifica}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </Section>
+      <p className="text-[12px] text-ink-muted -mt-1">
+        I maestri si assegnano dalla scheda gara (sezione &quot;Maestri assegnati&quot;), non da qui.
+      </p>
 
       {/* Footer azioni */}
       <div className="flex items-center justify-end gap-3 pt-2 border-t border-line">

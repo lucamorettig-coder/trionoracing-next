@@ -186,7 +186,7 @@ export default function WizardNuovaIscrizione({
     <div className="space-y-8">
       <StepperWizard steps={[...STEPS]} currentStep={step} />
 
-      <div className="bg-white border border-line rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] p-6 lg:p-8">
+      <div className="rounded-[var(--radius-xl)] p-0 sm:bg-white sm:border sm:border-line sm:shadow-[var(--shadow-sm)] sm:p-6 lg:p-8">
         {step === 1 && (
           <StepScegliFiglio
             step={1}

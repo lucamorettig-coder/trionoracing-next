@@ -5,6 +5,7 @@ import { Plus, Users } from "lucide-react";
 import { getGenitoreByClerkId, getBambiniByGenitore } from "@/lib/airtable-portale";
 import { Button } from "@/components/ui/button";
 import FiglioCard from "@/components/portale/figli/FiglioCard";
+import BackLink from "@/components/portale/BackLink";
 
 export default async function FigliPage() {
   const { userId } = await auth();
@@ -17,6 +18,7 @@ export default async function FigliPage() {
 
   return (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12">
+      <BackLink href="/portale" label="Torna alla dashboard" />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-ink">I miei figli</h1>

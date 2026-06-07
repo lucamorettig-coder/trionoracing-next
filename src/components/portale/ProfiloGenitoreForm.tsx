@@ -13,7 +13,7 @@ interface Props {
 
 export default function ProfiloGenitoreForm({ genitore }: Props) {
   const router = useRouter();
-  const { signOut } = useClerk();
+  const { signOut, openUserProfile } = useClerk();
   const { fields } = genitore;
 
   const [form, setForm] = useState({
@@ -135,17 +135,17 @@ export default function ProfiloGenitoreForm({ genitore }: Props) {
             <p className="text-sm text-ink-muted">{fields.EMAIL_GENITORE}</p>
           </div>
         </div>
-        <p className="text-xs text-ink-muted">
-          Per cambiare email o password accedi alle impostazioni del tuo account Clerk.
-        </p>
-      </section>
-
-      {/* Sezione 3: Sessioni */}
-      <section className="bg-white border border-line rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] p-6">
-        <h2 className="font-bold text-ink text-base mb-3">Sessioni</h2>
         <p className="text-sm text-ink-muted">
-          Gestisci i dispositivi collegati al tuo account.
+          Gestisci email, password, autenticazione e dispositivi collegati dal tuo
+          account.
         </p>
+        <Button
+          variant="outline"
+          size="md"
+          onClick={() => openUserProfile()}
+        >
+          Gestisci account
+        </Button>
       </section>
 
       {/* Sezione 4: Esci */}

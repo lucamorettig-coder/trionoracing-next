@@ -6,6 +6,7 @@ import { getGenitoreByClerkId, getTitoliByGenitore } from "@/lib/airtable-portal
 import { Button } from "@/components/ui/button";
 import { formatEUR } from "@/lib/portale-utils";
 import PagamentiLista from "@/components/portale/pagamenti/PagamentiLista";
+import BackLink from "@/components/portale/BackLink";
 
 export default async function PagamentiPage() {
   const { userId } = await auth();
@@ -25,6 +26,7 @@ export default async function PagamentiPage() {
 
   return (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12">
+      <BackLink href="/portale" label="Torna alla dashboard" />
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-ink">Pagamenti</h1>
         {titoli.length > 0 && (

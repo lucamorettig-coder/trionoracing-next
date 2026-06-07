@@ -30,8 +30,30 @@ export default function StepperWizard({ steps, currentStep }: Props) {
         </div>
       </div>
 
-      {/* Stepper row */}
-      <div>
+      {/* Mobile (< sm): variante compatta con progress bar — niente label sovrapposte */}
+      <div className="sm:hidden" aria-current="step">
+        <div className="flex items-baseline justify-between gap-3 mb-2">
+          <span className="text-base font-bold text-white leading-tight min-w-0 truncate">
+            {label}
+          </span>
+          <span className="font-mono text-[13px] text-white/70 shrink-0 tabular-nums">
+            {currentStep} / {steps.length}
+          </span>
+        </div>
+        <div className="h-2 rounded-full bg-white/[0.14] overflow-hidden">
+          <div
+            className="h-full rounded-full bg-sun-500 transition-[width] duration-300"
+            style={{
+              width: `${(currentStep / steps.length) * 100}%`,
+              boxShadow: "0 0 12px rgba(239,230,58,0.5)",
+            }}
+            aria-hidden
+          />
+        </div>
+      </div>
+
+      {/* Desktop (≥ sm): stepper completo */}
+      <div className="hidden sm:block">
         <ol className="flex items-start justify-between gap-0">
           {steps.map((stepLabel, i) => {
             const idx = i + 1;
