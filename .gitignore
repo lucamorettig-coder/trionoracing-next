@@ -158,3 +158,6 @@ next-env.d.ts
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Cowork design-system export (asset locali, non parte del codice di produzione)
+/Design System Triono/

@@ -30,7 +30,6 @@
 | EVO-023 | auth-portale | Restyle pagine auth portale (login + registrati split-screen brand panel su `<SignIn>`/`<SignUp>` Clerk + appearance raffinata + localizzazione IT) + **nuova** pagina recupero-password custom a step | 2026-06-06 | 2026-06-07 | completata | https://trionoracing-next.vercel.app/portale/login | [link](evolutive/EVO-023-auth-portale.md) |
 | EVO-024 | privacy-condizioni-analytics | Documenti legali GDPR: Privacy da bozza→definitiva + **nuova** Condizioni di Servizio (sito+portale) + **nuovo** banner cookie consent custom (Consent Mode v2) + Google Analytics 4 (`G-RMGEYC52J0`) post-consenso | 2026-06-07 | 2026-06-07 | completata | https://trionoracing-next.vercel.app | [link](evolutive/EVO-024-privacy-condizioni-analytics.md) |
 | EVO-025 | portale-qa-ux-polish | Portale QA/UX polish post-produzione (mobile genitori + admin) — 8 fix da "Check trionoracing.it" | 2026-06-07 | — | pronta per implementazione | — | [link](evolutive/EVO-025-portale-qa-ux-polish.md) |
-| EVO-026 | tariffe-corso-solo-mtb | Tariffe corso "Solo Mountain Bike" (1 lezione/sett, giovedì — Q1 270€/Q2 180€/Q3 90€) + scadenze rate dinamiche dal mese di iscrizione | 2026-06-11 | — | pronta per implementazione | — | [link](evolutive/EVO-026-tariffe-corso-solo-mtb.md) |
 
 ## Stati possibili
 
