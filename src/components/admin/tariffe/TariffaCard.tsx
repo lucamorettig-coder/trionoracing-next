@@ -33,6 +33,7 @@ export function TariffaCard({ tariffa, quarterColor, iscrizioniCount }: Props) {
   const f = tariffa.fields;
   const anno = f.ANNO_ISCRIZIONE ?? "—";
   const quarter = f.NOME_TARIFFA ?? "—";
+  const corso = f.TIPO_CORSO ?? "MTB-BDC";
   const titolo = QUARTER_LABEL[quarter] ?? quarter;
   const attiva = !!f.ATTIVA;
 
@@ -54,8 +55,9 @@ export function TariffaCard({ tariffa, quarterColor, iscrizioniCount }: Props) {
             }}
           />
           <div className="relative z-[1] px-5 py-4 flex flex-col gap-1">
-            <span className="font-mono text-[10.5px] uppercase tracking-wide opacity-80">
-              Quarter {quarter.replace(/^Q/, "")} · {anno}
+            <span className="font-mono text-[10.5px] uppercase tracking-wide opacity-80 flex items-center gap-2 flex-wrap">
+              <span>Quarter {quarter.replace(/^Q/, "")} · {anno}</span>
+              <span className="bg-white/20 rounded-full px-2 py-0.5 font-bold">{corso}</span>
             </span>
             <h2 className="text-[22px] font-extrabold leading-tight">{titolo}</h2>
             {f.DESCRIZIONE_TARIFFA && (
@@ -92,14 +94,9 @@ export function TariffaCard({ tariffa, quarterColor, iscrizioniCount }: Props) {
           />
           <Row label="Importo rata" value={fmt(f.IMPORTO_RATA)} />
           <Row label="Sconto famiglia" value={fmt(f.SCONTO_FAMIGLIA_NUMEROSA)} />
-          {f.SCADENZA_RATE && (
-            <div className="flex flex-col gap-1 py-2 border-b border-line-soft last:border-0">
-              <span className="text-[12px] text-ink-muted">Scadenze rate</span>
-              <span className="font-mono text-[11.5px] text-ink tabular-nums">
-                {f.SCADENZA_RATE}
-              </span>
-            </div>
-          )}
+          <p className="text-[11.5px] text-ink-muted italic pt-2 mt-1 border-t border-dashed border-line-soft">
+            Scadenze: dal mese di iscrizione, una rata ogni 2 mesi
+          </p>
         </div>
 
         {/* Footer */}

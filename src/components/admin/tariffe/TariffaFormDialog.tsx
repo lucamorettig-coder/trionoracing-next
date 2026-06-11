@@ -6,11 +6,17 @@ import { AdminFormDialog } from "@/components/admin/AdminFormDialog";
 import { Button } from "@/components/ui/button";
 import { upsertTariffa, type TariffaFormData } from "@/lib/actions-admin";
 import type { Tariffa } from "@/lib/airtable-admin";
+import type { TipoCorso } from "@/lib/airtable-portale";
 
 const QUARTERS = [
   { value: "Q1", label: "Q1 (Gennaio → Aprile)" },
   { value: "Q2", label: "Q2 (Maggio → Agosto)" },
   { value: "Q3", label: "Q3 (Settembre → Dicembre)" },
+] as const;
+
+const CORSI = [
+  { value: "MTB-BDC", label: "Corso MTB-BDC (Strada + MTB)" },
+  { value: "SOLO-MTB", label: "Solo Mountain Bike (giovedì)" },
 ] as const;
 
 interface DialogProps {
@@ -35,37 +41,46 @@ export function TariffaFormDialog({
     f.ANNO_ISCRIZIONE ?? String(annoDefault ?? new Date().getFullYear()),
   );
   const [nomeTariffa, setNomeTariffa] = React.useState(f.NOME_TARIFFA ?? "Q1");
+  const [tipoCorso, setTipoCorso] = React.useState<TipoCorso>(f.TIPO_CORSO ?? "MTB-BDC");
   const [descrizione, setDescrizione] = React.useState(f.DESCRIZIONE_TARIFFA ?? "");
   const [quotaTotale, setQuotaTotale] = React.useState(f.QUOTA_TOTALE_ANNO ?? 0);
   const [numeroRate, setNumeroRate] = React.useState(f.NUMERO_RATE ?? 3);
   const [importoRata, setImportoRata] = React.useState(f.IMPORTO_RATA ?? 0);
-  const [scadenzeRate, setScadenzeRate] = React.useState(f.SCADENZA_RATE ?? "");
   const [importoKit, setImportoKit] = React.useState(f.IMPORTO_KIT_SCUOLA ?? 0);
   const [importoIscrizione, setImportoIscrizione] = React.useState(f.IMPORTO_ISCRIZIONE ?? 0);
   const [scontoFamiglia, setScontoFamiglia] = React.useState(f.SCONTO_FAMIGLIA_NUMEROSA ?? 0);
   const [attiva, setAttiva] = React.useState(f.ATTIVA ?? true);
+  const [errore, setErrore] = React.useState<string | null>(null);
 
   const handleSubmit = async () => {
+    setErrore(null);
     const data: TariffaFormData = {
       anno: String(anno).trim(),
       nomeTariffa,
+      tipoCorso,
       descrizione: descrizione.trim() || undefined,
       quotaTotaleAnno: Number(quotaTotale) || 0,
       numeroRate: Number(numeroRate) || 1,
       importoRata: Number(importoRata) || 0,
-      scadenzeRate: scadenzeRate.trim(),
       importoKitScuola: Number(importoKit) || 0,
       importoIscrizione: Number(importoIscrizione) || 0,
       scontoFamigliaNumerosa: Number(scontoFamiglia) || 0,
       attiva,
     };
-    await upsertTariffa(data, tariffa?.id);
+    try {
+      await upsertTariffa(data, tariffa?.id);
+    } catch (e) {
+      // Errore inline (es. violazione unicità anno+quarter+corso). Re-throw mantiene
+      // il dialog aperto: AdminFormDialog chiude solo su submit riuscito.
+      setErrore(e instanceof Error ? e.message : "Errore durante il salvataggio.");
+      throw e;
+    }
   };
 
   const title = editing ? "Modifica tariffa" : "Nuova tariffa";
   const description = editing
-    ? `Tariffa ${f.NOME_TARIFFA ?? ""} · ${f.ANNO_ISCRIZIONE ?? ""}`
-    : "Crea una nuova tariffa per il quarter selezionato.";
+    ? `Tariffa ${f.NOME_TARIFFA ?? ""} · ${f.TIPO_CORSO ?? "MTB-BDC"} · ${f.ANNO_ISCRIZIONE ?? ""}`
+    : "Crea una nuova tariffa per corso e quarter.";
 
   return (
     <AdminFormDialog
@@ -81,6 +96,16 @@ export function TariffaFormDialog({
       footerHint="Le modifiche non sono retroattive sulle iscrizioni già create."
       onSubmit={handleSubmit}
     >
+      {errore && (
+        <div
+          role="alert"
+          className="rounded-[var(--radius-md)] bg-flag-50 border border-flag-200 border-l-[3px] border-l-flag-500 px-3 py-2.5 text-[12.5px] text-flag-700 flex items-start gap-2"
+        >
+          <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+          <span>{errore}</span>
+        </div>
+      )}
+
       {editing && iscrizioniCount > 0 && (
         <div
           role="alert"
@@ -101,6 +126,17 @@ export function TariffaFormDialog({
         <p className="text-[11.5px] uppercase tracking-wide font-bold text-ink-muted mb-2">
           Anagrafica
         </p>
+        <Field label="Corso" className="mb-3">
+          <select
+            value={tipoCorso}
+            onChange={(e) => setTipoCorso(e.target.value as TipoCorso)}
+            className="h-9 px-3 text-[13px] border border-line rounded-[var(--radius-md)] bg-white text-ink focus:outline-none focus:ring-2 focus:ring-navy-700/20 w-full"
+          >
+            {CORSI.map((c) => (
+              <option key={c.value} value={c.value}>{c.label}</option>
+            ))}
+          </select>
+        </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Anno">
             <input
@@ -159,15 +195,9 @@ export function TariffaFormDialog({
           <CurrencyField label="Importo rata base" value={importoRata} onChange={setImportoRata} />
           <CurrencyField label="Sconto famiglia" value={scontoFamiglia} onChange={setScontoFamiglia} />
         </div>
-        <Field label="Scadenze rate" className="mt-3" helper="Formato: nome mese MAIUSCOLO separato da ; (es. FEBBRAIO;MARZO;APRILE)">
-          <textarea
-            value={scadenzeRate}
-            onChange={(e) => setScadenzeRate(e.target.value)}
-            className="px-3 py-2 text-[13px] border border-line rounded-[var(--radius-md)] bg-white text-ink focus:outline-none focus:ring-2 focus:ring-navy-700/20 w-full min-h-[60px] font-mono"
-            rows={2}
-            placeholder="FEBBRAIO;MARZO;APRILE"
-          />
-        </Field>
+        <p className="mt-3 text-[11.5px] text-ink-muted italic">
+          Scadenze rate dinamiche: la 1ª rata scade nel mese di iscrizione, le successive ogni 2 mesi.
+        </p>
       </div>
 
       <div className="h-px bg-line-soft" />

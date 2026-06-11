@@ -75,6 +75,11 @@ export function AdminFormDialog({
     try {
       await onSubmit();
       onOpenChange(false);
+    } catch (err) {
+      // onSubmit ha fallito: il dialog resta aperto (niente onOpenChange(false)).
+      // I form che gestiscono l'errore (es. TariffaFormDialog con validazione unicità)
+      // lo mostrano inline; qui logghiamo per i form senza display dedicato.
+      console.error("[AdminFormDialog] onSubmit error:", err);
     } finally {
       setInternalLoading(false);
     }

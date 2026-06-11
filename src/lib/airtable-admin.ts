@@ -22,6 +22,7 @@ import type {
   PresenzaTipo,
   Ruolo,
   StatoIscrizioneGara,
+  TipoCorso,
   TitoloPagamento,
 } from "@/lib/airtable-portale";
 import {
@@ -647,11 +648,13 @@ export interface Tariffa {
   fields: {
     ANNO_ISCRIZIONE?: string;
     NOME_TARIFFA?: string; // Q1 | Q2 | Q3
+    TIPO_CORSO?: TipoCorso; // EVO-026; assente = MTB-BDC (legacy)
     DESCRIZIONE_TARIFFA?: string;
     QUOTA_TOTALE_ANNO?: number;
     NUMERO_RATE?: number;
     IMPORTO_RATA?: number;
-    SCADENZA_RATE?: string; // "FEBBRAIO;MARZO;APRILE"
+    /** @deprecated Legacy (EVO-026): scadenze dinamiche, non più usato in UI. */
+    SCADENZA_RATE?: string;
     IMPORTO_KIT_SCUOLA?: number;
     IMPORTO_ISCRIZIONE?: number;
     SCONTO_FAMIGLIA_NUMEROSA?: number;
