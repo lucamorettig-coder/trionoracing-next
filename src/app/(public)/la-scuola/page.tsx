@@ -16,7 +16,7 @@ export const revalidate = 600;
 export const metadata: Metadata = {
   title: "La Scuola di Ciclismo Triono a Terni · ASD CIEMME",
   description:
-    "Scuola di ciclismo per bambini a partire da 4 anni di età al Ciclodromo Renato Perona di Terni. Maestri federali, 2 lezioni a settimana: bici da strada (martedì) e mountain bike (giovedì). Carta UNESCO 1992.",
+    "Scuola di ciclismo per bambini a partire da 4 anni di età al Ciclodromo Renato Perona di Terni. Maestri federali. Due formule: corso completo strada + MTB (martedì e giovedì) oppure solo mountain bike il giovedì. Carta UNESCO 1992.",
   alternates: { canonical: "/la-scuola" },
   openGraph: {
     title: "La Scuola di Ciclismo Triono a Terni",

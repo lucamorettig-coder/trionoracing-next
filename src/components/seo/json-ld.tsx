@@ -126,7 +126,7 @@ export function CourseJsonLd() {
     "@id": absUrl("/la-scuola#course"),
     name: "Scuola di Ciclismo Triono",
     description:
-      "Scuola di ciclismo per bambini a partire da 4 anni di età. Maestri federali, 2 lezioni a settimana: bici da strada il martedì, mountain bike il giovedì. Ambiente sicuro, gruppi piccoli, principi della Carta UNESCO 1992 sui diritti dei bambini nello sport.",
+      "Scuola di ciclismo per bambini a partire da 4 anni di età. Maestri federali. Due formule di iscrizione: il corso completo strada + mountain bike (martedì e giovedì) oppure la formula solo mountain bike del giovedì. Ambiente sicuro, gruppi piccoli, principi della Carta UNESCO 1992 sui diritti dei bambini nello sport.",
     url: absUrl("/la-scuola"),
     inLanguage: "it-IT",
     provider: { "@id": ORG_ID },

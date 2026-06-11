@@ -59,7 +59,7 @@ const STEPS: readonly Step[] = [
     icon: ClipboardList,
     mock: "iscrizione",
     title: "Crea l'iscrizione",
-    text: "Inserisci i dati di tuo figlio, carica una foto e il certificato medico valido.",
+    text: "Inserisci i dati di tuo figlio, scegli la formula di corso, carica una foto e il certificato medico valido.",
   },
   {
     n: "04",
