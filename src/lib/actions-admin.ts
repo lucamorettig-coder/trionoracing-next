@@ -6,8 +6,9 @@ import {
   getTitoloById,
   updateTitoloPagamento,
   markPrimaRataPagata,
+  type TipoCorso,
 } from "@/lib/airtable-portale";
-import { getIscrizioneByIdAdmin, getBambinoByIdAdmin } from "@/lib/airtable-admin";
+import { getIscrizioneByIdAdmin, getBambinoByIdAdmin, getAllTariffe } from "@/lib/airtable-admin";
 
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TOKEN = process.env.AIRTABLE_TOKEN;
@@ -310,11 +311,11 @@ export async function bulkSegnaPagato(params: {
 export interface TariffaFormData {
   anno: string;
   nomeTariffa: string; // Q1 | Q2 | Q3
+  tipoCorso: TipoCorso; // EVO-026
   descrizione?: string;
   quotaTotaleAnno: number;
   numeroRate: number;
   importoRata: number;
-  scadenzeRate: string;
   importoKitScuola: number;
   importoIscrizione: number;
   scontoFamigliaNumerosa: number;
@@ -329,19 +330,36 @@ export async function upsertTariffa(
     throw new Error("Anno non valido (atteso YYYY)");
   }
   if (!data.nomeTariffa) throw new Error("Quarter (NOME_TARIFFA) obbligatorio");
+  if (data.tipoCorso !== "MTB-BDC" && data.tipoCorso !== "SOLO-MTB") {
+    throw new Error("Tipo corso obbligatorio (MTB-BDC o SOLO-MTB)");
+  }
   if (data.numeroRate < 1) throw new Error("Numero rate deve essere >= 1");
   if (data.quotaTotaleAnno < 0 || data.importoRata < 0 || data.importoKitScuola < 0 || data.importoIscrizione < 0 || data.scontoFamigliaNumerosa < 0) {
     throw new Error("Importi non possono essere negativi");
   }
 
+  // Unicità (anno, quarter, corso): una sola tariffa per combinazione (EVO-026).
+  const esistenti = await getAllTariffe({ anno: parseInt(data.anno, 10) });
+  const duplicato = esistenti.find(
+    (t) =>
+      t.id !== idEsistente &&
+      t.fields.NOME_TARIFFA === data.nomeTariffa &&
+      (t.fields.TIPO_CORSO ?? "MTB-BDC") === data.tipoCorso,
+  );
+  if (duplicato) {
+    throw new Error(
+      `Esiste già una tariffa ${data.nomeTariffa} per il corso ${data.tipoCorso} (${data.anno}). Modifica quella esistente invece di crearne una nuova.`,
+    );
+  }
+
   const fields = {
     ANNO_ISCRIZIONE: data.anno,
     NOME_TARIFFA: data.nomeTariffa,
+    TIPO_CORSO: data.tipoCorso,
     DESCRIZIONE_TARIFFA: data.descrizione ?? "",
     QUOTA_TOTALE_ANNO: data.quotaTotaleAnno,
     NUMERO_RATE: data.numeroRate,
     IMPORTO_RATA: data.importoRata,
-    SCADENZA_RATE: data.scadenzeRate,
     IMPORTO_KIT_SCUOLA: data.importoKitScuola,
     IMPORTO_ISCRIZIONE: data.importoIscrizione,
     SCONTO_FAMIGLIA_NUMEROSA: data.scontoFamigliaNumerosa,

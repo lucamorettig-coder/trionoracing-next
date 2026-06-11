@@ -92,7 +92,7 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
             <Link href="/portale/login">Accedi</Link>
           </Button>
           <Button asChild size="sm">
-            <Link href="/iscrizioni">Iscrivi tuo figlio</Link>
+            <Link href="/portale/iscrizioni">Iscrivi tuo figlio</Link>
           </Button>
         </div>
 
@@ -155,7 +155,7 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
               size="lg"
               className="w-full bg-sun-500 text-navy-900 border-sun-500 hover:bg-sun-600"
             >
-              <Link href="/iscrizioni" onClick={() => setOpen(false)}>
+              <Link href="/portale/iscrizioni" onClick={() => setOpen(false)}>
                 Iscrivi tuo figlio
               </Link>
             </Button>

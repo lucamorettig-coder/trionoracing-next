@@ -22,6 +22,7 @@ import type {
   PresenzaTipo,
   Ruolo,
   StatoIscrizioneGara,
+  TipoCorso,
   TitoloPagamento,
 } from "@/lib/airtable-portale";
 import {
@@ -322,7 +323,7 @@ export async function getKPIPagamentiPending(): Promise<KPIPagamentiPendingResul
 export interface IscrizioneAdminFilters {
   anno?: number;
   stato?: ("COMPLETA" | "INCOMPLETA" | "ANNULLATA" | "DEROGA")[];
-  corso?: ("MTB" | "Strada")[];
+  corso?: ("MTB-BDC" | "SOLO-MTB")[];
   modulistica?: "completa" | "incompleta";
   search?: string;
   limit?: number;
@@ -342,11 +343,13 @@ const ANNO_CORRENTE = new Date().getFullYear();
 export function parseIscrizioniFilters(params: URLSearchParams): IscrizioneAdminFilters {
   const anno = params.get("anno");
   const statoRaw = params.getAll("stato") as ("COMPLETA" | "INCOMPLETA" | "ANNULLATA" | "DEROGA")[];
+  const corsoRaw = params.getAll("corso") as ("MTB-BDC" | "SOLO-MTB")[];
   const modulistica = params.get("modulistica") as IscrizioneAdminFilters["modulistica"];
   const search = params.get("search") ?? undefined;
   return {
     anno: anno ? parseInt(anno, 10) : ANNO_CORRENTE,
     stato: statoRaw.length > 0 ? statoRaw : undefined,
+    corso: corsoRaw.length > 0 ? corsoRaw : undefined,
     modulistica: modulistica || undefined,
     search,
   };
@@ -647,11 +650,13 @@ export interface Tariffa {
   fields: {
     ANNO_ISCRIZIONE?: string;
     NOME_TARIFFA?: string; // Q1 | Q2 | Q3
+    TIPO_CORSO?: TipoCorso; // EVO-026; assente = MTB-BDC (legacy)
     DESCRIZIONE_TARIFFA?: string;
     QUOTA_TOTALE_ANNO?: number;
     NUMERO_RATE?: number;
     IMPORTO_RATA?: number;
-    SCADENZA_RATE?: string; // "FEBBRAIO;MARZO;APRILE"
+    /** @deprecated Legacy (EVO-026): scadenze dinamiche, non più usato in UI. */
+    SCADENZA_RATE?: string;
     IMPORTO_KIT_SCUOLA?: number;
     IMPORTO_ISCRIZIONE?: number;
     SCONTO_FAMIGLIA_NUMEROSA?: number;

@@ -9,12 +9,18 @@ import {
   getIscrizioneInBozzaPerGenitore,
   getIscrizioniByGenitore,
   getTitoliPagamento,
+  getTariffeVigenti,
+  getTariffaById,
+  getCurrentQuarter,
   calcTariffa,
+  type Tariffa,
+  type TipoCorso,
 } from "@/lib/airtable-portale";
 import { getStatoIscrizioneAnnoCorrente } from "@/lib/portale-utils";
 import { Button } from "@/components/ui/button";
 import WizardNuovaIscrizione, {
   type TariffaInfo,
+  type CorsoOption,
 } from "@/components/portale/iscrizioni/WizardNuovaIscrizione";
 
 interface PageProps {
@@ -31,10 +37,14 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const annoCorrente = new Date().getFullYear();
 
-  const [bambini, iscrizioni] = await Promise.all([
+  const [bambini, iscrizioni, tariffeVigenti] = await Promise.all([
     getBambiniByGenitore(genitore.id),
     getIscrizioniByGenitore(genitore.id),
+    getTariffeVigenti(annoCorrente),
   ]);
+
+  // Opzioni corso con quote del quarter corrente (calcolate server-side, no fetch client).
+  const corsiOptions = buildCorsiOptions(tariffeVigenti, getCurrentQuarter());
 
   // Mappa bambinoId → iscrizioneId per bambini già iscritti nell'anno corrente
   const bambiniIscrittiAnno = new Map<string, string>(
@@ -71,10 +81,22 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
     }
 
     const resumeBambinoId = iscrizione.fields.TABELLA_BAMBINI?.[0];
-    const [titoli, tariffaResult] = await Promise.all([
+    const linkedTariffaId = iscrizione.fields.TABELLA_TARIFFE?.[0];
+    // Il corso si DERIVA dalla tariffa collegata all'iscrizione, non si ricalcola
+    // (default MTB-BDC). calcTariffa serve solo per lo sconto famiglia: gli passiamo
+    // il corso derivato così la tariffa resta coerente con quella scelta (EVO-026).
+    const [titoli, linkedTariffa] = await Promise.all([
       getTitoliPagamento(iscrizione.id),
-      calcTariffa(genitore.id, annoCorrente, undefined, resumeBambinoId),
+      linkedTariffaId ? getTariffaById(linkedTariffaId) : Promise.resolve(null),
     ]);
+    const corsoResume: TipoCorso = linkedTariffa?.fields.TIPO_CORSO ?? "MTB-BDC";
+    const tariffaResult = await calcTariffa(
+      genitore.id,
+      annoCorrente,
+      undefined,
+      resumeBambinoId,
+      corsoResume,
+    );
     const tariffaInfo = tariffaResult ? toTariffaInfo(tariffaResult) : null;
 
     return (
@@ -82,6 +104,7 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
         <WizardNuovaIscrizione
           bambini={bambini}
           anno={annoCorrente}
+          corsiOptions={corsiOptions}
           initialIscrizione={iscrizione}
           initialTitoli={titoli}
           initialTariffa={tariffaInfo}
@@ -117,6 +140,7 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
           bambini={bambini}
           bambinoIniziale={sp.bambino}
           anno={annoCorrente}
+          corsiOptions={corsiOptions}
           bambiniIscrittiAnno={bambiniIscrittiAnno}
         />
       </Layout>
@@ -129,6 +153,7 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
         bambini={bambini}
         bambinoIniziale={sp.bambino}
         anno={annoCorrente}
+        corsiOptions={corsiOptions}
         bambiniIscrittiAnno={bambiniIscrittiAnno}
       />
     </Layout>
@@ -140,17 +165,41 @@ function Layout({ children }: { children: React.ReactNode }) {
     <div className="max-w-3xl mx-auto px-6 lg:px-10 py-8 lg:py-12">
       <h1 className="text-2xl font-bold text-ink mb-2 text-center">Nuova iscrizione</h1>
       <p className="text-ink-muted text-center mb-8">
-        6 step per iscrivere tuo figlio alla scuola.
+        7 step per iscrivere tuo figlio alla scuola.
       </p>
       {children}
     </div>
   );
 }
 
+/**
+ * Costruisce le opzioni corso (con quota del quarter corrente + quota anno intero)
+ * dalle tariffe vigenti dell'anno. I record senza TIPO_CORSO sono trattati come MTB-BDC.
+ */
+function buildCorsiOptions(
+  tariffe: Tariffa[],
+  quarterCorrente: "Q1" | "Q2" | "Q3",
+): CorsoOption[] {
+  const corsi: TipoCorso[] = ["MTB-BDC", "SOLO-MTB"];
+  return corsi.map((corso) => {
+    const forCorso = tariffe.filter((t) => (t.fields.TIPO_CORSO ?? "MTB-BDC") === corso);
+    const corrente = forCorso.find((t) => t.fields.NOME_TARIFFA === quarterCorrente);
+    const q1 = forCorso.find((t) => t.fields.NOME_TARIFFA === "Q1");
+    return {
+      corso,
+      quarter: quarterCorrente,
+      quotaQuarterCorrente: corrente?.fields.QUOTA_TOTALE_ANNO ?? null,
+      quotaAnnoIntero: q1?.fields.QUOTA_TOTALE_ANNO ?? null,
+      disponibile: !!corrente,
+    };
+  });
+}
+
 function toTariffaInfo(result: NonNullable<Awaited<ReturnType<typeof calcTariffa>>>): TariffaInfo {
   const t = result.tariffa.fields;
   return {
     tariffaId: result.tariffa.id,
+    tipoCorso: t.TIPO_CORSO ?? "MTB-BDC",
     quarter: result.quarter,
     anno: result.anno,
     importoIscrizione: t.IMPORTO_ISCRIZIONE,
@@ -163,9 +212,7 @@ function toTariffaInfo(result: NonNullable<Awaited<ReturnType<typeof calcTariffa
     importoTotale: result.importoTotale,
     ordineIscrizioneGenitore: result.ordineIscrizioneGenitore,
     descrizione: t.DESCRIZIONE_TARIFFA,
-    scadenzaRate: t.SCADENZA_RATE,
     regolamentoUrl: t.REGOLAMENTO?.[0]?.url ?? null,
     regolamentoFilename: t.REGOLAMENTO?.[0]?.filename ?? null,
   };
 }
-

@@ -151,12 +151,12 @@ export async function POST(
     const tariffe = await getAllTariffe();
     const csv = csvWriter(tariffe, [
       { key: "anno", label: "Anno", accessor: (r) => r.fields.ANNO_ISCRIZIONE ?? "" },
+      { key: "corso", label: "Corso", accessor: (r) => r.fields.TIPO_CORSO ?? "MTB-BDC" },
       { key: "quarter", label: "Quarter", accessor: (r) => r.fields.NOME_TARIFFA ?? "" },
       { key: "descrizione", label: "Descrizione", accessor: (r) => r.fields.DESCRIZIONE_TARIFFA ?? "" },
       { key: "quota_tot", label: "Quota totale (€)", accessor: (r) => r.fields.QUOTA_TOTALE_ANNO ?? "" },
       { key: "n_rate", label: "N. rate", accessor: (r) => r.fields.NUMERO_RATE ?? "" },
       { key: "imp_rata", label: "Importo rata (€)", accessor: (r) => r.fields.IMPORTO_RATA ?? "" },
-      { key: "scadenze", label: "Scadenze", accessor: (r) => r.fields.SCADENZA_RATE ?? "" },
       { key: "kit", label: "Kit (€)", accessor: (r) => r.fields.IMPORTO_KIT_SCUOLA ?? "" },
       { key: "iscrizione_imp", label: "Iscrizione (€)", accessor: (r) => r.fields.IMPORTO_ISCRIZIONE ?? "" },
       { key: "sconto", label: "Sconto famiglia (€)", accessor: (r) => r.fields.SCONTO_FAMIGLIA_NUMEROSA ?? "" },

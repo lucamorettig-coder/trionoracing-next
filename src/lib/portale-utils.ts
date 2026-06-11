@@ -47,6 +47,33 @@ export function quarterLabel(quarter: "Q1" | "Q2" | "Q3"): string {
   return "Q3 · settembre–dicembre";
 }
 
+export interface CorsoLabelInfo {
+  /** Label primaria user-facing (es. "Corso MTB-BDC" / "Solo Mountain Bike"). */
+  label: string;
+  /** Sottotitolo esteso (es. "Strada + MTB · 2 lezioni/settimana"). */
+  sublabel: string;
+  /** Forma compatta per badge/tabelle dense (es. "MTB-BDC" / "Solo MTB"). */
+  short: string;
+}
+
+const CORSO_LABELS: Record<string, CorsoLabelInfo> = {
+  "MTB-BDC": { label: "Corso MTB-BDC", sublabel: "Strada + MTB · 2 lezioni/settimana", short: "MTB-BDC" },
+  "SOLO-MTB": { label: "Solo Mountain Bike", sublabel: "solo giovedì · 1 lezione/settimana", short: "Solo MTB" },
+};
+
+/**
+ * Label user-facing per il tipo di corso (TIPO_CORSO tariffa / CORSO iscrizione, EVO-026).
+ * Valori legacy o vuoti ("MTB", "Strada", "") → trattati come MTB-BDC.
+ */
+export function corsoLabel(corso?: string | null): CorsoLabelInfo {
+  return CORSO_LABELS[corso ?? ""] ?? CORSO_LABELS["MTB-BDC"];
+}
+
+/** Variant Badge per il corso: MTB-BDC → info (sky), SOLO-MTB → warning (sun/ember). */
+export function corsoBadgeVariant(corso?: string | null): BadgeVariant {
+  return corso === "SOLO-MTB" ? "warning" : "info";
+}
+
 /**
  * Mappa SCADENZA_MESE Airtable (MAIUSCOLO) → nome mese in italiano lowercase.
  * Controparte client-side di MESI_IT_TO_NUM in airtable-portale.ts:772 (che mappa

@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { statoIscrizioneAdminBadge } from "@/lib/admin-utils";
-import { formatEUR } from "@/lib/portale-utils";
+import { formatEUR, corsoLabel, corsoBadgeVariant } from "@/lib/portale-utils";
 import { ModulisticaIcons, getModulisticaState } from "./ModulisticaIcons";
 import { AnnullaIscrizioneModal } from "./AnnullaIscrizioneModal";
 import { ForzaCompletaModal } from "./ForzaCompletaModal";
@@ -167,8 +167,8 @@ export function DettaglioIscrizioneAdmin({ iscrizione, titoli }: Props) {
           <div className="flex items-center gap-2 mt-2 flex-wrap">
             <Badge variant={statoVariant} size="md">{statoLabel}</Badge>
             {iscrizione.fields.CORSO && (
-              <Badge variant={iscrizione.fields.CORSO === "MTB" ? "success" : "info"} size="md">
-                {iscrizione.fields.CORSO}
+              <Badge variant={corsoBadgeVariant(iscrizione.fields.CORSO)} size="md">
+                {corsoLabel(iscrizione.fields.CORSO).label}
               </Badge>
             )}
             <Badge variant="neutral" size="md">

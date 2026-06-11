@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import type {
   Bambino,
   Iscrizione,
+  TipoCorso,
   TitoloPagamento,
 } from "@/lib/airtable-portale";
 import StepperWizard from "./StepperWizard";
 import StepScegliFiglio from "./steps/StepScegliFiglio";
 import StepVerificaRequisiti from "./steps/StepVerificaRequisiti";
+import StepScegliCorso from "./steps/StepScegliCorso";
 import StepRiepilogoTariffa from "./steps/StepRiepilogoTariffa";
 import StepPrivacy from "./steps/StepPrivacy";
 import StepRegolamento from "./steps/StepRegolamento";
@@ -21,6 +23,7 @@ import StepSommario from "./steps/StepSommario";
 const STEPS = [
   "Figlio",
   "Requisiti",
+  "Corso",
   "Tariffa",
   "Privacy",
   "Regolamento",
@@ -29,6 +32,7 @@ const STEPS = [
 
 export interface TariffaInfo {
   tariffaId: string;
+  tipoCorso: TipoCorso;
   quarter: "Q1" | "Q2" | "Q3";
   anno: number;
   importoIscrizione: number;
@@ -41,15 +45,29 @@ export interface TariffaInfo {
   importoTotale: number;
   ordineIscrizioneGenitore: number;
   descrizione?: string;
-  scadenzaRate?: string;
   regolamentoUrl?: string | null;
   regolamentoFilename?: string | null;
+}
+
+/** Opzione corso per lo step "Scegli il corso" (quote calcolate server-side da getTariffeVigenti). */
+export interface CorsoOption {
+  corso: TipoCorso;
+  /** Quarter corrente (per la nota "quota per iscrizioni {periodo}"). */
+  quarter: "Q1" | "Q2" | "Q3";
+  /** Quota del quarter corrente = ciò che il genitore paga iscrivendosi ora (null se nessuna tariffa attiva). */
+  quotaQuarterCorrente: number | null;
+  /** Quota anno intero (tariffa Q1) per la riga secondaria. */
+  quotaAnnoIntero: number | null;
+  /** Falso se non c'è una tariffa attiva per (corso, quarter corrente). */
+  disponibile: boolean;
 }
 
 interface Props {
   bambini: Bambino[];
   bambinoIniziale?: string;
   anno: number;
+  /** Opzioni corso con quote del quarter corrente (calcolate server-side). */
+  corsiOptions: CorsoOption[];
   /** Iscrizione esistente in bozza da riprendere (resume mode). */
   initialIscrizione?: Iscrizione | null;
   /** Titoli pagamento pre-caricati (solo in resume mode al landing sommario). */
@@ -61,19 +79,20 @@ interface Props {
 }
 
 function computeResumeStep(iscrizione: Iscrizione): number {
-  if (!iscrizione.fields.PRIVACY_MINORE) return 4;
+  if (!iscrizione.fields.PRIVACY_MINORE) return 5;
   if (
     !iscrizione.fields.FLAG_REGOLAMENTO ||
     !iscrizione.fields.REGOLAMENTO_FIRMATO?.length
   )
-    return 5;
-  return 6;
+    return 6;
+  return 7;
 }
 
 export default function WizardNuovaIscrizione({
   bambini,
   bambinoIniziale,
   anno,
+  corsiOptions,
   initialIscrizione = null,
   initialTitoli = [],
   initialTariffa = null,
@@ -100,6 +119,8 @@ export default function WizardNuovaIscrizione({
     initialIscrizione ? computeResumeStep(initialIscrizione) : preselected ? 2 : 1,
   );
   const [bambinoId, setBambinoId] = useState<string | null>(preselected);
+  // In resume mode il corso è derivato dalla tariffa collegata (initialTariffa.tipoCorso).
+  const [corso, setCorso] = useState<TipoCorso | null>(initialTariffa?.tipoCorso ?? null);
   const [tariffa, setTariffa] = useState<TariffaInfo | null>(initialTariffa);
   const [iscrizione, setIscrizione] = useState<Iscrizione | null>(initialIscrizione);
   const [titoli] = useState<TitoloPagamento[]>(initialTitoli);
@@ -108,14 +129,19 @@ export default function WizardNuovaIscrizione({
 
   const bambino = bambini.find((b) => b.id === bambinoId) ?? null;
 
+  // Cambio corso (solo nel flusso di creazione): invalida la tariffa per forzarne il ricalcolo.
+  function selectCorso(c: TipoCorso) {
+    if (c !== corso) setTariffa(null);
+    setCorso(c);
+  }
+
   // Fetch titoli quando entro nello step sommario e non li ho ancora
   const loadTitoli = useCallback(async () => {
     if (!iscrizione) return;
     if (titoli.length > 0) return;
     try {
-      // Riusiamo l'endpoint diario? no — non c'è un endpoint titoli pubblico.
-      // I titoli arrivano da Airtable via server. Refresh della pagina aggiorna.
-      // Per ora forziamo router.refresh che ri-fa SSR di nuova/page.tsx con i titoli aggiornati.
+      // I titoli arrivano da Airtable via server: router.refresh ri-fa SSR di nuova/page.tsx
+      // con i titoli aggiornati e remonta il wizard con initialTitoli popolato.
       router.refresh();
     } catch {
       /* noop */
@@ -123,15 +149,16 @@ export default function WizardNuovaIscrizione({
   }, [iscrizione, titoli.length, router]);
 
   useEffect(() => {
-    if (step === 6 && iscrizione && titoli.length === 0) {
+    if (step === 7 && iscrizione && titoli.length === 0) {
       loadTitoli();
     }
   }, [step, iscrizione, titoli.length, loadTitoli]);
 
   function back() {
     setError(null);
-    // Una volta creata l'iscrizione (step >= 4), non si può tornare prima del 4
-    if (iscrizione && step <= 4) return;
+    // Una volta creata l'iscrizione (step >= 5), non si può tornare prima del 5
+    // (corso e tariffa sono ormai bloccati sull'iscrizione creata).
+    if (iscrizione && step <= 5) return;
     setStep((s) => Math.max(1, s - 1));
   }
 
@@ -144,15 +171,15 @@ export default function WizardNuovaIscrizione({
       return;
     }
 
-    // Step 3 → 4 = CREATE iscrizione
-    if (step === 3 && !iscrizione) {
-      if (!bambinoId) return;
+    // Step 4 (Tariffa) → 5 = CREATE iscrizione
+    if (step === 4 && !iscrizione) {
+      if (!bambinoId || !corso) return;
       setCreating(true);
       try {
         const res = await fetch("/api/portale/iscrizioni", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ bambinoId, anno }),
+          body: JSON.stringify({ bambinoId, anno, corso }),
         });
         const data = await res.json();
         if (!res.ok) {
@@ -179,7 +206,7 @@ export default function WizardNuovaIscrizione({
     setStep((s) => Math.min(STEPS.length, s + 1));
   }
 
-  const showBack = step > 1 && !(iscrizione && step <= 4);
+  const showBack = step > 1 && !(iscrizione && step <= 5);
   const showSaveExit = !!iscrizione && step < STEPS.length;
 
   return (
@@ -200,19 +227,30 @@ export default function WizardNuovaIscrizione({
         {step === 2 && bambino && (
           <StepVerificaRequisiti step={2} total={STEPS.length} bambino={bambino} />
         )}
-        {step === 3 && bambino && (
-          <StepRiepilogoTariffa
+        {step === 3 && (
+          <StepScegliCorso
             step={3}
+            total={STEPS.length}
+            anno={anno}
+            options={corsiOptions}
+            selected={corso}
+            onSelect={selectCorso}
+          />
+        )}
+        {step === 4 && bambino && corso && (
+          <StepRiepilogoTariffa
+            step={4}
             total={STEPS.length}
             bambino={bambino}
             anno={anno}
+            corso={corso}
             tariffa={tariffa}
             onTariffaLoaded={setTariffa}
           />
         )}
-        {step === 4 && iscrizione && (
+        {step === 5 && iscrizione && (
           <StepPrivacy
-            step={4}
+            step={5}
             total={STEPS.length}
             iscrizione={iscrizione}
             onSigned={() => {
@@ -227,9 +265,9 @@ export default function WizardNuovaIscrizione({
             }}
           />
         )}
-        {step === 5 && iscrizione && (
+        {step === 6 && iscrizione && (
           <StepRegolamento
-            step={5}
+            step={6}
             total={STEPS.length}
             iscrizione={iscrizione}
             regolamentoUrl={tariffa?.regolamentoUrl ?? null}
@@ -249,9 +287,9 @@ export default function WizardNuovaIscrizione({
             }}
           />
         )}
-        {step === 6 && iscrizione && bambino && tariffa && (
+        {step === 7 && iscrizione && bambino && tariffa && (
           <StepSommario
-            step={6}
+            step={7}
             total={STEPS.length}
             bambino={bambino}
             iscrizione={iscrizione}
@@ -298,13 +336,13 @@ export default function WizardNuovaIscrizione({
             variant="primary"
             size="md"
             onClick={goNext}
-            disabled={isNextDisabled({ step, bambinoId, bambino, tariffa, iscrizione, creating, bambiniIscrittiAnno })}
+            disabled={isNextDisabled({ step, bambinoId, bambino, corso, tariffa, iscrizione, creating, bambiniIscrittiAnno })}
           >
             {creating ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" /> Creazione…
               </>
-            ) : step === 3 && !iscrizione ? (
+            ) : step === 4 && !iscrizione ? (
               <>
                 Crea iscrizione e continua
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -326,18 +364,20 @@ function isNextDisabled(args: {
   step: number;
   bambinoId: string | null;
   bambino: Bambino | null;
+  corso: TipoCorso | null;
   tariffa: TariffaInfo | null;
   iscrizione: Iscrizione | null;
   creating: boolean;
   bambiniIscrittiAnno?: Map<string, string>;
 }): boolean {
-  const { step, bambinoId, bambino, tariffa, iscrizione, creating, bambiniIscrittiAnno } = args;
+  const { step, bambinoId, bambino, corso, tariffa, iscrizione, creating, bambiniIscrittiAnno } = args;
   if (creating) return true;
   if (step === 1) return !bambinoId || !!(bambinoId && bambiniIscrittiAnno?.has(bambinoId));
   if (step === 2) return !canProceedRequisiti(bambino);
-  if (step === 3) return !tariffa;
-  if (step === 4) return !iscrizione?.fields.PRIVACY_MINORE;
-  if (step === 5) {
+  if (step === 3) return !corso;
+  if (step === 4) return !tariffa;
+  if (step === 5) return !iscrizione?.fields.PRIVACY_MINORE;
+  if (step === 6) {
     return (
       !iscrizione?.fields.FLAG_REGOLAMENTO ||
       !iscrizione?.fields.REGOLAMENTO_FIRMATO?.length

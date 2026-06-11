@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ModulisticaIcons, getModulisticaState } from "./ModulisticaIcons";
 import { statoIscrizioneAdminBadge } from "@/lib/admin-utils";
-import { formatEUR } from "@/lib/portale-utils";
+import { formatEUR, corsoLabel, corsoBadgeVariant } from "@/lib/portale-utils";
 import type { Iscrizione } from "@/lib/airtable-portale";
 
 interface IscrizioniDataTableProps {
@@ -53,8 +53,8 @@ export function IscrizioniDataTable({ iscrizioni }: IscrizioniDataTableProps) {
         const corso = r.fields.CORSO;
         if (!corso) return <span className="text-ink-muted">—</span>;
         return (
-          <Badge variant={corso === "MTB" ? "success" : "info"} size="sm">
-            {corso}
+          <Badge variant={corsoBadgeVariant(corso)} size="sm">
+            {corsoLabel(corso).short}
           </Badge>
         );
       },

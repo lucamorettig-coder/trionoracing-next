@@ -362,7 +362,23 @@ export async function airtablePatchBambino(
 
 // ─── TABELLA_ISCRIZIONI ─────────────────────────────────────────────────────
 
-export type Corso = "MTB" | "Strada";
+/**
+ * Tipo di corso (EVO-026). Vive su TABELLA_TARIFFE.TIPO_CORSO e, denormalizzato
+ * al momento dell'iscrizione, su TABELLA_ISCRIZIONI.CORSO.
+ * MTB-BDC = Strada + MTB (2 lezioni/sett). SOLO-MTB = solo giovedì (1 lezione/sett).
+ */
+export type TipoCorso = "MTB-BDC" | "SOLO-MTB";
+
+/** @deprecated Usa TipoCorso. Alias mantenuto per i consumer esistenti (EVO-026). */
+export type Corso = TipoCorso;
+
+/**
+ * Normalizza un valore arbitrario in TipoCorso. Default difensivo MTB-BDC:
+ * copre i valori legacy (MTB / Strada / vuoto) e gli input ignoti.
+ */
+export function parseTipoCorso(value: string | null | undefined): TipoCorso {
+  return value === "SOLO-MTB" ? "SOLO-MTB" : "MTB-BDC";
+}
 
 export interface Iscrizione {
   id: string;
@@ -550,17 +566,26 @@ export async function createIscrizione(
   tariffa: Tariffa,
   scontoFamiglia: boolean,
 ): Promise<Iscrizione> {
+  // CORSO autoritativo: derivato dal TIPO_CORSO della tariffa scelta (default MTB-BDC
+  // per le tariffe legacy senza TIPO_CORSO). Denormalizzato sull'iscrizione (EVO-026).
+  const corso: TipoCorso = tariffa.fields.TIPO_CORSO ?? "MTB-BDC";
   const res = await airtableFetch("TABELLA_ISCRIZIONI", {
     method: "POST",
-    body: JSON.stringify({ fields: stripIscrizioneReadOnlyFields(data) }),
+    body: JSON.stringify({
+      fields: stripIscrizioneReadOnlyFields({ ...data, CORSO: corso }),
+    }),
   });
   const iscrizione: Iscrizione = await res.json();
 
-  // Crea titolo prima rata (rata #1 include la quota iscrizione)
-  const scadenzaRate = (tariffa.fields.SCADENZA_RATE || "").split(";").map((s) => s.trim()).filter(Boolean);
-  const primoMese = scadenzaRate[0] ?? "";
+  // Crea titolo prima rata (rata #1 include la quota iscrizione).
+  // Scadenza dinamica (EVO-026): la 1ª rata scade nel mese di iscrizione, non più
+  // dal vecchio campo SCADENZA_RATE (legacy, non più letto). Le rate 2+ (ogni 2 mesi)
+  // restano generate da Make.com.
   const anno = parseInt(tariffa.fields.ANNO_ISCRIZIONE ?? `${new Date().getFullYear()}`, 10);
-  const scadenza = computeDataScadenzaRata(primoMese, anno);
+  const meseNum =
+    parseInt((data.DATA_ISCRIZIONE ?? "").slice(5, 7), 10) || new Date().getMonth() + 1;
+  const meseCorrente = MESI_IT_UPPER[meseNum - 1] ?? "";
+  const scadenza = computeDataScadenzaRata(meseCorrente, anno);
   const sconto = scontoFamiglia ? tariffa.fields.SCONTO_FAMIGLIA_NUMEROSA ?? 0 : 0;
   const descrizionePrimaRata = `Quota iscrizione + 1ª rata ${anno}`;
 
@@ -577,7 +602,7 @@ export async function createIscrizione(
         IMPORTO_SCONTO_APPLICATO: sconto,
         DATA_EMISSIONE: new Date().toISOString().slice(0, 10),
         DATA_SCADENZA_PAGAMENTO: scadenza,
-        SCADENZA_MESE: primoMese,
+        SCADENZA_MESE: meseCorrente,
       }),
     }),
   });
@@ -622,11 +647,14 @@ export interface Tariffa {
   fields: {
     ANNO_ISCRIZIONE: string;
     NOME_TARIFFA: "Q1" | "Q2" | "Q3";
+    /** Tipo di corso della tariffa (EVO-026). Assente sui record legacy → trattato come MTB-BDC. */
+    TIPO_CORSO?: TipoCorso;
     DESCRIZIONE_TARIFFA?: string;
     QUOTA_TOTALE_ANNO: number;
     NUMERO_RATE: number;
     IMPORTO_RATA: number;
-    SCADENZA_RATE: string;
+    /** @deprecated Legacy (EVO-026): scadenze dinamiche dal mese di iscrizione, non più letto. */
+    SCADENZA_RATE?: string;
     IMPORTO_KIT_SCUOLA?: number;
     IMPORTO_ISCRIZIONE: number;
     SCONTO_FAMIGLIA_NUMEROSA?: number;
@@ -654,11 +682,38 @@ export async function getTariffeVigenti(anno: number): Promise<Tariffa[]> {
   return data.records;
 }
 
-/** Dato anno+mese ritorna la tariffa del quarter corrispondente (Q1/Q2/Q3) o null. */
-export async function getTariffa(anno: number, mese: number): Promise<Tariffa | null> {
+/**
+ * Dato anno+mese+corso ritorna la tariffa del quarter corrispondente (Q1/Q2/Q3) o null.
+ * Filtra per quarter E per tipo corso; i record senza TIPO_CORSO (legacy) sono trattati
+ * come MTB-BDC (EVO-026).
+ */
+export async function getTariffa(
+  anno: number,
+  mese: number,
+  corso: TipoCorso = "MTB-BDC",
+): Promise<Tariffa | null> {
   const quarter = getCurrentQuarter(mese);
   const tariffe = await getTariffeVigenti(anno);
-  return tariffe.find((t) => t.fields.NOME_TARIFFA === quarter) ?? null;
+  return (
+    tariffe.find(
+      (t) =>
+        t.fields.NOME_TARIFFA === quarter &&
+        (t.fields.TIPO_CORSO ?? "MTB-BDC") === corso,
+    ) ?? null
+  );
+}
+
+/**
+ * Singola tariffa per ID (GET diretto). Usata dal resume bozza per derivare il corso
+ * dalla tariffa collegata all'iscrizione (EVO-026). Ritorna null se non trovata.
+ */
+export async function getTariffaById(id: string): Promise<Tariffa | null> {
+  try {
+    const res = await airtableFetch(`TABELLA_TARIFFE/${id}`);
+    return res.json();
+  } catch {
+    return null;
+  }
 }
 
 export interface CalcTariffaResult {
@@ -684,9 +739,10 @@ export async function calcTariffa(
   anno: number,
   meseRiferimento?: number,
   bambinoId?: string,
+  corso: TipoCorso = "MTB-BDC",
 ): Promise<CalcTariffaResult | null> {
   const mese = meseRiferimento ?? new Date().getMonth() + 1;
-  const tariffa = await getTariffa(anno, mese);
+  const tariffa = await getTariffa(anno, mese, corso);
   if (!tariffa) return null;
 
   const iscrizioniGenitore = await getIscrizioniByGenitore(genitoreId);
@@ -836,6 +892,12 @@ const MESI_IT_TO_NUM: Record<string, number> = {
   GENNAIO: 1, FEBBRAIO: 2, MARZO: 3, APRILE: 4, MAGGIO: 5, GIUGNO: 6,
   LUGLIO: 7, AGOSTO: 8, SETTEMBRE: 9, OTTOBRE: 10, NOVEMBRE: 11, DICEMBRE: 12,
 };
+
+/** Nomi mese IT MAIUSCOLI indicizzati 0-11 (controparte di MESI_IT_TO_NUM). Usato per SCADENZA_MESE. */
+const MESI_IT_UPPER = [
+  "GENNAIO", "FEBBRAIO", "MARZO", "APRILE", "MAGGIO", "GIUGNO",
+  "LUGLIO", "AGOSTO", "SETTEMBRE", "OTTOBRE", "NOVEMBRE", "DICEMBRE",
+] as const;
 
 /** Calcola la data di scadenza pagamento (ultimo giorno del mese SCADENZA_MESE / ANNO). */
 function computeDataScadenzaRata(mese: string, anno: number): string | undefined {
@@ -1287,7 +1349,10 @@ export async function updateLezione(
 
 /**
  * Lista bambini attivi (iscritti a un corso nell'anno corrente), opzionalmente
- * filtrati per disciplina. Mapping disciplina → CORSO: BDC ↔ "Strada", MTB ↔ "MTB".
+ * filtrati per disciplina (EVO-026). Mapping disciplina → CORSO:
+ * - BDC (lezione strada) → solo iscritti al corso completo MTB-BDC (incluse le
+ *   iscrizioni legacy con CORSO vuoto, trattate come MTB-BDC).
+ * - MTB (lezione mountain bike) → tutti i bambini attivi (MTB-BDC + SOLO-MTB).
  * Privacy view: il caller deve passare solo bambini al componente UI senza
  * arricchire con campi genitore/pagamenti/certificati.
  */
@@ -1298,11 +1363,10 @@ export async function getBambiniAttiviPerDisciplina(
   const conditions = [
     `{ANNO_ISCRIZIONE (from TABELLA_TARIFFE)}="${anno}"`,
   ];
-  if (disciplina === "MTB") {
-    conditions.push(`{CORSO}="MTB"`);
-  } else if (disciplina === "BDC") {
-    conditions.push(`{CORSO}="Strada"`);
+  if (disciplina === "BDC") {
+    conditions.push(`OR({CORSO}="MTB-BDC",{CORSO}="")`);
   }
+  // disciplina "MTB" o assente → nessun filtro corso: tutti i bambini attivi.
   const formula = encodeURIComponent(`AND(${conditions.join(",")})`);
   const res = await airtableFetch(
     `TABELLA_ISCRIZIONI?filterByFormula=${formula}&pageSize=100`,
