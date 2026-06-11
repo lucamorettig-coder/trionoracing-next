@@ -3,8 +3,8 @@
 - **ID**: EVO-026
 - **Slug**: tariffe-corso-solo-mtb
 - **Data inizio**: 2026-06-11
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: in pianificazione
+- **Data fine**: 2026-06-11
+- **Stato**: completata
 - **Tipo**: nuova feature (nuovo tipo corso + tariffe dedicate) + modifica feature esistente (regola scadenze rate dinamiche, generale per entrambi i corsi)
 - **Area**: cross-cutting — schema Airtable TARIFFE + wizard iscrizione genitore + admin tariffe/iscrizioni/report + vetrina pubblica `/la-scuola`
 - **Priorità**: alta (asap)
@@ -255,7 +255,25 @@ Vercel collegato a GitHub, deploy automatico al merge su `main` (~2 min). Ciclo:
 
 ## 8. Verifica e go-live
 
-_Da compilare in Fase 8._
+### Esito (PR #64 — squash `faf9794` — live in produzione 2026-06-11)
+
+Skill `verify-implementation` non caricata in sessione → verifica inline per dimensione (pattern post-EVO-010):
+
+| Dimensione | Esito | Note |
+|---|---|---|
+| **Design System** | ✅ coerente | Nuovo `CorsoRadioCard` (radio card, quota quarter corrente prominente + riga "anno intero"), badge corso via `corsoLabel`/`corsoBadgeVariant` (MTB-BDC→info/sky, SOLO-MTB→warning/sun/ember), `TariffaCard` chip corso + nota scadenze dinamiche, admin tariffe a 2 sezioni per corso. Stepper wizard a 7 voci: versione mobile compatta (EVO-025) regge. Nessun nuovo token. |
+| **Architettura** | ✅ coerente | `TipoCorso`/`parseTipoCorso`; nessun `export type` da file `"use server"` (`TariffaFormData` resta `interface`); filtri URL-driven loop-safe (`toggleMultiParam` inline); nessun `SEARCH+ARRAYJOIN` su linked record (`CORSO`/`TIPO_CORSO`/`NOME_TARIFFA` campi nativi); `CORSO` autoritativo dal `TIPO_CORSO` della tariffa; resume bozza deriva il corso dal link (`getTariffaById`), non ricalcolato. `AdminFormDialog` hardening (catch onSubmit → dialog aperto + log). |
+| **Lint + Typecheck + Build** | ✅ verdi | `npm run lint` 0 errori · `tsc --noEmit` pulito · `next build` ok. Grep `SCADENZA_RATE` pulito (solo type-decl legacy deprecati + commento). |
+| **Schema PROD+DEV** | ✅ speculari | `TIPO_CORSO` su `TABELLA_TARIFFE` + 3 record SOLO-MTB 2026 + backfill `MTB-BDC` + `CORSO` choices+backfill — applicato e **verificato su entrambe le basi** (PROD `appszpkU1aXb3xrFM`, DEV `app7FOqBdmmW0jBf5`). ⚠️ Le vecchie choices `MTB`/`Strada` su `CORSO` restano orfane (l'API Airtable Update Field non rinomina/rimuove le choices) — rimozione manuale opzionale dalle 2 basi, nessun impatto (nessun record le usa). |
+| **Smoke** | ✅ | Smoke utente su preview (10 step) verde + verifica prod `/la-scuola` (2 formule, niente prezzi) + navbar `/portale/iscrizioni`. |
+
+### Iterazioni / bug recepiti durante smoke
+
+- **Navbar "Iscrivi tuo figlio" → 404** (pre-esistente, non EVO-026): puntava a `/iscrizioni` (route inesistente, nessun redirect in `next.config`). Corretto a `/portale/iscrizioni` (self-serve, scelta utente), desktop + mobile. Stessa classe del pattern AGENTS.md EVO-002 ("link navbar pubblica → route portale corretta"). Incluso nella PR #64.
+
+### Go-live
+
+Merge squash PR #64 (`faf9794`) → deploy automatico Vercel, live su `trionoracing.it` / `trionoracing-next.vercel.app`. **Reminder consegnato all'utente**: adattare gli scenari Make.com `4086727` (PROD) + `5141784` (DEV) — rate 2+ — alla regola scadenze dinamiche (ogni 2 mesi dal mese di iscrizione), altrimenti le rate successive nascerebbero con scadenze sbagliate. Azione a carico utente, contestuale al go-live.
 
 ---
 
