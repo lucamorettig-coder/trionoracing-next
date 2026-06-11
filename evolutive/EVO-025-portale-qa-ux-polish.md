@@ -3,8 +3,8 @@
 - **ID**: EVO-025
 - **Slug**: portale-qa-ux-polish
 - **Data inizio**: 2026-06-07
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: in pianificazione
+- **Data fine**: 2026-06-07
+- **Stato**: ✅ completata e in produzione (PR #60)
 - **Tipo**: refactoring UX + piccole modifiche feature (prevalentemente usabilità)
 - **Area**: cross-cutting — portale genitori + portale admin (autenticato)
 - **Priorità**: alta (fix di usabilità su funzionalità già in produzione; alcuni impattanti: back-navigation assente, stepper rotto su mobile)
@@ -210,7 +210,26 @@ Vedi [`prompt-claude-code.md`](EVO-025-portale-qa-ux-polish/prompt-claude-code.m
 
 ## 8. Verifica e go-live
 
-_Da compilare in fase 8 dopo il ciclo completo di Claude Code._
+- **Stato**: ✅ completata e in produzione — 2026-06-07.
+- **PR**: [#60](https://github.com/lucamorettig-coder/trionoracing-next/pull/60) (squash, commit `f15edad`).
+- **Deploy prod**: `https://trionoracing-next.vercel.app` — `/`=200, `/portale/login`=200, `/portale/admin/migrazione`=404 (rimossa).
+- **Quality gate**: lint ✅ · typecheck ✅ · build ✅.
+- **Verifica**: report inline in [`EVO-025-portale-qa-ux-polish/verifica.md`](EVO-025-portale-qa-ux-polish/verifica.md) (skill `verify-implementation` non caricata → fallback manuale per dimensione).
+
+### Iterazioni recepite durante lo smoke (oltre agli 8 rilievi)
+
+1. BackLink "Torna alla dashboard" su tutte le pagine di primo livello area genitori.
+2. CTA admin uniformate (`size="sm"`); "Registra gara" rimosso dalla pagina lezioni.
+3. **Bug presenze**: gara registrata dal form lezione finiva in `PRESENZE_MAESTRI` come `tipo: lezione`. Risolto con flusso unificato **"Carica presenza"** (switch Lezione/Gara) per maestro + admin; modalità gara → `tipo: gara` con rimborso gara (`generatePresenzeForGara` idempotente). Auto-generazione da accompagnatori mantenuta.
+4. `GaraPicker` ricercabile (search + filtro Passate/Prossime).
+5. Assegnazione maestri inline sulla scheda gara (tolta dal form di modifica) + tab Gara / Iscrizioni (N).
+6. Fix maestro non riconosciuto: `getMaestroByGenitoreId` usa il link `UTENTE` come fonte di verità (non l'email).
+
+### Debito / follow-up
+
+- Bonifica dati storica `PRESENZE_MAESTRI` errate (gare salvate come `tipo: lezione`) — intervento dati separato, proposto.
+- Azione admin futura "collega maestro↔utente" per istruttori con email-maestro diversa da `EMAIL_GENITORE`.
+- `actionCreateLezione` (maestro) non più referenziata → rimovibile in cleanup.
 
 ---
 
