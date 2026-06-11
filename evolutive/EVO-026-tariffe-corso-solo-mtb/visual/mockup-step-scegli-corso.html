@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EVO-026 — Wizard Step 3 · Scegli il corso</title>
+<style>
+  /* Token DS Triono (da globals.css) */
+  :root {
+    --navy-50:#EEF1F8; --navy-300:#8298BF; --navy-700:#1F2D5A; --navy-900:#050E3F;
+    --sky-100:#D6EAFB; --sky-500:#3A82C8; --sky-700:#225589;
+    --sun-100:#FCF6AC; --sun-500:#EFE63A; --sun-700:#8C8615;
+    --ember-100:#FCE4BD; --ember-700:#8E5F0E;
+    --bg:#FFFFFF; --bg-soft:#FAFBFD; --line:#E4E7EF; --line-soft:#EEF0F5;
+    --ink:#14193A; --ink-muted:#6B7388;
+    --radius-lg:16px; --radius-xl:20px; --radius-pill:9999px;
+    --shadow-xs:0 1px 2px rgba(20,25,58,.04);
+    --shadow-sm:0 2px 6px rgba(20,25,58,.06),0 1px 2px rgba(20,25,58,.04);
+  }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:Inter,system-ui,sans-serif; background:var(--bg-soft); color:var(--ink); font-size:16px; line-height:1.65; padding:32px 16px; }
+  .wrap { max-width:768px; margin:0 auto; }
+  .page-title { text-align:center; font-size:24px; font-weight:700; margin-bottom:4px; }
+  .page-sub { text-align:center; color:var(--ink-muted); margin-bottom:28px; font-size:15px; }
+
+  /* Stepper (accennato — usare StepperWizard reale, 7 step) */
+  .stepper { display:flex; gap:6px; justify-content:center; margin-bottom:28px; }
+  .pip { width:28px; height:6px; border-radius:var(--radius-pill); background:var(--line); }
+  .pip.done { background:var(--navy-700); opacity:.45; }
+  .pip.curr { background:var(--navy-700); }
+
+  /* StepHeader (replica del reale, accent navy) */
+  .step-eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; font-family:ui-monospace,monospace; color:var(--navy-700); margin-bottom:8px; }
+  .step-eyebrow .dot { width:6px; height:6px; border-radius:50%; background:var(--navy-700); }
+  h2 { font-size:24px; font-weight:700; letter-spacing:-.01em; margin-bottom:8px; }
+  .step-desc { color:var(--ink-muted); font-size:14px; margin-bottom:24px; }
+
+  /* ── CorsoRadioCard ─────────────────────────── */
+  .radiogroup { display:flex; flex-direction:column; gap:14px; }
+  .corso-card { display:block; width:100%; text-align:left; background:#fff; border:2px solid var(--line); border-radius:var(--radius-xl); box-shadow:var(--shadow-xs); padding:20px; cursor:pointer; transition:border-color .15s, box-shadow .15s, background .15s; font:inherit; color:inherit; }
+  .corso-card:hover { border-color:var(--navy-300); box-shadow:var(--shadow-sm); }
+  .corso-card:focus-visible { outline:none; box-shadow:0 0 0 2px #fff, 0 0 0 4px var(--navy-300); }
+  .corso-card[aria-checked="true"] { border-color:var(--navy-700); background:linear-gradient(0deg, rgba(238,241,248,.4), rgba(238,241,248,.4)), #fff; }
+
+  .cc-row1 { display:flex; align-items:center; gap:12px; }
+  .cc-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .cc-icon.sky { background:var(--sky-100); color:var(--sky-700); }
+  .cc-icon.sun { background:var(--sun-100); color:var(--sun-700); }
+  .cc-name { font-size:18px; font-weight:700; flex:1; min-width:0; }
+  .cc-radio { width:22px; height:22px; border-radius:50%; border:2px solid var(--line); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  [aria-checked="true"] .cc-radio { border-color:var(--navy-700); }
+  [aria-checked="true"] .cc-radio::after { content:""; width:10px; height:10px; border-radius:50%; background:var(--navy-700); }
+
+  .cc-desc { color:var(--ink-muted); font-size:14px; margin:10px 0 12px; }
+  .cc-row3 { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .badge { display:inline-flex; align-items:center; gap:5px; border-radius:var(--radius-pill); padding:4px 10px; font-size:12px; font-weight:600; }
+  .badge.info { background:var(--sky-100); color:var(--sky-700); }
+  .badge.warning { background:var(--sun-100); color:var(--sun-700); }
+  .cc-price { margin-left:auto; font-weight:700; font-size:17px; white-space:nowrap; }
+  .cc-price small { color:var(--ink-muted); font-weight:500; font-size:12px; }
+  .cc-price-note { width:100%; text-align:right; font-size:11.5px; color:var(--ink-muted); margin-top:2px; }
+
+  /* Nav bottoni wizard (replica) */
+  .nav { display:flex; justify-content:space-between; margin-top:28px; }
+  .btn { border-radius:12px; padding:10px 20px; font-weight:600; font-size:14px; border:1px solid var(--line); background:#fff; color:var(--ink); cursor:pointer; }
+  .btn.primary { background:var(--navy-700); border-color:var(--navy-700); color:#fff; }
+
+  .note { margin-top:36px; padding:14px 16px; background:var(--ember-100); color:var(--ember-700); border-radius:var(--radius-lg); font-size:13px; }
+  @media (max-width:420px){ .cc-price { margin-left:0; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="page-title">Nuova iscrizione</p>
+  <p class="page-sub">7 step per iscrivere tuo figlio alla scuola.</p>
+
+  <div class="stepper" aria-hidden="true">
+    <span class="pip done"></span><span class="pip done"></span><span class="pip curr"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span>
+  </div>
+
+  <p class="step-eyebrow"><span class="dot"></span> Step 3 di 7</p>
+  <h2>Scegli il corso</h2>
+  <p class="step-desc">Due formule: il corso completo con due lezioni a settimana, oppure solo la mountain bike del giovedì. Potrai vedere il dettaglio della quota nello step successivo.</p>
+
+  <div class="radiogroup" role="radiogroup" aria-label="Scegli il corso">
+
+    <!-- Selezionata -->
+    <button class="corso-card" role="radio" aria-checked="true">
+      <div class="cc-row1">
+        <span class="cc-icon sky" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>
+        </span>
+        <span class="cc-name">Corso MTB-BDC</span>
+        <span class="cc-radio" aria-hidden="true"></span>
+      </div>
+      <p class="cc-desc">Strada il martedì e mountain bike il giovedì: la formula completa, due lezioni a settimana.</p>
+      <div class="cc-row3">
+        <span class="badge info">Martedì · Strada</span>
+        <span class="badge warning">Giovedì · MTB</span>
+        <span class="cc-price">240&nbsp;€ <small>per te</small></span>
+        <span class="cc-price-note">Quota per chi si iscrive ora (mag–ago) · anno intero: 360&nbsp;€</span>
+      </div>
+    </button>
+
+    <!-- Default -->
+    <button class="corso-card" role="radio" aria-checked="false">
+      <div class="cc-row1">
+        <span class="cc-icon sun" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+        </span>
+        <span class="cc-name">Solo Mountain Bike</span>
+        <span class="cc-radio" aria-hidden="true"></span>
+      </div>
+      <p class="cc-desc">Una lezione a settimana, il giovedì: equilibrio, frenata e padronanza del mezzo off-road.</p>
+      <div class="cc-row3">
+        <span class="badge warning">Giovedì · MTB</span>
+        <span class="cc-price">180&nbsp;€ <small>per te</small></span>
+        <span class="cc-price-note">Quota per chi si iscrive ora (mag–ago) · anno intero: 270&nbsp;€</span>
+      </div>
+    </button>
+  </div>
+
+  <div class="nav">
+    <button class="btn">← Indietro</button>
+    <button class="btn primary">Continua →</button>
+  </div>
+
+  <p class="note"><strong>Nota implementazione:</strong> i prezzi arrivano da <code>getTariffeVigenti(anno)</code> (quota annua intera + quota del quarter corrente). Stepper: usare <code>StepperWizard</code> reale (7 voci, verificare versione mobile compatta EVO-025). Icone: Lucide <code>Bike</code> / <code>Mountain</code>.</p>
+</div>
+</body>
+</html>
