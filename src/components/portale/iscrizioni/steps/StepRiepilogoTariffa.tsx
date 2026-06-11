@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, Shirt } from "lucide-react";
-import type { Bambino } from "@/lib/airtable-portale";
-import { formatEUR, quarterLabel } from "@/lib/portale-utils";
+import type { Bambino, TipoCorso } from "@/lib/airtable-portale";
+import { formatEUR, quarterLabel, corsoLabel } from "@/lib/portale-utils";
 import type { TariffaInfo } from "../WizardNuovaIscrizione";
 import StepHeader from "../StepHeader";
 
@@ -12,6 +12,7 @@ interface Props {
   total: number;
   bambino: Bambino;
   anno: number;
+  corso: TipoCorso;
   tariffa: TariffaInfo | null;
   onTariffaLoaded: (t: TariffaInfo) => void;
 }
@@ -21,6 +22,7 @@ export default function StepRiepilogoTariffa({
   total,
   bambino,
   anno,
+  corso,
   tariffa,
   onTariffaLoaded,
 }: Props) {
@@ -33,7 +35,7 @@ export default function StepRiepilogoTariffa({
     (async () => {
       try {
         const res = await fetch(
-          `/api/portale/iscrizioni/tariffa?bambinoId=${bambino.id}&anno=${anno}`,
+          `/api/portale/iscrizioni/tariffa?bambinoId=${bambino.id}&anno=${anno}&corso=${corso}`,
         );
         const data = await res.json();
         if (cancelled) return;
@@ -51,7 +53,7 @@ export default function StepRiepilogoTariffa({
     return () => {
       cancelled = true;
     };
-  }, [bambino.id, anno, tariffa, onTariffaLoaded]);
+  }, [bambino.id, anno, corso, tariffa, onTariffaLoaded]);
 
   return (
     <div>
@@ -81,6 +83,10 @@ export default function StepRiepilogoTariffa({
               Tariffa applicata
             </p>
             <div className="space-y-3">
+              <div className="flex justify-between items-baseline">
+                <span className="text-ink-muted text-sm">Corso</span>
+                <span className="text-ink font-semibold text-right">{corsoLabel(tariffa.tipoCorso).label}</span>
+              </div>
               <div className="flex justify-between items-baseline">
                 <span className="text-ink-muted text-sm">Anno</span>
                 <span className="text-ink font-semibold">{tariffa.anno}</span>

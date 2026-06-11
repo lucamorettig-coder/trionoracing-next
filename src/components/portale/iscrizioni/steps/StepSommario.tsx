@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import TitoloLabel from "@/components/portale/pagamenti/TitoloLabel";
 import type { Bambino, Iscrizione, TitoloPagamento } from "@/lib/airtable-portale";
-import { formatEUR, meseITLabel, quarterLabel, statoTitoloBadge } from "@/lib/portale-utils";
+import { formatEUR, meseITLabel, quarterLabel, statoTitoloBadge, corsoLabel } from "@/lib/portale-utils";
 import StepHeader from "../StepHeader";
 import type { TariffaInfo } from "../WizardNuovaIscrizione";
 
@@ -52,6 +52,7 @@ export default function StepSommario({
         {/* Anagrafica + stato modulistica */}
         <section className="bg-white border border-line rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] p-5 space-y-3">
           <Row label="Figlio" value={`${bambino.fields.NOME_BAMBINO} ${bambino.fields.COGNOME_BAMBINO}`} />
+          <Row label="Corso" value={corsoLabel(tariffa.tipoCorso).label} />
           <Row label="Anno" value={`${tariffa.anno}`} />
           <Row label="Periodo" value={quarterLabel(tariffa.quarter)} />
           <div className="pt-3 border-t border-line space-y-2">
