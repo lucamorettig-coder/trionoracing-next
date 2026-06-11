@@ -323,7 +323,7 @@ export async function getKPIPagamentiPending(): Promise<KPIPagamentiPendingResul
 export interface IscrizioneAdminFilters {
   anno?: number;
   stato?: ("COMPLETA" | "INCOMPLETA" | "ANNULLATA" | "DEROGA")[];
-  corso?: ("MTB" | "Strada")[];
+  corso?: ("MTB-BDC" | "SOLO-MTB")[];
   modulistica?: "completa" | "incompleta";
   search?: string;
   limit?: number;
@@ -343,11 +343,13 @@ const ANNO_CORRENTE = new Date().getFullYear();
 export function parseIscrizioniFilters(params: URLSearchParams): IscrizioneAdminFilters {
   const anno = params.get("anno");
   const statoRaw = params.getAll("stato") as ("COMPLETA" | "INCOMPLETA" | "ANNULLATA" | "DEROGA")[];
+  const corsoRaw = params.getAll("corso") as ("MTB-BDC" | "SOLO-MTB")[];
   const modulistica = params.get("modulistica") as IscrizioneAdminFilters["modulistica"];
   const search = params.get("search") ?? undefined;
   return {
     anno: anno ? parseInt(anno, 10) : ANNO_CORRENTE,
     stato: statoRaw.length > 0 ? statoRaw : undefined,
+    corso: corsoRaw.length > 0 ? corsoRaw : undefined,
     modulistica: modulistica || undefined,
     search,
   };

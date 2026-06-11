@@ -16,6 +16,11 @@ const STATI = [
   { value: "DEROGA", label: "Completata in deroga" },
 ] as const;
 
+const CORSI = [
+  { value: "MTB-BDC", label: "MTB-BDC" },
+  { value: "SOLO-MTB", label: "Solo MTB" },
+] as const;
+
 
 interface IscrizioniFiltersProps {
   initial: IscrizioneAdminFilters;
@@ -50,6 +55,7 @@ export function IscrizioniFilters({ initial }: IscrizioniFiltersProps) {
   const hasFilters =
     (initial.anno && initial.anno !== ANNO_CORRENTE) ||
     (initial.stato && initial.stato.length > 0) ||
+    (initial.corso && initial.corso.length > 0) ||
     initial.modulistica ||
     initial.search;
 
@@ -61,6 +67,7 @@ export function IscrizioniFilters({ initial }: IscrizioniFiltersProps) {
   }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const statiAttivi = initial.stato ?? [];
+  const corsiAttivi = initial.corso ?? [];
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -86,6 +93,25 @@ export function IscrizioniFilters({ initial }: IscrizioniFiltersProps) {
             className={cn(
               "h-9 px-3 text-[13px] font-medium border rounded-[var(--radius-md)] transition-colors",
               statiAttivi.includes(value as typeof statiAttivi[number])
+                ? "bg-navy-700 text-white border-navy-700"
+                : "bg-white text-ink-muted border-line hover:border-navy-700 hover:text-ink",
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Corso multi */}
+      <div className="flex items-center gap-1">
+        {CORSI.map(({ value, label }) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => toggleMultiParam("corso", value)}
+            className={cn(
+              "h-9 px-3 text-[13px] font-medium border rounded-[var(--radius-md)] transition-colors",
+              corsiAttivi.includes(value as typeof corsiAttivi[number])
                 ? "bg-navy-700 text-white border-navy-700"
                 : "bg-white text-ink-muted border-line hover:border-navy-700 hover:text-ink",
             )}
