@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Bambino, Iscrizione, TitoloPagamento } from "@/lib/airtable-portale";
-import { formatEUR, statoIscrizioneBadge } from "@/lib/portale-utils";
+import { formatEUR, statoIscrizioneBadge, corsoLabel, corsoBadgeVariant } from "@/lib/portale-utils";
 import TabStato from "./tabs/TabStato";
 import TabModulistica from "./tabs/TabModulistica";
 import TabTaglie from "./tabs/TabTaglie";
@@ -100,6 +100,13 @@ export default function DettaglioIscrizione({
               Iscrizione {anno}
               {quarter && <> · {quarter}</>}
             </p>
+            {fields.CORSO && (
+              <div className="mt-2">
+                <Badge variant={corsoBadgeVariant(fields.CORSO)} size="sm">
+                  {corsoLabel(fields.CORSO).label}
+                </Badge>
+              </div>
+            )}
           </div>
           <div className="text-right shrink-0">
             <Badge variant={badge.variant} size="md">{badge.label}</Badge>
