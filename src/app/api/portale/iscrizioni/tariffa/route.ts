@@ -4,11 +4,13 @@ import {
   getGenitoreByClerkId,
   getBambinoById,
   calcTariffa,
+  parseTipoCorso,
 } from "@/lib/airtable-portale";
 
 /**
- * GET /api/portale/iscrizioni/tariffa?bambinoId=...&anno=2026
+ * GET /api/portale/iscrizioni/tariffa?bambinoId=...&anno=2026&corso=MTB-BDC
  * Ritorna la tariffa applicabile + sconto famiglia per il genitore.
+ * `corso` (default MTB-BDC) seleziona il tipo di corso (EVO-026).
  */
 export async function GET(req: NextRequest) {
   const { userId } = await auth();
@@ -21,6 +23,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "bambinoId e anno obbligatori" }, { status: 400 });
   }
 
+  const corso = parseTipoCorso(url.searchParams.get("corso"));
+
   const genitore = await getGenitoreByClerkId(userId);
   if (!genitore) return NextResponse.json({ error: "Genitore non trovato" }, { status: 403 });
 
@@ -30,7 +34,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const result = await calcTariffa(genitore.id, anno, undefined, bambinoId);
+  const result = await calcTariffa(genitore.id, anno, undefined, bambinoId, corso);
   if (!result) {
     return NextResponse.json(
       { error: "Nessuna tariffa attiva per l'anno richiesto" },
@@ -40,6 +44,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     tariffaId: result.tariffa.id,
+    tipoCorso: result.tariffa.fields.TIPO_CORSO ?? "MTB-BDC",
     quarter: result.quarter,
     anno: result.anno,
     importoIscrizione: result.tariffa.fields.IMPORTO_ISCRIZIONE,
@@ -52,7 +57,6 @@ export async function GET(req: NextRequest) {
     importoTotale: result.importoTotale,
     ordineIscrizioneGenitore: result.ordineIscrizioneGenitore,
     descrizione: result.tariffa.fields.DESCRIZIONE_TARIFFA,
-    scadenzaRate: result.tariffa.fields.SCADENZA_RATE,
     regolamentoUrl: result.tariffa.fields.REGOLAMENTO?.[0]?.url ?? null,
     regolamentoFilename: result.tariffa.fields.REGOLAMENTO?.[0]?.filename ?? null,
   });

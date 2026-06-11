@@ -6,13 +6,14 @@ import {
   getIscrizioniBambino,
   calcTariffa,
   createIscrizione,
-  type Corso,
+  parseTipoCorso,
 } from "@/lib/airtable-portale";
 
 /**
  * POST /api/portale/iscrizioni
  * Body: { bambinoId, anno, corso }
  * Crea iscrizione + prima rata. 409 se esiste già per quel bambino/anno.
+ * `corso` (default MTB-BDC) seleziona la tariffa del tipo corso scelto (EVO-026).
  */
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const bambinoId = body.bambinoId as string | undefined;
   const anno = Number(body.anno);
-  const corso = body.corso as Corso | undefined;
+  const corso = parseTipoCorso(body.corso);
 
   if (!bambinoId || !Number.isFinite(anno)) {
     return NextResponse.json({ error: "bambinoId e anno obbligatori" }, { status: 400 });
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const calcResult = await calcTariffa(genitore.id, anno, undefined, bambinoId);
+  const calcResult = await calcTariffa(genitore.id, anno, undefined, bambinoId, corso);
   if (!calcResult) {
     return NextResponse.json(
       { error: "Nessuna tariffa attiva per l'anno richiesto. Contatta la segreteria." },
@@ -58,13 +59,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // CORSO viene scritto da createIscrizione dal TIPO_CORSO della tariffa selezionata.
     const iscrizione = await createIscrizione(
       {
         TABELLA_BAMBINI: [bambinoId],
         TABELLA_GENITORI: [genitore.id],
         TABELLA_TARIFFE: [calcResult.tariffa.id],
         DATA_ISCRIZIONE: new Date().toISOString().slice(0, 10),
-        CORSO: corso,
         ORDINE_ISCRIZIONE_GENITORE: calcResult.ordineIscrizioneGenitore,
       },
       calcResult.tariffa,
