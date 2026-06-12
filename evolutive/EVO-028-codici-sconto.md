@@ -212,8 +212,8 @@ Nessun rilievo bloccante; requisito "evidenza dello sconto" centrato (risparmio 
 - Verifica post-deploy ✅: `/`, `/la-scuola`, `/portale/login` → 200 (nessuna regressione pubblica dai fix `<a>`→`<Link>`); route auth-gated → 404 uniforme (pattern Clerk non-autenticato, identico a `/portale/admin/tariffe`); esistenza route admin confermata da `next build`. Verifica funzionale auth-gated rimandata allo smoke utente loggato.
 
 ### Azioni residue (post-go-live)
-- **Make.com**: verificare che lo scenario del return_url matchi il titolo via `?ref` (= `CODICE_TITOLO`), non via `checkout_reference` — rilevante solo nel caso raro "reference univoco". Fallback `/verify` browser comunque attivo.
-- **Conflitti `feat/sumup-widget-telemetry`**: al merge di quel branch risolvere i conflitti su `CheckoutSumUp.tsx` + `…/sumup/checkout/route.ts`.
+- **Make.com** (verificato 2026-06-13): lo scenario `4086727` PROD / `5141784` DEV trova il titolo con `{CODICE_TITOLO} = "{{2.data.checkout_reference}}"` — dal reference REALE del checkout, **non** dal `?ref`. Col reference univoco quindi NON aggancia il titolo. **Fix data all'utente** (da applicare a mano nei 2 scenari): estendere la formula Search a `OR({CODICE_TITOLO}="{{2.data.checkout_reference}}", {CODICE_TITOLO}="{{last(split(2.data.return_url; "ref="))}}")`. Rilevante solo nel caso raro "reference univoco + browser chiuso prima del `/verify`"; il `/verify` copre il flusso normale.
+- **`feat/sumup-widget-telemetry`** — **mergiato** via PR [#74](https://github.com/lucamorettig-coder/trionoracing-next/pull/74) (`2f92a70`): unico conflitto su `CheckoutSumUp.tsx`, risolto integrando la telemetria (beacon `/sumup/log` + `WIDGET_*`/`PAGE_ABANDONED`/`SCRIPT_LOAD_ERROR`) nel flusso EVO-028; la checkout `route.ts` non era in conflitto. Quality gate verdi.
 - **Codici seed DEV** (`ESTATE2026`, `SCADUTO2025`, `TROPPO200`): di test su DEV, rimuovibili a piacere.
 
 ---
