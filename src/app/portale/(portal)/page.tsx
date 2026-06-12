@@ -17,8 +17,13 @@ import DashboardGenitore from "@/components/portale/dashboard/DashboardGenitore"
 import SezioneMaestro from "@/components/portale/dashboard/SezioneMaestro";
 import SezioneMaestroNonCollegato from "@/components/portale/lezioni/SezioneMaestroNonCollegato";
 
-export default async function PortalePage() {
+export default async function PortalePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ "figlio-creato"?: string }>;
+}) {
   const { sessionClaims, userId } = await auth();
+  const { "figlio-creato": figlioCreatoId } = await searchParams;
   const role = (sessionClaims?.role as string) ?? "GENITORE";
 
   if (role === "ADMIN") redirect("/portale/admin");
@@ -57,6 +62,7 @@ export default async function PortalePage() {
                 titoli={titoli}
                 iscrizioniGara={iscrizioniGara}
                 gareFuture={gareFuture}
+                figlioAppenaCreato={figlioCreatoId ? bambini.find((b) => b.id === figlioCreatoId) ?? null : null}
               />
             </>
           )}
@@ -104,6 +110,7 @@ export default async function PortalePage() {
               titoli={titoli}
               iscrizioniGara={iscrizioniGara}
               gareFuture={gareFuture}
+              figlioAppenaCreato={figlioCreatoId ? bambini.find((b) => b.id === figlioCreatoId) ?? null : null}
             />
           </>
         )}
@@ -128,6 +135,7 @@ export default async function PortalePage() {
       titoli={titoli}
       iscrizioniGara={iscrizioniGara}
       gareFuture={gareFuture}
+      figlioAppenaCreato={figlioCreatoId ? bambini.find((b) => b.id === figlioCreatoId) ?? null : null}
     />
   );
 }

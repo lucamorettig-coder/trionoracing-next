@@ -3,6 +3,7 @@ import { Plus, CreditCard, CheckCircle2, FileText, Stethoscope, Euro, Trophy, Ar
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import FiglioCard from "@/components/portale/figli/FiglioCard";
+import JustCreatedBanner from "@/components/portale/figli/JustCreatedBanner";
 import { formatDateIT, getStatoIscrizioneAnnoCorrente, buildScadenze } from "@/lib/portale-utils";
 import { statoIscrizioneGaraBadge } from "@/components/portale/gare/gara-utils";
 import type {
@@ -21,6 +22,8 @@ interface Props {
   titoli: TitoloPagamento[];
   iscrizioniGara?: IscrizioneGara[];
   gareFuture?: Gara[];
+  /** Se presente, mostra il banner di conferma "Hai aggiunto X" in cima (redirect post-creazione figlio, EVO-027). */
+  figlioAppenaCreato?: Bambino | null;
 }
 
 export default function DashboardGenitore({
@@ -30,6 +33,7 @@ export default function DashboardGenitore({
   titoli,
   iscrizioniGara = [],
   gareFuture = [],
+  figlioAppenaCreato = null,
 }: Props) {
   const nome = genitore.fields.NOME_GENITORE;
   const anno = new Date().getFullYear();
@@ -93,6 +97,13 @@ export default function DashboardGenitore({
           )}
         </div>
       </section>
+
+      {figlioAppenaCreato && (
+        <JustCreatedBanner
+          nomeBambino={figlioAppenaCreato.fields.NOME_BAMBINO ?? ""}
+          bambinoId={figlioAppenaCreato.id}
+        />
+      )}
 
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12 space-y-10">
         {/* Prossime scadenze — sopra "I miei figli" quando presenti (EVO-025) */}

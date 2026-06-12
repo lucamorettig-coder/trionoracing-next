@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
@@ -31,6 +32,8 @@ const defaultLinks: NavBarProps["links"] = [
 export function NavBar({ links = defaultLinks, className }: NavBarProps) {
   const [scrolled, setScrolled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  // EVO-027: navbar auth-aware. isSignedIn è undefined finché Clerk non carica → default "Accedi".
+  const { isSignedIn } = useAuth();
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -86,10 +89,14 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
           ))}
         </nav>
 
-        {/* Desktop CTAs */}
+        {/* Desktop CTAs — auth-aware (EVO-027): "Vai al portale" se loggato */}
         <div className="hidden lg:flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link href="/portale/login">Accedi</Link>
+            {isSignedIn ? (
+              <Link href="/portale">Vai al portale</Link>
+            ) : (
+              <Link href="/portale/login">Accedi</Link>
+            )}
           </Button>
           <Button asChild size="sm">
             <Link href="/portale/iscrizioni">Iscrivi tuo figlio</Link>
@@ -165,7 +172,11 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
               size="lg"
               className="w-full text-white border-white/30 hover:bg-white/10"
             >
-              <Link href="/portale/login" onClick={() => setOpen(false)}>Accedi</Link>
+              {isSignedIn ? (
+                <Link href="/portale" onClick={() => setOpen(false)}>Vai al portale</Link>
+              ) : (
+                <Link href="/portale/login" onClick={() => setOpen(false)}>Accedi</Link>
+              )}
             </Button>
           </div>
       </div>

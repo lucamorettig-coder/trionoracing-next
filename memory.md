@@ -31,6 +31,7 @@
 | EVO-024 | privacy-condizioni-analytics | Documenti legali GDPR: Privacy da bozza→definitiva + **nuova** Condizioni di Servizio (sito+portale) + **nuovo** banner cookie consent custom (Consent Mode v2) + Google Analytics 4 (`G-RMGEYC52J0`) post-consenso | 2026-06-07 | 2026-06-07 | completata | https://trionoracing-next.vercel.app | [link](evolutive/EVO-024-privacy-condizioni-analytics.md) |
 | EVO-025 | portale-qa-ux-polish | Portale QA/UX polish post-produzione (mobile genitori + admin) — 8 fix da "Check trionoracing.it" | 2026-06-07 | — | pronta per implementazione | — | [link](evolutive/EVO-025-portale-qa-ux-polish.md) |
 | EVO-026 | tariffe-corso-solo-mtb | **Nuovo tipo corso "Solo Mountain Bike"** (1 lezione/sett, giovedì — Q1 270€/Q2 180€/Q3 90€) accanto a MTB-BDC, via `TARIFFE.TIPO_CORSO` + wizard a 7 step con scelta corso + **scadenze rate dinamiche** dal mese di iscrizione + admin/vetrina/filtri corso | 2026-06-11 | 2026-06-11 | completata | https://trionoracing-next.vercel.app/portale/iscrizioni | [link](evolutive/EVO-026-tariffe-corso-solo-mtb.md) |
+| EVO-027 | portale-ux-redirect-tariffe | Redirect post-creazione figlio → home portale + redirect post-login (navbar auth-aware) + restyle header card tariffe (admin) | 2026-06-12 | — | in PR (#67) | — | [link](evolutive/EVO-027-portale-ux-redirect-tariffe.md) |
 
 ## Stati possibili
 
