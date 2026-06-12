@@ -197,6 +197,27 @@ Nessun rilievo bloccante; requisito "evidenza dello sconto" centrato (risparmio 
 
 ---
 
+## 8. Verifica e go-live
+
+### Go-live
+- **PR**: [#71](https://github.com/lucamorettig-coder/trionoracing-next/pull/71) — squash-merge `6077d88` su `main`.
+- **Branch**: `evo-028-codici-sconto` (da `main` b1f4de7, worktree isolato).
+- **Deploy**: Vercel production `dpl_14qHMXdoU5pFTkSgyQHuFihcJARW` **READY** (build da `6077d88`).
+- **URL produzione**: https://trionoracing-next.vercel.app (alias `trionoracing.it`) — admin `/portale/admin/codici-sconto`, checkout via `/portale/iscrizioni/[id]/checkout`.
+- **Data go-live**: 2026-06-13.
+
+### Esito quality + smoke
+- Quality gate: `tsc` ✅ · `eslint` 0 errori ✅ · `next build` ✅.
+- Smoke dev (Airtable DEV): applicazione codice (valido/scaduto/troppo-alto) + riepilogo sconto ✅; checkout SumUp a importo scontato ✅ (dopo fix reference univoco).
+- Verifica post-deploy ✅: `/`, `/la-scuola`, `/portale/login` → 200 (nessuna regressione pubblica dai fix `<a>`→`<Link>`); route auth-gated → 404 uniforme (pattern Clerk non-autenticato, identico a `/portale/admin/tariffe`); esistenza route admin confermata da `next build`. Verifica funzionale auth-gated rimandata allo smoke utente loggato.
+
+### Azioni residue (post-go-live)
+- **Make.com**: verificare che lo scenario del return_url matchi il titolo via `?ref` (= `CODICE_TITOLO`), non via `checkout_reference` — rilevante solo nel caso raro "reference univoco". Fallback `/verify` browser comunque attivo.
+- **Conflitti `feat/sumup-widget-telemetry`**: al merge di quel branch risolvere i conflitti su `CheckoutSumUp.tsx` + `…/sumup/checkout/route.ts`.
+- **Codici seed DEV** (`ESTATE2026`, `SCADUTO2025`, `TROPPO200`): di test su DEV, rimuovibili a piacere.
+
+---
+
 ## Log fasi
 
 ### [2026-06-12] Fase 0 — Bootstrap completata
@@ -225,3 +246,6 @@ Smoke utente su dev (Airtable DEV). **UI sconto OK** al primo colpo (140€ barr
 
 ### [2026-06-12] Fase 7 — Implementazione + quality gate
 Branch `evo-028-codici-sconto` da `main` (worktree isolato; repo principale su `feat/sumup-widget-telemetry`, non toccato). **Schema Airtable PROD+DEV** applicato via MCP e validato (test non distruttivo: importi invariati con campo vuoto → blank=0 ok). **Codice**: `src/lib/codici-sconto.ts` (validazione pura) + `getCodiceByCodice` (injection-safe); preview action `validaCodiceScontoAction` + refactor `CheckoutSumUp` (step "Procedi al pagamento" → codice prima del widget, riepilogo barrato/sconto/totale + pill); checkout route con sconto rivalidato server-side + idempotenza per-importo (DELETE+recreate se importo cambia); admin CRUD `/portale/admin/codici-sconto` (helper `airtable-admin.ts` + page + actions/actions-types + `CodiceFormDialog` + `CodiciDataTable` + voce NavBar). **Quality gate verdi**: typecheck ok · lint 0 errori (fixati en passant 3 `<a>`→`<Link>` pre-esistenti del commit #70 verso `/portale/iscrizioni`) · build ok (route `/portale/admin/codici-sconto` + checkout generate). **Seed DEV**: codici `ESTATE2026` (−30€, valido) e `SCADUTO2025` (−20€, scaduto). Dev server avviato per smoke guidato.
+
+### [2026-06-13] Fase 8 — Go-live + consolidamento
+PR [#71](https://github.com/lucamorettig-coder/trionoracing-next/pull/71) squash-merged (`6077d88`), deploy Vercel production **READY**, live su https://trionoracing-next.vercel.app (alias `trionoracing.it`). Smoke prod: pubbliche 200 (nessuna regressione dai fix `<a>`→`<Link>`), route auth-gated 404 (pattern Clerk non-autenticato). Consolidamento: scheda §8, **AGENTS.md** (7 pattern EVO-028: reference univoco SumUp, sconto via campo+formula, `filterByFormula` injection-safe, helper validazione condiviso preview/commit, step "Procedi" pre-widget, 404 Clerk, worktree parallelo), **memory.md** → completata. **Residui**: verifica scenario Make.com (`?ref` vs `checkout_reference`, caso raro); conflitti attesi con `feat/sumup-widget-telemetry` su `CheckoutSumUp.tsx`+`route.ts`; codici seed DEV rimovibili.
