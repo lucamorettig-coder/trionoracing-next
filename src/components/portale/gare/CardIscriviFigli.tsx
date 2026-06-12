@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Check, Clock, ArrowRight, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Badge } from "@/components/ui/badge";
 import type { Bambino, Gara, IscrizioneGara } from "@/lib/airtable-portale";
 import { calcCategoriaFCI } from "@/lib/airtable-portale";
@@ -140,8 +140,7 @@ export default function CardIscriviFigli({ gara, bambini, iscrizioniGenitore }: 
           );
         })}
 
-        <Button
-          type="submit"
+        <SubmitButton
           variant="primary"
           size="md"
           disabled={selected.size === 0}
@@ -149,7 +148,7 @@ export default function CardIscriviFigli({ gara, bambini, iscrizioniGenitore }: 
         >
           {ctaLabel}
           <ArrowRight className="w-4 h-4" />
-        </Button>
+        </SubmitButton>
       </form>
 
       <p className="text-[12px] text-ink-muted mt-3 leading-snug">

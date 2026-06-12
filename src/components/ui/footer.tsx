@@ -21,6 +21,7 @@ export interface FooterProps {
 export function Footer({ onNewsletterSubmit }: FooterProps) {
   const [email, setEmail] = React.useState("");
   const [submitted, setSubmitted] = React.useState(false);
+  const [pending, setPending] = React.useState(false);
 
   return (
     <footer className="photo-bg-navy text-white">
@@ -72,8 +73,14 @@ export function Footer({ onNewsletterSubmit }: FooterProps) {
               <form
                 onSubmit={async (e) => {
                   e.preventDefault();
-                  await onNewsletterSubmit?.(email);
-                  setSubmitted(true);
+                  if (pending) return;
+                  setPending(true);
+                  try {
+                    await onNewsletterSubmit?.(email);
+                    setSubmitted(true);
+                  } finally {
+                    setPending(false);
+                  }
                 }}
                 className="space-y-2"
                 suppressHydrationWarning
@@ -91,6 +98,7 @@ export function Footer({ onNewsletterSubmit }: FooterProps) {
                 <Button
                   type="submit"
                   size="md"
+                  loading={pending}
                   className="w-full bg-sun-500 text-navy-900 border-sun-500 hover:bg-sun-600 hover:border-sun-600"
                 >
                   Iscrivimi
