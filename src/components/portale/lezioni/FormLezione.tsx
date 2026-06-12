@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { TIPO_SESSIONE_VALUES, type TipoSessione } from "@/lib/airtable-portale";
 import { tipoSessioneStyle } from "@/lib/portale-utils";
 import type { Bambino, Lezione, Maestro } from "@/lib/airtable-portale";
@@ -212,9 +213,9 @@ export default function FormLezione({
 
       {!readOnly && (
         <div className="flex items-center gap-3 pt-2">
-          <Button type="submit" variant="primary" size="md">
+          <SubmitButton variant="primary" size="md">
             {submitLabel}
-          </Button>
+          </SubmitButton>
           <Button asChild variant="ghost" size="md">
             <Link href={cancelHref}>Annulla</Link>
           </Button>

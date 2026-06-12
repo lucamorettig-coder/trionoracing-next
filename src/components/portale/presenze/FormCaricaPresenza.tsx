@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { TIPO_SESSIONE_VALUES, type TipoSessione } from "@/lib/airtable-portale";
 import { tipoSessioneStyle } from "@/lib/portale-utils";
 import type { Bambino, Gara, Maestro } from "@/lib/airtable-portale";
@@ -250,8 +251,7 @@ export default function FormCaricaPresenza({
                       </span>
                     ) : (
                       joinAction && (
-                        <Button
-                          type="submit"
+                        <SubmitButton
                           variant="primary"
                           size="sm"
                           formAction={joinAction}
@@ -263,7 +263,7 @@ export default function FormCaricaPresenza({
                           {admin
                             ? "Aggiungi i maestri selezionati"
                             : "Aggiungimi a questa lezione"}
-                        </Button>
+                        </SubmitButton>
                       )
                     )}
                   </li>
@@ -372,9 +372,9 @@ export default function FormCaricaPresenza({
       )}
 
       <div className="flex items-center gap-3 pt-2">
-        <Button type="submit" variant="primary" size="md">
+        <SubmitButton variant="primary" size="md">
           Salva presenza
-        </Button>
+        </SubmitButton>
         <Button asChild variant="ghost" size="md">
           <Link href={cancelHref}>Annulla</Link>
         </Button>
