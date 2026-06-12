@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Card, CardIcon, CardTitle, CardBody, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -77,7 +78,7 @@ export function SezioneScuola() {
           </div>
           <div className="mt-8">
             <Button asChild>
-              <a href="/portale/iscrizioni">Iscrivi tuo figlio</a>
+              <Link href="/portale/iscrizioni">Iscrivi tuo figlio</Link>
             </Button>
           </div>
         </CardContent>

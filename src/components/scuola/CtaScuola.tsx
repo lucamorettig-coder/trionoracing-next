@@ -6,6 +6,7 @@ import { getSiteSettings, formatPhoneIT, phoneHref } from "@/lib/site-settings";
 import { Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CONTACT_EMAIL } from "@/lib/seo";
+import Link from "next/link";
 
 export async function CtaScuola() {
   // Sfondo video gestito da Airtable (slot "scuola-cta"). Se assente/non attivo →
@@ -38,7 +39,7 @@ export async function CtaScuola() {
         />
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Button asChild size="lg" className="bg-white text-navy-900 border-white hover:bg-navy-50">
-            <a href="/portale/iscrizioni">Iscrivi tuo figlio</a>
+            <Link href="/portale/iscrizioni">Iscrivi tuo figlio</Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:border-white">
             <a href={`mailto:${CONTACT_EMAIL}`}>Scrivici via email</a>

@@ -33,7 +33,7 @@ export async function CtaFinale() {
         />
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Button asChild size="lg" className="bg-white text-navy-900 border-white hover:bg-navy-50">
-            <a href="/portale/iscrizioni">Iscrivi tuo figlio</a>
+            <Link href="/portale/iscrizioni">Iscrivi tuo figlio</Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:border-white">
             <Link href="/portale/login">Accedi all&apos;area genitori</Link>

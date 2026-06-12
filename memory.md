@@ -32,6 +32,7 @@
 | EVO-025 | portale-qa-ux-polish | Portale QA/UX polish post-produzione (mobile genitori + admin) — 8 fix da "Check trionoracing.it" | 2026-06-07 | — | pronta per implementazione | — | [link](evolutive/EVO-025-portale-qa-ux-polish.md) |
 | EVO-026 | tariffe-corso-solo-mtb | **Nuovo tipo corso "Solo Mountain Bike"** (1 lezione/sett, giovedì — Q1 270€/Q2 180€/Q3 90€) accanto a MTB-BDC, via `TARIFFE.TIPO_CORSO` + wizard a 7 step con scelta corso + **scadenze rate dinamiche** dal mese di iscrizione + admin/vetrina/filtri corso | 2026-06-11 | 2026-06-11 | completata | https://trionoracing-next.vercel.app/portale/iscrizioni | [link](evolutive/EVO-026-tariffe-corso-solo-mtb.md) |
 | EVO-027 | portale-ux-redirect-tariffe | Redirect post-creazione figlio → home portale + redirect post-login (navbar auth-aware) + restyle header card tariffe (admin) | 2026-06-12 | 2026-06-12 | completata | https://trionoracing-next.vercel.app/portale | [link](evolutive/EVO-027-portale-ux-redirect-tariffe.md) |
+| EVO-028 | codici-sconto | Codici sconto a importo fisso applicabili in iscrizione (prima rata) + pagamento titoli/rate, con periodo di validità, gestiti da admin (CRUD) | 2026-06-12 | — | in pianificazione | — | [link](evolutive/EVO-028-codici-sconto.md) |
 
 ## Stati possibili
 

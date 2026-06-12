@@ -34,6 +34,7 @@ import {
   updateGenitoreAccountDisabilitato,
 } from "@/lib/airtable-portale";
 import { clerkClient } from "@clerk/nextjs/server";
+import { type CodiceSconto, normalizzaCodice } from "@/lib/codici-sconto";
 
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TOKEN = process.env.AIRTABLE_TOKEN;
@@ -2010,4 +2011,145 @@ export async function getUtentiMigrati(
   }
 
   return genitori;
+}
+
+// ─── Codici Sconto (EVO-028) ────────────────────────────────────────────────
+
+const CODICI_SCONTO_TABLE = "Codici Sconto";
+
+export interface CodiceScontoFormData {
+  codice: string;
+  importo: number;
+  /** YYYY-MM-DD */
+  validoDa: string;
+  /** YYYY-MM-DD */
+  validoA: string;
+  attivo: boolean;
+  descrizione?: string;
+}
+
+/** Tutti i codici sconto, ordinati per codice. */
+export async function getAllCodiciSconto(): Promise<CodiceSconto[]> {
+  return fetchAllPages<CodiceSconto>(CODICI_SCONTO_TABLE, {
+    sort: [{ field: "CODICE", direction: "asc" }],
+  });
+}
+
+/** Singolo codice sconto per ID (null se non trovato). */
+export async function getCodiceScontoById(id: string): Promise<CodiceSconto | null> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(CODICI_SCONTO_TABLE)}/${encodeURIComponent(id)}`,
+    { headers: { Authorization: `Bearer ${TOKEN}` }, cache: "no-store" },
+  );
+  if (!res.ok) return null;
+  return res.json();
+}
+
+/**
+ * Normalizza + valida i dati del form e costruisce i fields Airtable.
+ * Throw con messaggio user-facing su input non valido (mostrato inline dal form).
+ * `escludiId` esclude il record corrente dal controllo di unicità (update).
+ */
+async function buildCodiceFields(
+  data: CodiceScontoFormData,
+  escludiId?: string,
+): Promise<Record<string, unknown>> {
+  const codice = normalizzaCodice(data.codice);
+  if (!codice) throw new Error("Il codice è obbligatorio (lettere, numeri, - e _).");
+  const importo = Number(data.importo) || 0;
+  if (importo <= 0) throw new Error("L'importo dello sconto deve essere maggiore di zero.");
+  if (!data.validoDa || !data.validoA) throw new Error("Specifica il periodo di validità (da / a).");
+  if (data.validoA < data.validoDa) {
+    throw new Error("La data di fine validità non può precedere quella di inizio.");
+  }
+
+  // Unicità codice (case-insensitive via normalizzazione).
+  const esistenti = await getAllCodiciSconto();
+  const dup = esistenti.find(
+    (c) => normalizzaCodice(c.fields.CODICE ?? "") === codice && c.id !== escludiId,
+  );
+  if (dup) throw new Error(`Esiste già un codice "${codice}".`);
+
+  return {
+    CODICE: codice,
+    IMPORTO: importo,
+    VALIDO_DA: data.validoDa,
+    VALIDO_A: data.validoA,
+    ATTIVO: data.attivo,
+    DESCRIZIONE: data.descrizione?.trim() || "",
+  };
+}
+
+export async function createCodiceSconto(data: CodiceScontoFormData): Promise<CodiceSconto> {
+  requireEnv();
+  const fields = await buildCodiceFields(data);
+  const res = await fetch(`${API_BASE}/${BASE_ID}/${encodeURIComponent(CODICI_SCONTO_TABLE)}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ fields }),
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`[airtable-admin] createCodiceSconto failed: ${res.status} ${body}`);
+  }
+  return res.json();
+}
+
+export async function updateCodiceSconto(
+  id: string,
+  data: CodiceScontoFormData,
+): Promise<CodiceSconto> {
+  requireEnv();
+  const fields = await buildCodiceFields(data, id);
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(CODICI_SCONTO_TABLE)}/${encodeURIComponent(id)}`,
+    {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ fields }),
+      cache: "no-store",
+    },
+  );
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`[airtable-admin] updateCodiceSconto ${id} failed: ${res.status} ${body}`);
+  }
+  return res.json();
+}
+
+/** Toggle rapido ATTIVO (inline dalla tabella). */
+export async function toggleAttivoCodiceSconto(id: string, attivo: boolean): Promise<void> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(CODICI_SCONTO_TABLE)}/${encodeURIComponent(id)}`,
+    {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ fields: { ATTIVO: attivo } }),
+      cache: "no-store",
+    },
+  );
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`[airtable-admin] toggleAttivoCodiceSconto ${id} failed: ${res.status} ${body}`);
+  }
+}
+
+/**
+ * Hard delete di un codice sconto. Safe: i codici non hanno linked record che
+ * blocchino la cancellazione — i titoli registrano il codice come testo
+ * (CODICE_SCONTO), non come link, quindi lo storico pagamenti resta intatto.
+ */
+export async function deleteCodiceSconto(id: string): Promise<void> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(CODICI_SCONTO_TABLE)}/${encodeURIComponent(id)}`,
+    { method: "DELETE", headers: { Authorization: `Bearer ${TOKEN}` }, cache: "no-store" },
+  );
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`[airtable-admin] deleteCodiceSconto ${id} failed: ${res.status} ${body}`);
+  }
 }
