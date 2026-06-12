@@ -9,6 +9,8 @@
  * su campi formula/lookup. Field names in MAIUSCOLO_UNDERSCORE (Airtable legacy).
  */
 
+import { type CodiceSconto, normalizzaCodice } from "./codici-sconto";
+
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TOKEN = process.env.AIRTABLE_TOKEN;
 const API_BASE = "https://api.airtable.com/v0";
@@ -786,6 +788,9 @@ export interface TitoloPagamento {
     IMPORTO_RATA_BASE?: number;
     IMPORTO_ISCRIZIONE?: number;
     IMPORTO_SCONTO_APPLICATO?: number;
+    // EVO-028 — codice sconto applicato a questo titolo (sottratto da IMPORTO via formula)
+    IMPORTO_SCONTO_CODICE?: number;
+    CODICE_SCONTO?: string;
     DATA_EMISSIONE?: string;
     DATA_SCADENZA_PAGAMENTO?: string;
     SCADENZA_MESE?: string;
@@ -825,6 +830,9 @@ const TITOLI_WRITABLE_FIELDS = new Set([
   "ID_TRANSAZIONE",
   "NOTE_INTERNE",
   "DESCRIZIONE",
+  // EVO-028 — codice sconto
+  "IMPORTO_SCONTO_CODICE",
+  "CODICE_SCONTO",
 ]);
 
 export function stripTitoloReadOnlyFields<T extends object>(fields: T): Partial<T> {
@@ -886,6 +894,24 @@ export async function updateTitoloPagamento(
     method: "PATCH",
     body: JSON.stringify({ fields: stripTitoloReadOnlyFields(fields) }),
   });
+}
+
+// ─── Codici Sconto (EVO-028) ────────────────────────────────────────────────
+
+/**
+ * Cerca un codice sconto ATTIVO per codice (case-insensitive, injection-safe).
+ * Ritorna null se non esiste o è disattivato. La validità temporale e l'importo
+ * sono verificati a valle da `validaCodiceSconto`. Tabella "Codici Sconto".
+ */
+export async function getCodiceByCodice(codiceInput: string): Promise<CodiceSconto | null> {
+  const codice = normalizzaCodice(codiceInput);
+  if (!codice) return null;
+  const formula = encodeURIComponent(`AND(UPPER({CODICE})="${codice}",{ATTIVO}=1)`);
+  const res = await airtableFetch(
+    `${encodeURIComponent("Codici Sconto")}?filterByFormula=${formula}&maxRecords=1`,
+  );
+  const data: { records: CodiceSconto[] } = await res.json();
+  return data.records[0] ?? null;
 }
 
 const MESI_IT_TO_NUM: Record<string, number> = {
