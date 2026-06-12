@@ -223,16 +223,19 @@ export default function CheckoutSumUp({
     } catch (err) {
       console.error("[SumUp widget] mount error:", err);
       logEvent("WIDGET_MOUNT_ERROR", err instanceof Error ? err.message : undefined, checkoutId);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError(
         "Impossibile caricare il widget di pagamento. Ricarica la pagina e riprova.",
       );
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMounting(false);
       return;
     }
 
     return () => {
+      // Navigazione SPA (Annulla/Torna indietro): pagehide non scatta,
+      // l'abbandono va intercettato qui allo smontaggio del widget.
+      if (!outcomeRef.current) {
+        logEvent("WIDGET_UNMOUNTED", undefined, checkoutId);
+      }
       try {
         widget?.unmount();
       } catch {
