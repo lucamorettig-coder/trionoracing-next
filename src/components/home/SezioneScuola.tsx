@@ -77,7 +77,7 @@ export function SezioneScuola() {
           </div>
           <div className="mt-8">
             <Button asChild>
-              <a href="/contatti?motivo=scuola">Iscrivi tuo figlio</a>
+              <a href="/portale/iscrizioni">Iscrivi tuo figlio</a>
             </Button>
           </div>
         </CardContent>

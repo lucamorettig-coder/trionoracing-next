@@ -14,7 +14,7 @@ export async function HomeHero() {
       eyebrow="Triono Racing · dal 2015"
       title={<>In bici, sicuri,<br />insieme.</>}
       subtitle="Una scuola di ciclismo per bambini a partire da 4 anni di età, guidata da maestri federali. Strada e mountain bike, due volte a settimana, al Ciclodromo Renato Perona di Terni."
-      primaryCta={{ label: "Iscrivi tuo figlio", href: "/contatti?motivo=scuola" }}
+      primaryCta={{ label: "Iscrivi tuo figlio", href: "/portale/iscrizioni" }}
       secondaryCta={{ label: "Scopri la Scuola", href: "/la-scuola" }}
       stats={[
         { value: "11", label: "anni di squadra", highlight: true },
