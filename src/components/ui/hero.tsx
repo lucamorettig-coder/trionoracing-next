@@ -176,7 +176,7 @@ export function Hero({
   eyebrow="Scuola di Ciclismo · A.S.D. Triono Racing"
   title={<>In bici, sicuri,<br/>insieme.</>}
   subtitle="Maestri federali, gruppi piccoli per età, attenzione totale alla sicurezza."
-  primaryCta={{ label: "Iscrivi tuo figlio", href: "/iscrizioni" }}
+  primaryCta={{ label: "Iscrivi tuo figlio", href: "/portale/iscrizioni" }}
   secondaryCta={{ label: "Scopri la Scuola", href: "/scuola" }}
 />
 */

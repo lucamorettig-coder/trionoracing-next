@@ -38,7 +38,7 @@ export async function CtaScuola() {
         />
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Button asChild size="lg" className="bg-white text-navy-900 border-white hover:bg-navy-50">
-            <a href="/contatti?motivo=scuola">Iscrivi tuo figlio</a>
+            <a href="/portale/iscrizioni">Iscrivi tuo figlio</a>
           </Button>
           <Button asChild size="lg" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:border-white">
             <a href={`mailto:${CONTACT_EMAIL}`}>Scrivici via email</a>
