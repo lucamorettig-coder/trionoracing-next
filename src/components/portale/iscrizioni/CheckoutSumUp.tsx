@@ -33,6 +33,19 @@ interface Props {
   annoIscrizione: string;
 }
 
+// Estrae dal body onResponse solo i campi diagnostici (mai dati carta completi)
+function extractDetail(body: unknown): string | undefined {
+  if (!body || typeof body !== "object") return undefined;
+  const b = body as Record<string, unknown>;
+  const card = (b.card ?? undefined) as Record<string, unknown> | undefined;
+  const parts: string[] = [];
+  if (b.status) parts.push(`status=${b.status}`);
+  if (b.error_code) parts.push(`code=${b.error_code}`);
+  if (typeof b.message === "string") parts.push(`msg=${b.message}`);
+  if (card?.last_4_digits) parts.push(`card=*${card.last_4_digits}`);
+  return parts.length ? parts.join(" · ").slice(0, 300) : undefined;
+}
+
 export default function CheckoutSumUp({
   iscrizioneId,
   titoloId,
@@ -56,6 +69,30 @@ export default function CheckoutSumUp({
   const [slowLoading, setSlowLoading] = useState(false);
   const widgetRef = useRef<{ unmount: () => void } | null>(null);
   const verifyingRef = useRef(false);
+  // Esito raggiunto dal widget (success/error): gating per PAGE_ABANDONED
+  const outcomeRef = useRef<string | null>(null);
+
+  // Telemetria diagnostica fire-and-forget: non deve mai interferire col pagamento
+  const logEvent = useCallback(
+    (event: string, detail?: string, ckId?: string | null) => {
+      try {
+        void fetch("/api/portale/pagamenti/sumup/log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            titoloId,
+            checkoutId: ckId ?? undefined,
+            event,
+            detail,
+          }),
+          keepalive: true,
+        }).catch(() => {});
+      } catch {
+        /* noop */
+      }
+    },
+    [titoloId],
+  );
 
   // Crea checkout SumUp lato server
   useEffect(() => {
@@ -90,9 +127,33 @@ export default function CheckoutSumUp({
   // Timeout di sicurezza: se dopo 8s il widget non si è montato, suggerisci ricarica.
   useEffect(() => {
     if (!mounting) return;
-    const t = setTimeout(() => setSlowLoading(true), 8000);
+    const t = setTimeout(() => {
+      setSlowLoading(true);
+      logEvent("WIDGET_MOUNT_TIMEOUT", undefined, checkoutId);
+    }, 8000);
     return () => clearTimeout(t);
-  }, [mounting]);
+  }, [mounting, checkoutId, logEvent]);
+
+  // Se l'utente chiude/abbandona la pagina con un pagamento aperto senza esito → beacon
+  useEffect(() => {
+    if (!checkoutId) return;
+    const onPageHide = () => {
+      if (outcomeRef.current) return;
+      try {
+        navigator.sendBeacon(
+          "/api/portale/pagamenti/sumup/log",
+          new Blob(
+            [JSON.stringify({ titoloId, checkoutId, event: "PAGE_ABANDONED" })],
+            { type: "application/json" },
+          ),
+        );
+      } catch {
+        /* noop */
+      }
+    };
+    window.addEventListener("pagehide", onPageHide);
+    return () => window.removeEventListener("pagehide", onPageHide);
+  }, [checkoutId, titoloId]);
 
   const callVerify = useCallback(async () => {
     if (verifyingRef.current || !checkoutId) return;
@@ -131,7 +192,11 @@ export default function CheckoutSumUp({
         locale: "it-IT",
         showFooter: false,
         onResponse: (type, body) => {
+          // Telemetria: ogni evento del widget (sent, auth-screen, success, error, fail, invalid…)
+          const evt = `WIDGET_${String(type).toUpperCase().replace(/[^A-Z0-9]/g, "_")}`.slice(0, 40);
+          logEvent(evt, extractDetail(body), checkoutId);
           if (type === "success" || (type === "sent" && body?.status === "PAID")) {
+            outcomeRef.current = "success";
             callVerify();
           } else if (type === "error" || type === "fail" || type === "invalid") {
             // Checkout già pagato in precedenza (METADATA non aggiornato) → verifica
@@ -139,9 +204,12 @@ export default function CheckoutSumUp({
               body?.error_code === "CONFLICT" ||
               (typeof body?.message === "string" && body.message.includes("already been processed"))
             ) {
+              outcomeRef.current = "success";
               callVerify();
               return;
             }
+            // invalid = errore di compilazione correggibile, non è un esito terminale
+            if (type !== "invalid") outcomeRef.current = "error";
             const raw = body?.detail || body?.message;
             const isMeaningful = raw && typeof raw === "string" && !raw.includes("undefined");
             setError(isMeaningful ? raw : "Pagamento non riuscito. Riprova.");
@@ -149,10 +217,12 @@ export default function CheckoutSumUp({
         },
       });
       widgetRef.current = widget;
+      logEvent("WIDGET_MOUNTED", undefined, checkoutId);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setMounting(false);
     } catch (err) {
       console.error("[SumUp widget] mount error:", err);
+      logEvent("WIDGET_MOUNT_ERROR", err instanceof Error ? err.message : undefined, checkoutId);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setError(
         "Impossibile caricare il widget di pagamento. Ricarica la pagina e riprova.",
@@ -170,7 +240,7 @@ export default function CheckoutSumUp({
       }
       widgetRef.current = null;
     };
-  }, [scriptReady, checkoutId, callVerify]);
+  }, [scriptReady, checkoutId, callVerify, logEvent]);
 
   return (
     <div className="max-w-xl mx-auto px-6 lg:px-10 py-8 lg:py-12">
@@ -178,6 +248,13 @@ export default function CheckoutSumUp({
         src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"
         strategy="afterInteractive"
         onLoad={() => setScriptReady(true)}
+        onError={() => {
+          logEvent("SCRIPT_LOAD_ERROR");
+          setError(
+            "Impossibile caricare il modulo di pagamento. Controlla la connessione o eventuali blocchi del browser e ricarica.",
+          );
+          setMounting(false);
+        }}
       />
 
       <Link
