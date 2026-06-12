@@ -22,10 +22,18 @@ const QUARTER_LABEL: Record<string, string> = {
   Q3: "Settembre → Dicembre",
 };
 
+// EVO-027: token corretti `--color-*` (i precedenti `--grass-500` ecc. non esistevano
+// in Tailwind v4 → gradient vuoto = header "slavato"). Gradient profondo 500→700.
 const HEADER_GRADIENTS: Record<QuarterColor, string> = {
-  grass: "linear-gradient(135deg, var(--grass-500), var(--grass-600))",
-  ember: "linear-gradient(135deg, var(--ember-500), var(--ember-600))",
-  sky: "linear-gradient(135deg, var(--sky-500), var(--sky-600))",
+  grass: "linear-gradient(135deg, var(--color-grass-500), var(--color-grass-700))",
+  ember: "linear-gradient(135deg, var(--color-ember-500), var(--color-ember-700))",
+  sky: "linear-gradient(135deg, var(--color-sky-500), var(--color-sky-700))",
+};
+
+const CHIP_TEXT: Record<QuarterColor, string> = {
+  grass: "var(--color-grass-700)",
+  ember: "var(--color-ember-700)",
+  sky: "var(--color-sky-700)",
 };
 
 export function TariffaCard({ tariffa, quarterColor, iscrizioniCount }: Props) {
@@ -35,49 +43,71 @@ export function TariffaCard({ tariffa, quarterColor, iscrizioniCount }: Props) {
   const quarter = f.NOME_TARIFFA ?? "—";
   const corso = f.TIPO_CORSO ?? "MTB-BDC";
   const titolo = QUARTER_LABEL[quarter] ?? quarter;
+  const quarterNum = quarter.replace(/^Q/, "");
   const attiva = !!f.ATTIVA;
 
   return (
     <>
       <article className="bg-white border border-line rounded-[var(--radius-xl)] shadow-[var(--shadow-xs)] overflow-hidden flex flex-col">
-        {/* Header colorato gradient + pattern overlay */}
+        {/* Header colorato — restyle EVO-027 (token --color-* corretti, gradient 500→700) */}
         <div
-          className="relative text-white"
+          className="relative text-white overflow-hidden"
           style={{ background: HEADER_GRADIENTS[quarterColor] }}
         >
-          <div
+          {/* Numero trimestre in filigrana */}
+          <span
             aria-hidden
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundImage: "url('/assets/pattern.svg')",
-              backgroundSize: "180px 180px",
-              opacity: 0.15,
-            }}
-          />
-          <div className="relative z-[1] px-5 py-4 flex flex-col gap-1">
-            <span className="font-mono text-[10.5px] uppercase tracking-wide opacity-80 flex items-center gap-2 flex-wrap">
-              <span>Quarter {quarter.replace(/^Q/, "")} · {anno}</span>
-              <span className="bg-white/20 rounded-full px-2 py-0.5 font-bold">{corso}</span>
-            </span>
-            <h2 className="text-[22px] font-extrabold leading-tight">{titolo}</h2>
+            className="absolute -right-1 -top-5 text-[78px] font-extrabold leading-none tracking-tighter text-white/[0.13] select-none pointer-events-none"
+          >
+            {quarterNum}
+          </span>
+
+          <div className="relative z-[1] px-5 py-4">
+            {/* Top: chip trimestre + stato */}
+            <div className="flex items-center justify-between gap-2">
+              <span
+                className="inline-flex items-center justify-center bg-white rounded-[var(--radius-sm)] px-2.5 py-1 text-[13px] font-extrabold leading-none"
+                style={{ color: CHIP_TEXT[quarterColor] }}
+              >
+                {quarter}
+              </span>
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11.5px] font-semibold",
+                  attiva ? "bg-white/20" : "bg-white/[0.12]",
+                )}
+              >
+                <span
+                  className={cn(
+                    "w-1.5 h-1.5 rounded-full inline-block",
+                    attiva ? "bg-white" : "bg-white/50",
+                  )}
+                />
+                {attiva ? "Attiva" : "In preparazione"}
+              </span>
+            </div>
+
+            {/* Titolo-eroe: periodo */}
+            <h2 className="text-[21px] font-extrabold leading-tight mt-2.5 tracking-[-0.01em]">
+              {titolo}
+            </h2>
+
+            {/* Meta line: anno · corso · iscrizioni */}
+            <div className="mt-1.5 flex items-center gap-2 flex-wrap text-[12.5px]">
+              <span className="font-semibold">{anno}</span>
+              <span className="bg-white/20 rounded-full px-2 py-0.5 text-[11.5px] font-bold">
+                {corso}
+              </span>
+              <span className="opacity-90">
+                · {iscrizioniCount} iscrizion{iscrizioniCount === 1 ? "e" : "i"}
+              </span>
+            </div>
+
             {f.DESCRIZIONE_TARIFFA && (
-              <p className="font-mono text-[12.5px] opacity-85 mt-0.5">
+              <p className="text-[12px] text-white/85 mt-2 leading-snug">
                 {f.DESCRIZIONE_TARIFFA}
               </p>
             )}
-            <div className="mt-2 flex items-center gap-2">
-              <span
-                className={cn(
-                  "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11.5px] font-semibold",
-                  attiva ? "bg-white/20" : "bg-white/10",
-                )}
-              >
-                {attiva ? "✓ Attiva" : "⏱ In preparazione"}
-              </span>
-              <span className="text-[11.5px] opacity-80">
-                {iscrizioniCount} iscrizion{iscrizioniCount === 1 ? "e" : "i"}
-              </span>
-            </div>
           </div>
         </div>
 

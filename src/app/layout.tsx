@@ -33,7 +33,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ClerkProvider afterSignOutUrl="/" localization={itIT}>
+    <ClerkProvider
+      afterSignOutUrl="/"
+      signInFallbackRedirectUrl="/portale"
+      signUpFallbackRedirectUrl="/portale"
+      localization={itIT}
+    >
       <html
         lang="it"
         className={`${inter.variable} ${anton.variable} h-full antialiased`}

@@ -116,7 +116,7 @@ export default function AggiungiFiglioForm({ bambinoId, initialData, mode = "cre
         router.refresh();
       } else {
         const id = data.bambino?.id;
-        router.push(`/portale/figli/${id}?just-created=true`);
+        router.push(`/portale?figlio-creato=${id}`);
       }
     } catch {
       setServerError("Errore di connessione. Controlla la tua rete e riprova.");
