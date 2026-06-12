@@ -4,7 +4,7 @@
 - **Slug**: portale-ux-redirect-tariffe
 - **Data inizio**: 2026-06-12
 - **Data fine**: —
-- **Stato**: in implementazione
+- **Stato**: in PR (#67)
 - **Tipo**: refactoring UX / polish (3 fix indipendenti, single deploy)
 - **Area**: portale autenticato (genitore) + admin tariffe + navbar pubblica + config Clerk
 - **Priorità**: media
@@ -205,3 +205,9 @@ Root: `trionoracing-next`. CLAUDE.md → @AGENTS.md (75KB). memory.md letto, ult
 
 ### [2026-06-12] Fasi 1-3 — Requisiti + Ambito + As-is completate
 3 decisioni utente raccolte (1 round AskUserQuestion). As-is mappato sui 3 file core + root-cause #3 individuato (env Clerk legacy vuoto in prod). Confermato single deploy.
+
+### [2026-06-12] Fasi 4-6 — WBS + Coerenza + UX completate
+Mockup header before/after approvato (gradient 500→700). Coerenza ✅ su 4 dimensioni. Scoperto **bug latente token** `var(--grass-*)` inesistente (causa primaria header slavato). Implementazione scelta: diretta (percorso b).
+
+### [2026-06-12] Fase 7 — Implementazione + quality gate + smoke + PR
+Branch `evo-027-portale-ux-redirect-tariffe` da `main`. 6 file toccati. Fix #3 navbar: `@clerk/nextjs` ^7 (Future API) **non esporta** `SignedIn/SignedOut` → usato `useAuth()` (mantiene statiche le pagine pubbliche). Quality gate verde (build/typecheck exit 0/lint 0 err). Smoke dev OK (utente: login→/portale, navbar loggata, crea figlio→banner, header tariffe vivido). Commit `9c66bab`. **PR #67** → main. In attesa di OK merge.
