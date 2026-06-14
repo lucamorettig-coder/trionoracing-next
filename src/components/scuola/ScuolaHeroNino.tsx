@@ -49,7 +49,6 @@ export interface ScuolaHeroNinoProps {
 const BRUSH = 160; // diametro pennello (px logici)
 const FADE = 0.014; // alpha sottratta per frame alla scia
 const SATURATE = 1.15; // saturazione del geometrico rivelato
-const PARALLAX = 20; // px max di spostamento
 
 export function ScuolaHeroNino({
   eyebrow,
@@ -66,15 +65,11 @@ export function ScuolaHeroNino({
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
-  const ninoRef = React.useRef<HTMLDivElement | null>(null);
-  const contentRef = React.useRef<HTMLDivElement | null>(null);
   const hasStats = !!stats?.length;
 
   React.useEffect(() => {
     const section = sectionRef.current;
     const canvas = canvasRef.current;
-    const nino = ninoRef.current;
-    const content = contentRef.current;
     if (!section || !canvas) return;
 
     const ctx = canvas.getContext("2d");
@@ -110,17 +105,13 @@ export function ScuolaHeroNino({
       mctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     }
 
-    // coordinate puntatore + parallax target
+    // coordinate puntatore (per la scia reveal)
     let px = 0,
       py = 0,
       lx = 0,
       ly = 0,
       hasPointer = false,
       lastMove = 0;
-    let tnx = 0,
-      tny = 0,
-      nx = 0,
-      ny = 0;
 
     function drawGeoCover() {
       const ir = geo.width / geo.height;
@@ -173,8 +164,6 @@ export function ScuolaHeroNino({
         const t = now / 1000;
         px = W * (0.5 + 0.32 * Math.sin(t * 0.7));
         py = H * (0.52 + 0.3 * Math.sin(t * 1.13 + 1.2));
-        tnx = (px / W - 0.5) * 2;
-        tny = (py / H - 0.5) * 2;
       }
 
       // svanimento della scia
@@ -193,12 +182,6 @@ export function ScuolaHeroNino({
       ctx!.globalCompositeOperation = "destination-in";
       ctx!.drawImage(mask, 0, 0, W, H);
       ctx!.globalCompositeOperation = "source-over";
-
-      // parallax (lerp)
-      nx += (tnx - nx) * 0.06;
-      ny += (tny - ny) * 0.06;
-      if (nino) nino.style.transform = `translate3d(${-nx * PARALLAX}px, ${-ny * PARALLAX * 0.5}px, 0)`;
-      if (content) content.style.transform = `translate3d(${nx * PARALLAX * 0.35}px, ${ny * PARALLAX * 0.18}px, 0)`;
     }
 
     function onMove(e: PointerEvent) {
@@ -207,13 +190,9 @@ export function ScuolaHeroNino({
       py = e.clientY - r.top;
       hasPointer = true;
       lastMove = now();
-      tnx = (px / W - 0.5) * 2;
-      tny = (py / H - 0.5) * 2;
     }
     function onLeave() {
       hasPointer = false;
-      tnx = 0;
-      tny = 0;
     }
     function now() {
       return performance.now();
@@ -299,13 +278,10 @@ export function ScuolaHeroNino({
         />
       </div>
 
-      {/* Contenuto (dietro Nino) */}
-      <div className="relative min-h-[560px] lg:min-h-[640px] flex items-start lg:items-end">
-        <div
-          ref={contentRef}
-          className="w-full max-w-[1280px] mx-auto px-6 lg:px-14 py-14 lg:py-20"
-          style={{ willChange: "transform" }}
-        >
+      {/* Contenuto (dietro Nino). Su mobile testo in alto e Nino piccolo in basso a
+          destra (assoluto, non aggiunge altezza); da sm in su Nino più grande sovrapposto. */}
+      <div className="relative min-h-[470px] sm:min-h-[560px] lg:min-h-[640px] flex items-start lg:items-end">
+        <div className="w-full max-w-[1280px] mx-auto px-6 lg:px-14 py-14 lg:py-20">
           <div className="text-navy-900 max-w-[680px]">
             {eyebrow && (
               <div className="inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] text-navy-700 before:content-[''] before:w-6 before:h-[2px] before:bg-flag-500 before:inline-block">
@@ -369,18 +345,14 @@ export function ScuolaHeroNino({
           darebbe un alone; uso un'ombra di contatto morbida grigia. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute z-[5] flex items-end
-          right-[-3%] top-auto bottom-[-46px] h-[84%]
-          sm:right-[6%] sm:h-auto sm:top-[-50px] sm:bottom-[-110px]
+        className="pointer-events-none z-[5] flex items-end
+          absolute right-[-1%] bottom-[-26px] h-[384px]
+          sm:right-[6%] sm:bottom-[-110px] sm:top-[-50px] sm:h-auto
           lg:right-[9%] lg:top-[-70px] lg:bottom-[-140px]"
       >
         <div
-          ref={ninoRef}
           className="h-full"
-          style={{
-            willChange: "transform",
-            filter: "drop-shadow(0 18px 22px rgba(31,45,90,0.18))",
-          }}
+          style={{ filter: "drop-shadow(0 18px 22px rgba(31,45,90,0.18))" }}
         >
           <video
             ref={videoRef}
