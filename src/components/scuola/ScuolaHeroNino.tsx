@@ -299,8 +299,9 @@ export function ScuolaHeroNino({
         />
       </div>
 
-      {/* Contenuto (dietro Nino) */}
-      <div className="relative min-h-[560px] lg:min-h-[640px] flex items-start lg:items-end">
+      {/* Contenuto (dietro Nino). Su mobile l'altezza è naturale (layout impilato:
+          testo sopra, Nino sotto); da sm in su torna l'altezza piena per Nino assoluto. */}
+      <div className="relative min-h-0 sm:min-h-[560px] lg:min-h-[640px] flex items-start lg:items-end">
         <div
           ref={contentRef}
           className="w-full max-w-[1280px] mx-auto px-6 lg:px-14 py-14 lg:py-20"
@@ -369,9 +370,9 @@ export function ScuolaHeroNino({
           darebbe un alone; uso un'ombra di contatto morbida grigia. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute z-[5] flex items-end
-          right-[-3%] top-auto bottom-[-46px] h-[84%]
-          sm:right-[6%] sm:h-auto sm:top-[-50px] sm:bottom-[-110px]
+        className="pointer-events-none z-[5] flex items-end
+          relative w-full justify-center mt-2 -mb-[56px] h-[420px]
+          sm:absolute sm:w-auto sm:justify-start sm:mt-0 sm:mb-0 sm:h-auto sm:right-[6%] sm:top-[-50px] sm:bottom-[-110px]
           lg:right-[9%] lg:top-[-70px] lg:bottom-[-140px]"
       >
         <div
