@@ -278,9 +278,9 @@ export function ScuolaHeroNino({
         />
       </div>
 
-      {/* Contenuto (dietro Nino). Su mobile l'altezza è naturale (layout impilato:
-          testo sopra, Nino sotto); da sm in su torna l'altezza piena per Nino assoluto. */}
-      <div className="relative min-h-0 sm:min-h-[560px] lg:min-h-[640px] flex items-start lg:items-end">
+      {/* Contenuto (dietro Nino). Su mobile testo in alto e Nino piccolo in basso a
+          destra (assoluto, non aggiunge altezza); da sm in su Nino più grande sovrapposto. */}
+      <div className="relative min-h-[470px] sm:min-h-[560px] lg:min-h-[640px] flex items-start lg:items-end">
         <div className="w-full max-w-[1280px] mx-auto px-6 lg:px-14 py-14 lg:py-20">
           <div className="text-navy-900 max-w-[680px]">
             {eyebrow && (
@@ -346,8 +346,8 @@ export function ScuolaHeroNino({
       <div
         aria-hidden
         className="pointer-events-none z-[5] flex items-end
-          relative w-full justify-center mt-2 -mb-[56px] h-[420px]
-          sm:absolute sm:w-auto sm:justify-start sm:mt-0 sm:mb-0 sm:h-auto sm:right-[6%] sm:top-[-50px] sm:bottom-[-110px]
+          absolute right-[-1%] bottom-[-26px] h-[384px]
+          sm:right-[6%] sm:bottom-[-110px] sm:top-[-50px] sm:h-auto
           lg:right-[9%] lg:top-[-70px] lg:bottom-[-140px]"
       >
         <div
