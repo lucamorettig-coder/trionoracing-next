@@ -113,13 +113,17 @@ body {
    SVG di sfondo + pseudo-elemento ::after che applica un gradient overlay
    col colore del fondo. Il parent DEVE avere bg navy-900 (versione scura)
    o bg-soft (versione chiara). Per il pattern senza sfumatura usa .pattern-full. */
-/* Pattern navy: SVG geometrico tile + overlay scuro radial+verticale */
+/* Pattern navy: fondo brand "sfondo-real" (navy + geometrie a colori) cover +
+   overlay scuro radial+verticale. Sorgente unica del navy-geometrico del DS:
+   usata da hero (chi-siamo/amatori/marathon), sezioni navy (corsi), card e
+   wizard. Cambiare QUI propaga ovunque. */
 .pattern-navy {
   position: relative;
-  background-color: transparent;
-  background-image: url("/assets/pattern.svg");
-  background-size: 240px 240px;
-  background-repeat: repeat;
+  background-color: #050E3F;
+  background-image: url("/assets/sfondo-real.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 /* Pattern light: foto bitmap (tessuto + pattern) cover + overlay forte chiaro */
 .pattern-light {

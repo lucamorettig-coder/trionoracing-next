@@ -3,10 +3,17 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
+
+/** Link attivo: match esatto per la home, prefisso (con slash) per le altre. */
+function isActiveHref(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(href + "/");
+}
 
 /**
  * NavBar — Triono Racing
@@ -32,6 +39,7 @@ const defaultLinks: NavBarProps["links"] = [
 export function NavBar({ links = defaultLinks, className }: NavBarProps) {
   const [scrolled, setScrolled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const pathname = usePathname();
   // EVO-027: navbar auth-aware. isSignedIn è undefined finché Clerk non carica → default "Accedi".
   const { isSignedIn } = useAuth();
 
@@ -51,42 +59,62 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
     <>
     <header
       className={cn(
-        "sticky top-0 z-40 transition-[background,backdrop-filter,box-shadow] duration-200",
+        "sticky top-0 z-40 transition-[background-color,backdrop-filter,box-shadow,border-color] duration-300 ease-out",
         scrolled
-          ? "bg-white/90 backdrop-blur border-b border-line shadow-[var(--shadow-xs)]"
+          ? "bg-white/65 backdrop-blur-xl border-b border-line/70 shadow-[0_6px_24px_rgba(5,14,63,0.07)]"
           : "bg-white border-b border-transparent",
         className
       )}
     >
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
-        {/* Logo */}
+      <div
+        className={cn(
+          "max-w-[1280px] mx-auto px-6 lg:px-10 flex items-center justify-between transition-[height] duration-300 ease-out",
+          scrolled ? "h-16" : "h-20"
+        )}
+      >
+        {/* Logo — si rimpicciolisce leggermente allo scroll */}
         <Link href="/" className="flex items-center gap-3">
           <Image
             src="/assets/logo-triono-racing.png"
             alt="Triono Racing"
             width={140}
             height={36}
-            className="h-9 w-auto"
+            className={cn("w-auto transition-all duration-300 ease-out", scrolled ? "h-8" : "h-9")}
             priority
           />
         </Link>
 
-        {/* Desktop links */}
+        {/* Desktop links — stato attivo + underline animato */}
         <nav className="hidden lg:flex items-center gap-8 text-sm">
-          {links?.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="text-ink-muted hover:text-navy-700 transition-colors font-medium flex items-center gap-2"
-            >
-              {l.label}
-              {l.badge && (
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-sun-500 text-navy-900">
-                  {l.badge}
-                </span>
-              )}
-            </Link>
-          ))}
+          {links?.map((l) => {
+            const active = isActiveHref(pathname, l.href);
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "group relative py-1 font-medium transition-colors flex items-center gap-2",
+                  active ? "text-navy-900" : "text-ink-muted hover:text-navy-700"
+                )}
+              >
+                {l.label}
+                {l.badge && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-sun-500 text-navy-900">
+                    {l.badge}
+                  </span>
+                )}
+                {/* underline: piena se attivo, anima da 0 in hover */}
+                <span
+                  aria-hidden
+                  className={cn(
+                    "pointer-events-none absolute left-0 -bottom-0.5 h-[2px] rounded-full bg-navy-700 transition-all duration-300 ease-out",
+                    active ? "w-full opacity-100" : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"
+                  )}
+                />
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Desktop CTAs — auth-aware (EVO-027): "Vai al portale" se loggato */}
@@ -140,21 +168,30 @@ export function NavBar({ links = defaultLinks, className }: NavBarProps) {
             </button>
           </div>
           <nav className="relative z-10 flex-1 overflow-y-auto p-4 space-y-1">
-            {links?.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="flex items-center justify-between px-4 py-3 rounded-[var(--radius-md)] text-white/80 hover:bg-white/5 hover:text-white"
-              >
-                {l.label}
-                {l.badge && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-sun-500 text-navy-900">
-                    {l.badge}
-                  </span>
-                )}
-              </Link>
-            ))}
+            {links?.map((l) => {
+              const active = isActiveHref(pathname, l.href);
+              return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setOpen(false)}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "flex items-center justify-between px-4 py-3 rounded-[var(--radius-md)] transition-colors",
+                    active
+                      ? "bg-white/10 text-white font-semibold border-l-2 border-sun-500"
+                      : "text-white/80 hover:bg-white/5 hover:text-white"
+                  )}
+                >
+                  {l.label}
+                  {l.badge && (
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-sun-500 text-navy-900">
+                      {l.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
           </nav>
           <div className="relative z-10 p-4 space-y-2 border-t border-white/10">
             <Button
