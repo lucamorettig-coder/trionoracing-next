@@ -20,6 +20,8 @@ export interface SectionHeaderProps {
   className?: string;
   /** size del titolo. "lg" è default per opener di sezione, "md" per intra-sezione */
   size?: "md" | "lg";
+  /** "dark" (default) su sfondo chiaro · "light" su sfondo scuro (navy) */
+  tone?: "dark" | "light";
 }
 
 export function SectionHeader({
@@ -30,8 +32,10 @@ export function SectionHeader({
   align = "left",
   className,
   size = "lg",
+  tone = "dark",
 }: SectionHeaderProps) {
   const isCenter = align === "center";
+  const light = tone === "light";
   return (
     <header
       className={cn(
@@ -44,7 +48,8 @@ export function SectionHeader({
         {eyebrow && (
           <div
             className={cn(
-              "inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] text-sky-600",
+              "inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em]",
+              light ? "text-sky-300" : "text-sky-600",
               "before:content-[''] before:w-6 before:h-[2px] before:bg-current before:inline-block"
             )}
           >
@@ -53,7 +58,8 @@ export function SectionHeader({
         )}
         <h2
           className={cn(
-            "mt-4 font-bold tracking-tight text-ink",
+            "mt-4 font-bold tracking-tight",
+            light ? "text-white" : "text-ink",
             size === "lg"
               ? "text-[32px] lg:text-[48px] leading-[1.05]"
               : "text-[24px] lg:text-[32px] leading-[1.15]"
@@ -64,7 +70,8 @@ export function SectionHeader({
         {subtitle && (
           <p
             className={cn(
-              "mt-5 text-ink-muted",
+              "mt-5",
+              light ? "text-white/75" : "text-ink-muted",
               size === "lg" ? "text-[17px]" : "text-[15px]",
               "leading-relaxed"
             )}
