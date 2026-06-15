@@ -43,6 +43,10 @@ export interface ScuolaHeroNinoProps {
   ninoWebm?: string;
   ninoMov?: string;
   ninoPoster?: string;
+  /** asset video di Vittoria (compagna di Nino, affiancata a sinistra) */
+  vittoriaWebm?: string;
+  vittoriaMov?: string;
+  vittoriaPoster?: string;
 }
 
 // preset "Morbida"
@@ -62,10 +66,14 @@ export function ScuolaHeroNino({
   ninoWebm = "/nino/nino-figura.webm",
   ninoMov = "/nino/nino-figura.mov",
   ninoPoster = "/nino/nino-figura-poster.png",
+  vittoriaWebm = "/vittoria/vittoria-figura.webm",
+  vittoriaMov = "/vittoria/vittoria-figura.mov",
+  vittoriaPoster = "/vittoria/vittoria-figura-poster.png",
 }: ScuolaHeroNinoProps) {
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
+  const vittoriaVideoRef = React.useRef<HTMLVideoElement | null>(null);
   const ninoRef = React.useRef<HTMLDivElement | null>(null);
   const contentRef = React.useRef<HTMLDivElement | null>(null);
   const hasStats = !!stats?.length;
@@ -239,6 +247,7 @@ export function ScuolaHeroNino({
     if (reduced) {
       ctx!.clearRect(0, 0, W, H);
       video?.pause();
+      vittoriaVideoRef.current?.pause();
       const onResize = () => size();
       window.addEventListener("resize", onResize);
       return () => window.removeEventListener("resize", onResize);
@@ -363,37 +372,60 @@ export function ScuolaHeroNino({
         </div>
       </div>
 
-      {/* Nino — primo piano, esce dal FONDO del riquadro (piedi sotto al box, sul
-          bianco della pagina). Wrapper esterno = posizione (non clippato);
-          interno (ninoRef) = parallax. Niente drop-shadow scuro: su bianco
-          darebbe un alone; uso un'ombra di contatto morbida grigia. */}
+      {/* Duo Nino + Vittoria — primo piano, escono dal FONDO del riquadro (piedi
+          sotto al box, sul bianco della pagina). Wrapper esterno = posizione
+          (non clippato); interno (ninoRef) = parallax sull'intero gruppo.
+          Vittoria sta a sinistra, un filo più piccola e DIETRO Nino; su mobile
+          resta solo Nino per non affollare il testo. Niente drop-shadow scuro:
+          su bianco darebbe un alone; uso un'ombra di contatto morbida grigia. */}
       <div
         aria-hidden
         className="pointer-events-none absolute z-[5] flex items-end
-          right-[-3%] top-auto bottom-[-46px] h-[84%]
-          sm:right-[6%] sm:h-auto sm:top-[-50px] sm:bottom-[-110px]
-          lg:right-[9%] lg:top-[-70px] lg:bottom-[-140px]"
+          right-[-3%] top-auto bottom-[-46px] h-1/2
+          sm:right-[3%] sm:h-auto sm:top-[-50px] sm:bottom-[-110px]
+          lg:right-[6%] lg:top-[-70px] lg:bottom-[-140px]"
       >
         <div
           ref={ninoRef}
-          className="h-full"
-          style={{
-            willChange: "transform",
-            filter: "drop-shadow(0 18px 22px rgba(31,45,90,0.18))",
-          }}
+          className="flex items-end h-full"
+          style={{ willChange: "transform" }}
         >
-          <video
-            ref={videoRef}
-            className="h-full w-auto object-contain object-bottom"
-            poster={ninoPoster}
-            autoPlay
-            muted
-            loop
-            playsInline
+          {/* Vittoria — dietro, un filo più piccola, nascosta su mobile */}
+          <div
+            className="hidden sm:block relative z-0 h-[90%] -mr-[7%]"
+            style={{ filter: "drop-shadow(0 18px 22px rgba(31,45,90,0.18))" }}
           >
-            <source src={ninoWebm} type="video/webm" />
-            <source src={ninoMov} type="video/quicktime" />
-          </video>
+            <video
+              ref={vittoriaVideoRef}
+              className="h-full w-auto object-contain object-bottom"
+              poster={vittoriaPoster}
+              autoPlay
+              muted
+              loop
+              playsInline
+            >
+              <source src={vittoriaWebm} type="video/webm" />
+              <source src={vittoriaMov} type="video/quicktime" />
+            </video>
+          </div>
+          {/* Nino — davanti */}
+          <div
+            className="relative z-10 h-full"
+            style={{ filter: "drop-shadow(0 18px 22px rgba(31,45,90,0.18))" }}
+          >
+            <video
+              ref={videoRef}
+              className="h-full w-auto object-contain object-bottom"
+              poster={ninoPoster}
+              autoPlay
+              muted
+              loop
+              playsInline
+            >
+              <source src={ninoWebm} type="video/webm" />
+              <source src={ninoMov} type="video/quicktime" />
+            </video>
+          </div>
         </div>
       </div>
     </section>
