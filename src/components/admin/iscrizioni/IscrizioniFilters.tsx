@@ -18,7 +18,7 @@ const STATI = [
 
 const CORSI = [
   { value: "MTB-BDC", label: "MTB-BDC" },
-  { value: "SOLO-MTB", label: "Solo MTB" },
+  { value: "SOLO-MTB", label: "Corso MTB" },
 ] as const;
 
 
