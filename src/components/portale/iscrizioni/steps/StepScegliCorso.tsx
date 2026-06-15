@@ -56,7 +56,7 @@ export default function StepScegliCorso({ step, total, anno, options, selected, 
         step={step}
         total={total}
         title="Scegli il corso"
-        description="Due formule: il corso completo con due lezioni a settimana, oppure solo la mountain bike del giovedì. Nello step successivo vedrai il dettaglio della quota."
+        description="Due formule: il corso completo con due lezioni a settimana, oppure il Corso MTB del giovedì. Nello step successivo vedrai il dettaglio della quota."
       />
 
       <div className="flex flex-col gap-3.5" role="radiogroup" aria-label="Scegli il corso">

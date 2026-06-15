@@ -48,17 +48,17 @@ export function quarterLabel(quarter: "Q1" | "Q2" | "Q3"): string {
 }
 
 export interface CorsoLabelInfo {
-  /** Label primaria user-facing (es. "Corso MTB-BDC" / "Solo Mountain Bike"). */
+  /** Label primaria user-facing (es. "Corso MTB-BDC" / "Corso MTB"). */
   label: string;
   /** Sottotitolo esteso (es. "Strada + MTB · 2 lezioni/settimana"). */
   sublabel: string;
-  /** Forma compatta per badge/tabelle dense (es. "MTB-BDC" / "Solo MTB"). */
+  /** Forma compatta per badge/tabelle dense (es. "MTB-BDC" / "MTB"). */
   short: string;
 }
 
 const CORSO_LABELS: Record<string, CorsoLabelInfo> = {
   "MTB-BDC": { label: "Corso MTB-BDC", sublabel: "Strada + MTB · 2 lezioni/settimana", short: "MTB-BDC" },
-  "SOLO-MTB": { label: "Solo Mountain Bike", sublabel: "solo giovedì · 1 lezione/settimana", short: "Solo MTB" },
+  "SOLO-MTB": { label: "Corso MTB", sublabel: "solo giovedì · 1 lezione/settimana", short: "MTB" },
 };
 
 /**

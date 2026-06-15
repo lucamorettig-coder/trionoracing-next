@@ -16,7 +16,7 @@ const QUARTERS = [
 
 const CORSI = [
   { value: "MTB-BDC", label: "Corso MTB-BDC (Strada + MTB)" },
-  { value: "SOLO-MTB", label: "Solo Mountain Bike (giovedì)" },
+  { value: "SOLO-MTB", label: "Corso MTB (giovedì)" },
 ] as const;
 
 interface DialogProps {

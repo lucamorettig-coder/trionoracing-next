@@ -33,7 +33,7 @@ export function SezioneCorsi() {
             tone="light"
             eyebrow="I corsi · dai 4 anni"
             title="Due formule, una scuola: imparare divertendosi."
-            subtitle="Puoi scegliere il corso completo — strada e mountain bike, due lezioni a settimana — oppure la formula solo mountain bike del giovedì. Stessi maestri, stessi gruppi, stesso ambiente protetto al ciclodromo."
+            subtitle="Puoi scegliere il corso completo — strada e mountain bike, due lezioni a settimana — oppure il Corso MTB del giovedì. Stessi maestri, stessi gruppi, stesso ambiente protetto al ciclodromo."
           />
         </div>
 
@@ -60,11 +60,11 @@ export function SezioneCorsi() {
             </CardContent>
           </Card>
 
-          {/* Formula 2 — Solo Mountain Bike */}
+          {/* Formula 2 — Corso MTB */}
           <Card className="reveal reveal-delay-2 relative border-t-4 border-t-grass-500">
             <CardContent>
               <CardIcon color="grass"><MountainIcon /></CardIcon>
-              <CardTitle>Solo Mountain Bike</CardTitle>
+              <CardTitle>Corso MTB</CardTitle>
               <p className="mt-1 font-mono text-xs uppercase tracking-wider text-grass-700 font-bold">
                 1 lezione a settimana
               </p>

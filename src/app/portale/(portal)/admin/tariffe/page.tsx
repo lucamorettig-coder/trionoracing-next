@@ -33,7 +33,7 @@ const QUARTER_COLOR: Record<string, QuarterColor> = {
   Q3: "sky",
 };
 
-// Ordine sezioni: prima il corso completo, poi Solo MTB.
+// Ordine sezioni: prima il corso completo, poi Corso MTB.
 const CORSI_ORDER: TipoCorso[] = ["MTB-BDC", "SOLO-MTB"];
 
 function corsoOf(t: Tariffa): TipoCorso {
