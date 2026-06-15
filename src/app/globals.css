@@ -509,6 +509,10 @@ body {
   overflow: hidden;
   pointer-events: none;
 }
+/* variante page = layer ambient ancorato al viewport (CSS unlayered → vince su .fixed) */
+.brand-backdrop--page {
+  position: fixed;
+}
 .bd-shape {
   position: absolute;
   width: var(--s);

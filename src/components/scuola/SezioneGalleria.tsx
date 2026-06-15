@@ -41,9 +41,36 @@ export function SezioneGalleria() {
           />
         </div>
 
-        {/* Grid con tile orizzontali su 2 colonne (foto landscape) e verticali su 1.
-            grid-flow-row-dense impacchetta riempiendo i buchi. */}
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 grid-flow-row-dense">
+        {/* Mobile: carosello a scroll orizzontale (le foto impilate non piacciono).
+            scroll-snap + peek della successiva + hint. Keyboard-scrollabile (tabIndex). */}
+        <div className="mt-10 sm:hidden">
+          <ul
+            tabIndex={0}
+            aria-label="Galleria foto della Scuola — scorri orizzontalmente"
+            className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-3 -mx-6 px-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {photos.map((p) => (
+              <li key={p.id} className="snap-center shrink-0 w-[82%]">
+                <div className="photo-house relative aspect-[3/4] w-full rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)]">
+                  <Image
+                    src={`${CLD}/${p.id}.jpg`}
+                    alt={p.alt}
+                    fill
+                    className="object-cover"
+                    sizes="82vw"
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-center text-[12.5px] font-semibold text-ink-muted" aria-hidden>
+            Scorri per vedere tutte le foto →
+          </p>
+        </div>
+
+        {/* Desktop: griglia masonry (tile orizzontali su 2 colonne, verticali su 1;
+            grid-flow-row-dense impacchetta riempiendo i buchi). */}
+        <div className="mt-12 hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 grid-flow-row-dense">
           {photos.map((p) => (
             <div
               key={p.id}
@@ -56,8 +83,8 @@ export function SezioneGalleria() {
                   fill
                   className="object-cover"
                   sizes={p.orient === "l"
-                    ? "(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 66vw"
-                    : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"}
+                    ? "(max-width: 1024px) 100vw, 66vw"
+                    : "(max-width: 1024px) 50vw, 33vw"}
                 />
               </div>
             </div>
