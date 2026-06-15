@@ -14,9 +14,10 @@ import { Button } from "@/components/ui/button";
  *     dipendenza). Quando il puntatore è fermo / su touch parte un'auto-demo
  *     ambient che traccia la scia da sola.
  *  3. scrim navy per la leggibilità del testo
- *  4. contenuto (eyebrow, titolo, sottotitolo, CTA, stats) — sta DIETRO Nino
- *  5. video di Nino scontornato (alpha webm + HEVC per Safari) in primo piano,
- *     con leggero parallax sul movimento del mouse → senso di profondità.
+ *  4. video di Nino + Vittoria scontornati (alpha webm + HEVC per Safari): il duo della scuola.
+ *  5. contenuto (eyebrow, titolo, sottotitolo, CTA, stats). Su desktop il duo sta a destra,
+ *     accanto al testo; su mobile fa da backdrop DIETRO al testo (con velo bianco per la
+ *     leggibilità). Nessun parallax: le figure restano ferme.
  *
  * Accessibilità / performance:
  *  - il video è decorativo (`aria-hidden`); su `prefers-reduced-motion` la scia
@@ -43,13 +44,16 @@ export interface ScuolaHeroNinoProps {
   ninoWebm?: string;
   ninoMov?: string;
   ninoPoster?: string;
+  /** asset video di Vittoria (compagna di Nino, affiancata a sinistra) */
+  vittoriaWebm?: string;
+  vittoriaMov?: string;
+  vittoriaPoster?: string;
 }
 
 // preset "Morbida"
 const BRUSH = 160; // diametro pennello (px logici)
 const FADE = 0.014; // alpha sottratta per frame alla scia
 const SATURATE = 1.15; // saturazione del geometrico rivelato
-const PARALLAX = 20; // px max di spostamento
 
 export function ScuolaHeroNino({
   eyebrow,
@@ -62,10 +66,14 @@ export function ScuolaHeroNino({
   ninoWebm = "/nino/nino-figura.webm",
   ninoMov = "/nino/nino-figura.mov",
   ninoPoster = "/nino/nino-figura-poster.png",
+  vittoriaWebm = "/vittoria/vittoria-figura.webm",
+  vittoriaMov = "/vittoria/vittoria-figura.mov",
+  vittoriaPoster = "/vittoria/vittoria-figura-poster.png",
 }: ScuolaHeroNinoProps) {
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
+  const vittoriaVideoRef = React.useRef<HTMLVideoElement | null>(null);
   const ninoRef = React.useRef<HTMLDivElement | null>(null);
   const contentRef = React.useRef<HTMLDivElement | null>(null);
   const hasStats = !!stats?.length;
@@ -73,8 +81,6 @@ export function ScuolaHeroNino({
   React.useEffect(() => {
     const section = sectionRef.current;
     const canvas = canvasRef.current;
-    const nino = ninoRef.current;
-    const content = contentRef.current;
     if (!section || !canvas) return;
 
     const ctx = canvas.getContext("2d");
@@ -110,17 +116,13 @@ export function ScuolaHeroNino({
       mctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     }
 
-    // coordinate puntatore + parallax target
+    // coordinate puntatore (per la scia di reveal)
     let px = 0,
       py = 0,
       lx = 0,
       ly = 0,
       hasPointer = false,
       lastMove = 0;
-    let tnx = 0,
-      tny = 0,
-      nx = 0,
-      ny = 0;
 
     function drawGeoCover() {
       const ir = geo.width / geo.height;
@@ -173,8 +175,6 @@ export function ScuolaHeroNino({
         const t = now / 1000;
         px = W * (0.5 + 0.32 * Math.sin(t * 0.7));
         py = H * (0.52 + 0.3 * Math.sin(t * 1.13 + 1.2));
-        tnx = (px / W - 0.5) * 2;
-        tny = (py / H - 0.5) * 2;
       }
 
       // svanimento della scia
@@ -193,12 +193,7 @@ export function ScuolaHeroNino({
       ctx!.globalCompositeOperation = "destination-in";
       ctx!.drawImage(mask, 0, 0, W, H);
       ctx!.globalCompositeOperation = "source-over";
-
-      // parallax (lerp)
-      nx += (tnx - nx) * 0.06;
-      ny += (tny - ny) * 0.06;
-      if (nino) nino.style.transform = `translate3d(${-nx * PARALLAX}px, ${-ny * PARALLAX * 0.5}px, 0)`;
-      if (content) content.style.transform = `translate3d(${nx * PARALLAX * 0.35}px, ${ny * PARALLAX * 0.18}px, 0)`;
+      // parallax rimosso (richiesta utente): mascotte e testo restano fermi.
     }
 
     function onMove(e: PointerEvent) {
@@ -207,13 +202,9 @@ export function ScuolaHeroNino({
       py = e.clientY - r.top;
       hasPointer = true;
       lastMove = now();
-      tnx = (px / W - 0.5) * 2;
-      tny = (py / H - 0.5) * 2;
     }
     function onLeave() {
       hasPointer = false;
-      tnx = 0;
-      tny = 0;
     }
     function now() {
       return performance.now();
@@ -239,6 +230,7 @@ export function ScuolaHeroNino({
     if (reduced) {
       ctx!.clearRect(0, 0, W, H);
       video?.pause();
+      vittoriaVideoRef.current?.pause();
       const onResize = () => size();
       window.addEventListener("resize", onResize);
       return () => window.removeEventListener("resize", onResize);
@@ -299,8 +291,8 @@ export function ScuolaHeroNino({
         />
       </div>
 
-      {/* Contenuto (dietro Nino) */}
-      <div className="relative min-h-[560px] lg:min-h-[640px] flex items-start lg:items-end">
+      {/* Contenuto — SOPRA le mascotte (z-20). Su mobile Nino+Vittoria stanno DIETRO al testo. */}
+      <div className="relative z-20 min-h-[560px] lg:min-h-[640px] flex items-start lg:items-end">
         <div
           ref={contentRef}
           className="w-full max-w-[1280px] mx-auto px-6 lg:px-14 py-14 lg:py-20"
@@ -363,37 +355,70 @@ export function ScuolaHeroNino({
         </div>
       </div>
 
-      {/* Nino — primo piano, esce dal FONDO del riquadro (piedi sotto al box, sul
-          bianco della pagina). Wrapper esterno = posizione (non clippato);
-          interno (ninoRef) = parallax. Niente drop-shadow scuro: su bianco
-          darebbe un alone; uso un'ombra di contatto morbida grigia. */}
+      {/* Velo bianco SOLO-mobile: sta sopra le mascotte (z-10) e sotto il testo (z-20),
+          così le mascotte fanno da backdrop dietro al testo restando leggibili. Lo scrim
+          della card non basta perché è sotto le mascotte. Su desktop è disattivato. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-10 sm:hidden"
+        style={{
+          background:
+            "linear-gradient(to top, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.62) 48%, rgba(255,255,255,0.12) 100%)",
+        }}
+      />
+
+      {/* Duo Nino + Vittoria — stanno DIETRO al testo (container z-[5] < contenuto z-20).
+          Desktop: a destra, ben visibili (lì non c'è testo). Mobile: backdrop dietro al
+          testo, un filo più piccoli, ammorbiditi dal velo qui sopra. Vittoria a
+          sinistra/dietro, Nino davanti. Escono dal fondo del riquadro. */}
       <div
         aria-hidden
         className="pointer-events-none absolute z-[5] flex items-end
-          right-[-3%] top-auto bottom-[-46px] h-[84%]
-          sm:right-[6%] sm:h-auto sm:top-[-50px] sm:bottom-[-110px]
-          lg:right-[9%] lg:top-[-70px] lg:bottom-[-140px]"
+          right-0 top-auto bottom-2 h-1/2
+          sm:right-[3%] sm:h-auto sm:top-[-50px] sm:bottom-[-110px]
+          lg:right-[6%] lg:top-[-70px] lg:bottom-[-140px]"
       >
         <div
           ref={ninoRef}
-          className="h-full"
-          style={{
-            willChange: "transform",
-            filter: "drop-shadow(0 18px 22px rgba(31,45,90,0.18))",
-          }}
+          className="flex items-end h-full"
+          style={{ willChange: "transform" }}
         >
-          <video
-            ref={videoRef}
-            className="h-full w-auto object-contain object-bottom"
-            poster={ninoPoster}
-            autoPlay
-            muted
-            loop
-            playsInline
+          {/* Vittoria — dietro, un filo più piccola (visibile anche su mobile, come backdrop) */}
+          <div
+            className="block relative z-0 h-[90%] -mr-[7%]"
+            style={{ filter: "drop-shadow(0 18px 22px rgba(31,45,90,0.18))" }}
           >
-            <source src={ninoWebm} type="video/webm" />
-            <source src={ninoMov} type="video/quicktime" />
-          </video>
+            <video
+              ref={vittoriaVideoRef}
+              className="h-full w-auto object-contain object-bottom"
+              poster={vittoriaPoster}
+              autoPlay
+              muted
+              loop
+              playsInline
+            >
+              <source src={vittoriaWebm} type="video/webm" />
+              <source src={vittoriaMov} type="video/quicktime" />
+            </video>
+          </div>
+          {/* Nino — davanti */}
+          <div
+            className="relative z-10 h-full"
+            style={{ filter: "drop-shadow(0 18px 22px rgba(31,45,90,0.18))" }}
+          >
+            <video
+              ref={videoRef}
+              className="h-full w-auto object-contain object-bottom"
+              poster={ninoPoster}
+              autoPlay
+              muted
+              loop
+              playsInline
+            >
+              <source src={ninoWebm} type="video/webm" />
+              <source src={ninoMov} type="video/quicktime" />
+            </video>
+          </div>
         </div>
       </div>
     </section>
