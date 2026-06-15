@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import { ScuolaHero } from "@/components/scuola/ScuolaHero";
 import { SezioneCorsi } from "@/components/scuola/SezioneCorsi";
 import { SezioneFilosofia } from "@/components/scuola/SezioneFilosofia";
-import { SezioneKitScuola } from "@/components/scuola/SezioneKitScuola";
 import { SezioneMaestri } from "@/components/scuola/SezioneMaestri";
+import { SezioneKitScuola } from "@/components/scuola/SezioneKitScuola";
+import { SezioneAllenarsiACasa } from "@/components/scuola/SezioneAllenarsiACasa";
+import { SezioneSicurezza } from "@/components/scuola/SezioneSicurezza";
 import { SezioneGalleria } from "@/components/scuola/SezioneGalleria";
 import { SezioneComeIscriversi } from "@/components/scuola/SezioneComeIscriversi";
 import { CtaScuola } from "@/components/scuola/CtaScuola";
+import { BrandBackdrop } from "@/components/ui/brand-backdrop";
 import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 // ISR: gli sfondi video (slot "scuola-hero"/"scuola-cta") sono letti da Airtable
@@ -34,14 +37,27 @@ export default function LaScuolaPage() {
     <>
       <CourseJsonLd />
       <BreadcrumbJsonLd items={[{ name: "La Scuola", url: "/la-scuola" }]} />
+
+      {/* Hero invariato (EVO-021) */}
       <ScuolaHero />
-      <SezioneCorsi />
-      <SezioneFilosofia />
-      <SezioneKitScuola />
-      <SezioneMaestri />
-      <SezioneGalleria />
-      <SezioneComeIscriversi />
-      <CtaScuola />
+
+      {/* Corpo pagina (EVO-029) — ordine "parent journey".
+          Sfondo "brand backdrop" ambient dietro le sezioni: quelle trasparenti
+          (Corsi, Maestri, Sicurezza) lo lasciano trasparire, le altre lo coprono. */}
+      <div className="relative">
+        <BrandBackdrop variant="page" className="z-0" />
+        <div className="relative z-[1]">
+          <SezioneCorsi />
+          <SezioneFilosofia />
+          <SezioneMaestri />
+          <SezioneKitScuola />
+          <SezioneAllenarsiACasa />
+          <SezioneSicurezza />
+          <SezioneGalleria />
+          <SezioneComeIscriversi />
+          <CtaScuola />
+        </div>
+      </div>
     </>
   );
 }

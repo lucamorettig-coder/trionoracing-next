@@ -494,3 +494,71 @@ body {
     rgba(254,242,242,0.90) 60%,
     rgba(254,242,242,0.96) 100%);
 }
+
+/* ===== Brand Backdrop (modalità sfondo animata — EVO-029) =====
+   Forme geometriche del brand che fluttuano lentamente. SVG inline + CSS, zero JS.
+   Render dal componente <BrandBackdrop variant="page|cta" />.
+   Si animano SOLO transform/opacity (GPU): niente CLS, INP trascurabile.
+   - variant "page": layer di pagina sottile (forme navy a bassa opacità).
+   - variant "cta" : variante densa wireframe con accenti sky/sun per card scure.
+   reduced-motion → forme ferme. Mobile → le forme `.bd-m` sono nascoste.
+   Spec: evolutive/EVO-029-scuola-restyle-v3/visual/DS-NOTES-brand-backdrop.md */
+.brand-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* variante page = layer ambient ancorato al viewport (CSS unlayered → vince su .fixed) */
+.brand-backdrop--page {
+  position: fixed;
+}
+.bd-shape {
+  position: absolute;
+  width: var(--s);
+  height: var(--s);
+  will-change: transform;
+  animation-name: var(--bd-anim);
+  animation-duration: var(--bd-dur);
+  animation-delay: var(--bd-del, 0s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-fill-mode: both;
+}
+@keyframes bd-float-a { to { transform: translate3d(14px, -22px, 0) rotate(22deg); } }
+@keyframes bd-float-b { to { transform: translate3d(-18px, 16px, 0) rotate(-18deg); } }
+@keyframes bd-float-c { to { transform: translate3d(10px, 24px, 0) rotate(30deg); } }
+@keyframes bd-float-d { to { transform: translate3d(-12px, -18px, 0) rotate(-26deg); } }
+
+/* --- variant page: forme navy sottili --- */
+.brand-backdrop--page .bd-shape { color: var(--color-navy-500); opacity: 0.06; }
+.bd-1  { --s: 92px;  top: 8%;  left: 6%;   --bd-anim: bd-float-a; --bd-dur: 30s; color: var(--color-navy-500); opacity: .07; }
+.bd-2  { --s: 124px; top: 17%; left: 82%;  --bd-anim: bd-float-b; --bd-dur: 38s; color: var(--color-navy-300); opacity: .06; }
+.bd-3  { --s: 70px;  top: 44%; left: 13%;  --bd-anim: bd-float-c; --bd-dur: 26s; --bd-del: -4s; color: var(--color-navy-600); opacity: .05; }
+.bd-4  { --s: 112px; top: 62%; left: 77%;  --bd-anim: bd-float-d; --bd-dur: 34s; --bd-del: -6s; color: var(--color-navy-400); opacity: .06; }
+.bd-5  { --s: 64px;  top: 79%; left: 28%;  --bd-anim: bd-float-a; --bd-dur: 28s; --bd-del: -9s; color: var(--color-navy-500); opacity: .05; }
+.bd-6  { --s: 54px;  top: 30%; left: 47%;  --bd-anim: bd-float-b; --bd-dur: 32s; --bd-del: -3s; color: var(--color-navy-300); opacity: .05; }
+.bd-7  { --s: 92px;  top: 84%; left: 61%;  --bd-anim: bd-float-c; --bd-dur: 40s; color: var(--color-navy-400); opacity: .05; }
+.bd-8  { --s: 80px;  top: 49%; left: 90%;  --bd-anim: bd-float-d; --bd-dur: 30s; --bd-del: -8s; color: var(--color-navy-500); opacity: .06; }
+.bd-9  { --s: 60px;  top: 6%;  left: 60%;  --bd-anim: bd-float-a; --bd-dur: 36s; color: var(--color-navy-400); opacity: .05; }
+.bd-10 { --s: 84px;  top: 87%; left: 8%;   --bd-anim: bd-float-b; --bd-dur: 30s; --bd-del: -3s; color: var(--color-navy-500); opacity: .05; }
+.bd-11 { --s: 50px;  top: 13%; left: 38%;  --bd-anim: bd-float-c; --bd-dur: 34s; color: var(--color-navy-300); opacity: .04; }
+.bd-12 { --s: 46px;  top: 70%; left: 50%;  --bd-anim: bd-float-d; --bd-dur: 28s; color: var(--color-navy-400); opacity: .04; }
+
+/* --- variant cta: wireframe con accenti, dentro card scura --- */
+.bd-c1 { --s: 124px; top: 9%;  left: 7%;   --bd-anim: bd-float-a; --bd-dur: 30s; color: var(--color-sky-500);  opacity: .45; }
+.bd-c2 { --s: 102px; top: 58%; left: 83%;  --bd-anim: bd-float-b; --bd-dur: 34s; color: var(--color-sun-500);  opacity: .40; }
+.bd-c3 { --s: 82px;  top: 70%; left: 15%;  --bd-anim: bd-float-c; --bd-dur: 28s; --bd-del: -5s; color: var(--color-sky-300); opacity: .40; }
+.bd-c4 { --s: 112px; top: 14%; left: 73%;  --bd-anim: bd-float-d; --bd-dur: 32s; color: var(--color-navy-200); opacity: .35; }
+.bd-c5 { --s: 70px;  top: 40%; left: 49%;  --bd-anim: bd-float-a; --bd-dur: 26s; --bd-del: -7s; color: var(--color-sun-500); opacity: .35; }
+.bd-c6 { --s: 60px;  top: 80%; left: 60%;  --bd-anim: bd-float-b; --bd-dur: 30s; color: var(--color-sky-400);  opacity: .42; }
+.bd-c7 { --s: 90px;  top: 30%; left: 28%;  --bd-anim: bd-float-c; --bd-dur: 36s; color: var(--color-navy-300); opacity: .30; }
+.bd-c8 { --s: 64px;  top: 8%;  left: 44%;  --bd-anim: bd-float-d; --bd-dur: 30s; color: var(--color-sun-600);  opacity: .35; }
+
+@media (max-width: 640px) {
+  .bd-m { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bd-shape { animation: none; }
+}

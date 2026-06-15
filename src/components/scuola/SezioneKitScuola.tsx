@@ -83,15 +83,37 @@ export function SezioneKitScuola() {
               />
             </div>
 
-            <div className="reveal reveal-delay-3 photo-bg-navy rounded-[var(--radius-xl)] text-white">
-              <div className="p-8 lg:p-10">
-                <p className="text-xs font-semibold uppercase tracking-wider text-sky-300">
+            <div className="reveal reveal-delay-3 relative flex overflow-hidden photo-bg-navy rounded-[var(--radius-xl)] text-white">
+              <div className="relative w-[38%] min-w-[120px] shrink-0 self-end aspect-[3/4]">
+                <Image
+                  src="/vittoria/vittoria-stand.webp"
+                  alt="Vittoria indossa il kit completo della Scuola Triono"
+                  fill
+                  sizes="(max-width: 1024px) 38vw, 200px"
+                  className="object-contain object-bottom"
+                />
+              </div>
+              <div className="flex-1 p-6 lg:p-7">
+                <p className="text-xs font-semibold uppercase tracking-wider text-sun-500">
                   Il senso del kit
                 </p>
-                <p className="mt-4 text-xl font-semibold leading-snug lg:text-2xl">
-                  Quando indossi i colori del team,{" "}
+                <p className="mt-3 text-lg font-semibold leading-snug lg:text-xl">
+                  Quando indossi i colori,{" "}
                   <span className="text-sun-500">sei già parte</span> di Triono.
                 </p>
+                <p className="mt-3 text-sm leading-relaxed text-navy-100">
+                  Vittoria e Nino lo portano a ogni lezione. È lo stesso kit che riceverà tuo figlio.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {["04 capi", "1 identità", "Incluso nell'iscrizione"].map((c) => (
+                    <span
+                      key={c}
+                      className="inline-flex items-center rounded-[var(--radius-pill)] border border-white/15 bg-white/[0.08] px-3 py-1 text-[11.5px] font-semibold text-white"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

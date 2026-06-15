@@ -1,6 +1,7 @@
 import { SectionHeader } from "@/components/ui/section-header";
 import { Button } from "@/components/ui/button";
 import { VideoBackdrop } from "@/components/ui/video-backdrop";
+import { BrandBackdrop } from "@/components/ui/brand-backdrop";
 import { getSfondoVideo, cloudinaryVideoOptimized } from "@/lib/sfondi-video";
 import { getSiteSettings, formatPhoneIT, phoneHref } from "@/lib/site-settings";
 import { Phone } from "lucide-react";
@@ -18,12 +19,15 @@ export async function CtaScuola() {
 
   return (
     <section className={cn("relative text-white overflow-hidden", !sfondo && "photo-bg-navy")}>
-      {sfondo && (
+      {sfondo ? (
         <VideoBackdrop
           videoSrc={cloudinaryVideoOptimized(sfondo.videoUrl, 1600)}
           posterSrc={sfondo.posterUrl}
           overlay="cta"
         />
+      ) : (
+        // Senza video: backdrop animato di forme brand (wireframe) sopra il navy
+        <BrandBackdrop variant="cta" />
       )}
       <div className="relative z-[1] max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32 text-center reveal">
         <SectionHeader

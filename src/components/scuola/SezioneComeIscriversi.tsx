@@ -238,7 +238,7 @@ function LinkProva({ className = "" }: { className?: string }) {
    ============================================================ */
 function CtaBand() {
   return (
-    <div className="reveal reveal-delay-5 relative mt-12 overflow-hidden rounded-[var(--radius-2xl)] bg-navy-900 p-7 lg:mt-16 lg:flex lg:items-center lg:justify-between lg:gap-10 lg:px-14 lg:py-11">
+    <div className="reveal reveal-delay-5 relative mt-12 overflow-hidden rounded-[var(--radius-2xl)] bg-navy-900 p-7 lg:mt-16 lg:px-12 lg:py-10">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[url('/assets/pattern.svg')] bg-repeat opacity-[0.32]"
@@ -250,32 +250,46 @@ function CtaBand() {
             "linear-gradient(105deg,#000 0%,#000 28%,rgba(0,0,0,.45) 70%,transparent 100%)",
         }}
       />
-      <div className="relative max-w-[560px]">
-        <span className="inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.1em] text-sun-500 before:inline-block before:h-[2px] before:w-7 before:bg-current before:content-['']">
-          Pronti a partire
-        </span>
-        <h3 className="mt-3.5 text-[22px] font-bold leading-[1.15] tracking-[-0.015em] text-white lg:text-[30px] lg:leading-[1.12]">
-          Bastano una foto e il certificato medico.
-        </h3>
-        <p className="mt-2.5 max-w-[470px] text-[14px] leading-[1.55] text-white/70 lg:text-[14.5px]">
-          Tieni pronti una foto di tuo figlio e il certificato medico di idoneità sportiva non
-          agonistica.
-        </p>
-      </div>
-      <div className="relative mt-6 flex flex-col items-start gap-3 lg:mt-0">
-        <Button
-          asChild
-          size="lg"
-          className="w-full border-sun-500 bg-sun-500 text-navy-900 hover:border-sun-600 hover:bg-sun-600 lg:w-auto"
-        >
-          <Link href="/portale/iscrizioni">
-            {"Inizia l'iscrizione"}
-            <ArrowRight className="h-[18px] w-[18px]" strokeWidth={2.2} />
-          </Link>
-        </Button>
-        <span className="pl-0.5 font-mono text-[11px] tracking-[0.04em] text-white/55">
-          → area riservata genitori
-        </span>
+      <div className="relative flex flex-col items-center gap-6 text-center lg:flex-row lg:gap-10 lg:text-left">
+        {/* Duo mascotte: Nino col certificato medico, Vittoria con la foto tessera */}
+        <div className="relative aspect-[101/120] w-[150px] shrink-0 self-end lg:w-[210px]">
+          <Image
+            src="/scuola/duo-iscrizione.webp"
+            alt="Nino mostra il certificato medico e Vittoria la foto tessera"
+            fill
+            sizes="(max-width: 1024px) 150px, 210px"
+            className="object-contain object-bottom drop-shadow-[0_16px_22px_rgba(0,0,0,0.30)]"
+          />
+        </div>
+
+        <div className="max-w-[520px] lg:flex-1">
+          <span className="inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.1em] text-sun-500 before:inline-block before:h-[2px] before:w-7 before:bg-current before:content-['']">
+            Pronti a partire
+          </span>
+          <h3 className="mt-3.5 text-[22px] font-bold leading-[1.15] tracking-[-0.015em] text-white lg:text-[30px] lg:leading-[1.12]">
+            Bastano una foto e il certificato medico.
+          </h3>
+          <p className="mx-auto mt-2.5 max-w-[470px] text-[14px] leading-[1.55] text-white/70 lg:mx-0 lg:text-[14.5px]">
+            Tieni pronti una foto di tuo figlio e il certificato medico di idoneità sportiva non
+            agonistica.
+          </p>
+        </div>
+
+        <div className="flex w-full flex-col items-center gap-3 lg:w-auto lg:shrink-0 lg:items-start">
+          <Button
+            asChild
+            size="lg"
+            className="w-full border-sun-500 bg-sun-500 text-navy-900 hover:border-sun-600 hover:bg-sun-600 lg:w-auto"
+          >
+            <Link href="/portale/iscrizioni">
+              {"Inizia l'iscrizione"}
+              <ArrowRight className="h-[18px] w-[18px]" strokeWidth={2.2} />
+            </Link>
+          </Button>
+          <span className="pl-0.5 font-mono text-[11px] tracking-[0.04em] text-white/55">
+            → area riservata genitori
+          </span>
+        </div>
       </div>
     </div>
   );
