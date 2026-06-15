@@ -308,8 +308,8 @@ export function ScuolaHeroNino({
         />
       </div>
 
-      {/* Contenuto (dietro Nino) */}
-      <div className="relative min-h-[560px] lg:min-h-[640px] flex items-start lg:items-end">
+      {/* Contenuto — SOPRA le mascotte (z-20). Su mobile Nino+Vittoria stanno DIETRO al testo. */}
+      <div className="relative z-20 min-h-[560px] lg:min-h-[640px] flex items-start lg:items-end">
         <div
           ref={contentRef}
           className="w-full max-w-[1280px] mx-auto px-6 lg:px-14 py-14 lg:py-20"
@@ -372,12 +372,22 @@ export function ScuolaHeroNino({
         </div>
       </div>
 
-      {/* Duo Nino + Vittoria — primo piano, escono dal FONDO del riquadro (piedi
-          sotto al box, sul bianco della pagina). Wrapper esterno = posizione
-          (non clippato); interno (ninoRef) = parallax sull'intero gruppo.
-          Vittoria sta a sinistra, un filo più piccola e DIETRO Nino; su mobile
-          resta solo Nino per non affollare il testo. Niente drop-shadow scuro:
-          su bianco darebbe un alone; uso un'ombra di contatto morbida grigia. */}
+      {/* Velo bianco SOLO-mobile: sta sopra le mascotte (z-10) e sotto il testo (z-20),
+          così le mascotte fanno da backdrop dietro al testo restando leggibili. Lo scrim
+          della card non basta perché è sotto le mascotte. Su desktop è disattivato. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-10 sm:hidden"
+        style={{
+          background:
+            "linear-gradient(to top, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.62) 48%, rgba(255,255,255,0.12) 100%)",
+        }}
+      />
+
+      {/* Duo Nino + Vittoria — stanno DIETRO al testo (container z-[5] < contenuto z-20).
+          Desktop: a destra, ben visibili (lì non c'è testo). Mobile: backdrop dietro al
+          testo, un filo più piccoli, ammorbiditi dal velo qui sopra. Vittoria a
+          sinistra/dietro, Nino davanti. Escono dal fondo del riquadro; ninoRef = parallax. */}
       <div
         aria-hidden
         className="pointer-events-none absolute z-[5] flex items-end
@@ -390,9 +400,9 @@ export function ScuolaHeroNino({
           className="flex items-end h-full"
           style={{ willChange: "transform" }}
         >
-          {/* Vittoria — dietro, un filo più piccola, nascosta su mobile */}
+          {/* Vittoria — dietro, un filo più piccola (visibile anche su mobile, come backdrop) */}
           <div
-            className="hidden sm:block relative z-0 h-[90%] -mr-[7%]"
+            className="block relative z-0 h-[90%] -mr-[7%]"
             style={{ filter: "drop-shadow(0 18px 22px rgba(31,45,90,0.18))" }}
           >
             <video
