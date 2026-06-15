@@ -106,6 +106,9 @@ Next.js 16 · **App Router** (`src/app`, route group `(public)`) · componenti p
 - ✅ Nino **ancorato al bordo inferiore** e **ingrandito** (taglio = bordo del contenuto).
 - ✅ Sotto ENERVIT **niente tagline**.
 - ✅ Le **dotazioni di sicurezza** della scuola sono **5**: casco, guanti, occhiali, borraccia, luci.
+- ✅ **Mascotte in sella / mentre pedalano = casco OBBLIGATORIO** (navy, allacciato); è la regola #1 della scuola. Mascotte **in piedi accanto** alla bici → casco opzionale. Per Vittoria il casco sostituisce la bandana ma la coda esce dal casco. (EVO-029)
+- ✅ **Bici delle mascotte = ruote a 5 razze "mag wheels"** (razze spesse e piatte fuse, nero opaco), **mai raggi a filo**. Prompt: `five-spoke mag wheels, solid matte-black cast spokes (BMX-style), no thin wire spokes`. Vale per strada, MTB, kids bike, balance bike. (EVO-029)
+- ✅ **Scene "in azione" su sfondo bianco usabili senza cutout**: per i banner card (es. "Allenarsi a casa") le scene generate su bianco si fondono sulla tinta della card con `mix-blend-multiply` (come le foto kit) → niente cutout. Il cutout (Adobe) serve solo quando la mascotte va su **fondo scuro/navy** (es. banda iscrizione). (EVO-029)
 - ✅ Sfondi navy = texture reale `sfondo-real.png` + velo, non navy piatto.
 - ✅ Per gli oggetti tenuti (casco/borraccia) il logo Scuola va sull'oggetto, ma la maglia resta "come viene".
 - ✅ **Vittoria** è la gemella femminile (§11): stessi costanti brand, carattere "ribelle ma femminile, non bambolina".
