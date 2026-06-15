@@ -202,11 +202,13 @@ export function ScuolaHeroNino({
       ctx!.drawImage(mask, 0, 0, W, H);
       ctx!.globalCompositeOperation = "source-over";
 
-      // parallax (lerp)
+      // parallax (lerp) — DISATTIVATO su mobile (<640px): su touch non ha senso e farebbe
+      // "ballare" le mascotte/il testo. Reset a transform vuota sotto il breakpoint.
       nx += (tnx - nx) * 0.06;
       ny += (tny - ny) * 0.06;
-      if (nino) nino.style.transform = `translate3d(${-nx * PARALLAX}px, ${-ny * PARALLAX * 0.5}px, 0)`;
-      if (content) content.style.transform = `translate3d(${nx * PARALLAX * 0.35}px, ${ny * PARALLAX * 0.18}px, 0)`;
+      const mobile = W < 640;
+      if (nino) nino.style.transform = mobile ? "" : `translate3d(${-nx * PARALLAX}px, ${-ny * PARALLAX * 0.5}px, 0)`;
+      if (content) content.style.transform = mobile ? "" : `translate3d(${nx * PARALLAX * 0.35}px, ${ny * PARALLAX * 0.18}px, 0)`;
     }
 
     function onMove(e: PointerEvent) {
