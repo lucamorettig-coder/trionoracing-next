@@ -110,7 +110,7 @@ export function SezioneSicurezza() {
         <div className="reveal mt-10 flex items-end justify-center gap-0">
           <div className="relative hidden sm:block w-[110px] shrink-0 aspect-[3/4] -mr-4 z-10 self-end">
             <Image
-              src="/nino/nino-occhiali.webp"
+              src="/nino/nino-casco.webp"
               alt=""
               aria-hidden
               fill
