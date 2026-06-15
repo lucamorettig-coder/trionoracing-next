@@ -14,9 +14,10 @@ import { Button } from "@/components/ui/button";
  *     dipendenza). Quando il puntatore è fermo / su touch parte un'auto-demo
  *     ambient che traccia la scia da sola.
  *  3. scrim navy per la leggibilità del testo
- *  4. contenuto (eyebrow, titolo, sottotitolo, CTA, stats) — sta DIETRO Nino
- *  5. video di Nino scontornato (alpha webm + HEVC per Safari) in primo piano,
- *     con leggero parallax sul movimento del mouse → senso di profondità.
+ *  4. video di Nino + Vittoria scontornati (alpha webm + HEVC per Safari): il duo della scuola.
+ *  5. contenuto (eyebrow, titolo, sottotitolo, CTA, stats). Su desktop il duo sta a destra,
+ *     accanto al testo; su mobile fa da backdrop DIETRO al testo (con velo bianco per la
+ *     leggibilità). Nessun parallax: le figure restano ferme.
  *
  * Accessibilità / performance:
  *  - il video è decorativo (`aria-hidden`); su `prefers-reduced-motion` la scia
@@ -53,7 +54,6 @@ export interface ScuolaHeroNinoProps {
 const BRUSH = 160; // diametro pennello (px logici)
 const FADE = 0.014; // alpha sottratta per frame alla scia
 const SATURATE = 1.15; // saturazione del geometrico rivelato
-const PARALLAX = 20; // px max di spostamento
 
 export function ScuolaHeroNino({
   eyebrow,
@@ -81,8 +81,6 @@ export function ScuolaHeroNino({
   React.useEffect(() => {
     const section = sectionRef.current;
     const canvas = canvasRef.current;
-    const nino = ninoRef.current;
-    const content = contentRef.current;
     if (!section || !canvas) return;
 
     const ctx = canvas.getContext("2d");
@@ -118,17 +116,13 @@ export function ScuolaHeroNino({
       mctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     }
 
-    // coordinate puntatore + parallax target
+    // coordinate puntatore (per la scia di reveal)
     let px = 0,
       py = 0,
       lx = 0,
       ly = 0,
       hasPointer = false,
       lastMove = 0;
-    let tnx = 0,
-      tny = 0,
-      nx = 0,
-      ny = 0;
 
     function drawGeoCover() {
       const ir = geo.width / geo.height;
@@ -181,8 +175,6 @@ export function ScuolaHeroNino({
         const t = now / 1000;
         px = W * (0.5 + 0.32 * Math.sin(t * 0.7));
         py = H * (0.52 + 0.3 * Math.sin(t * 1.13 + 1.2));
-        tnx = (px / W - 0.5) * 2;
-        tny = (py / H - 0.5) * 2;
       }
 
       // svanimento della scia
@@ -201,14 +193,7 @@ export function ScuolaHeroNino({
       ctx!.globalCompositeOperation = "destination-in";
       ctx!.drawImage(mask, 0, 0, W, H);
       ctx!.globalCompositeOperation = "source-over";
-
-      // parallax (lerp) — DISATTIVATO su mobile (<640px): su touch non ha senso e farebbe
-      // "ballare" le mascotte/il testo. Reset a transform vuota sotto il breakpoint.
-      nx += (tnx - nx) * 0.06;
-      ny += (tny - ny) * 0.06;
-      const mobile = W < 640;
-      if (nino) nino.style.transform = mobile ? "" : `translate3d(${-nx * PARALLAX}px, ${-ny * PARALLAX * 0.5}px, 0)`;
-      if (content) content.style.transform = mobile ? "" : `translate3d(${nx * PARALLAX * 0.35}px, ${ny * PARALLAX * 0.18}px, 0)`;
+      // parallax rimosso (richiesta utente): mascotte e testo restano fermi.
     }
 
     function onMove(e: PointerEvent) {
@@ -217,13 +202,9 @@ export function ScuolaHeroNino({
       py = e.clientY - r.top;
       hasPointer = true;
       lastMove = now();
-      tnx = (px / W - 0.5) * 2;
-      tny = (py / H - 0.5) * 2;
     }
     function onLeave() {
       hasPointer = false;
-      tnx = 0;
-      tny = 0;
     }
     function now() {
       return performance.now();
@@ -389,7 +370,7 @@ export function ScuolaHeroNino({
       {/* Duo Nino + Vittoria — stanno DIETRO al testo (container z-[5] < contenuto z-20).
           Desktop: a destra, ben visibili (lì non c'è testo). Mobile: backdrop dietro al
           testo, un filo più piccoli, ammorbiditi dal velo qui sopra. Vittoria a
-          sinistra/dietro, Nino davanti. Escono dal fondo del riquadro; ninoRef = parallax. */}
+          sinistra/dietro, Nino davanti. Escono dal fondo del riquadro. */}
       <div
         aria-hidden
         className="pointer-events-none absolute z-[5] flex items-end
