@@ -374,7 +374,7 @@ export function ScuolaHeroNino({
       <div
         aria-hidden
         className="pointer-events-none absolute z-[5] flex items-end
-          right-[-3%] top-auto bottom-[-46px] h-1/2
+          right-0 top-auto bottom-2 h-1/2
           sm:right-[3%] sm:h-auto sm:top-[-50px] sm:bottom-[-110px]
           lg:right-[6%] lg:top-[-70px] lg:bottom-[-140px]"
       >
