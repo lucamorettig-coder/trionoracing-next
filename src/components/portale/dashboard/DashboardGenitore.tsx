@@ -110,7 +110,7 @@ export default function DashboardGenitore({
       )}
 
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12 space-y-10">
-        {/* Banner soft profilo incompleto (EVO-029) — non bloccante */}
+        {/* Banner soft profilo incompleto (EVO-030) — non bloccante */}
         {profiloIncompleto && (
           <WarningSoftBanner
             title="Completa il tuo profilo"

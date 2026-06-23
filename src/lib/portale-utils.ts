@@ -1,7 +1,7 @@
 import type { BadgeVariant } from "@/components/ui/badge";
 import type { Bambino, Genitore, Iscrizione, Lezione, TitoloPagamento } from "@/lib/airtable-portale";
 
-// ─── EVO-029 — profilo genitore obbligatorio ───────────────────────────────
+// ─── EVO-030 — profilo genitore obbligatorio ───────────────────────────────
 
 /**
  * Campi anagrafici estesi del genitore richiesti per il tesseramento FCI del minore.

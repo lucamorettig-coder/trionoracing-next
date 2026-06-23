@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   const genitore = await getGenitoreByClerkId(userId);
   if (!genitore) return NextResponse.json({ error: "Genitore non trovato" }, { status: 403 });
 
-  // Guard EVO-029: profilo genitore completo è obbligatorio per iscrivere un minore
+  // Guard EVO-030: profilo genitore completo è obbligatorio per iscrivere un minore
   // (dati necessari al tesseramento FCI). Anti-bypass: non ci fidiamo del solo client.
   if (!isProfiloGenitoreCompleto(genitore)) {
     return NextResponse.json(

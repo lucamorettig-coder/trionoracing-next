@@ -17,7 +17,7 @@ interface Props {
 }
 
 /**
- * Step "I tuoi dati" — primo step condizionale del wizard di iscrizione (EVO-029).
+ * Step "I tuoi dati" — primo step condizionale del wizard di iscrizione (EVO-030).
  * Compare solo quando il profilo del genitore è incompleto. Presentazionale: lo
  * stato e il salvataggio (PATCH /api/portale/profilo) vivono in WizardNuovaIscrizione.
  */

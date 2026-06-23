@@ -7,7 +7,7 @@
  * questi casi, mentre il checksum resta valido — quindi validiamo charset +
  * checksum e non il pattern posizionale.
  *
- * EVO-029 — usato dallo step "I tuoi dati" del wizard e dalla pagina profilo.
+ * EVO-030 — usato dallo step "I tuoi dati" del wizard e dalla pagina profilo.
  */
 
 export const ERRORE_CF =

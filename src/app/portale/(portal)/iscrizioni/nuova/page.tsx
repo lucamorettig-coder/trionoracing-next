@@ -46,7 +46,7 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
   // Opzioni corso con quote del quarter corrente (calcolate server-side, no fetch client).
   const corsiOptions = buildCorsiOptions(tariffeVigenti, getCurrentQuarter());
 
-  // Gate EVO-029: lo step "I tuoi dati" compare solo se il profilo è incompleto.
+  // Gate EVO-030: lo step "I tuoi dati" compare solo se il profilo è incompleto.
   const profiloCompleto = isProfiloGenitoreCompleto(genitore);
 
   // Mappa bambinoId → iscrizioneId per bambini già iscritti nell'anno corrente
