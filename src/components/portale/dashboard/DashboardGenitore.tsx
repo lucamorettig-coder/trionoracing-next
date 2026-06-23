@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import FiglioCard from "@/components/portale/figli/FiglioCard";
 import JustCreatedBanner from "@/components/portale/figli/JustCreatedBanner";
-import { formatDateIT, getStatoIscrizioneAnnoCorrente, buildScadenze } from "@/lib/portale-utils";
+import { formatDateIT, getStatoIscrizioneAnnoCorrente, buildScadenze, isProfiloGenitoreCompleto, campiMancantiProfilo } from "@/lib/portale-utils";
+import WarningSoftBanner from "@/components/ui/warning-soft-banner";
 import { statoIscrizioneGaraBadge } from "@/components/portale/gare/gara-utils";
 import type {
   Genitore,
@@ -45,6 +46,9 @@ export default function DashboardGenitore({
 
   const tuttiIscritti = bambini.length > 0 && statiIscrizione.every((s) => s.stato === 'iscritto');
   const qualcunoDaIscrivere = statiIscrizione.some((s) => s.stato !== 'iscritto');
+
+  const profiloIncompleto = !isProfiloGenitoreCompleto(genitore);
+  const mancanti = profiloIncompleto ? campiMancantiProfilo(genitore).slice(0, 2).join(", ") : "";
 
   const scadenze = buildScadenze(bambini, titoli, iscrizioni);
   const scadenzeCount = scadenze.length;
@@ -106,6 +110,21 @@ export default function DashboardGenitore({
       )}
 
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-8 lg:py-12 space-y-10">
+        {/* Banner soft profilo incompleto (EVO-029) — non bloccante */}
+        {profiloIncompleto && (
+          <WarningSoftBanner
+            title="Completa il tuo profilo"
+            description={
+              <>
+                Mancano alcuni dati anagrafici
+                {mancanti ? ` (${mancanti}…)` : ""} necessari per le iscrizioni e
+                il tesseramento dei tuoi figli.
+              </>
+            }
+            cta={{ label: "Completa il profilo", href: "/portale/profilo" }}
+          />
+        )}
+
         {/* Prossime scadenze — sopra "I miei figli" quando presenti (EVO-025) */}
         {scadenzeVisible.length > 0 && (
           <section>
