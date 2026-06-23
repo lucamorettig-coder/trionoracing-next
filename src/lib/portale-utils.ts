@@ -1,5 +1,47 @@
 import type { BadgeVariant } from "@/components/ui/badge";
-import type { Bambino, Iscrizione, Lezione, TitoloPagamento } from "@/lib/airtable-portale";
+import type { Bambino, Genitore, Iscrizione, Lezione, TitoloPagamento } from "@/lib/airtable-portale";
+
+// ─── EVO-029 — profilo genitore obbligatorio ───────────────────────────────
+
+/**
+ * Campi anagrafici estesi del genitore richiesti per il tesseramento FCI del minore.
+ * Single source of truth: usata dal gate del wizard, dal guard server-side,
+ * dalla validazione del form profilo e dal banner soft in dashboard.
+ * Nome/Cognome/Email arrivano da Clerk e non sono qui.
+ */
+export const CAMPI_PROFILO_OBBLIGATORI = [
+  "CELLULARE_GENITORE",
+  "DATA_NASCITA_GENITORE",
+  "LUOGO_NASCITA_GENITORE",
+  "CODICE_FISCALE_GENITORE",
+  "VIA_RESIDENZA_GENITORE",
+  "CITTA_RESIDENZA_GENITORE",
+] as const;
+
+export type CampoProfiloObbligatorio = (typeof CAMPI_PROFILO_OBBLIGATORI)[number];
+
+const CAMPO_PROFILO_LABEL: Record<CampoProfiloObbligatorio, string> = {
+  CELLULARE_GENITORE: "cellulare",
+  DATA_NASCITA_GENITORE: "data di nascita",
+  LUOGO_NASCITA_GENITORE: "luogo di nascita",
+  CODICE_FISCALE_GENITORE: "codice fiscale",
+  VIA_RESIDENZA_GENITORE: "indirizzo di residenza",
+  CITTA_RESIDENZA_GENITORE: "città di residenza",
+};
+
+/** True se tutti i campi anagrafici estesi del genitore sono valorizzati (presenza, non vuoti). */
+export function isProfiloGenitoreCompleto(genitore: Genitore): boolean {
+  return CAMPI_PROFILO_OBBLIGATORI.every(
+    (k) => !!(genitore.fields[k] ?? "").toString().trim(),
+  );
+}
+
+/** Etichette umane (lowercase) dei campi obbligatori mancanti — per il banner soft. */
+export function campiMancantiProfilo(genitore: Genitore): string[] {
+  return CAMPI_PROFILO_OBBLIGATORI.filter(
+    (k) => !(genitore.fields[k] ?? "").toString().trim(),
+  ).map((k) => CAMPO_PROFILO_LABEL[k]);
+}
 
 export interface StatoIscrizioneBadge {
   variant: BadgeVariant;
