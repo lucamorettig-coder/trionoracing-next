@@ -16,7 +16,7 @@ import {
   type Tariffa,
   type TipoCorso,
 } from "@/lib/airtable-portale";
-import { getStatoIscrizioneAnnoCorrente } from "@/lib/portale-utils";
+import { getStatoIscrizioneAnnoCorrente, isProfiloGenitoreCompleto } from "@/lib/portale-utils";
 import { Button } from "@/components/ui/button";
 import WizardNuovaIscrizione, {
   type TariffaInfo,
@@ -45,6 +45,9 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
 
   // Opzioni corso con quote del quarter corrente (calcolate server-side, no fetch client).
   const corsiOptions = buildCorsiOptions(tariffeVigenti, getCurrentQuarter());
+
+  // Gate EVO-029: lo step "I tuoi dati" compare solo se il profilo è incompleto.
+  const profiloCompleto = isProfiloGenitoreCompleto(genitore);
 
   // Mappa bambinoId → iscrizioneId per bambini già iscritti nell'anno corrente
   const bambiniIscrittiAnno = new Map<string, string>(
@@ -100,8 +103,10 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
     const tariffaInfo = tariffaResult ? toTariffaInfo(tariffaResult) : null;
 
     return (
-      <Layout>
+      <Layout profiloCompleto={profiloCompleto}>
         <WizardNuovaIscrizione
+          genitore={genitore}
+          profiloCompleto={profiloCompleto}
           bambini={bambini}
           anno={annoCorrente}
           corsiOptions={corsiOptions}
@@ -119,7 +124,7 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
   if (bozza) {
     const nomeBambino = bozza.fields["NOME_BAMBINO (from TABELLA_BAMBINI)"]?.[0] ?? "tuo figlio";
     return (
-      <Layout>
+      <Layout profiloCompleto={profiloCompleto}>
         <div className="bg-sun-100 border border-sun-500/30 rounded-[var(--radius-xl)] p-5 flex items-start gap-3 mb-6">
           <Sparkles className="w-5 h-5 text-ink shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
@@ -137,6 +142,8 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
           </Button>
         </div>
         <WizardNuovaIscrizione
+          genitore={genitore}
+          profiloCompleto={profiloCompleto}
           bambini={bambini}
           bambinoIniziale={sp.bambino}
           anno={annoCorrente}
@@ -148,8 +155,10 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
   }
 
   return (
-    <Layout>
+    <Layout profiloCompleto={profiloCompleto}>
       <WizardNuovaIscrizione
+        genitore={genitore}
+        profiloCompleto={profiloCompleto}
         bambini={bambini}
         bambinoIniziale={sp.bambino}
         anno={annoCorrente}
@@ -160,12 +169,19 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
   );
 }
 
-function Layout({ children }: { children: React.ReactNode }) {
+function Layout({
+  children,
+  profiloCompleto,
+}: {
+  children: React.ReactNode;
+  profiloCompleto: boolean;
+}) {
+  const totalSteps = profiloCompleto ? 7 : 8;
   return (
     <div className="max-w-3xl mx-auto px-6 lg:px-10 py-8 lg:py-12">
       <h1 className="text-2xl font-bold text-ink mb-2 text-center">Nuova iscrizione</h1>
       <p className="text-ink-muted text-center mb-8">
-        7 step per iscrivere tuo figlio alla scuola.
+        {totalSteps} step per iscrivere tuo figlio alla scuola.
       </p>
       {children}
     </div>

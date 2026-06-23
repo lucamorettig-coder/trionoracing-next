@@ -8,6 +8,7 @@ import {
   createIscrizione,
   parseTipoCorso,
 } from "@/lib/airtable-portale";
+import { isProfiloGenitoreCompleto } from "@/lib/portale-utils";
 
 /**
  * POST /api/portale/iscrizioni
@@ -30,6 +31,19 @@ export async function POST(req: NextRequest) {
 
   const genitore = await getGenitoreByClerkId(userId);
   if (!genitore) return NextResponse.json({ error: "Genitore non trovato" }, { status: 403 });
+
+  // Guard EVO-029: profilo genitore completo è obbligatorio per iscrivere un minore
+  // (dati necessari al tesseramento FCI). Anti-bypass: non ci fidiamo del solo client.
+  if (!isProfiloGenitoreCompleto(genitore)) {
+    return NextResponse.json(
+      {
+        error:
+          "Completa prima i tuoi dati anagrafici (cellulare, data e luogo di nascita, codice fiscale, residenza) dal profilo.",
+        code: "PROFILO_INCOMPLETO",
+      },
+      { status: 422 },
+    );
+  }
 
   const bambino = await getBambinoById(bambinoId);
   if (!bambino) return NextResponse.json({ error: "Bambino non trovato" }, { status: 404 });

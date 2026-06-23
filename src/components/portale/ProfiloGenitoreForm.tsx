@@ -4,8 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { FormField, Label, Input, FormHelper } from "@/components/ui/form";
 import type { Genitore } from "@/lib/airtable-portale";
+import DatiAnagraficiGenitoreFields, {
+  datiAnagraficiFromGenitore,
+  validateDatiAnagrafici,
+  type DatiAnagraficiValues,
+  type DatiAnagraficiErrors,
+} from "@/components/portale/DatiAnagraficiGenitoreFields";
 
 interface Props {
   genitore: Genitore;
@@ -16,27 +21,29 @@ export default function ProfiloGenitoreForm({ genitore }: Props) {
   const { signOut, openUserProfile } = useClerk();
   const { fields } = genitore;
 
-  const [form, setForm] = useState({
-    NOME_GENITORE: fields.NOME_GENITORE ?? "",
-    COGNOME_GENITORE: fields.COGNOME_GENITORE ?? "",
-    CELLULARE_GENITORE: fields.CELLULARE_GENITORE ?? "",
-    DATA_NASCITA_GENITORE: fields.DATA_NASCITA_GENITORE ?? "",
-    LUOGO_NASCITA_GENITORE: fields.LUOGO_NASCITA_GENITORE ?? "",
-    CODICE_FISCALE_GENITORE: fields.CODICE_FISCALE_GENITORE ?? "",
-    VIA_RESIDENZA_GENITORE: fields.VIA_RESIDENZA_GENITORE ?? "",
-    CITTA_RESIDENZA_GENITORE: fields.CITTA_RESIDENZA_GENITORE ?? "",
-  });
+  const [form, setForm] = useState<DatiAnagraficiValues>(() =>
+    datiAnagraficiFromGenitore(fields),
+  );
+  const [errors, setErrors] = useState<DatiAnagraficiErrors>({});
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function set(field: keyof typeof form, value: string) {
+  function set(field: keyof DatiAnagraficiValues, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
+    setErrors((e) => (e[field] ? { ...e, [field]: undefined } : e));
     setSuccess(false);
   }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
+    const errs = validateDatiAnagrafici(form);
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      setError(null);
+      setSuccess(false);
+      return;
+    }
     setSaving(true);
     setError(null);
     setSuccess(false);
@@ -77,48 +84,12 @@ export default function ProfiloGenitoreForm({ genitore }: Props) {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField>
-              <Label htmlFor="nome-genitore">Nome</Label>
-              <Input id="nome-genitore" value={form.NOME_GENITORE} onChange={(e) => set("NOME_GENITORE", e.target.value)} />
-            </FormField>
-            <FormField>
-              <Label htmlFor="cognome-genitore">Cognome</Label>
-              <Input id="cognome-genitore" value={form.COGNOME_GENITORE} onChange={(e) => set("COGNOME_GENITORE", e.target.value)} />
-            </FormField>
-          </div>
-
-          <FormField>
-            <Label htmlFor="cellulare">Cellulare</Label>
-            <Input id="cellulare" type="tel" value={form.CELLULARE_GENITORE} onChange={(e) => set("CELLULARE_GENITORE", e.target.value)} placeholder="+39 333 1234567" />
-          </FormField>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField>
-              <Label htmlFor="data-nascita-g">Data di nascita</Label>
-              <Input id="data-nascita-g" type="date" value={form.DATA_NASCITA_GENITORE} onChange={(e) => set("DATA_NASCITA_GENITORE", e.target.value)} />
-            </FormField>
-            <FormField>
-              <Label htmlFor="luogo-nascita-g">Luogo di nascita</Label>
-              <Input id="luogo-nascita-g" value={form.LUOGO_NASCITA_GENITORE} onChange={(e) => set("LUOGO_NASCITA_GENITORE", e.target.value)} />
-            </FormField>
-          </div>
-
-          <FormField>
-            <Label htmlFor="cf-genitore">Codice fiscale</Label>
-            <Input id="cf-genitore" value={form.CODICE_FISCALE_GENITORE} onChange={(e) => set("CODICE_FISCALE_GENITORE", e.target.value.toUpperCase())} maxLength={16} />
-          </FormField>
-
-          <FormField>
-            <Label htmlFor="via-g">Indirizzo di residenza</Label>
-            <Input id="via-g" value={form.VIA_RESIDENZA_GENITORE} onChange={(e) => set("VIA_RESIDENZA_GENITORE", e.target.value)} />
-            <FormHelper>Via e numero civico</FormHelper>
-          </FormField>
-
-          <FormField>
-            <Label htmlFor="citta-g">Città</Label>
-            <Input id="citta-g" value={form.CITTA_RESIDENZA_GENITORE} onChange={(e) => set("CITTA_RESIDENZA_GENITORE", e.target.value)} />
-          </FormField>
+          <DatiAnagraficiGenitoreFields
+            values={form}
+            onChange={set}
+            errors={errors}
+            disabled={saving}
+          />
 
           <Button type="submit" variant="primary" size="md" loading={saving}>
             Salva modifiche
