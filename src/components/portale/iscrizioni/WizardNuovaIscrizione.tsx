@@ -31,7 +31,7 @@ import {
 
 /**
  * Chiavi step del wizard. La sequenza è dinamica: lo step "datiGenitore" è
- * presente solo quando il profilo del genitore è incompleto (EVO-029).
+ * presente solo quando il profilo del genitore è incompleto (EVO-030).
  * Tutta la logica confronta le CHIAVI, non gli indici, così inserire uno step
  * in testa non rompe gli offset.
  */
@@ -179,7 +179,7 @@ export default function WizardNuovaIscrizione({
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Step "I tuoi dati" (EVO-029): stato dei campi anagrafici + errori inline.
+  // Step "I tuoi dati" (EVO-030): stato dei campi anagrafici + errori inline.
   const [dati, setDati] = useState<DatiAnagraficiValues>(() =>
     datiAnagraficiFromGenitore(genitore.fields),
   );

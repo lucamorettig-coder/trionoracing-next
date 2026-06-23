@@ -6,7 +6,7 @@ import { CAMPI_PROFILO_OBBLIGATORI } from "@/lib/portale-utils";
 import { isCodiceFiscaleValido, ERRORE_CF } from "@/lib/codice-fiscale";
 
 /**
- * Campi anagrafici del genitore — componente condiviso (EVO-029).
+ * Campi anagrafici del genitore — componente condiviso (EVO-030).
  * Usato dalla pagina profilo (`ProfiloGenitoreForm`) e dallo step "I tuoi dati"
  * del wizard di iscrizione (`StepDatiGenitore`). Controllato: lo stato vive nel
  * parent; la validazione è il puro `validateDatiAnagrafici` esportato sotto.

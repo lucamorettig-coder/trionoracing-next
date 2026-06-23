@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EVO-027 — Mockup · Step "I tuoi dati" + banner profilo</title>
+<style>
+  :root{
+    --navy-50:#EEF1F8; --navy-100:#D7DEED; --navy-300:#8298BF; --navy-700:#1F2D5A; --navy-900:#050E3F;
+    --sky-600:#2A6BA9; --grass-50:#F0F8EB; --grass-200:#DAEFCD; --grass-500:#5FAC36; --grass-700:#3F7522;
+    --ember-50:#FDF4E5; --ember-100:#FCE4BD; --ember-500:#E09618; --ember-600:#BC7E12; --ember-700:#8E5F0E;
+    --flag-50:#FBEAEA; --flag-200:#F4C3C3; --flag-500:#C01818; --flag-700:#791010;
+    --sun-500:#EFE63A;
+    --bg:#FFFFFF; --bg-soft:#FAFBFD; --bg-muted:#F2F4F9; --line:#E4E7EF; --line-soft:#EEF0F5;
+    --ink:#14193A; --ink-muted:#6B7388;
+    --r-md:12px; --r-lg:16px; --r-xl:20px; --r-pill:9999px;
+    --sh-xs:0 1px 2px rgba(20,25,58,.04);
+    --sh-sm:0 2px 6px rgba(20,25,58,.06),0 1px 2px rgba(20,25,58,.04);
+    --sh-md:0 8px 20px rgba(20,25,58,.08),0 2px 6px rgba(20,25,58,.04);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg-muted);color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased;padding:32px 16px}
+  h1.page{font-size:15px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-muted);font-weight:700;margin:0 0 24px;text-align:center}
+  .artboard{max-width:1080px;margin:0 auto 44px}
+  .artboard > h2{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--navy-700);
+    margin:0 0 4px;display:flex;align-items:center;gap:8px}
+  .artboard > h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--sun-500);box-shadow:0 0 8px var(--sun-500)}
+  .artboard > p.cap{font-size:13px;color:var(--ink-muted);margin:0 0 16px}
+  .frames{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+  .frame-desktop{flex:1 1 600px;min-width:340px}
+  .frame-mobile{width:330px}
+  .device-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-muted);margin:0 0 8px}
+
+  /* Stepper navy */
+  .stepper{position:relative;border-radius:var(--r-xl);overflow:hidden;color:#fff;
+    background:radial-gradient(120% 120% at 0% 0%,#0a1750 0%,var(--navy-900) 55%,#020730 100%);
+    padding:34px 24px 30px;box-shadow:var(--sh-md)}
+  .stepper::after{content:"";position:absolute;inset:0;opacity:.10;pointer-events:none;
+    background-image:radial-gradient(circle at 18% 22%,#fff 1px,transparent 1.4px),radial-gradient(circle at 70% 60%,#fff 1px,transparent 1.4px);
+    background-size:34px 34px,46px 46px}
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:var(--r-pill);
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+    font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.78)}
+  .chip .pip{width:6px;height:6px;border-radius:50%;background:var(--sun-500);box-shadow:0 0 8px var(--sun-500)}
+  .chip-wrap{display:flex;justify-content:center;margin-bottom:22px}
+  .steps{display:flex;align-items:flex-start;justify-content:space-between;list-style:none;margin:0;padding:0}
+  .steps li{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center}
+  .row{display:flex;align-items:center;width:100%}
+  .line{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.12)}
+  .line.done{background:var(--sun-500);box-shadow:0 0 12px rgba(239,230,58,.4)}
+  .line.transparent{background:transparent}
+  .node{position:relative;margin:0 8px;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:16px;flex-shrink:0}
+  .node.todo{background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.18);color:rgba(255,255,255,.55)}
+  .node.active{background:#fff;color:var(--navy-900);border:2px solid #fff;box-shadow:0 0 0 5px rgba(255,255,255,.18),0 0 20px rgba(255,255,255,.35)}
+  .node.done{background:var(--sun-500);color:var(--navy-900);border:2px solid var(--sun-500);box-shadow:0 0 0 4px rgba(239,230,58,.18)}
+  .slabel{margin-top:12px;padding:0 2px}
+  .slabel .k{font:700 9px/1.2 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;color:rgba(255,255,255,.45)}
+  .slabel .k.active{color:#fff}.slabel .k.done{color:var(--sun-500)}
+  .slabel .t{font-size:12px;line-height:1.15;color:rgba(255,255,255,.55);font-weight:600}
+  .slabel .t.active{color:#fff;font-weight:800}.slabel .t.done{color:rgba(255,255,255,.85)}
+  /* mobile stepper */
+  .stepper-m .toprow{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:8px}
+  .stepper-m .toprow .lab{font-size:16px;font-weight:800;color:#fff}
+  .stepper-m .toprow .cnt{font:600 13px/1 ui-monospace,monospace;color:rgba(255,255,255,.7)}
+  .bar{height:8px;border-radius:var(--r-pill);background:rgba(255,255,255,.14);overflow:hidden}
+  .bar > span{display:block;height:100%;border-radius:var(--r-pill);background:var(--sun-500);box-shadow:0 0 12px rgba(239,230,58,.5)}
+
+  /* Card form */
+  .panel{background:#fff;border:1px solid var(--line);border-radius:var(--r-xl);box-shadow:var(--sh-sm);padding:28px;margin-top:20px}
+  .panel.mobile{padding:18px;border-radius:var(--r-lg)}
+  .sh-kicker{display:inline-flex;align-items:center;gap:8px;font:700 11px/1 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--navy-700);margin-bottom:10px}
+  .sh-kicker .pip{width:6px;height:6px;border-radius:50%;background:var(--navy-700)}
+  .sh-title{font-size:24px;font-weight:800;letter-spacing:-.01em;margin:0 0 8px}
+  .sh-desc{font-size:14px;line-height:1.55;color:var(--ink-muted);margin:0 0 22px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:430px){.grid2{grid-template-columns:1fr}}
+  .field{margin-bottom:16px}
+  .label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+  .label .req{color:var(--flag-500);margin-left:2px}
+  .label .opt{color:var(--ink-muted);font-weight:500}
+  .input{width:100%;height:42px;border:1px solid var(--line);border-radius:var(--r-md);padding:0 12px;font-size:14px;color:var(--ink);background:#fff}
+  .input::placeholder{color:#aab0c0}
+  .input:focus{outline:none;border-color:var(--navy-300);box-shadow:0 0 0 3px rgba(130,152,191,.25)}
+  .input.filled{border-color:var(--line);background:var(--bg-soft)}
+  .input.err{border-color:var(--flag-500);box-shadow:0 0 0 3px rgba(192,24,24,.12)}
+  .helper{font-size:12px;color:var(--ink-muted);margin-top:5px}
+  .helper.err{color:var(--flag-700);font-weight:600;display:flex;align-items:center;gap:5px}
+  .reassure{display:flex;gap:10px;align-items:flex-start;background:var(--navy-50);border:1px solid var(--navy-100);border-radius:var(--r-md);padding:11px 13px;margin-bottom:20px;font-size:12.5px;color:var(--navy-700);line-height:1.45}
+  .reassure svg{flex-shrink:0;margin-top:1px}
+
+  /* Footer wizard */
+  .wfoot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px;flex-wrap:wrap}
+  .link-muted{font-size:14px;color:var(--ink-muted);text-decoration:underline;cursor:pointer}
+  .btn{display:inline-flex;align-items:center;gap:7px;height:42px;padding:0 18px;border-radius:var(--r-md);font-size:14px;font-weight:700;cursor:pointer;border:1px solid transparent}
+  .btn-primary{background:var(--navy-700);color:#fff}
+  .btn-primary:hover{background:var(--navy-900)}
+  .btn-primary.disabled{background:var(--navy-100);color:#fff;cursor:not-allowed;box-shadow:none}
+  .btn-ghost{background:transparent;color:var(--ink-muted)}
+  .btn-ghost.dis{opacity:.4;cursor:not-allowed}
+  .btn-outline{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  .arrow{font-size:15px;line-height:1}
+
+  /* Dashboard mock */
+  .dash{background:var(--bg-soft);border:1px solid var(--line);border-radius:var(--r-xl);padding:22px;box-shadow:var(--sh-sm)}
+  .dash .hello{font-size:20px;font-weight:800;margin:0 0 16px}
+  .banner{display:flex;gap:13px;align-items:flex-start;background:var(--ember-50);border:1px solid var(--ember-100);border-radius:var(--r-lg);padding:15px 16px;margin-bottom:20px}
+  .banner .ic{width:34px;height:34px;border-radius:10px;background:var(--ember-500);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .banner .bt{font-size:14px;font-weight:800;color:var(--ember-700);margin:0 0 3px}
+  .banner .bd{font-size:13px;color:#4a3a16;line-height:1.45;margin:0 0 11px}
+  .banner .cta{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 16px;border-radius:var(--r-md);background:var(--ember-600);color:#fff;font-size:13px;font-weight:700;text-decoration:none}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .tile{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;box-shadow:var(--sh-xs)}
+  .tile .tl{font-size:12px;color:var(--ink-muted);font-weight:600;margin:0 0 4px}
+  .tile .tv{font-size:15px;font-weight:800}
+  .skel{height:10px;border-radius:6px;background:var(--line-soft);margin:7px 0}
+</style>
+</head>
+<body>
+<h1 class="page">EVO-027 · Step "I tuoi dati" nel wizard iscrizione + banner profilo incompleto</h1>
+
+<!-- ARTBOARD 1 -->
+<section class="artboard">
+  <h2><span class="dot"></span>Artboard 1 — Step "I tuoi dati" (da compilare)</h2>
+  <p class="cap">Compare come <strong>Step 01</strong> del wizard solo quando il profilo è incompleto: il totale passa da 7 a 8 step. Riusa <code>StepperWizard</code>, <code>StepHeader</code>, campi del profilo.</p>
+  <div class="frames">
+    <div class="frame-desktop">
+      <p class="device-label">Desktop</p>
+      <div class="stepper">
+        <div class="chip-wrap"><span class="chip"><span class="pip"></span>Step 1 di 8 · I tuoi dati</span></div>
+        <ol class="steps">
+          <li><div class="row"><div class="line transparent"></div><div class="node active">1</div><div class="line"></div></div><div class="slabel"><div class="k active">Step 01 · Attivo</div><div class="t active">I tuoi dati</div></div></li>
+          <li><div class="row"><div class="line"></div><div class="node todo">2</div><div class="line"></div></div><div class="slabel"><div class="k">Step 02</div><div class="t">Figlio</div></div></li>
+          <li><div class="row"><div class="line"></div><div class="node todo">3</div><div class="line"></div></div><div class="slabel"><div class="k">Step 03</div><div class="t">Requisiti</div></div></li>
+          <li><div class="row"><div class="line"></div><div class="node todo">4</div><div class="line"></div></div><div class="slabel"><div class="k">Step 04</div><div class="t">Corso</div></div></li>
+          <li><div class="row"><div class="line"></div><div class="node todo">5</div><div class="line"></div></div><div class="slabel"><div class="k">Step 05</div><div class="t">Tariffa</div></div></li>
+          <li><div class="row"><div class="line"></div><div class="node todo">6</div><div class="line"></div></div><div class="slabel"><div class="k">Step 06</div><div class="t">Privacy</div></div></li>
+          <li><div class="row"><div class="line"></div><div class="node todo">7</div><div class="line"></div></div><div class="slabel"><div class="k">Step 07</div><div class="t">Regolamento</div></div></li>
+          <li><div class="row"><div class="line"></div><div class="node todo">8</div><div class="line transparent"></div></div><div class="slabel"><div class="k">Step 08</div><div class="t">Sommario</div></div></li>
+        </ol>
+      </div>
+      <div class="panel">
+        <div class="sh-kicker"><span class="pip"></span>Step 1 di 8</div>
+        <h3 class="sh-title">I tuoi dati</h3>
+        <p class="sh-desc">Prima di iscrivere tuo figlio completa i tuoi dati anagrafici: servono per il tesseramento e l'assicurazione. Te li chiediamo una sola volta, poi restano nel tuo profilo.</p>
+        <div class="reassure">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1F2D5A" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Dati trattati secondo la Privacy Policy. Usati solo per tesseramento FCI e assicurazione del minore.</span>
+        </div>
+        <div class="grid2">
+          <div class="field"><label class="label">Nome <span class="opt">(dal tuo account)</span></label><input class="input filled" value="Luca" readonly></div>
+          <div class="field"><label class="label">Cognome <span class="opt">(dal tuo account)</span></label><input class="input filled" value="Moretti" readonly></div>
+        </div>
+        <div class="field"><label class="label">Cellulare <span class="req">*</span></label><input class="input" placeholder="+39 333 1234567"></div>
+        <div class="grid2">
+          <div class="field"><label class="label">Data di nascita <span class="req">*</span></label><input class="input" placeholder="gg / mm / aaaa"></div>
+          <div class="field"><label class="label">Luogo di nascita <span class="req">*</span></label><input class="input" placeholder="Es. Terni"></div>
+        </div>
+        <div class="field"><label class="label">Codice fiscale <span class="req">*</span></label><input class="input" placeholder="RSSMRA80A01L117X" maxlength="16" style="text-transform:uppercase"><div class="helper">16 caratteri</div></div>
+        <div class="field"><label class="label">Indirizzo di residenza <span class="req">*</span></label><input class="input" placeholder="Via e numero civico"></div>
+        <div class="field"><label class="label">Città <span class="req">*</span></label><input class="input" placeholder="Es. Terni"></div>
+        <p style="font-size:12px;color:var(--ink-muted);margin:2px 0 0">I campi con <span style="color:var(--flag-500);font-weight:700">*</span> sono obbligatori.</p>
+        <div class="wfoot">
+          <span class="link-muted">Annulla</span>
+          <button class="btn btn-primary disabled">Continua <span class="arrow">→</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="frame-mobile">
+      <p class="device-label">Mobile</p>
+      <div class="stepper stepper-m">
+        <div class="chip-wrap"><span class="chip"><span class="pip"></span>Step 1 di 8</span></div>
+        <div class="toprow"><span class="lab">I tuoi dati</span><span class="cnt">1 / 8</span></div>
+        <div class="bar"><span style="width:12.5%"></span></div>
+      </div>
+      <div class="panel mobile">
+        <div class="sh-kicker"><span class="pip"></span>Step 1 di 8</div>
+        <h3 class="sh-title" style="font-size:21px">I tuoi dati</h3>
+        <p class="sh-desc" style="margin-bottom:16px">Completa i tuoi dati anagrafici: servono per il tesseramento. Te li chiediamo una sola volta.</p>
+        <div class="field"><label class="label">Cellulare <span class="req">*</span></label><input class="input" placeholder="+39 333 1234567"></div>
+        <div class="field"><label class="label">Data di nascita <span class="req">*</span></label><input class="input" placeholder="gg / mm / aaaa"></div>
+        <div class="field"><label class="label">Luogo di nascita <span class="req">*</span></label><input class="input" placeholder="Es. Terni"></div>
+        <div class="field"><label class="label">Codice fiscale <span class="req">*</span></label><input class="input" placeholder="RSSMRA80A01L117X"><div class="helper">16 caratteri</div></div>
+        <div class="field"><label class="label">Indirizzo di residenza <span class="req">*</span></label><input class="input" placeholder="Via e numero civico"></div>
+        <div class="field"><label class="label">Città <span class="req">*</span></label><input class="input" placeholder="Es. Terni"></div>
+        <button class="btn btn-primary disabled" style="width:100%;justify-content:center;margin-top:4px">Continua <span class="arrow">→</span></button>
+        <div style="text-align:center;margin-top:12px"><span class="link-muted">Annulla</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARTBOARD 2 -->
+<section class="artboard">
+  <h2><span class="dot"></span>Artboard 2 — Validazione (CF non valido + obbligatori vuoti)</h2>
+  <p class="cap">Errori inline in <code>flag</code>; il pulsante "Continua" resta disabilitato finché il form non è valido.</p>
+  <div class="frames">
+    <div class="frame-desktop">
+      <p class="device-label">Desktop</p>
+      <div class="panel">
+        <div class="sh-kicker"><span class="pip"></span>Step 1 di 8</div>
+        <h3 class="sh-title">I tuoi dati</h3>
+        <p class="sh-desc">Controlla i campi evidenziati per proseguire.</p>
+        <div class="field"><label class="label">Cellulare <span class="req">*</span></label><input class="input filled" value="+39 333 1234567"></div>
+        <div class="grid2">
+          <div class="field"><label class="label">Data di nascita <span class="req">*</span></label><input class="input filled" value="09/08/1981"></div>
+          <div class="field"><label class="label">Luogo di nascita <span class="req">*</span></label><input class="input err" value=""><div class="helper err">⚠ Campo obbligatorio</div></div>
+        </div>
+        <div class="field"><label class="label">Codice fiscale <span class="req">*</span></label><input class="input err" value="MRTLCU81M09" style="text-transform:uppercase"><div class="helper err">⚠ Codice fiscale non valido (servono 16 caratteri)</div></div>
+        <div class="field"><label class="label">Indirizzo di residenza <span class="req">*</span></label><input class="input filled" value="Via Ternana 12"></div>
+        <div class="field"><label class="label">Città <span class="req">*</span></label><input class="input err" value=""><div class="helper err">⚠ Campo obbligatorio</div></div>
+        <div class="wfoot">
+          <span class="link-muted">Annulla</span>
+          <button class="btn btn-primary disabled">Continua <span class="arrow">→</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="frame-mobile">
+      <p class="device-label">Mobile · stato valido</p>
+      <div class="panel mobile">
+        <div class="sh-kicker"><span class="pip"></span>Step 1 di 8</div>
+        <h3 class="sh-title" style="font-size:21px">I tuoi dati</h3>
+        <p class="sh-desc" style="margin-bottom:16px">Tutto pronto: ora puoi proseguire.</p>
+        <div class="field"><label class="label">Cellulare <span class="req">*</span></label><input class="input filled" value="+39 333 1234567"></div>
+        <div class="field"><label class="label">Codice fiscale <span class="req">*</span></label><input class="input filled" value="MRTLCU81M09L117R"><div class="helper" style="color:var(--grass-700);font-weight:600">✓ Valido</div></div>
+        <div class="field"><label class="label">Città <span class="req">*</span></label><input class="input filled" value="Sangemini"></div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px">Continua <span class="arrow">→</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARTBOARD 3 -->
+<section class="artboard">
+  <h2><span class="dot"></span>Artboard 3 — Banner soft in dashboard (profilo incompleto)</h2>
+  <p class="cap">Promemoria <code>ember</code> non bloccante: invita a completare il profilo senza fermare il resto della dashboard.</p>
+  <div class="frames">
+    <div class="frame-desktop">
+      <p class="device-label">Desktop</p>
+      <div class="dash">
+        <p class="hello">Ciao Luca 👋</p>
+        <div class="banner">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg></div>
+          <div>
+            <p class="bt">Completa il tuo profilo</p>
+            <p class="bd">Mancano alcuni dati anagrafici (codice fiscale, residenza…) necessari per le iscrizioni e il tesseramento dei tuoi figli.</p>
+            <a class="cta" href="#">Completa il profilo →</a>
+          </div>
+        </div>
+        <div class="tiles">
+          <div class="tile"><p class="tl">I miei figli</p><p class="tv">2 figli</p><div class="skel" style="width:70%"></div></div>
+          <div class="tile"><p class="tl">Prossime scadenze</p><p class="tv">1 rata in arrivo</p><div class="skel" style="width:55%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-mobile">
+      <p class="device-label">Mobile</p>
+      <div class="dash" style="padding:16px">
+        <p class="hello" style="font-size:18px">Ciao Luca 👋</p>
+        <div class="banner" style="flex-direction:column">
+          <div style="display:flex;gap:11px;align-items:flex-start">
+            <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg></div>
+            <div><p class="bt">Completa il tuo profilo</p><p class="bd">Mancano dati anagrafici (CF, residenza) necessari per le iscrizioni.</p></div>
+          </div>
+          <a class="cta" href="#" style="width:100%;justify-content:center">Completa il profilo →</a>
+        </div>
+        <div class="tile"><p class="tl">I miei figli</p><p class="tv">2 figli</p><div class="skel" style="width:70%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

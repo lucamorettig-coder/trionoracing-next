@@ -3,7 +3,7 @@ import { AlertTriangle } from "lucide-react";
 import type { ReactNode } from "react";
 
 /**
- * Banner soft (ember) non bloccante — promemoria con CTA (EVO-029).
+ * Banner soft (ember) non bloccante — promemoria con CTA (EVO-030).
  * Pari prominenza al contenuto ma senza fermare il resto della pagina.
  * Prima istanza: nudge "Completa il profilo" in dashboard genitore.
  */
