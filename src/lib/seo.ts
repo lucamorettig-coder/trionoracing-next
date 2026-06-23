@@ -1,12 +1,14 @@
 /**
  * Single source of truth per URL canonico del sito.
  *
- * Nota 2026-05: il dominio trionoracing.it è ancora pointed al sito Webflow legacy.
- * Finché non swappi DNS, SITE_URL deve puntare al Vercel deployment per evitare
- * canonical che ridireziona Google al sito vecchio.
- * Quando migri il dominio, cambia SOLO questa costante.
+ * Nota 2026-06 (EVO-031, chiude D-27): il dominio trionoracing.it è ora LIVE su
+ * Vercel (cutover DNS completato — apex e www serviti da questo progetto). Il
+ * canonical è quindi sul dominio reale: da qui derivano metadataBase (canonical
+ * + og:url di ogni pagina), robots.ts (host + sitemap) e sitemap.ts.
+ * Gli host *.vercel.app di PRODUZIONE fanno 308 → dominio (vedi src/proxy.ts) per
+ * uscire dall'indice Google. Per cambiare dominio canonico, cambia SOLO questa costante.
  */
-export const SITE_URL = "https://trionoracing-next.vercel.app";
+export const SITE_URL = "https://trionoracing.it";
 
 /** Nome brand visibile ovunque (NOT legal name, that's ASD CIEMME) */
 export const SITE_NAME = "Triono Racing";

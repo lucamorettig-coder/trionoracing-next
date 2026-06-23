@@ -12,6 +12,11 @@
  * Fallback se role undefined: tratta come 'GENITORE' (sicuro).
  */
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import { SITE_URL } from "@/lib/seo";
+
+// Host canonico del sito (derivato da SITE_URL → single source of truth, EVO-031).
+const CANONICAL_HOST = new URL(SITE_URL).host;
 
 // Route portale pubbliche (no auth richiesta)
 const isPortalePublic = createRouteMatcher([
@@ -33,6 +38,25 @@ const isIstruttoreOrAdmin = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  // EVO-031 (D-27): de-indicizzazione *.vercel.app. Tutti gli host di PRODUZIONE
+  // che finiscono in .vercel.app (alias principale + alias progetto/team +
+  // *-git-main-*) fanno 308 → dominio canonico, preservando path e query, così
+  // escono dall'indice Google e consolidano la SEO sul dominio.
+  // Solo in production (VERCEL_ENV === "production"): i deploy di PREVIEW
+  // (VERCEL_ENV === "preview") restano navigabili per i test, non redirezionati.
+  const host = req.headers.get("host") ?? "";
+  if (
+    process.env.VERCEL_ENV === "production" &&
+    host.endsWith(".vercel.app") &&
+    host !== CANONICAL_HOST
+  ) {
+    const url = new URL(req.url);
+    url.protocol = "https:";
+    url.host = CANONICAL_HOST;
+    url.port = "";
+    return NextResponse.redirect(url, 308);
+  }
+
   // Pagine auth: lascia passare senza protezione
   if (isPortalePublic(req)) return;
 
