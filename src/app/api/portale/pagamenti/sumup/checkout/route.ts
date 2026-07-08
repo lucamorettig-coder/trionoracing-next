@@ -8,6 +8,7 @@ import {
   updateTitoloPagamento,
 } from "@/lib/airtable-portale";
 import { validaCodiceSconto, messaggioRifiuto } from "@/lib/codici-sconto";
+import { descrizioneCheckoutSumUp } from "@/lib/portale-utils";
 
 /**
  * POST /api/portale/pagamenti/sumup/checkout
@@ -133,6 +134,9 @@ export async function POST(req: NextRequest) {
   // può diventare univoco se quello base è già occupato (vedi sotto).
   const baseRef = titolo.fields.CODICE_TITOLO || titoloId;
 
+  // EVO-032 — descrizione dinamica mostrata in dashboard/ricevuta SumUp.
+  const descrizione = descrizioneCheckoutSumUp(titolo, iscrizione);
+
   // ─── Helper SumUp ───────────────────────────────────────────────────────────
   const createSumupCheckout = (reference: string) =>
     fetch("https://api.sumup.com/v0.1/checkouts", {
@@ -142,7 +146,7 @@ export async function POST(req: NextRequest) {
         amount: amountFinale,
         currency: "EUR",
         checkout_reference: reference,
-        description: "Pagamento iscrizione Triono Racing",
+        description: descrizione,
         merchant_code: merchantCode,
         // ?ref SEMPRE il riferimento base: il fallback Make.com trova il titolo via
         // CODICE_TITOLO, indipendentemente dal checkout_reference (eventualmente univoco).
