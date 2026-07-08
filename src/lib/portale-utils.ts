@@ -190,6 +190,25 @@ export function titoloLabel(titolo: TitoloPagamento): TitoloLabelInfo {
   return { primary, secondary, secondaryVariant };
 }
 
+/**
+ * Descrizione dinamica per il checkout SumUp (EVO-032): "{Nome} {Cognome bambino} — {causale}".
+ * Visibile in dashboard/ricevuta SumUp. Preferisce i lookup da TABELLA_BAMBINI, fallback ai campi
+ * piatti; se il nome bambino è comunque assente, ritorna la descrizione statica pregressa.
+ * Troncata difensivamente a 90 caratteri (limite descrizione checkout).
+ */
+export function descrizioneCheckoutSumUp(titolo: TitoloPagamento, iscrizione: Iscrizione): string {
+  const f = iscrizione.fields;
+  const nome = (f["NOME_BAMBINO (from TABELLA_BAMBINI)"]?.[0] ?? f.NOME_BAMBINO ?? "").trim();
+  const cognome = (f["COGNOME_BAMBINO (from TABELLA_BAMBINI)"]?.[0] ?? f.COGNOME_BAMBINO ?? "").trim();
+  const nomeCompleto = [nome, cognome].filter(Boolean).join(" ");
+
+  if (!nomeCompleto) {
+    return "Pagamento iscrizione Triono Racing";
+  }
+
+  const descrizione = `${nomeCompleto} — ${titoloLabel(titolo).primary}`;
+  return descrizione.length > 90 ? `${descrizione.slice(0, 89)}…` : descrizione;
+}
 
 /** Calcola anni interi tra una data di nascita (YYYY-MM-DD) e oggi. */
 export function diffInYears(dataNascita: string): number {
