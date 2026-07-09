@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth-admin";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { KPICard } from "@/components/admin/KPICard";
 import { ExportCSVButton } from "@/components/admin/ExportCSVButton";
+import { GeneraReportButton } from "@/components/admin/presenze-maestri/GeneraReportButton";
 import { PresenzeAggregatoTable } from "@/components/admin/presenze-maestri/PresenzeAggregatoTable";
 import { PresenzePeriodoFilters } from "./PresenzePeriodoFilters";
 import { parsePresenzeFilters, getPresenzeAggregato } from "@/lib/airtable-admin";
@@ -52,6 +53,7 @@ export default async function PresenzeMaestriAdminPage({ searchParams }: PagePro
               filters={filters as unknown as Record<string, unknown>}
               label="Riepilogo contabile"
             />
+            <GeneraReportButton mese={filters.mese} anno={filters.anno} hasDati={aggregato.length > 0} />
           </div>
         }
       />

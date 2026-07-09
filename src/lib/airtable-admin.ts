@@ -1449,6 +1449,118 @@ export async function getPresenzeAggregato(
   return result;
 }
 
+/**
+ * Report presenze maestri con breakdown MTB/Strada/Gare separato (EVO-033).
+ * Stessa aggregazione periodo di `getPresenzeAggregato`, ma per le presenze
+ * TIPO="lezione" risale a TIPO_SESSIONE della Lezione collegata (batch fetch
+ * per RECORD_ID(), mai SEARCH+ARRAYJOIN su linked — bug noto EVO-006/020) per
+ * distinguere "Lezione MTB Ciclodromo" da "Lezione BDC Ciclodromo".
+ */
+export interface ReportPresenzeMaestroRow {
+  maestroNome: string;
+  maestroCognome: string;
+  lezMTB: number;
+  lezStrada: number;
+  gare: number;
+  totale: number;
+  importo: number; // somma IMPORTO_DOVUTO in EUR
+}
+
+export async function getReportPresenzeMaestri(filters: {
+  mese: number;
+  anno: number;
+}): Promise<ReportPresenzeMaestroRow[]> {
+  const formula = `AND(YEAR({DATA})=${filters.anno},MONTH({DATA})=${filters.mese})`;
+  const presenze = await fetchAllPages<PresenzaMaestro>(PRESENZE_TABLE, {
+    filterByFormula: formula,
+  });
+  if (presenze.length === 0) return [];
+
+  const byMaestro = new Map<string, PresenzaMaestro[]>();
+  for (const p of presenze) {
+    const mId = p.fields.MAESTRO?.[0];
+    if (!mId) continue;
+    const list = byMaestro.get(mId) ?? [];
+    list.push(p);
+    byMaestro.set(mId, list);
+  }
+
+  const maestriIds = Array.from(byMaestro.keys());
+  const maestriCond = maestriIds.map((id) => `RECORD_ID()="${id}"`).join(",");
+  const maestri = await fetchAllPages<Maestro>("TABELLA_MAESTRI", {
+    filterByFormula: `OR(${maestriCond})`,
+    fields: ["NOME_MAESTRO", "COGNOME_MAESTRO"],
+  });
+  const maestriById = new Map(maestri.map((m) => [m.id, m]));
+
+  // Batch fetch di tutte le Lezioni collegate alle presenze TIPO="lezione",
+  // per l'intero periodo (no N+1 per maestro).
+  const lezioniIds = Array.from(
+    new Set(
+      presenze
+        .filter((p) => p.fields.TIPO === "lezione")
+        .flatMap((p) => p.fields.LEZIONE ?? []),
+    ),
+  );
+  const lezioniById = new Map<string, Lezione>();
+  if (lezioniIds.length > 0) {
+    const lezioniCond = lezioniIds.map((id) => `RECORD_ID()="${id}"`).join(",");
+    const lezioni = await fetchAllPages<Lezione>("TABELLA_LEZIONI", {
+      filterByFormula: `OR(${lezioniCond})`,
+      fields: ["TIPO_SESSIONE"],
+    });
+    for (const l of lezioni) lezioniById.set(l.id, l);
+  }
+
+  const result: ReportPresenzeMaestroRow[] = [];
+  for (const [mId, lista] of byMaestro.entries()) {
+    const m = maestriById.get(mId);
+    let lezMTB = 0;
+    let lezStrada = 0;
+    let gare = 0;
+    const importo = lista.reduce((s, p) => s + (p.fields.IMPORTO_DOVUTO ?? 0), 0);
+
+    for (const p of lista) {
+      if (p.fields.TIPO === "gara") {
+        gare += 1;
+        continue;
+      }
+      const lid = p.fields.LEZIONE?.[0];
+      const tipoSessione = lid ? lezioniById.get(lid)?.fields.TIPO_SESSIONE : undefined;
+      if (tipoSessione === "Lezione MTB Ciclodromo") {
+        lezMTB += 1;
+      } else if (tipoSessione === "Lezione BDC Ciclodromo") {
+        lezStrada += 1;
+      } else {
+        console.warn(
+          `[airtable-admin] getReportPresenzeMaestri: TIPO_SESSIONE inatteso "${tipoSessione ?? "—"}" per presenza ${p.id} (lezione ${lid ?? "—"})`,
+        );
+      }
+    }
+
+    const totale = lezMTB + lezStrada + gare;
+    if (totale === 0) continue;
+
+    result.push({
+      maestroNome: m?.fields.NOME_MAESTRO ?? "",
+      maestroCognome: m?.fields.COGNOME_MAESTRO ?? "",
+      lezMTB,
+      lezStrada,
+      gare,
+      totale,
+      importo,
+    });
+  }
+
+  result.sort(
+    (a, b) =>
+      a.maestroCognome.localeCompare(b.maestroCognome, "it") ||
+      a.maestroNome.localeCompare(b.maestroNome, "it"),
+  );
+
+  return result;
+}
+
 export interface PresenzaMaestroEnriched extends PresenzaMaestro {
   eventoLabel: string;
   eventoId: string | null;
