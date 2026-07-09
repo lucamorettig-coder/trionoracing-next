@@ -11,6 +11,7 @@ const ANNI = [ANNO_CORRENTE, ANNO_CORRENTE - 1, ANNO_CORRENTE - 2];
 
 const STATI = [
   { value: "COMPLETA", label: "Completa" },
+  { value: "SOSPESA", label: "Sospesa" },
   { value: "INCOMPLETA", label: "Incompleta" },
   { value: "ANNULLATA", label: "Annullata" },
   { value: "DEROGA", label: "Completata in deroga" },

@@ -50,11 +50,12 @@ export interface StatoIscrizioneBadge {
 
 /**
  * Mappa STATO_ISCRIZIONE (formula Airtable) → badge UI.
- * Valori reali: COMPLETA | INCOMPLETA | ANNULLATA. Per coerenza UX usiamo etichette italiane comprensibili.
+ * Valori reali: COMPLETA | SOSPESA | INCOMPLETA | ANNULLATA. Per coerenza UX usiamo etichette italiane comprensibili.
  */
 export function statoIscrizioneBadge(stato?: string): StatoIscrizioneBadge {
   const s = (stato ?? "").toUpperCase();
   if (s === "COMPLETA") return { variant: "success", label: "Attiva" };
+  if (s === "SOSPESA") return { variant: "error", label: "Sospesa" };
   if (s === "ANNULLATA") return { variant: "error", label: "Annullata" };
   if (s === "INCOMPLETA") return { variant: "warning", label: "Da completare" };
   return { variant: "neutral", label: "Bozza" };
@@ -247,7 +248,7 @@ export interface StatoIscrizioneAnnoCorrenteResult {
 
 /**
  * Deriva lo stato di iscrizione di un bambino per l'anno solare corrente.
- * iscritto = iscrizione COMPLETA nell'anno; da_completare = esiste ma INCOMPLETA; non_iscritto = nessuna.
+ * iscritto = iscrizione COMPLETA o SOSPESA nell'anno; da_completare = esiste ma INCOMPLETA; non_iscritto = nessuna.
  */
 export function getStatoIscrizioneAnnoCorrente(
   bambinoId: string,
@@ -261,7 +262,8 @@ export function getStatoIscrizioneAnnoCorrente(
   );
   if (!match) return { stato: 'non_iscritto' };
   if (match.fields.STATO_ISCRIZIONE === "ANNULLATA") return { stato: 'non_iscritto' };
-  if (match.fields.STATO_ISCRIZIONE === "COMPLETA") return { stato: 'iscritto', iscrizioneId: match.id };
+  if (match.fields.STATO_ISCRIZIONE === "COMPLETA" || match.fields.STATO_ISCRIZIONE === "SOSPESA")
+    return { stato: 'iscritto', iscrizioneId: match.id };
   return { stato: 'da_completare', iscrizioneId: match.id };
 }
 

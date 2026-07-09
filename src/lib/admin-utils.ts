@@ -8,6 +8,7 @@ export interface StatoBadge {
 
 export function statoIscrizioneAdminBadge(iscrizione: Iscrizione): StatoBadge {
   if (iscrizione.fields.ANNULLATA) return { label: "Annullata", variant: "error" };
+  if (iscrizione.fields.STATO_ISCRIZIONE === "SOSPESA") return { label: "Sospesa", variant: "error" };
   if ((iscrizione.fields.NOTE_ADMIN ?? "").includes("FORZA_COMPLETA")) {
     return { label: "Completata in deroga", variant: "info" };
   }
