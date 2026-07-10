@@ -26,6 +26,7 @@ interface Props {
 
 function statoIscrizioneBadge(stato: string | undefined) {
   if (stato === "COMPLETA") return <Badge variant="success" size="sm">Completa</Badge>;
+  if (stato === "SOSPESA") return <Badge variant="error" size="sm">Sospesa</Badge>;
   if (stato === "ANNULLATA") return <Badge variant="neutral" size="sm">Annullata</Badge>;
   return <Badge variant="warning" size="sm">Incompleta</Badge>;
 }

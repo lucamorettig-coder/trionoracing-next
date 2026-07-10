@@ -78,8 +78,12 @@ export default async function NuovaIscrizionePage({ searchParams }: PageProps) {
     const iscrizione = await getIscrizioneById(sp.iscrizione);
     if (!iscrizione) notFound();
     if (!iscrizione.fields.TABELLA_GENITORI?.includes(genitore.id)) notFound();
-    // Se già COMPLETA, vai al dettaglio (nessun motivo di ri-fare il wizard)
-    if (iscrizione.fields.STATO_ISCRIZIONE === "COMPLETA") {
+    // Se già COMPLETA o SOSPESA (era già completa, sospesa per pagamento scaduto),
+    // vai al dettaglio (nessun motivo di ri-fare il wizard)
+    if (
+      iscrizione.fields.STATO_ISCRIZIONE === "COMPLETA" ||
+      iscrizione.fields.STATO_ISCRIZIONE === "SOSPESA"
+    ) {
       redirect(`/portale/iscrizioni/${iscrizione.id}`);
     }
 

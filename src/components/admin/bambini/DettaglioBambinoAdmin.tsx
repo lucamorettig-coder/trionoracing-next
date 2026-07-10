@@ -135,6 +135,8 @@ export function DettaglioBambinoAdmin({ bambino, iscrizioni }: Props) {
                   const anno = isc.fields["ANNO_ISCRIZIONE (from TABELLA_TARIFFE)"]?.[0];
                   const stato = isc.fields.ANNULLATA
                     ? { label: "Annullata", variant: "error" as const }
+                    : isc.fields.STATO_ISCRIZIONE === "SOSPESA"
+                    ? { label: "Sospesa", variant: "error" as const }
                     : isc.fields.STATO_ISCRIZIONE === "COMPLETA"
                     ? { label: "Completa", variant: "success" as const }
                     : { label: "Incompleta", variant: "warning" as const };

@@ -387,7 +387,7 @@ export interface Iscrizione {
   createdTime?: string;
   fields: {
     ID_ISCRIZIONE?: string;
-    STATO_ISCRIZIONE?: string; // formula: COMPLETA | INCOMPLETA | ANNULLATA
+    STATO_ISCRIZIONE?: string; // formula: COMPLETA | INCOMPLETA | ANNULLATA | SOSPESA
     ANNULLATA?: boolean;
     MOTIVO_ANNULLAMENTO?: string;
     DATA_ANNULLAMENTO?: string;
