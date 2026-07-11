@@ -33,21 +33,27 @@ export function HeroManifesto() {
         }}
       />
 
-      {/* Vittoria — ancorata al bordo inferiore, grande. Il taglio del cutout
-          coincide col bordo della sezione. Decorativa (il messaggio è nell'h1). */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute z-[4] bottom-0 right-0 sm:right-[2%] lg:right-[6%]
-          h-[52%] w-[74%] sm:h-[82%] sm:w-[48%] lg:h-[96%] lg:w-[42%] max-w-[520px]"
-      >
-        <Image
-          src="/vittoria/vittoria-iwantyou.webp"
-          alt=""
-          fill
-          priority
-          sizes="(max-width: 640px) 74vw, (max-width: 1024px) 48vw, 520px"
-          className="object-contain object-bottom drop-shadow-[0_20px_30px_rgba(5,14,63,0.45)]"
-        />
+      {/* Vittoria — ancorata al bordo inferiore, grande e verso il CENTRO (non a
+          filo del bordo destro): il wrapper è il container centrato del contenuto,
+          così su schermi larghi resta in posizione centro-destra invece di
+          incollarsi al bordo viewport. Il taglio del cutout coincide col bordo
+          inferiore della sezione. Decorativa (il messaggio è nell'h1). */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[4]">
+        <div className="relative h-full max-w-[1180px] mx-auto">
+          <div
+            className="absolute bottom-0 right-0 sm:right-[4%] lg:right-0
+              h-[52%] w-[74%] sm:h-[82%] sm:w-[46%] lg:h-[96%] lg:w-[40%] max-w-[500px]"
+          >
+            <Image
+              src="/vittoria/vittoria-iwantyou.webp"
+              alt=""
+              fill
+              priority
+              sizes="(max-width: 640px) 74vw, (max-width: 1024px) 46vw, 500px"
+              className="object-contain object-bottom drop-shadow-[0_20px_30px_rgba(5,14,63,0.45)]"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Velo navy solo-mobile: Vittoria backdrop dietro al testo */}

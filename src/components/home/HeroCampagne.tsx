@@ -152,30 +152,34 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
 
         {/* Layer mascotte — ANCORATE AL BORDO INFERIORE (il taglio del cutout a mezza
             figura coincide col bordo della card → niente figura "appesa" a mezz'aria,
-            regola NINO.md §6/§12). Una per slide, cross-fade in opacità sulla attiva. */}
+            regola NINO.md §6/§12). Wrapper = container centrato del contenuto, così su
+            schermi larghi la mascotte resta verso il centro-destra e non a filo bordo.
+            Una per slide, cross-fade in opacità sulla attiva. */}
         <div aria-hidden className="pointer-events-none absolute inset-0 z-[4]">
-          {comunicazioni.map((c, i) =>
-            c.immagineUrl ? (
-              <div
-                key={c.id}
-                className={cn(
-                  "absolute bottom-0 right-0 sm:right-[2%] lg:right-[5%]",
-                  "h-[58%] w-[64%] sm:h-[80%] sm:w-[46%] lg:h-[94%] lg:w-[40%] max-w-[440px]",
-                  "transition-opacity duration-500 ease-out motion-reduce:transition-none",
-                  i === activeIndex ? "opacity-100" : "opacity-0"
-                )}
-              >
-                <Image
-                  src={c.immagineUrl}
-                  alt=""
-                  fill
-                  priority={i === 0}
-                  sizes="(max-width: 640px) 64vw, (max-width: 1024px) 46vw, 440px"
-                  className="object-contain object-bottom drop-shadow-[0_16px_24px_rgba(5,14,63,0.4)]"
-                />
-              </div>
-            ) : null
-          )}
+          <div className="relative h-full max-w-[1180px] mx-auto">
+            {comunicazioni.map((c, i) =>
+              c.immagineUrl ? (
+                <div
+                  key={c.id}
+                  className={cn(
+                    "absolute bottom-0 right-0 sm:right-[4%] lg:right-0",
+                    "h-[58%] w-[64%] sm:h-[80%] sm:w-[44%] lg:h-[94%] lg:w-[38%] max-w-[430px]",
+                    "transition-opacity duration-500 ease-out motion-reduce:transition-none",
+                    i === activeIndex ? "opacity-100" : "opacity-0"
+                  )}
+                >
+                  <Image
+                    src={c.immagineUrl}
+                    alt=""
+                    fill
+                    priority={i === 0}
+                    sizes="(max-width: 640px) 64vw, (max-width: 1024px) 44vw, 430px"
+                    className="object-contain object-bottom drop-shadow-[0_16px_24px_rgba(5,14,63,0.4)]"
+                  />
+                </div>
+              ) : null
+            )}
+          </div>
         </div>
 
         {/* Velo navy SOLO-mobile: tiene il testo leggibile sopra la mascotte (backdrop)

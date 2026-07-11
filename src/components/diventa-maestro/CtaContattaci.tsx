@@ -16,19 +16,23 @@ export function CtaContattaci() {
     <section id="contatti" className="relative overflow-hidden bg-navy-900 scroll-mt-20">
       <div className="absolute inset-0 pattern-navy" aria-hidden />
 
-      {/* Nino — ancorato al bordo inferiore, grande. Decorativo. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute z-[4] bottom-0 right-0 sm:right-[3%] lg:right-[7%]
-          h-[50%] w-[62%] sm:h-[74%] sm:w-[42%] lg:h-[92%] lg:w-[36%] max-w-[440px]"
-      >
-        <Image
-          src="/nino/nino-iwantyou.webp"
-          alt=""
-          fill
-          sizes="(max-width: 640px) 62vw, (max-width: 1024px) 42vw, 440px"
-          className="object-contain object-bottom drop-shadow-[0_20px_30px_rgba(5,14,63,0.45)]"
-        />
+      {/* Nino — ancorato al bordo inferiore, grande e verso il centro (wrapper =
+          container centrato del contenuto, non il bordo della sezione full-bleed). */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[4]">
+        <div className="relative h-full max-w-[1180px] mx-auto">
+          <div
+            className="absolute bottom-0 right-0 sm:right-[4%] lg:right-0
+              h-[50%] w-[62%] sm:h-[74%] sm:w-[42%] lg:h-[90%] lg:w-[34%] max-w-[420px]"
+          >
+            <Image
+              src="/nino/nino-iwantyou.webp"
+              alt=""
+              fill
+              sizes="(max-width: 640px) 62vw, (max-width: 1024px) 42vw, 420px"
+              className="object-contain object-bottom drop-shadow-[0_20px_30px_rgba(5,14,63,0.45)]"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Velo navy solo-mobile: Nino backdrop dietro al testo */}
