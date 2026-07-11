@@ -19,7 +19,7 @@ export function HeroManifesto() {
       <div className="absolute inset-0 pattern-navy" aria-hidden />
 
       <div className="relative max-w-[1280px] mx-auto px-6 lg:px-14 py-16 lg:py-24 min-h-[520px] lg:min-h-[640px] flex items-center">
-        <div className="grid gap-8 lg:grid-cols-12 lg:gap-10 items-center w-full">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10 items-center w-full min-w-0">
           {/* Cutout: sopra il testo su mobile, a destra su desktop (order via grid) */}
           <div className="order-1 lg:order-2 lg:col-span-5 flex justify-center">
             <div className="relative h-[260px] w-[220px] sm:h-[320px] sm:w-[270px] lg:h-[440px] lg:w-full xl:h-[500px]">
@@ -34,7 +34,7 @@ export function HeroManifesto() {
             </div>
           </div>
 
-          <div className="order-2 lg:order-1 lg:col-span-7 text-white text-center lg:text-left">
+          <div className="order-2 lg:order-1 lg:col-span-7 min-w-0 text-white text-center lg:text-left">
             <div className="inline-flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-[0.1em] text-sun-500 before:content-[''] before:w-6 before:h-[2px] before:bg-current before:inline-block">
               Scuola Triono cerca te
             </div>

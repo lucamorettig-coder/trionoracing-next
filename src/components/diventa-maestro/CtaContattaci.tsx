@@ -15,8 +15,8 @@ export function CtaContattaci() {
       <div className="absolute inset-0 pattern-navy" aria-hidden />
 
       <div className="relative max-w-[1280px] mx-auto px-6 lg:px-14 py-20 lg:py-28">
-        <div className="grid gap-8 lg:grid-cols-12 lg:gap-10 items-center">
-          <div className="order-2 lg:order-1 lg:col-span-7 text-white text-center lg:text-left">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10 items-center">
+          <div className="order-2 lg:order-1 lg:col-span-7 min-w-0 text-white text-center lg:text-left">
             <div className="inline-flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-[0.1em] text-sun-500 before:content-[''] before:w-6 before:h-[2px] before:bg-current before:inline-block">
               Parliamone
             </div>
