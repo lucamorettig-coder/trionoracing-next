@@ -27,6 +27,16 @@ export const metadata: Metadata = {
   },
   description:
     "ASD CIEMME · Triono Racing — Scuola di ciclismo, squadra amatori, eventi MTB.",
+  // OG di default (EVO-036): serve l'anteprima social alle pagine che NON
+  // definiscono un proprio openGraph (privacy/cookie/condizioni/contatti).
+  // Le pagine che definiscono openGraph lo SOVRASCRIVONO interamente (merge
+  // shallow Next 16) → quelle senza images propria la ridichiarano.
+  openGraph: {
+    siteName: "Triono Racing",
+    locale: "it_IT",
+    type: "website",
+    images: [{ url: "/og/home.jpg", width: 1200, height: 630, alt: "Triono Racing · Scuola di Ciclismo" }],
+  },
 };
 
 export default function RootLayout({

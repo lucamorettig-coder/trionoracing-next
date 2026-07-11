@@ -29,6 +29,8 @@ export const metadata: Metadata = {
     siteName: "Triono Racing",
     locale: "it_IT",
     type: "website",
+    // Merge shallow Next 16: openGraph qui sovrascrive quello del root → ridichiaro l'OG default.
+    images: [{ url: "/og/home.jpg", width: 1200, height: 630, alt: "Triono Racing · Scuola di Ciclismo" }],
   },
 };
 
