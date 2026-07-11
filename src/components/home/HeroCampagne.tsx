@@ -126,6 +126,7 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
 
   const useVideo = !!videoSrc;
   const altre = singola ? [] : comunicazioni.filter((_, i) => i !== activeIndex);
+  const hasAnyImg = comunicazioni.some((c) => c.immagineUrl);
 
   return (
     <div>
@@ -149,83 +150,108 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
           </div>
         )}
 
-        <div className="relative min-h-[520px] lg:min-h-[640px] flex items-end">
+        {/* Layer mascotte — ANCORATE AL BORDO INFERIORE (il taglio del cutout a mezza
+            figura coincide col bordo della card → niente figura "appesa" a mezz'aria,
+            regola NINO.md §6/§12). Una per slide, cross-fade in opacità sulla attiva. */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 z-[4]">
+          {comunicazioni.map((c, i) =>
+            c.immagineUrl ? (
+              <div
+                key={c.id}
+                className={cn(
+                  "absolute bottom-0 right-0 sm:right-[2%] lg:right-[5%]",
+                  "h-[58%] w-[64%] sm:h-[80%] sm:w-[46%] lg:h-[94%] lg:w-[40%] max-w-[440px]",
+                  "transition-opacity duration-500 ease-out motion-reduce:transition-none",
+                  i === activeIndex ? "opacity-100" : "opacity-0"
+                )}
+              >
+                <Image
+                  src={c.immagineUrl}
+                  alt=""
+                  fill
+                  priority={i === 0}
+                  sizes="(max-width: 640px) 64vw, (max-width: 1024px) 46vw, 440px"
+                  className="object-contain object-bottom drop-shadow-[0_16px_24px_rgba(5,14,63,0.4)]"
+                />
+              </div>
+            ) : null
+          )}
+        </div>
+
+        {/* Velo navy SOLO-mobile: tiene il testo leggibile sopra la mascotte (backdrop)
+            senza spostarla dal bordo. Su desktop il testo sta a sinistra della mascotte. */}
+        {hasAnyImg && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-[5] sm:hidden"
+            style={{
+              background:
+                "linear-gradient(to top, rgba(5,14,63,0.92) 0%, rgba(5,14,63,0.55) 46%, rgba(5,14,63,0.05) 100%)",
+            }}
+          />
+        )}
+
+        <div className="relative z-10 min-h-[520px] lg:min-h-[640px] flex items-end">
           <div className="w-full min-w-0 max-w-[1280px] mx-auto px-6 lg:px-14 py-14 lg:py-20">
             <h1 className="inline-flex items-center gap-2.5 text-[15px] font-semibold text-white/90">
               In bici, sicuri, insieme.
               <span aria-hidden className="inline-block w-8 h-px bg-white/30" />
             </h1>
 
-            <div className="mt-5">
+            {/* Slide impilate nella stessa cella grid → cross-fade animato, container
+                dimensionato sulla slide più alta (nessun CLS). Tutte nel DOM (SEO):
+                le non-attive restano renderizzate, solo opacità + aria-hidden/inert. */}
+            <div className="mt-5 grid">
               {comunicazioni.map((c, i) => {
                 const active = i === activeIndex;
-                const hasImg = !!c.immagineUrl;
                 return (
                   <article
                     key={c.id}
                     aria-hidden={!active}
                     inert={!active ? true : undefined}
                     className={cn(
-                      !active && "hidden",
-                      active && "grid grid-cols-1 gap-8 items-center",
-                      active && hasImg && "lg:grid-cols-12 lg:gap-10"
+                      "col-start-1 row-start-1 min-w-0 max-w-[560px]",
+                      "transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none",
+                      active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"
                     )}
                   >
-                    <div className={cn("min-w-0", hasImg && "order-2 lg:order-1 lg:col-span-7")}>
-                      {c.eyebrow && (
-                        <div className="inline-flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-[0.1em] text-sun-500 before:content-[''] before:w-6 before:h-[2px] before:bg-current before:inline-block">
-                          {c.eyebrow}
-                        </div>
-                      )}
-                      <p
-                        className="mt-3 font-bold tracking-[-0.02em] leading-[0.98] text-white"
-                        style={{ fontSize: "clamp(32px, 5vw, 64px)" }}
-                      >
-                        {renderTitolo(c.titolo)}
+                    {c.eyebrow && (
+                      <div className="inline-flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-[0.1em] text-sun-500 before:content-[''] before:w-6 before:h-[2px] before:bg-current before:inline-block">
+                        {c.eyebrow}
+                      </div>
+                    )}
+                    <p
+                      className="mt-3 font-bold tracking-[-0.02em] leading-[0.98] text-white"
+                      style={{ fontSize: "clamp(32px, 5vw, 64px)" }}
+                    >
+                      {renderTitolo(c.titolo)}
+                    </p>
+                    {c.sottotitolo && (
+                      <p className="mt-4 max-w-[520px] text-[16px] leading-relaxed text-white/80 line-clamp-2">
+                        {c.sottotitolo}
                       </p>
-                      {c.sottotitolo && (
-                        <p className="mt-4 max-w-[520px] text-[16px] leading-relaxed text-white/80 line-clamp-2">
-                          {c.sottotitolo}
-                        </p>
-                      )}
-                      {(c.ctaLabel || c.cta2Label) && (
-                        <div className="mt-7 flex flex-wrap gap-3">
-                          {c.ctaLabel && c.ctaUrl && (
-                            <Button
-                              asChild
-                              size="lg"
-                              className="bg-white text-navy-900 border-white hover:bg-navy-50"
-                            >
-                              <a href={c.ctaUrl}>{c.ctaLabel}</a>
-                            </Button>
-                          )}
-                          {c.cta2Label && c.cta2Url && (
-                            <Button
-                              asChild
-                              variant="outline"
-                              size="lg"
-                              className="text-white border-white/50 hover:bg-white/10 hover:border-white"
-                            >
-                              <a href={c.cta2Url}>{c.cta2Label}</a>
-                            </Button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {hasImg && (
-                      <div className="order-1 lg:order-2 lg:col-span-5 flex justify-center">
-                        <div className="relative h-[190px] w-[160px] sm:h-[250px] sm:w-[210px] lg:h-[380px] lg:w-full">
-                          <Image
-                            src={c.immagineUrl!}
-                            alt=""
-                            aria-hidden
-                            fill
-                            priority={i === 0}
-                            sizes="(max-width: 640px) 160px, (max-width: 1024px) 210px, 360px"
-                            className="object-contain object-bottom drop-shadow-[0_16px_24px_rgba(5,14,63,0.35)]"
-                          />
-                        </div>
+                    )}
+                    {(c.ctaLabel || c.cta2Label) && (
+                      <div className="mt-7 flex flex-wrap gap-3">
+                        {c.ctaLabel && c.ctaUrl && (
+                          <Button
+                            asChild
+                            size="lg"
+                            className="bg-white text-navy-900 border-white hover:bg-navy-50"
+                          >
+                            <a href={c.ctaUrl}>{c.ctaLabel}</a>
+                          </Button>
+                        )}
+                        {c.cta2Label && c.cta2Url && (
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="lg"
+                            className="text-white border-white/50 hover:bg-white/10 hover:border-white"
+                          >
+                            <a href={c.cta2Url}>{c.cta2Label}</a>
+                          </Button>
+                        )}
                       </div>
                     )}
                   </article>
@@ -301,32 +327,34 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
       </section>
 
       {altre.length > 0 && (
-        <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
-          <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.1em] text-ink-muted">
-            Altre slide in rotazione
-          </span>
-          <div className="flex flex-1 flex-col sm:flex-row flex-wrap gap-2">
-            {altre.map((c) => {
-              const idx = comunicazioni.findIndex((x) => x.id === c.id);
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => goTo(idx)}
-                  className="flex-1 min-w-[220px] text-left rounded-[var(--radius-lg)] bg-navy-900 hover:bg-navy-950 px-4 py-2.5 transition-colors"
-                >
-                  {c.eyebrow && (
-                    <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-white/50">
-                      <span aria-hidden className="w-1 h-1 rounded-full bg-white/40" />
-                      {c.eyebrow}
+        <div className="max-w-[1280px] mx-auto px-6 lg:px-14">
+          <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.1em] text-ink-muted">
+              Altre slide in rotazione
+            </span>
+            <div className="flex flex-1 flex-col sm:flex-row flex-wrap gap-2">
+              {altre.map((c) => {
+                const idx = comunicazioni.findIndex((x) => x.id === c.id);
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => goTo(idx)}
+                    className="flex-1 min-w-[220px] text-left rounded-[var(--radius-lg)] bg-navy-900 hover:bg-navy-950 px-4 py-2.5 transition-colors"
+                  >
+                    {c.eyebrow && (
+                      <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-white/50">
+                        <span aria-hidden className="w-1 h-1 rounded-full bg-white/40" />
+                        {c.eyebrow}
+                      </span>
+                    )}
+                    <span className="block text-[13.5px] font-semibold text-white mt-0.5 truncate">
+                      {c.titolo.replace(/\*\*/g, "")}
                     </span>
-                  )}
-                  <span className="block text-[13.5px] font-semibold text-white mt-0.5 truncate">
-                    {c.titolo.replace(/\*\*/g, "")}
-                  </span>
-                </button>
-              );
-            })}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
