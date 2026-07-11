@@ -278,11 +278,16 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
                   <button
                     type="button"
                     onClick={() => setUserPlaying((p) => !p)}
-                    aria-label={isPlaying ? "Metti in pausa la rotazione" : "Avvia la rotazione"}
-                    aria-pressed={isPlaying}
+                    aria-label={userPlaying ? "Metti in pausa la rotazione" : "Avvia la rotazione"}
+                    aria-pressed={userPlaying}
                     className="w-10 h-10 grid place-items-center rounded-full bg-sun-500 text-navy-900 hover:bg-sun-400 transition-colors"
                   >
-                    {isPlaying ? (
+                    {/* Riflette l'INTENTO utente (userPlaying), non lo stato derivato
+                        isPlaying: quest'ultimo include la pausa automatica on-hover/focus,
+                        che su desktop terrebbe l'icona sempre su "play" mentre il puntatore
+                        è sopra la hero — facendo sembrare il pulsante non funzionante. La
+                        rotazione resta comunque in pausa su hover/focus (SC 2.2.2). */}
+                    {userPlaying ? (
                       <Pause size={14} fill="currentColor" aria-hidden />
                     ) : (
                       <Play size={14} fill="currentColor" aria-hidden />
