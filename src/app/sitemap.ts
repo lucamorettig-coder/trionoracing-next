@@ -23,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/marathon-209", priority: 0.9, changeFrequency: "weekly" },
     { path: "/chi-siamo", priority: 0.7, changeFrequency: "yearly" },
     { path: "/gli-amatori-triono", priority: 0.7, changeFrequency: "monthly" },
+    { path: "/diventa-maestro", priority: 0.7, changeFrequency: "monthly" },
     { path: "/contatti", priority: 0.6, changeFrequency: "monthly" },
     { path: "/privacy", priority: 0.3, changeFrequency: "yearly" },
     { path: "/cookie", priority: 0.3, changeFrequency: "yearly" },

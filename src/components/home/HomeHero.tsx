@@ -1,10 +1,26 @@
 import { Hero } from "@/components/ui/hero";
+import { HeroCampagne } from "@/components/home/HeroCampagne";
 import { getSfondoVideo, cloudinaryVideoOptimized } from "@/lib/sfondi-video";
+import { getComunicazioniHeroAttive } from "@/lib/comunicazioni-hero";
 
 export async function HomeHero() {
-  // Sfondo video gestito da Airtable (slot "home-hero"). Se assente/non attivo →
-  // fallback allo sfondo pattern (variant="pattern"). EVO-021.
-  const sfondo = await getSfondoVideo("home-hero");
+  // Sfondo video (slot "home-hero") e comunicazioni/campagne attive (EVO-035)
+  // sono indipendenti: fetch in parallelo, no waterfall.
+  const [sfondo, comunicazioni] = await Promise.all([
+    getSfondoVideo("home-hero"),
+    getComunicazioniHeroAttive(),
+  ]);
+
+  const videoSrc = sfondo ? cloudinaryVideoOptimized(sfondo.videoUrl, 1600) : undefined;
+
+  // 0 comunicazioni attive → hero statica attuale, identica al pre-EVO-035
+  // (stats incluse). N≥1 → hero dinamica multi-campagna, stats escluse
+  // (decisione Fase 6: la campagna prende il posto delle stats nella hero).
+  if (comunicazioni.length > 0) {
+    return (
+      <HeroCampagne comunicazioni={comunicazioni} videoSrc={videoSrc} posterSrc={sfondo?.posterUrl} />
+    );
+  }
 
   return (
     <Hero

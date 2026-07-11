@@ -21,6 +21,7 @@ function getLinksForRole(role: string, hasFigli: boolean): NavLink[] {
         { label: "Genitori", href: "/portale/admin/genitori" },
         { label: "Tariffe", href: "/portale/admin/tariffe" },
         { label: "Codici sconto", href: "/portale/admin/codici-sconto" },
+        { label: "Comunicazioni", href: "/portale/admin/comunicazioni" },
       ];
     case "ISTRUTTORE": {
       const maestroLinks: NavLink[] = [

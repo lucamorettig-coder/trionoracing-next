@@ -35,6 +35,7 @@ import {
 } from "@/lib/airtable-portale";
 import { clerkClient } from "@clerk/nextjs/server";
 import { type CodiceSconto, normalizzaCodice } from "@/lib/codici-sconto";
+import type { ComunicazioneHeroFields } from "@/lib/comunicazioni-hero";
 
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TOKEN = process.env.AIRTABLE_TOKEN;
@@ -2263,5 +2264,191 @@ export async function deleteCodiceSconto(id: string): Promise<void> {
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     throw new Error(`[airtable-admin] deleteCodiceSconto ${id} failed: ${res.status} ${body}`);
+  }
+}
+
+// ─── Comunicazioni Hero (EVO-035) ───────────────────────────────────────────
+
+const COMUNICAZIONI_HERO_TABLE = "Comunicazioni Hero";
+
+export interface ComunicazioneHeroAdmin {
+  id: string;
+  createdTime?: string;
+  fields: ComunicazioneHeroFields;
+}
+
+export interface ComunicazioneHeroFormData {
+  nome: string;
+  eyebrow?: string;
+  titolo: string;
+  sottotitolo?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
+  cta2Label?: string;
+  cta2Url?: string;
+  immagineUrl?: string;
+  attiva: boolean;
+  /** YYYY-MM-DD */
+  validoDa?: string;
+  /** YYYY-MM-DD */
+  validoA?: string;
+  priorita: number;
+  note?: string;
+}
+
+/** Path relativo (`/diventa-maestro`) o URL assoluta https. */
+function isValidCtaUrl(url: string): boolean {
+  if (url.startsWith("/")) return true;
+  try {
+    return new URL(url).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+/** Tutte le comunicazioni, ordinate per priorità (asc). */
+export async function getAllComunicazioni(): Promise<ComunicazioneHeroAdmin[]> {
+  return fetchAllPages<ComunicazioneHeroAdmin>(COMUNICAZIONI_HERO_TABLE, {
+    sort: [{ field: "PRIORITA", direction: "asc" }],
+  });
+}
+
+/** Singola comunicazione per ID (null se non trovata). */
+export async function getComunicazioneById(id: string): Promise<ComunicazioneHeroAdmin | null> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(COMUNICAZIONI_HERO_TABLE)}/${encodeURIComponent(id)}`,
+    { headers: { Authorization: `Bearer ${TOKEN}` }, cache: "no-store" },
+  );
+  if (!res.ok) return null;
+  return res.json();
+}
+
+/**
+ * Normalizza + valida i dati del form e costruisce i fields Airtable.
+ * Throw con messaggio user-facing su input non valido (mostrato inline dal form).
+ * Lunghezze vincolate (TITOLO ≤60 / SOTTOTITOLO ≤140): finiscono nella hero a
+ * min-height fissa — il template codici-sconto non valida lunghezze, qui serve.
+ */
+function buildComunicazioneFields(data: ComunicazioneHeroFormData): Record<string, unknown> {
+  const nome = data.nome.trim();
+  if (!nome) throw new Error("Il nome interno è obbligatorio.");
+
+  const titolo = data.titolo.trim();
+  if (!titolo) throw new Error("Il titolo è obbligatorio.");
+  if (titolo.length > 60) throw new Error("Il titolo non può superare i 60 caratteri.");
+
+  const sottotitolo = data.sottotitolo?.trim() ?? "";
+  if (sottotitolo.length > 140) throw new Error("Il sottotitolo non può superare i 140 caratteri.");
+
+  const ctaLabel = data.ctaLabel?.trim() ?? "";
+  const ctaUrl = data.ctaUrl?.trim() ?? "";
+  if (ctaLabel && !ctaUrl) throw new Error("Specifica l'URL della CTA principale.");
+  if (ctaUrl && !isValidCtaUrl(ctaUrl)) {
+    throw new Error("L'URL della CTA principale non è valida (usa un path relativo o un URL https).");
+  }
+
+  const cta2Label = data.cta2Label?.trim() ?? "";
+  const cta2Url = data.cta2Url?.trim() ?? "";
+  if (cta2Label && !cta2Url) throw new Error("Specifica l'URL della CTA secondaria.");
+  if (cta2Url && !isValidCtaUrl(cta2Url)) {
+    throw new Error("L'URL della CTA secondaria non è valida (usa un path relativo o un URL https).");
+  }
+
+  if (data.validoDa && data.validoA && data.validoA < data.validoDa) {
+    throw new Error("La data di fine validità non può precedere quella di inizio.");
+  }
+
+  const priorita = Number(data.priorita);
+  if (!Number.isInteger(priorita) || priorita < 0) {
+    throw new Error("La priorità deve essere un numero intero maggiore o uguale a zero.");
+  }
+
+  return {
+    NOME: nome,
+    EYEBROW: data.eyebrow?.trim() || "",
+    TITOLO: titolo,
+    SOTTOTITOLO: sottotitolo,
+    CTA_LABEL: ctaLabel,
+    CTA_URL: ctaUrl,
+    CTA2_LABEL: cta2Label,
+    CTA2_URL: cta2Url,
+    IMMAGINE_URL: data.immagineUrl?.trim() || "",
+    ATTIVA: data.attiva,
+    VALIDO_DA: data.validoDa || "",
+    VALIDO_A: data.validoA || "",
+    PRIORITA: priorita,
+    NOTE: data.note?.trim() || "",
+  };
+}
+
+export async function createComunicazione(
+  data: ComunicazioneHeroFormData,
+): Promise<ComunicazioneHeroAdmin> {
+  requireEnv();
+  const fields = buildComunicazioneFields(data);
+  const res = await fetch(`${API_BASE}/${BASE_ID}/${encodeURIComponent(COMUNICAZIONI_HERO_TABLE)}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ fields }),
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`[airtable-admin] createComunicazione failed: ${res.status} ${body}`);
+  }
+  return res.json();
+}
+
+export async function updateComunicazione(
+  id: string,
+  data: ComunicazioneHeroFormData,
+): Promise<ComunicazioneHeroAdmin> {
+  requireEnv();
+  const fields = buildComunicazioneFields(data);
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(COMUNICAZIONI_HERO_TABLE)}/${encodeURIComponent(id)}`,
+    {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ fields }),
+      cache: "no-store",
+    },
+  );
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`[airtable-admin] updateComunicazione ${id} failed: ${res.status} ${body}`);
+  }
+  return res.json();
+}
+
+/** Toggle rapido ATTIVA (inline dalla tabella). */
+export async function toggleAttivaComunicazione(id: string, attiva: boolean): Promise<void> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(COMUNICAZIONI_HERO_TABLE)}/${encodeURIComponent(id)}`,
+    {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ fields: { ATTIVA: attiva } }),
+      cache: "no-store",
+    },
+  );
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`[airtable-admin] toggleAttivaComunicazione ${id} failed: ${res.status} ${body}`);
+  }
+}
+
+/** Hard delete. Nessun linked record da questa tabella: safe. */
+export async function deleteComunicazione(id: string): Promise<void> {
+  requireEnv();
+  const res = await fetch(
+    `${API_BASE}/${BASE_ID}/${encodeURIComponent(COMUNICAZIONI_HERO_TABLE)}/${encodeURIComponent(id)}`,
+    { method: "DELETE", headers: { Authorization: `Bearer ${TOKEN}` }, cache: "no-store" },
+  );
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`[airtable-admin] deleteComunicazione ${id} failed: ${res.status} ${body}`);
   }
 }
