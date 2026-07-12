@@ -155,17 +155,23 @@
 }
 
 /* Fondale vivo (L−2) */
+/* Stacking SENZA z-index espliciti (bug fixato): l'ordine deve seguire
+   l'ordine naturale ::before → figli DOM → ::after, così il floodlight
+   resta SOTTO il video (non lo copre) e la vignetta resta sopra tutto.
+   Un z-index esplicito su ::before/::after (com'era prima) li porta sopra
+   il video anche se dichiarati prima nel DOM → video "sparito" dietro il
+   floodlight (che ha riempimenti navy fino al 90% di opacità agli angoli). */
 .apex-fondale { position: absolute; inset: 0; z-index: var(--z-fondale); overflow: hidden;
   background: var(--stage-bg); }
-.apex-fondale::before { content: ""; position: absolute; inset: 0; background: var(--floodlight); z-index: 2; }
-.apex-fondale::after  { content: ""; position: absolute; inset: 0; background: var(--vignette); z-index: 2; }
+.apex-fondale::before { content: ""; position: absolute; inset: 0; background: var(--floodlight); }
+.apex-fondale::after  { content: ""; position: absolute; inset: 0; background: var(--vignette); }
 .apex-fondale__video {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
   transform: scale(var(--video-scale)); opacity: var(--video-opacity);
   filter: grayscale(1) contrast(1.05);
   mix-blend-mode: screen;
 }
-.apex-fondale__duotone { position: absolute; inset: 0; background: var(--duotone); mix-blend-mode: color; z-index: 1; }
+.apex-fondale__duotone { position: absolute; inset: 0; background: var(--duotone); mix-blend-mode: color; }
 
 /* =============================================================================
    SectionLap
