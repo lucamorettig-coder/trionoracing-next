@@ -161,3 +161,6 @@ next-env.d.ts
 
 # Cowork design-system export (asset locali, non parte del codice di produzione)
 /Design System Triono/
+
+# dev-shot screenshots (scripts/dev-shot.mjs)
+.dev-shots/

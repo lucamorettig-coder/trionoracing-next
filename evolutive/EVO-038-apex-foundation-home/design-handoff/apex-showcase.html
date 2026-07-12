@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX · Velodromo Notturno — Design System Triono Racing</title>
+
+<!-- Font: Archivo (display expanded), Inter (body), JetBrains Mono (data) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..900;1,700..900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Sorgente canonica dei token -->
+<link rel="stylesheet" href="apex-tokens.css">
+
+<style>
+/* =============================================================================
+   SHOWCASE — classi componente del DS v2 (trasportabili 1:1 in React+Tailwind).
+   Tutto usa SOLO token semantici: nessun componente conosce i colori di livrea.
+   ============================================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--stage-bg);
+  color: var(--stage-ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { color: var(--accent); text-decoration: none; transition: color var(--dur-quick); }
+a:hover { color: var(--accent-2); }
+img { max-width: 100%; display: block; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.ink-on-accent { --ink-on-accent: #04091c; }
+
+/* ---- Tipografia --------------------------------------------------------- */
+.eyebrow, .data {
+  font-family: var(--font-data);
+  font-size: var(--fs-data);
+  font-weight: var(--weight-data);
+  letter-spacing: var(--tracking-data);
+  text-transform: uppercase;
+  color: var(--stage-muted);
+  line-height: var(--lh-data);
+}
+.eyebrow .live, .data .live { color: var(--accent); }
+.display, h1.display, .lap-title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-stretch: 125%;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  margin: 0;
+}
+.stroke-word {
+  color: transparent;
+  -webkit-text-stroke: var(--stroke-display) var(--accent);
+  text-stroke: var(--stroke-display) var(--accent);
+}
+.accent-word { color: var(--accent); }
+
+/* ---- Layout guscio ------------------------------------------------------ */
+.wrap { max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+.section { padding-block: var(--section-y); position: relative; z-index: var(--z-pista); }
+.section--edge { border-top: 1px solid var(--stage-line-soft); }
+
+/* =============================================================================
+   GRAIN (telaio) — feTurbulence, fixed, animato a steps()
+   ============================================================================= */
+.apex-grain {
+  position: fixed; inset: -50%;
+  z-index: 90; pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 0.6s steps(4) infinite;
+}
+@keyframes grain-shift {
+  0%   { transform: translate(0,0); }
+  25%  { transform: translate(-6%, 4%); }
+  50%  { transform: translate(4%, -6%); }
+  75%  { transform: translate(-4%, -4%); }
+  100% { transform: translate(6%, 6%); }
+}
+
+/* =============================================================================
+   REGIA (L+2) — chrome broadcast: navbar, ticker, progress, dock
+   ============================================================================= */
+.regia { position: fixed; inset: 0 0 auto 0; z-index: var(--z-regia); }
+
+/* NavBar — SEMPRE livrea Racing */
+.apex-nav {
+  display: flex; align-items: center; gap: var(--space-6);
+  height: 60px; padding-inline: var(--gutter);
+  background: color-mix(in srgb, var(--stage-bg) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom: 1px solid var(--stage-line-soft);
+}
+.apex-nav__logo { height: 26px; width: auto; filter: brightness(0) invert(1); opacity: 0.95; }
+.apex-nav__links { display: flex; gap: var(--space-5); margin-left: auto; }
+.apex-nav__links a {
+  font-family: var(--font-data); font-size: var(--fs-data);
+  letter-spacing: var(--tracking-data); text-transform: uppercase;
+  color: var(--stage-ink-dim); position: relative; padding-block: 4px;
+}
+.apex-nav__links a::after {
+  content: ""; position: absolute; left: 0; bottom: -2px; height: 2px; width: 0;
+  background: var(--accent); transition: width var(--dur-hover) var(--ease-out);
+}
+.apex-nav__links a:hover { color: var(--stage-ink); }
+.apex-nav__links a:hover::after { width: 100%; }
+.apex-nav__live {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-data); font-size: var(--fs-data);
+  letter-spacing: var(--tracking-data); color: var(--accent);
+}
+.live-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%;
+  box-shadow: 0 0 0 0 var(--glow); animation: live-pulse 1.6s var(--ease-inout) infinite; }
+@keyframes live-pulse {
+  0%   { box-shadow: 0 0 0 0 var(--glow); opacity: 1; }
+  70%  { box-shadow: 0 0 0 8px transparent; opacity: 0.7; }
+  100% { box-shadow: 0 0 0 0 transparent; opacity: 1; }
+}
+
+/* Ticker — marquee mono seamless (doppio chunk) */
+.apex-ticker {
+  overflow: hidden; white-space: nowrap;
+  border-bottom: 1px solid var(--stage-line-soft);
+  background: color-mix(in srgb, var(--stage-navy) 70%, var(--stage-bg));
+  height: 34px; display: flex; align-items: center;
+}
+.apex-ticker__track { display: inline-flex; will-change: transform;
+  animation: ticker-run var(--dur-ticker) linear infinite; }
+.apex-ticker__chunk { display: inline-flex; }
+.apex-ticker__item {
+  font-family: var(--font-data); font-size: var(--fs-data);
+  letter-spacing: var(--tracking-data); text-transform: uppercase;
+  color: var(--stage-ink-dim); padding-inline: var(--space-5);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.apex-ticker__item b { color: var(--accent); font-weight: 700; }
+.apex-ticker__sep { color: var(--stage-faint); }
+@keyframes ticker-run { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* Scroll progress */
+.apex-progress { position: fixed; left: 0; top: 0; height: 2px; width: 0%;
+  background: var(--accent); z-index: calc(var(--z-regia) + 1); box-shadow: 0 0 12px var(--glow); }
+
+/* Control dock */
+.dock {
+  position: fixed; right: var(--space-4); bottom: var(--space-4); z-index: calc(var(--z-regia) + 2);
+  background: color-mix(in srgb, var(--stage-surface) 88%, transparent);
+  backdrop-filter: blur(16px); border: 1px solid var(--stage-line);
+  clip-path: var(--clip-panel); padding: var(--space-4);
+  width: min(300px, calc(100vw - 2 * var(--space-4)));
+  box-shadow: var(--shadow-regia);
+}
+.dock__title { display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-3); }
+.dock__label { font-family: var(--font-data); font-size: var(--fs-data-sm);
+  letter-spacing: var(--tracking-data); color: var(--stage-muted); text-transform: uppercase; margin: var(--space-3) 0 6px; }
+.livery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.livery-btn {
+  font-family: var(--font-data); font-size: var(--fs-data-sm); letter-spacing: 0.08em;
+  text-transform: uppercase; text-align: left; cursor: pointer;
+  padding: 8px 9px; color: var(--stage-ink-dim); background: transparent;
+  border: 1px solid var(--stage-line); position: relative;
+  transition: border-color var(--dur-hover), color var(--dur-hover);
+}
+.livery-btn:hover { color: var(--stage-ink); }
+.livery-btn[aria-pressed="true"] { color: var(--stage-ink); border-color: var(--sw); }
+.livery-btn__sw { display: inline-block; width: 10px; height: 10px; margin-right: 6px;
+  vertical-align: -1px; background: var(--sw); }
+.livery-btn[data-l="racing"]     { --sw: #37C8FF; }
+.livery-btn[data-l="scuola"]     { --sw: #F4E718; }
+.livery-btn[data-l="marathon"]   { --sw: #EF4444; }
+.livery-btn[data-l="ciclocross"] { --sw: #EAF4FF; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  font-family: var(--font-data); font-size: var(--fs-data-sm); letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--stage-ink-dim); padding: 6px 0; }
+.sw {
+  --on: 0; position: relative; width: 38px; height: 20px; flex: none; cursor: pointer;
+  background: var(--stage-line); border: 1px solid var(--stage-line);
+  transition: background var(--dur-hover);
+}
+.sw[aria-checked="true"] { background: color-mix(in srgb, var(--accent) 40%, transparent); border-color: var(--accent); }
+.sw::after { content: ""; position: absolute; top: 1px; left: 1px; width: 16px; height: 16px;
+  background: var(--stage-ink); transition: transform var(--dur-hover) var(--ease-out); }
+.sw[aria-checked="true"]::after { transform: translateX(18px); background: var(--accent); }
+
+/* =============================================================================
+   PALCO — livelli & prop wrapper (StageProp)
+   ============================================================================= */
+.stage-scene { position: relative; overflow: hidden; }
+.apex-prop { position: absolute; pointer-events: none; will-change: transform; }
+.apex-prop[data-depth="sceno"]   { z-index: var(--z-scenografia); }
+.apex-prop[data-depth="oggetti"] { z-index: var(--z-oggetti); }
+.float { animation: float var(--dur-float) var(--ease-inout) infinite; }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+
+/* Fondale vivo (L−2) */
+.apex-fondale { position: absolute; inset: 0; z-index: var(--z-fondale); overflow: hidden;
+  background: var(--stage-bg); }
+.apex-fondale::before { content: ""; position: absolute; inset: 0; background: var(--floodlight); }
+.apex-fondale::after  { content: ""; position: absolute; inset: 0; background: var(--vignette); }
+.fondale-video {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  transform: scale(var(--video-scale)); opacity: var(--video-opacity);
+  filter: grayscale(1) contrast(1.05);
+  mix-blend-mode: screen;
+}
+/* Simulazione video "vivo" quando manca l'asset: bande di luce che scorrono */
+.fondale-sim {
+  position: absolute; inset: -20%; opacity: var(--video-opacity);
+  background:
+    repeating-linear-gradient(115deg, transparent 0 60px,
+      color-mix(in srgb, var(--accent) 10%, transparent) 60px 62px, transparent 62px 140px);
+  filter: blur(1px);
+  animation: sweep 14s linear infinite;
+}
+@keyframes sweep { from { transform: translateX(-8%); } to { transform: translateX(8%); } }
+.duotone-overlay { position: absolute; inset: 0; background: var(--duotone); mix-blend-mode: color; }
+
+/* =============================================================================
+   SectionLap
+   ============================================================================= */
+.apex-lap { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-7); }
+.apex-lap__eyebrow { display: inline-flex; align-items: center; gap: 12px; }
+.apex-lap__num { font-family: var(--font-data); font-weight: 700; color: var(--accent);
+  letter-spacing: var(--tracking-data); }
+.apex-lap__rule { flex: 1; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); }
+.lap-title { font-size: var(--fs-display); }
+
+/* =============================================================================
+   CTA
+   ============================================================================= */
+.apex-cta {
+  --pad-x: 26px;
+  display: inline-flex; align-items: center; gap: 10px; cursor: pointer;
+  font-family: var(--font-data); font-weight: 700; font-size: var(--fs-data);
+  letter-spacing: var(--tracking-data); text-transform: uppercase;
+  padding: 15px var(--pad-x); border: 0; position: relative;
+  clip-path: var(--clip-cta);
+  transition: transform var(--dur-hover) var(--ease-out), box-shadow var(--dur-hover), background var(--dur-hover);
+}
+.apex-cta__arrow { transition: transform var(--dur-hover) var(--ease-out); }
+.apex-cta:hover .apex-cta__arrow { transform: translateX(4px); }
+.apex-cta--primary { background: var(--accent); color: #04091c; }
+.apex-cta--primary:hover { transform: translateY(-2px); box-shadow: 0 0 34px -6px var(--glow); }
+.apex-cta--ghost { background: transparent; color: var(--stage-ink);
+  box-shadow: inset 0 0 0 1px var(--accent); }
+.apex-cta--ghost:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.apex-cta--support { background: var(--accent-2); color: #04091c; }
+.apex-cta--support:hover { transform: translateY(-2px); box-shadow: 0 0 34px -6px color-mix(in srgb, var(--accent-2) 70%, transparent); }
+.apex-cta:disabled, .apex-cta[aria-disabled="true"] {
+  background: var(--stage-surface); color: var(--stage-faint); cursor: not-allowed;
+  box-shadow: none; transform: none; pointer-events: none;
+}
+
+/* =============================================================================
+   Card APEX
+   ============================================================================= */
+.apex-card {
+  position: relative; background: var(--stage-surface);
+  border: 1px solid var(--stage-line); padding: var(--space-6);
+  box-shadow: var(--shadow-inset-top); overflow: hidden;
+  transition: transform var(--dur-hover) var(--ease-out), border-color var(--dur-hover), box-shadow var(--dur-hover);
+}
+.apex-card::before { content: ""; position: absolute; left: 0; top: 0; height: 3px; width: 44px;
+  background: var(--accent); }
+.apex-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--accent) 50%, var(--stage-line));
+  box-shadow: var(--shadow-oggetti), 0 0 40px -14px var(--glow); }
+.apex-card h3 { font-family: var(--font-display); font-stretch: 125%; font-weight: 800;
+  text-transform: uppercase; letter-spacing: var(--tracking-display); line-height: var(--lh-heading);
+  margin: var(--space-4) 0 var(--space-3); font-size: var(--fs-h3); }
+.apex-card p { color: var(--stage-muted); margin: 0; }
+.apex-card__index { font-family: var(--font-data); color: var(--accent); font-size: var(--fs-data);
+  letter-spacing: var(--tracking-data); }
+.apex-card--photo { padding: 0; }
+.apex-card--photo .card-photo { position: relative; aspect-ratio: 4/3; overflow: hidden; background: var(--stage-navy); }
+.apex-card--photo .card-photo .duotone-overlay { }
+.apex-card--photo .card-body { padding: var(--space-5) var(--space-6) var(--space-6); }
+
+/* =============================================================================
+   HUD
+   ============================================================================= */
+.apex-hud {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px;
+  background: var(--stage-line); border: 1px solid var(--stage-line);
+  font-family: var(--font-data);
+}
+.apex-hud__cell { background: color-mix(in srgb, var(--stage-surface) 92%, var(--stage-bg)); padding: 14px 16px; }
+.apex-hud__k { font-size: var(--fs-data-sm); letter-spacing: var(--tracking-data); color: var(--stage-muted);
+  text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+.apex-hud__v { font-size: 1.5rem; font-weight: 700; color: var(--stage-ink); margin-top: 6px;
+  font-variant-numeric: tabular-nums; }
+.apex-hud__v small { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+.dot-live { width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
+  animation: live-pulse 1.6s var(--ease-inout) infinite; }
+
+/* =============================================================================
+   Countdown
+   ============================================================================= */
+.apex-countdown { display: inline-flex; gap: var(--space-3); font-family: var(--font-data); }
+.apex-countdown__unit { text-align: center; }
+.apex-countdown__n { font-family: var(--font-display); font-stretch: 125%; font-weight: 900;
+  font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1; color: var(--stage-ink);
+  font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.apex-countdown__l { font-size: var(--fs-data-sm); letter-spacing: var(--tracking-data);
+  text-transform: uppercase; color: var(--stage-muted); margin-top: 6px; }
+.apex-countdown__sep { font-family: var(--font-display); font-weight: 900; font-size: clamp(2rem,5vw,3.5rem);
+  color: var(--accent); align-self: flex-start; line-height: 1; }
+
+/* =============================================================================
+   PropKit — elementi firma (CODE, parametrici su --accent)
+   ============================================================================= */
+.kit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-5); }
+.kit-cell { position: relative; background: color-mix(in srgb, var(--stage-navy) 40%, var(--stage-bg));
+  border: 1px solid var(--stage-line-soft); min-height: 260px; overflow: hidden;
+  display: flex; align-items: center; justify-content: center; }
+.kit-cell__tag { position: absolute; left: 10px; top: 10px; z-index: 5;
+  font-family: var(--font-data); font-size: var(--fs-data-sm); letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--stage-muted); }
+.kit-cell__tag b { color: var(--accent); }
+.kit-cell__code { position: absolute; right: 10px; top: 10px; z-index: 5;
+  font-family: var(--font-data); font-size: 9px; letter-spacing: 0.14em; padding: 2px 6px;
+  border: 1px solid var(--stage-line); color: var(--stage-faint); }
+
+/* R2 telemetria ghost */
+.tel-ghost { font-family: var(--font-display); font-stretch:125%; font-weight: 900;
+  font-size: clamp(3rem, 9vw, 5.5rem); color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--accent) 55%, transparent);
+  letter-spacing: -0.03em; line-height: 0.9; text-align: center; }
+.waveform { width: 82%; height: 46px; }
+.waveform path { fill: none; stroke: var(--accent); stroke-width: 2; }
+
+/* R3 targa dorsale */
+.targa { background: #f4f6ff; color: #05070f; padding: 12px 14px 8px; transform: rotate(-3deg);
+  clip-path: var(--clip-tag); box-shadow: var(--shadow-oggetti); text-align: center; min-width: 150px; }
+.targa__n { font-family: var(--font-display); font-stretch:125%; font-weight: 900; font-size: 3.2rem;
+  line-height: 0.86; letter-spacing: -0.02em; }
+.targa__t { font-family: var(--font-data); font-size: 8px; letter-spacing: 0.28em; margin-top: 4px; color:#1a2340; }
+
+/* R4 racing line */
+.raceline { width: 88%; height: 150px; }
+.raceline path { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; }
+.raceline .ghost { stroke: color-mix(in srgb, var(--accent) 28%, transparent); stroke-dasharray: 3 7; }
+.raceline .apex-dot { fill: var(--accent); }
+
+/* eco-scia (R1 mechanic) */
+.echo-stack { position: relative; width: 180px; height: 220px; }
+.echo-stack .layer { position: absolute; inset: 0; }
+.echo-stack .layer img, .echo-stack .layer .silhouette { width: 100%; height: 100%; }
+.echo-stack .e1 { transform: translateX(-26px); filter: grayscale(1) brightness(.4) sepia(1) hue-rotate(160deg) saturate(6); opacity: .35; }
+.echo-stack .e2 { transform: translateX(-13px); filter: grayscale(1) brightness(.6) sepia(1) hue-rotate(160deg) saturate(6); opacity: .55; }
+.silhouette { background:
+    radial-gradient(60% 80% at 50% 20%, var(--stage-faint) 0 40%, transparent 42%),
+    linear-gradient(180deg, var(--stage-faint), color-mix(in srgb, var(--stage-faint) 40%, transparent));
+  clip-path: polygon(42% 0, 58% 0, 62% 18%, 74% 34%, 70% 60%, 78% 100%, 58% 100%, 50% 72%, 42% 100%, 22% 100%, 30% 60%, 26% 34%, 38% 18%);
+}
+.tint-atleta { filter: none; }
+
+/* S2 cartoleria Scuola */
+.sticker { background: var(--accent); color: #04091c; padding: 10px 16px; position: relative;
+  font-family: var(--font-display); font-stretch: 125%; font-weight: 900; text-transform: uppercase;
+  letter-spacing: -0.01em; transform: rotate(-4deg); box-shadow: 0 0 0 6px #fff, var(--shadow-oggetti); }
+.toppa { background: var(--accent-2); color: #2a1400; padding: 6px 12px; transform: rotate(3deg);
+  font-family: var(--font-data); font-weight: 700; font-size: var(--fs-data); letter-spacing: 0.14em;
+  text-transform: uppercase; box-shadow: 0 0 0 3px #fff; border: 2px dashed rgba(0,0,0,.25); }
+.doodle { width: 90px; height: 60px; }
+.doodle path { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 220; stroke-dashoffset: 220; animation: draw var(--dur-draw) var(--ease-stage) forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.cartoleria { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; justify-content: center; }
+
+/* M1 numerone 209 monolite + glitch */
+.monolite { font-family: var(--font-display); font-stretch: 125%; font-weight: 900;
+  font-size: clamp(5rem, 16vw, 11rem); color: transparent;
+  -webkit-text-stroke: 2px var(--accent); letter-spacing: -0.04em; line-height: 0.8; position: relative; }
+.monolite.glitch::before, .monolite.glitch::after {
+  content: attr(data-t); position: absolute; left: 0; top: 0; width: 100%;
+  -webkit-text-stroke: 2px var(--accent); color: transparent; }
+.monolite.glitch::before { clip-path: inset(12% 0 60% 0); transform: translateX(-6px); opacity: .8; }
+.monolite.glitch::after  { clip-path: inset(58% 0 8% 0); transform: translateX(6px); color: var(--accent-2); -webkit-text-stroke: 0; }
+
+/* M2 altimetria */
+.altimetria { width: 92%; height: 150px; }
+.altimetria path.profile { fill: color-mix(in srgb, var(--accent) 10%, transparent); stroke: var(--accent); stroke-width: 2; }
+.altimetria line { stroke: var(--stage-line); stroke-width: 1; }
+.altimetria text { font-family: var(--font-data); font-size: 9px; fill: var(--stage-muted); letter-spacing: 0.08em; }
+.altimetria .peak { fill: var(--accent); }
+.altimetria .peaktext { fill: var(--accent); font-weight: 700; }
+
+/* M3 slash diagonali */
+.slashes { position: absolute; inset: 0; z-index: var(--z-scenografia); pointer-events: none; overflow: hidden; }
+.slash { position: absolute; height: 26px; width: 160%; left: -30%; background: var(--accent);
+  transform: rotate(-18deg); opacity: .85; }
+.slash--grain { background:
+    linear-gradient(90deg, var(--accent), var(--accent)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='g'%3E%3CfeTurbulence baseFrequency='0.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-blend-mode: multiply; }
+.slash--thin { height: 8px; opacity: .7; }
+
+/* M4 sequenza d'azione 3-frame */
+.seq { position: relative; width: 220px; height: 220px; }
+.seq .frame { position: absolute; inset: 0; }
+.seq .f-echo1 { transform: translateX(-40px); opacity: .28; filter: grayscale(1) brightness(.5) sepia(1) hue-rotate(-30deg) saturate(4); }
+.seq .f-echo2 { transform: translateX(-20px); opacity: .5; filter: grayscale(1) brightness(.7) sepia(1) hue-rotate(-30deg) saturate(4); }
+
+/* C1 pini nella nebbia */
+.pini { width: 100%; height: 100%; }
+.pini polygon { fill: color-mix(in srgb, var(--accent) 22%, transparent); }
+.pini .far { fill: color-mix(in srgb, var(--accent) 10%, transparent); }
+.pini rect.fog { fill: color-mix(in srgb, var(--stage-navy) 70%, transparent); }
+
+/* mascotte */
+.mascotte { height: 240px; filter: drop-shadow(var(--shadow-oggetti)); }
+
+/* =============================================================================
+   Reveal (in-view)
+   ============================================================================= */
+/* Default (no-JS): visibile. Lo stato nascosto vale SOLO con JS (classe .js). */
+.reveal-word { display: inline-block; }
+.js .reveal-word { opacity: 0; transform: translateY(0.5em);
+  transition: opacity var(--dur-reveal) var(--ease-stage), transform var(--dur-reveal) var(--ease-stage); }
+.js .in-view .reveal-word { opacity: 1; transform: translateY(0); }
+.js .reveal { opacity: 0; transform: translateY(24px);
+  transition: opacity var(--dur-reveal) var(--ease-stage), transform var(--dur-reveal) var(--ease-stage); }
+.js .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+/* =============================================================================
+   Tabelle di riferimento (contrasto / degradazione)
+   ============================================================================= */
+.ref-table { width: 100%; border-collapse: collapse; font-size: var(--fs-small); }
+.ref-table th, .ref-table td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--stage-line-soft); vertical-align: top; }
+.ref-table th { font-family: var(--font-data); font-size: var(--fs-data); letter-spacing: var(--tracking-data);
+  text-transform: uppercase; color: var(--stage-muted); font-weight: 600; }
+.ref-table td b { color: var(--stage-ink); }
+.chip-swatch { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-data); font-size: var(--fs-data); }
+.chip-swatch i { width: 22px; height: 22px; display: inline-block; }
+.pass { color: #86efac; } .warn { color: #fbbf24; } .fail { color: #f87171; }
+.badge-mono { font-family: var(--font-data); font-size: var(--fs-data-sm); letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--stage-line); color: var(--stage-ink-dim); }
+
+/* =============================================================================
+   Utility
+   ============================================================================= */
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-5); }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-5); }
+.row { display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: center; }
+.stack { display: flex; flex-direction: column; gap: var(--space-4); }
+.muted { color: var(--stage-muted); }
+.note { font-family: var(--font-data); font-size: var(--fs-data-sm); letter-spacing: 0.06em;
+  color: var(--stage-faint); text-transform: uppercase; }
+.dim-panel { background: color-mix(in srgb, var(--stage-navy) 30%, var(--stage-bg));
+  border: 1px solid var(--stage-line-soft); padding: var(--space-6); }
+.center { text-align: center; }
+hr.hair { border: 0; border-top: 1px solid var(--stage-line-soft); margin: var(--space-6) 0; }
+
+/* Footer */
+.apex-footer { background: var(--stage-navy); border-top: 1px solid var(--stage-line);
+  padding-block: var(--space-8); position: relative; z-index: var(--z-pista); }
+.apex-footer .apex-nav__logo { filter: brightness(0) invert(1); height: 30px; margin-bottom: var(--space-4); }
+
+/* Mobile: 1 prop L+1 per sezione, no mouse-parallax (gestito da JS + queste regole) */
+@media (max-width: 767px) {
+  .apex-prop[data-mobile="hide"] { display: none; }
+  .lap-title { font-size: var(--fs-h1); }
+}
+</style>
+</head>
+
+<script>document.documentElement.classList.add('js');</script>
+<body>
+
+<!-- GRAIN (telaio) -->
+<div class="apex-grain" aria-hidden="true"></div>
+
+<!-- Progress (regia) -->
+<div class="apex-progress" id="progress" aria-hidden="true"></div>
+
+<!-- ============================================================ REGIA -->
+<header class="regia" data-livery="racing">
+  <nav class="apex-nav" aria-label="Navigazione principale">
+    <img class="apex-nav__logo" src="public/assets/logo-triono-racing.png" alt="Triono Racing">
+    <span class="apex-nav__live"><span class="live-dot"></span> ON AIR</span>
+    <div class="apex-nav__links">
+      <a href="#palco">Il Palco</a>
+      <a href="#componenti">Componenti</a>
+      <a href="#propkit">PropKit</a>
+      <a href="#motion">Motion</a>
+      <a href="#a11y">A11y</a>
+    </div>
+  </nav>
+  <div class="apex-ticker" aria-hidden="true">
+    <div class="apex-ticker__track" id="ticker"></div>
+  </div>
+</header>
+
+<!-- Control dock -->
+<aside class="dock" data-livery="racing" aria-label="Controlli showcase">
+  <div class="dock__title">
+    <span class="live-dot"></span>
+    <span class="data" style="color:var(--stage-ink)">APEX · REGIA</span>
+  </div>
+  <div class="dock__label">Livrea</div>
+  <div class="livery-grid" role="group" aria-label="Switch livrea">
+    <button class="livery-btn" data-l="racing"     aria-pressed="true"><span class="livery-btn__sw"></span>Racing</button>
+    <button class="livery-btn" data-l="scuola"     aria-pressed="false"><span class="livery-btn__sw"></span>Scuola</button>
+    <button class="livery-btn" data-l="marathon"   aria-pressed="false"><span class="livery-btn__sw"></span>209</button>
+    <button class="livery-btn" data-l="ciclocross" aria-pressed="false"><span class="livery-btn__sw"></span>Ciclocross</button>
+  </div>
+  <div class="dock__label">Motion</div>
+  <div class="toggle-row">Parallax <span class="sw" id="sw-parallax" role="switch" aria-checked="true" tabindex="0"></span></div>
+  <div class="toggle-row">Reduced-motion <span class="sw" id="sw-reduced" role="switch" aria-checked="false" tabindex="0"></span></div>
+</aside>
+
+<!-- ============================================================ STAGE (livrea variabile) -->
+<main id="stage" data-livery="racing">
+
+  <!-- ---------- HERO: palco a 5 livelli dal vivo ---------- -->
+  <section class="stage-scene" id="hero" style="min-height: 92vh; display:flex; align-items:center;">
+    <!-- L−2 Fondale vivo -->
+    <div class="apex-fondale" aria-hidden="true">
+      <div class="fondale-sim"></div>
+    </div>
+    <!-- L−1 Scenografia: numerone ghost + waveform -->
+    <div class="apex-prop" data-depth="sceno" data-par="sceno" style="right:-2%; top:8%; opacity:.9;" aria-hidden="true">
+      <div class="tel-ghost" id="hero-ghost">54 KM/H</div>
+    </div>
+    <div class="apex-prop" data-depth="sceno" data-par="sceno" style="left:2%; bottom:10%; width:min(420px,40vw);" aria-hidden="true">
+      <svg class="waveform" viewBox="0 0 400 46" preserveAspectRatio="none"><path id="hero-wave" d=""></path></svg>
+    </div>
+    <!-- L+1 Oggetto di scena: targa dorsale -->
+    <div class="apex-prop" data-depth="oggetti" data-par="oggetti" data-mobile="hide" style="right:8%; bottom:16%;" aria-hidden="true">
+      <div class="targa float"><div class="targa__n">209</div><div class="targa__t">TRIONO RACING</div></div>
+    </div>
+
+    <!-- L0 Pista: contenuto (SACRO) -->
+    <div class="wrap" style="position:relative; z-index:var(--z-pista);">
+      <div class="apex-lap in-view">
+        <div class="apex-lap__eyebrow eyebrow">
+          <span class="apex-lap__num">DS v2</span>
+          <span class="apex-lap__rule"></span>
+          <span class="live"><span id="live-livery">RACING</span> · VELODROMO NOTTURNO</span>
+        </div>
+      </div>
+      <h1 class="display" style="font-size:var(--fs-hero); max-width:15ch;">
+        <span class="reveal-word">La</span> <span class="reveal-word">gara</span>
+        <span class="reveal-word stroke-word">è</span> <span class="reveal-word">il</span><br>
+        <span class="reveal-word accent-word">chrome.</span>
+      </h1>
+      <p class="reveal" style="max-width:52ch; font-size:var(--fs-body-lg); color:var(--stage-ink-dim); margin-top:var(--space-4);">
+        Regia broadcast notturna di una corsa su pista. Un solo telaio, quattro
+        livree. La pagina è un palco a cinque livelli di profondità.
+      </p>
+      <div class="row reveal" style="margin-top:var(--space-6);">
+        <button class="apex-cta apex-cta--primary">Entra in pista <span class="apex-cta__arrow">→</span></button>
+        <button class="apex-cta apex-cta--ghost">Guarda la regia</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- IL PALCO ---------- -->
+  <section class="section section--edge" id="palco">
+    <div class="wrap">
+      <div class="apex-lap">
+        <div class="apex-lap__eyebrow eyebrow"><span class="apex-lap__num">LAP 01</span><span class="apex-lap__rule"></span><span>IL PALCO A 5 LIVELLI</span></div>
+        <h2 class="lap-title">Profondità<br><span class="accent-word">di scena</span></h2>
+      </div>
+      <p class="muted" style="max-width:60ch; margin-top:calc(-1 * var(--space-4)); margin-bottom:var(--space-7);">
+        Ogni livrea porta in scena i propri oggetti sugli stessi cinque piani. Il buio
+        deve respirare: budget di densità severo, L0 sacro, velocità parallax come token di livello.
+      </p>
+      <div class="grid-3">
+        <div class="dim-panel"><div class="note">L−2 · z 0</div><h3 class="display" style="font-size:var(--fs-h4);margin:8px 0">Fondale</h3><p class="muted">Stage dark, floodlight radiali, grain, video ambient trattato. <b>Fisso.</b></p></div>
+        <div class="dim-panel"><div class="note">L−1 · z 10</div><h3 class="display" style="font-size:var(--fs-h4);margin:8px 0">Scenografia</h3><p class="muted">Numeroni ghost, waveform, silhouette. Parallax 0.15–0.3×. Max 1 dominante.</p></div>
+        <div class="dim-panel" style="border-color:var(--accent)"><div class="note" style="color:var(--accent)">L0 · z 20 · SACRO</div><h3 class="display" style="font-size:var(--fs-h4);margin:8px 0">Pista</h3><p class="muted">Testo, card, CTA, foto. Scroll naturale. <b>Mai coperto.</b></p></div>
+        <div class="dim-panel"><div class="note">L+1 · z 30</div><h3 class="display" style="font-size:var(--fs-h4);margin:8px 0">Oggetti di scena</h3><p class="muted">Cutout, mascotte, sticker. Parallax 1.1–1.3× + mouse. Max 2–3/viewport.</p></div>
+        <div class="dim-panel"><div class="note">L+2 · z 40</div><h3 class="display" style="font-size:var(--fs-h4);margin:8px 0">Regia</h3><p class="muted">HUD, ticker, countdown, progress. Fixed/sticky. Sempre sopra.</p></div>
+        <div class="dim-panel" style="display:flex;align-items:center;justify-content:center;background:transparent;border-style:dashed">
+          <span class="note center">Muovi il mouse<br>nell'hero →<br>parallax dal vivo</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- COMPONENTI ---------- -->
+  <section class="section section--edge" id="componenti">
+    <div class="wrap">
+      <div class="apex-lap">
+        <div class="apex-lap__eyebrow eyebrow"><span class="apex-lap__num">LAP 02</span><span class="apex-lap__rule"></span><span>I 9 COMPONENTI</span></div>
+        <h2 class="lap-title">Il telaio,<br><span class="stroke-word">componibile</span></h2>
+      </div>
+
+      <!-- CTA -->
+      <div class="stack" style="margin-bottom:var(--space-8)">
+        <div class="eyebrow">01 · CTA — clip-path angolato, hover glow + micro-translate</div>
+        <div class="row">
+          <button class="apex-cta apex-cta--primary">Primary <span class="apex-cta__arrow">→</span></button>
+          <button class="apex-cta apex-cta--support">Support</button>
+          <button class="apex-cta apex-cta--ghost">Ghost</button>
+          <button class="apex-cta apex-cta--primary" aria-disabled="true">Disabled</button>
+        </div>
+      </div>
+
+      <!-- Card -->
+      <div class="stack" style="margin-bottom:var(--space-8)">
+        <div class="eyebrow">02 · Card APEX — angolare, bordo hairline, accento top, hover glow</div>
+        <div class="grid-3">
+          <article class="apex-card">
+            <span class="apex-card__index">/ 01</span>
+            <h3>Amatori & Agonisti</h3>
+            <p>Il gruppo che macina chilometri. Calendario, uscite, orgoglio di maglia.</p>
+          </article>
+          <article class="apex-card">
+            <span class="apex-card__index">/ 02</span>
+            <h3>Scuola di Ciclismo</h3>
+            <p>Dai 5 anni. Sicurezza prima di tutto, gioco sempre.</p>
+          </article>
+          <article class="apex-card apex-card--photo">
+            <div class="card-photo">
+              <div class="fondale-sim" style="opacity:.5"></div>
+              <div class="duotone-overlay"></div>
+              <div style="position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px"><span class="badge-mono">FOTO · DUOTONE</span></div>
+            </div>
+            <div class="card-body">
+              <h3 style="margin-top:0">Card con foto</h3>
+              <p>Ricetta duotone: grayscale + tinta accent 15% + vignetta navy.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- HUD + Countdown -->
+      <div class="grid-2" style="margin-bottom:var(--space-8)">
+        <div class="stack">
+          <div class="eyebrow">03 · HUD — metriche mono che tickano (random-walk clampato)</div>
+          <div class="apex-hud" id="hud">
+            <div class="apex-hud__cell"><div class="apex-hud__k"><span class="dot-live"></span>Potenza</div><div class="apex-hud__v" data-hud="pow" data-min="240" data-max="360">312<small>W</small></div></div>
+            <div class="apex-hud__cell"><div class="apex-hud__k">Velocità</div><div class="apex-hud__v" data-hud="spd" data-min="38" data-max="58">54<small>km/h</small></div></div>
+            <div class="apex-hud__cell"><div class="apex-hud__k">Cadenza</div><div class="apex-hud__v" data-hud="cad" data-min="82" data-max="104">96<small>rpm</small></div></div>
+            <div class="apex-hud__cell"><div class="apex-hud__k">HR</div><div class="apex-hud__v" data-hud="hr" data-min="148" data-max="182">168<small>bpm</small></div></div>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="eyebrow">04 · Countdown — prossima gara</div>
+          <div class="dim-panel">
+            <div class="apex-countdown" id="countdown" aria-label="Countdown alla prossima gara">
+              <div class="apex-countdown__unit"><div class="apex-countdown__n" data-cd="d">00</div><div class="apex-countdown__l">Giorni</div></div>
+              <div class="apex-countdown__sep">:</div>
+              <div class="apex-countdown__unit"><div class="apex-countdown__n" data-cd="h">00</div><div class="apex-countdown__l">Ore</div></div>
+              <div class="apex-countdown__sep">:</div>
+              <div class="apex-countdown__unit"><div class="apex-countdown__n" data-cd="m">00</div><div class="apex-countdown__l">Min</div></div>
+              <div class="apex-countdown__sep">:</div>
+              <div class="apex-countdown__unit"><div class="apex-countdown__n" data-cd="s">00</div><div class="apex-countdown__l">Sec</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SectionLap + Ticker + FondaleVivo + StageProp note -->
+      <div class="grid-2">
+        <div class="stack">
+          <div class="eyebrow">05 · SectionLap — "LAP 01 — CHI SIAMO"</div>
+          <div class="dim-panel">
+            <div class="apex-lap" style="margin:0">
+              <div class="apex-lap__eyebrow eyebrow"><span class="apex-lap__num">LAP 03</span><span class="apex-lap__rule"></span><span>CHI SIAMO</span></div>
+              <h3 class="lap-title" style="font-size:var(--fs-h2)">La squadra</h3>
+            </div>
+          </div>
+          <div class="eyebrow" style="margin-top:var(--space-4)">06 · Ticker — marquee mono seamless (vedi in alto, nella regia)</div>
+        </div>
+        <div class="stack">
+          <div class="eyebrow">07 · FondaleVivo · 08 · StageProp · 09 · useStageParallax</div>
+          <div class="dim-panel">
+            <div class="stack" style="gap:var(--space-3)">
+              <div><span class="badge-mono">FondaleVivo</span> <span class="muted" style="font-size:var(--fs-small)">— incapsula le regole del §6: duotone, vignetta, opacity ≤.4, poster su reduced-motion/save-data.</span></div>
+              <div><span class="badge-mono">StageProp</span> <span class="muted" style="font-size:var(--fs-small)">— wrapper posizionabile <code>level/parallax/anchor</code>, <code>aria-hidden</code> di default.</span></div>
+              <div><span class="badge-mono">useStageParallax</span> <span class="muted" style="font-size:var(--fs-small)">— unico modulo scroll/pointer con kill-switch globale (vedi dock).</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- PROPKIT ---------- -->
+  <section class="section section--edge" id="propkit">
+    <div class="wrap">
+      <div class="apex-lap">
+        <div class="apex-lap__eyebrow eyebrow"><span class="apex-lap__num">LAP 03</span><span class="apex-lap__rule"></span><span>ELEMENTI FIRMA · <span id="kit-livery">RACING</span></span></div>
+        <h2 class="lap-title">Il <span class="accent-word">registry</span></h2>
+      </div>
+      <p class="muted" style="max-width:62ch; margin-top:calc(-1 * var(--space-4)); margin-bottom:var(--space-7)">
+        Gli elementi marcati <span class="badge-mono">CODE</span> sono SVG/CSS parametrici su <code>--accent</code>: cambiano
+        anima con lo switcher, in alto. I cutout fotografici e le mascotte sono asset (qui: placeholder / asset reali Nino &amp; Vittoria).
+      </p>
+
+      <!-- Racing kit -->
+      <div class="kit-block" data-kit="racing">
+        <div class="kit-grid">
+          <div class="kit-cell">
+            <span class="kit-cell__tag"><b>R2</b> Telemetria ghost</span><span class="kit-cell__code">CODE</span>
+            <div class="stack center">
+              <div class="tel-ghost">312W</div>
+              <svg class="waveform" viewBox="0 0 400 46" preserveAspectRatio="none"><path class="kit-wave" d=""></path></svg>
+            </div>
+          </div>
+          <div class="kit-cell">
+            <span class="kit-cell__tag"><b>R3</b> Targa dorsale</span><span class="kit-cell__code">CODE</span>
+            <div class="targa"><div class="targa__n">07</div><div class="targa__t">TRIONO RACING</div></div>
+          </div>
+          <div class="kit-cell">
+            <span class="kit-cell__tag"><b>R4</b> Racing line</span><span class="kit-cell__code">CODE</span>
+            <svg class="raceline" viewBox="0 0 300 150">
+              <path class="ghost" d="M10 130 C 80 130, 60 30, 150 40 S 250 130, 290 60"></path>
+              <path d="M10 130 C 80 130, 60 30, 150 40 S 250 130, 290 60"></path>
+              <circle class="apex-dot" cx="150" cy="40" r="5"><animate attributeName="r" values="4;7;4" dur="1.6s" repeatCount="indefinite"/></circle>
+            </svg>
+          </div>
+          <div class="kit-cell">
+            <span class="kit-cell__tag"><b>R1</b> Cutout + eco-scia</span><span class="kit-cell__code">ASSET + CODE</span>
+            <div class="echo-stack">
+              <div class="layer e1"><div class="silhouette"></div></div>
+              <div class="layer e2"><div class="silhouette"></div></div>
+              <div class="layer"><div class="silhouette" style="background:linear-gradient(180deg,var(--stage-muted),var(--stage-faint))"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scuola kit -->
+      <div class="kit-block" data-kit="scuola" hidden>
+        <div class="kit-grid">
+          <div class="kit-cell" style="grid-column: span 2;">
+            <span class="kit-cell__tag"><b>S2</b> Cartoleria</span><span class="kit-cell__code">CODE + GRAFICA</span>
+            <div class="cartoleria">
+              <div class="sticker">Scuola Triono</div>
+              <div class="toppa">Dai 5 anni</div>
+              <svg class="doodle" viewBox="0 0 90 60"><path d="M6 40 C 25 10, 45 55, 66 22 L 60 30 M66 22 L 72 34"></path></svg>
+              <svg class="doodle" viewBox="0 0 90 60"><path d="M45 6 L 52 26 L 74 26 L 56 40 L 63 60 L 45 46 L 27 60 L 34 40 L 16 26 L 38 26 Z"></path></svg>
+            </div>
+          </div>
+          <div class="kit-cell">
+            <span class="kit-cell__tag"><b>S1</b> Mascotte · Nino</span><span class="kit-cell__code">ASSET</span>
+            <img class="mascotte float" src="public/nino/nino-strada.webp" alt="Mascotte Nino">
+          </div>
+          <div class="kit-cell">
+            <span class="kit-cell__tag"><b>S3</b> Mascotte · Vittoria</span><span class="kit-cell__code">ASSET</span>
+            <img class="mascotte float" src="public/vittoria/vittoria-mtb.webp" alt="Mascotte Vittoria" style="animation-delay:-2s">
+          </div>
+        </div>
+      </div>
+
+      <!-- Marathon kit -->
+      <div class="kit-block" data-kit="marathon" hidden>
+        <div class="kit-grid">
+          <div class="kit-cell" style="grid-column: span 2;">
+            <span class="kit-cell__tag"><b>M1</b> Numerone 209 monolite</span><span class="kit-cell__code">CODE</span>
+            <div class="monolite" id="m209" data-t="209">209</div>
+          </div>
+          <div class="kit-cell" style="grid-column: span 2;">
+            <span class="kit-cell__tag"><b>M2</b> Altimetria race-data</span><span class="kit-cell__code">CODE</span>
+            <svg class="altimetria" viewBox="0 0 400 150" preserveAspectRatio="none">
+              <line x1="0" y1="120" x2="400" y2="120"></line>
+              <path class="profile" d="M0 120 L 30 100 L 70 108 L 110 70 L 150 88 L 200 30 L 250 78 L 300 60 L 350 96 L 400 84 L 400 120 L 0 120 Z"></path>
+              <circle class="peak" cx="200" cy="30" r="4"></circle>
+              <text class="peaktext" x="200" y="20" text-anchor="middle">KM 141 · 890M</text>
+              <text x="0" y="140">KM 0</text><text x="200" y="140" text-anchor="middle">KM 100</text><text x="400" y="140" text-anchor="end">KM 209</text>
+            </svg>
+          </div>
+          <div class="kit-cell">
+            <span class="kit-cell__tag"><b>M3</b> Slash diagonali</span><span class="kit-cell__code">CODE</span>
+            <div class="slashes" style="position:relative;width:100%;height:100%">
+              <div class="slash" style="top:40%"></div>
+              <div class="slash slash--grain" style="top:56%"></div>
+              <div class="slash slash--thin" style="top:70%"></div>
+            </div>
+          </div>
+          <div class="kit-cell">
+            <span class="kit-cell__tag"><b>M4</b> Sequenza d'azione</span><span class="kit-cell__code">ASSET + CODE</span>
+            <div class="seq">
+              <div class="frame f-echo1"><div class="silhouette"></div></div>
+              <div class="frame f-echo2"><div class="silhouette"></div></div>
+              <div class="frame"><div class="silhouette" style="background:linear-gradient(180deg,var(--stage-muted),var(--stage-faint))"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ciclocross kit (solo dimostrativo) -->
+      <div class="kit-block" data-kit="ciclocross" hidden>
+        <div class="kit-grid">
+          <div class="kit-cell" style="grid-column: span 2;">
+            <span class="kit-cell__tag"><b>C1</b> Pini nella nebbia</span><span class="kit-cell__code">CODE</span>
+            <svg class="pini" viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice">
+              <polygon class="far" points="60,200 90,90 120,200"></polygon>
+              <polygon class="far" points="300,200 330,80 360,200"></polygon>
+              <polygon points="150,210 195,50 240,210"></polygon>
+              <polygon points="230,210 265,110 300,210"></polygon>
+              <polygon points="90,215 130,120 170,215"></polygon>
+              <rect class="fog" x="0" y="150" width="400" height="90"></rect>
+            </svg>
+          </div>
+          <div class="kit-cell" style="grid-column: span 2; flex-direction:column; gap:12px">
+            <span class="kit-cell__tag">Livrea futura</span>
+            <p class="center muted" style="max-width:36ch">Nessun asset né pagina oggi. La prova che <b style="color:var(--accent)">"nuovo evento = ~10 righe di CSS"</b>: solo lo scope <code>[data-livery="ciclocross"]</code> ridipinge tutto.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- MOTION ---------- -->
+  <section class="section section--edge" id="motion">
+    <div class="wrap">
+      <div class="apex-lap">
+        <div class="apex-lap__eyebrow eyebrow"><span class="apex-lap__num">LAP 04</span><span class="apex-lap__rule"></span><span>MOTION SPEC</span></div>
+        <h2 class="lap-title">Solo transform<br><span class="accent-word">&amp; opacity</span></h2>
+      </div>
+      <div class="grid-3">
+        <div class="dim-panel"><div class="note">Switch livrea · 500ms ease</div><p class="muted">Transizione token colore su tutto il palco.</p></div>
+        <div class="dim-panel"><div class="note">Headline · reveal 600ms</div><p class="muted">Staggered per parola, cubic-bezier(.2,.8,.2,1).</p></div>
+        <div class="dim-panel"><div class="note">Ticker · ~30s loop</div><p class="muted">Marquee CSS seamless a doppio chunk.</p></div>
+        <div class="dim-panel"><div class="note">HUD · tick 1–2s</div><p class="muted">Random-walk clampato entro min/max.</p></div>
+        <div class="dim-panel"><div class="note">Doodle · stroke draw 3.2s</div><p class="muted">Solo nella livrea Scuola.</p></div>
+        <div class="dim-panel"><div class="note">Glitch 209 · &lt;200ms, ogni 8–12s</div><p class="muted">Slice orizzontale raro; buca i confini.</p></div>
+      </div>
+      <p class="note center" style="margin-top:var(--space-6)">Attiva "Reduced-motion" nella regia → tutto resta presente, da fermo.</p>
+    </div>
+  </section>
+
+  <!-- ---------- A11Y / CONTRASTO ---------- -->
+  <section class="section section--edge" id="a11y">
+    <div class="wrap">
+      <div class="apex-lap">
+        <div class="apex-lap__eyebrow eyebrow"><span class="apex-lap__num">LAP 05</span><span class="apex-lap__rule"></span><span>CONTRASTO · VERIFICATO SU #030818</span></div>
+        <h2 class="lap-title">Le soglie<br><span class="stroke-word">per livrea</span></h2>
+      </div>
+      <table class="ref-table">
+        <thead><tr><th>Accento</th><th>Ratio vs #030818</th><th>Small text (AA 4.5)</th><th>Regola d'uso</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="chip-swatch"><i style="background:#F4E718"></i>Giallo · Scuola</span></td>
+            <td><b>15.5:1</b></td><td class="pass">AA + AAA ✓</td>
+            <td>Testo piccolo consentito su stage.</td>
+          </tr>
+          <tr>
+            <td><span class="chip-swatch"><i style="background:#EAF4FF"></i>Ghiaccio · CX</span></td>
+            <td><b>17.4:1</b></td><td class="pass">AA + AAA ✓</td>
+            <td>Testo piccolo consentito su stage.</td>
+          </tr>
+          <tr>
+            <td><span class="chip-swatch"><i style="background:#37C8FF"></i>Ciano · Racing</span></td>
+            <td><b>10.3:1</b></td><td class="pass">AA + AAA ✓</td>
+            <td>OK anche small; per data-label ≤11px usare <b>weight ≥500</b> (leggibilità hue satura).</td>
+          </tr>
+          <tr>
+            <td><span class="chip-swatch"><i style="background:#EF4444"></i>Rosso · 209</span></td>
+            <td><b>5.3:1</b></td><td class="warn">AA ✓ · AAA ✗</td>
+            <td>Il più debole. Body a lungo respiro → usare <b>ink</b>; rosso per titoli/accenti <b>≥18px o ≥14px bold</b>. Mai come rosso-errore nelle pagine 209.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note" style="margin-top:var(--space-4)">Nota: valori WCAG ricalcolati. Testo su superficie accent → sempre ink scuro (<code>#04091c</code>). Focus-visible = anello <code>--accent</code>; ordine di focus = DOM (L0), mai i livelli visivi.</p>
+
+      <hr class="hair">
+
+      <div class="apex-lap" style="margin-top:var(--space-7)">
+        <div class="apex-lap__eyebrow eyebrow"><span class="apex-lap__num">MATRICE</span><span class="apex-lap__rule"></span><span>DEGRADAZIONE</span></div>
+      </div>
+      <table class="ref-table">
+        <thead><tr><th>Contesto</th><th>Comportamento</th></tr></thead>
+        <tbody>
+          <tr><td><b>Mobile &lt;768px</b></td><td>1 solo prop L+1 per sezione · niente mouse-parallax · L−1 ridotto al dominante.</td></tr>
+          <tr><td><b>prefers-reduced-motion</b></td><td>Tutto presente ma statico. Video → solo poster. Props in posizione finale.</td></tr>
+          <tr><td><b>No-JS / JS lento</b></td><td>Il palco degrada a statico: props in posizione finale, ticker/HUD fermi ma leggibili.</td></tr>
+          <tr><td><b>Asset mancante</b></td><td>FondaleVivo → poster/gradiente. Cutout → silhouette. Nessun layout shift (absolute).</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================================================ FOOTER (Racing) -->
+<footer class="apex-footer" data-livery="racing">
+  <div class="wrap">
+    <img class="apex-nav__logo" src="public/assets/logo-triono-racing.png" alt="Triono Racing">
+    <p class="muted" style="max-width:52ch">ASD Triono Racing · APEX Design System v2 — Velodromo Notturno. NavBar e Footer sono sempre in livrea Racing: il brand padre firma tutto.</p>
+    <p class="note" style="margin-top:var(--space-4)">© Triono Racing · DS v2 APEX · Deliverable di sistema (non le pagine finali)</p>
+  </div>
+</footer>
+
+<script>
+/* =============================================================================
+   APEX — modulo unico, vanilla, isolato, spegnibile.
+   (In produzione: componente React `useStageParallax` con lo stesso kill-switch.)
+   ============================================================================= */
+(function () {
+  "use strict";
+  const APEX = { motion: { parallax: true, reduced: false } };
+  const mqReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const isMobile  = () => window.matchMedia("(max-width: 767px)").matches;
+  APEX.motion.reduced = mqReduced.matches;
+
+  /* ---------- Ticker: doppio chunk seamless ---------- */
+  (function ticker() {
+    const items = [
+      ["MARATHON 209", "12 GIU"], ["CICLOCROSS DEI PINI", "STAGIONE INVERNALE"],
+      ["SCUOLA · DAI 5 ANNI", "ISCRIZIONI APERTE"], ["AMATORI & AGONISTI", "TESSERAMENTO 2026"],
+      ["209 KM", "1 LEGGENDA"], ["ON AIR", "VELODROMO NOTTURNO"],
+    ];
+    const chunk = document.createElement("span");
+    chunk.className = "apex-ticker__chunk";
+    items.forEach(([a, b]) => {
+      const el = document.createElement("span");
+      el.className = "apex-ticker__item";
+      el.innerHTML = `${a} <b>${b}</b> <span class="apex-ticker__sep">/</span>`;
+      chunk.appendChild(el);
+    });
+    const track = document.getElementById("ticker");
+    track.appendChild(chunk);
+    track.appendChild(chunk.cloneNode(true)); // secondo chunk → loop -50%
+  })();
+
+  /* ---------- Waveform generator (R2) ---------- */
+  function buildWave(path, seed) {
+    if (!path) return;
+    const W = 400, H = 46, n = 60; let d = `M0 ${H/2}`;
+    for (let i = 1; i <= n; i++) {
+      const x = (i / n) * W;
+      const amp = (Math.sin(i * 0.6 + seed) * 0.6 + Math.sin(i * 1.9 + seed) * 0.4);
+      const y = H / 2 - amp * (H / 2 - 4);
+      d += ` L${x.toFixed(1)} ${y.toFixed(1)}`;
+    }
+    path.setAttribute("d", d);
+  }
+  buildWave(document.getElementById("hero-wave"), 0.4);
+  document.querySelectorAll(".kit-wave").forEach((p, i) => buildWave(p, i + 1));
+
+  /* ---------- HUD random-walk clampato ---------- */
+  const hudCells = [...document.querySelectorAll("[data-hud]")];
+  function hudTick() {
+    hudCells.forEach((cell) => {
+      const min = +cell.dataset.min, max = +cell.dataset.max;
+      const unit = cell.querySelector("small");
+      let cur = parseInt(cell.textContent, 10) || (min + max) / 2;
+      cur += Math.round((Math.random() - 0.5) * (max - min) * 0.12);
+      cur = Math.max(min, Math.min(max, cur));
+      cell.firstChild.textContent = cur;
+      if (unit && !cell.contains(unit)) cell.appendChild(unit);
+    });
+  }
+  let hudTimer = setInterval(() => { if (!APEX.motion.reduced) hudTick(); }, 1400);
+
+  /* ---------- Countdown ---------- */
+  const cd = { d: q("d"), h: q("h"), m: q("m"), s: q("s") };
+  function q(k) { return document.querySelector(`[data-cd="${k}"]`); }
+  const target = new Date(); target.setDate(target.getDate() + 47);
+  target.setHours(9, 0, 0, 0);
+  function cdTick() {
+    let diff = Math.max(0, target - new Date());
+    const dd = Math.floor(diff / 864e5); diff -= dd * 864e5;
+    const hh = Math.floor(diff / 36e5); diff -= hh * 36e5;
+    const mm = Math.floor(diff / 6e4); diff -= mm * 6e4;
+    const ss = Math.floor(diff / 1e3);
+    cd.d.textContent = String(dd).padStart(2, "0");
+    cd.h.textContent = String(hh).padStart(2, "0");
+    cd.m.textContent = String(mm).padStart(2, "0");
+    cd.s.textContent = String(ss).padStart(2, "0");
+  }
+  cdTick(); setInterval(cdTick, 1000);
+
+  /* ---------- Glitch 209 (raro) ---------- */
+  function glitchLoop() {
+    const el = document.getElementById("m209");
+    const wait = 8000 + Math.random() * 4000;
+    setTimeout(() => {
+      if (el && !APEX.motion.reduced && !document.querySelector('[data-kit="marathon"]').hidden) {
+        el.classList.add("glitch");
+        setTimeout(() => el.classList.remove("glitch"), 160);
+      }
+      glitchLoop();
+    }, wait);
+  }
+  glitchLoop();
+
+  /* ---------- Scroll progress ---------- */
+  const progress = document.getElementById("progress");
+  function onScrollProgress() {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + "%";
+  }
+  onScrollProgress();
+
+  /* ---------- Parallax: unico modulo scroll+pointer con lerp e kill-switch ---------- */
+  const props = [...document.querySelectorAll(".apex-prop[data-par]")];
+  const state = new Map();
+  props.forEach((p) => state.set(p, { tx: 0, ty: 0, cx: 0, cy: 0, sy: 0 }));
+  let pointer = { x: 0, y: 0 };
+  const hero = document.getElementById("hero");
+
+  window.addEventListener("pointermove", (e) => {
+    if (!APEX.motion.parallax || APEX.motion.reduced || isMobile()) return;
+    const r = hero.getBoundingClientRect();
+    pointer.x = (e.clientX / window.innerWidth - 0.5);
+    pointer.y = (e.clientY / window.innerHeight - 0.5);
+  }, { passive: true });
+
+  function amp(p) {
+    const depth = p.dataset.par;
+    return depth === "oggetti"
+      ? parseFloat(getVar("--par-mouse-oggetti"))
+      : parseFloat(getVar("--par-mouse-sceno"));
+  }
+  function levelFactor(p) {
+    return p.dataset.par === "oggetti"
+      ? (parseFloat(getVar("--par-oggetti")) - 1)
+      : -(1 - parseFloat(getVar("--par-scenografia")));
+  }
+  function getVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name) || "0";
+  }
+
+  function raf() {
+    const killed = !APEX.motion.parallax || APEX.motion.reduced;
+    const mobile = isMobile();
+    const scrolled = window.scrollY;
+    props.forEach((p) => {
+      const s = state.get(p);
+      if (killed) { s.tx = 0; s.ty = 0; }
+      else {
+        const a = mobile ? 0 : amp(p);
+        s.tx = pointer.x * a;
+        // scroll parallax solo sui prop dell'hero
+        const heroRel = (scrolled) * levelFactor(p) * 0.12;
+        s.ty = pointer.y * a + (p.closest("#hero") ? heroRel : 0);
+      }
+      s.cx += (s.tx - s.cx) * 0.08;
+      s.cy += (s.ty - s.cy) * 0.08;
+      p.style.transform = `translate3d(${s.cx.toFixed(2)}px, ${s.cy.toFixed(2)}px, 0)`;
+    });
+    onScrollProgress();
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+
+  /* ---------- Livery switcher ---------- */
+  const stage = document.getElementById("stage");
+  const liveryBtns = [...document.querySelectorAll(".livery-btn")];
+  const kitBlocks = [...document.querySelectorAll(".kit-block")];
+  const names = { racing: "RACING", scuola: "SCUOLA", marathon: "MARATHON 209", ciclocross: "CICLOCROSS DEI PINI" };
+  function setLivery(l) {
+    stage.dataset.livery = l;
+    liveryBtns.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.l === l)));
+    kitBlocks.forEach((k) => (k.hidden = k.dataset.kit !== l));
+    const nm = names[l] || l.toUpperCase();
+    setText("live-livery", nm); setText("kit-livery", nm);
+  }
+  function setText(id, t) { const e = document.getElementById(id); if (e) e.textContent = t; }
+  liveryBtns.forEach((b) => b.addEventListener("click", () => setLivery(b.dataset.l)));
+
+  /* ---------- Motion toggles ---------- */
+  function bindSwitch(id, init, onChange) {
+    const el = document.getElementById(id);
+    let on = init; el.setAttribute("aria-checked", String(on));
+    function toggle() { on = !on; el.setAttribute("aria-checked", String(on)); onChange(on); }
+    el.addEventListener("click", toggle);
+    el.addEventListener("keydown", (e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(); } });
+  }
+  bindSwitch("sw-parallax", true, (on) => (APEX.motion.parallax = on));
+  bindSwitch("sw-reduced", APEX.motion.reduced, (on) => {
+    APEX.motion.reduced = on;
+    document.documentElement.style.setProperty("--reduced-sim", on ? "1" : "0");
+    document.body.classList.toggle("apex-reduced", on);
+  });
+
+  /* ---------- Reveal in-view (scroll-driven, no IntersectionObserver) ---------- */
+  const revealEls = [...document.querySelectorAll(".reveal, .apex-lap, #hero .display")];
+  document.querySelectorAll("#hero .reveal-word").forEach((w, i) => (w.style.transitionDelay = i * 80 + "ms"));
+  function checkReveals() {
+    const trigger = window.innerHeight * 0.9;
+    for (let i = revealEls.length - 1; i >= 0; i--) {
+      const el = revealEls[i];
+      if (el.getBoundingClientRect().top < trigger) {
+        el.classList.add("in-view");
+        revealEls.splice(i, 1);
+      }
+    }
+  }
+  window.addEventListener("scroll", checkReveals, { passive: true });
+  window.addEventListener("resize", checkReveals, { passive: true });
+  requestAnimationFrame(() => requestAnimationFrame(checkReveals)); // 2 frame → la transizione parte
+
+  window.APEX = APEX;
+})();
+</script>
+<style>
+/* Reduced-motion simulato via toggle (oltre alla media query nativa) */
+body.apex-reduced .apex-grain,
+body.apex-reduced .fondale-sim,
+body.apex-reduced .float,
+body.apex-reduced .live-dot,
+body.apex-reduced .dot-live,
+body.apex-reduced .apex-ticker__track,
+body.apex-reduced .doodle path,
+body.apex-reduced .apex-dot animate { animation: none !important; }
+body.apex-reduced .reveal, body.apex-reduced .reveal-word { opacity: 1 !important; transform: none !important; }
+</style>
+</body>
+</html>

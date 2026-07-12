@@ -4,17 +4,23 @@ import * as React from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { VideoBackdrop } from "@/components/ui/video-backdrop";
+import { FondaleVivo } from "@/components/apex/FondaleVivo";
+import { StageProp } from "@/components/apex/StageProp";
+import { useStageParallax } from "@/components/apex/StageScene";
+import { TelemetriaGhost, Waveform } from "@/components/apex/propkit/TelemetriaGhost";
+import { TargaDorsale } from "@/components/apex/propkit/TargaDorsale";
 import type { ComunicazioneHero } from "@/lib/comunicazioni-hero";
 
 /**
  * HeroCampagne — hero homepage dinamica, variante A "rotazione" (EVO-035).
+ * Reskin APEX DS v2 (EVO-038): SOLO lo strato presentazionale — la meccanica
+ * (rotazione, pausa userPlaying, roving tabindex, cross-fade grid, inert,
+ * reduced-motion) è INVARIATA. Sfondo → FondaleVivo (duotone di livrea).
  *
  * Sostituisce `<Hero>` in `HomeHero` quando ci sono comunicazioni Airtable
  * attive. `hero.tsx` NON è toccato (lo usano anche Amatori/Chi siamo — meno
  * rischio regressioni, decisione Fase 6): questo componente replica solo lo
- * strato di sfondo (VideoBackdrop/pattern-navy) e la scena, ma con contenuto
+ * strato di sfondo (FondaleVivo/fondale statico APEX) e la scena, ma con contenuto
  * multiplo che ruota.
  *
  * SEO/LCP: TUTTE le comunicazioni sono renderizzate nel markup (ognuna nel suo
@@ -34,14 +40,14 @@ export interface HeroCampagneProps {
   posterSrc?: string;
 }
 
-/** `**parola**` → evidenza sun-500 (non-italic nonostante <em>, solo colore). */
+/** `**parola**` → evidenza accent di livrea (non-italic nonostante <em>, solo colore). */
 function renderTitolo(titolo: string): React.ReactNode {
   const parts = titolo.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
   return parts.map((part, i) => {
     const m = part.match(/^\*\*([^*]+)\*\*$/);
     if (m) {
       return (
-        <em key={i} className="not-italic text-sun-500">
+        <em key={i} className="not-italic accent-word">
           {m[1]}
         </em>
       );
@@ -83,6 +89,11 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
   const [reducedMotionReconciled, setReducedMotionReconciled] = React.useState(false);
   const reducedMotionDefault = useReducedMotionDefault();
   const dotRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
+
+  // Palco vivo: parallax scroll+mouse sui prop della hero (unico modulo JS
+  // del DS, kill-switch globale; no-op su mobile/reduced-motion).
+  const sceneRef = React.useRef<HTMLElement>(null);
+  useStageParallax(sceneRef);
 
   // Reduced-motion → niente autoplay di default (una tantum); l'utente può
   // comunque premere play. setState durante il render con bailout, non in un
@@ -131,7 +142,8 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
   return (
     <div>
       <section
-        className="relative overflow-hidden rounded-[var(--radius-2xl)] shadow-[var(--shadow-hero)]"
+        ref={sceneRef}
+        className="stage-scene relative overflow-hidden"
         onMouseEnter={() => setHoverPaused(true)}
         onMouseLeave={() => setHoverPaused(false)}
         onFocus={() => setFocusPaused(true)}
@@ -142,20 +154,45 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
           ? { role: "region", "aria-roledescription": "carosello", "aria-label": "Comunicazioni in evidenza" }
           : {})}
       >
+        {/* L−2: fondale vivo (video Airtable, trattamento duotone di livrea)
+            oppure fondale statico (stage + floodlight + vignetta) */}
         {useVideo ? (
-          <VideoBackdrop videoSrc={videoSrc} posterSrc={posterSrc} overlay="hero" />
+          <FondaleVivo src={videoSrc} poster={posterSrc} />
         ) : (
-          <div className="absolute inset-0 bg-navy-900" aria-hidden>
-            <div className="absolute inset-0 pattern-navy" />
-          </div>
+          <div className="apex-fondale" aria-hidden />
         )}
+
+        {/* L−1 scenografia + L+1 oggetto di scena (palco a 5 livelli, DS-APEX §4).
+            zIndex ESPLICITI via anchor: la hero ha una scala z locale (fondale 0 ·
+            scenografia 2 · mascotte 4 · velo 5 · targa 6 · contenuto 10) — i token
+            di livello del DS (10/30) qui collideerebbero col contenuto. */}
+        <StageProp level="sceno" anchor={{ right: "-1%", top: "7%", opacity: 0.9, zIndex: 2 }}>
+          <TelemetriaGhost value="54 KM/H" />
+        </StageProp>
+        <StageProp
+          level="sceno"
+          anchor={{ left: "2%", bottom: "9%", width: "min(420px, 38vw)", zIndex: 2 }}
+          mobileHide
+        >
+          <Waveform />
+        </StageProp>
+        <StageProp
+          level="oggetti"
+          anchor={{ right: "3%", bottom: "13%", zIndex: 6 }}
+          mobileHide
+          float
+        >
+          <TargaDorsale numero="11" />
+        </StageProp>
 
         {/* Layer mascotte — ANCORATE AL BORDO INFERIORE (il taglio del cutout a mezza
             figura coincide col bordo della card → niente figura "appesa" a mezz'aria,
             regola NINO.md §6/§12). Wrapper = container centrato del contenuto, così su
             schermi larghi la mascotte resta verso il centro-destra e non a filo bordo.
             Una per slide, cross-fade in opacità sulla attiva. */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 z-[4]">
+        {/* apex-prop + data-par: il layer partecipa al parallax mouse come
+            oggetto di scena (profondità), senza data-depth per non toccare lo z. */}
+        <div aria-hidden className="apex-prop pointer-events-none absolute inset-0 z-[4]" data-par="oggetti">
           <div className="relative h-full max-w-[1180px] mx-auto">
             {comunicazioni.map((c, i) =>
               c.immagineUrl ? (
@@ -190,16 +227,16 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
             className="pointer-events-none absolute inset-0 z-[5] sm:hidden"
             style={{
               background:
-                "linear-gradient(to top, rgba(5,14,63,0.92) 0%, rgba(5,14,63,0.55) 46%, rgba(5,14,63,0.05) 100%)",
+                "linear-gradient(to top, rgba(3,8,24,0.92) 0%, rgba(3,8,24,0.55) 46%, rgba(3,8,24,0.05) 100%)",
             }}
           />
         )}
 
         <div className="relative z-10 min-h-[520px] lg:min-h-[640px] flex items-end">
           <div className="w-full min-w-0 max-w-[1280px] mx-auto px-6 lg:px-14 py-14 lg:py-20">
-            <h1 className="inline-flex items-center gap-2.5 text-[15px] font-semibold text-white/90">
+            <h1 className="inline-flex items-center gap-2.5 text-[15px] font-semibold text-stage-ink/90">
               In bici, sicuri, insieme.
-              <span aria-hidden className="inline-block w-8 h-px bg-white/30" />
+              <span aria-hidden className="inline-block w-8 h-px bg-stage-ink/30" />
             </h1>
 
             {/* Slide impilate nella stessa cella grid → cross-fade animato, container
@@ -220,41 +257,32 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
                     )}
                   >
                     {c.eyebrow && (
-                      <div className="inline-flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-[0.1em] text-sun-500 before:content-[''] before:w-6 before:h-[2px] before:bg-current before:inline-block">
+                      <div className="apex-eyebrow inline-flex items-center gap-2 text-accent-2 before:content-[''] before:w-6 before:h-[2px] before:bg-current before:inline-block">
                         {c.eyebrow}
                       </div>
                     )}
                     <p
-                      className="mt-3 font-bold tracking-[-0.02em] leading-[0.98] text-white"
-                      style={{ fontSize: "clamp(32px, 5vw, 64px)" }}
+                      className="apex-display mt-3 text-stage-ink"
+                      style={{ fontSize: "clamp(32px, 5vw, 64px)", lineHeight: 0.98 }}
                     >
                       {renderTitolo(c.titolo)}
                     </p>
                     {c.sottotitolo && (
-                      <p className="mt-4 max-w-[520px] text-[16px] leading-relaxed text-white/80 line-clamp-2">
+                      <p className="mt-4 max-w-[520px] text-[16px] leading-relaxed text-stage-ink-dim line-clamp-2">
                         {c.sottotitolo}
                       </p>
                     )}
                     {(c.ctaLabel || c.cta2Label) && (
                       <div className="mt-7 flex flex-wrap gap-3">
                         {c.ctaLabel && c.ctaUrl && (
-                          <Button
-                            asChild
-                            size="lg"
-                            className="bg-white text-navy-900 border-white hover:bg-navy-50"
-                          >
-                            <a href={c.ctaUrl}>{c.ctaLabel}</a>
-                          </Button>
+                          <a href={c.ctaUrl} className="apex-cta apex-cta--primary">
+                            {c.ctaLabel} <span className="apex-cta__arrow" aria-hidden>→</span>
+                          </a>
                         )}
                         {c.cta2Label && c.cta2Url && (
-                          <Button
-                            asChild
-                            variant="outline"
-                            size="lg"
-                            className="text-white border-white/50 hover:bg-white/10 hover:border-white"
-                          >
-                            <a href={c.cta2Url}>{c.cta2Label}</a>
-                          </Button>
+                          <a href={c.cta2Url} className="apex-cta apex-cta--ghost">
+                            {c.cta2Label}
+                          </a>
                         )}
                       </div>
                     )}
@@ -265,12 +293,12 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
 
             {!singola && (
               <div className="mt-8 flex justify-center lg:justify-start">
-                <div className="inline-flex items-center gap-1 rounded-full bg-navy-950/60 backdrop-blur px-2 py-1.5">
+                <div className="inline-flex items-center gap-1 border border-stage-line bg-stage-surface/80 backdrop-blur px-2 py-1.5">
                   <button
                     type="button"
                     onClick={() => goTo(activeIndex - 1)}
                     aria-label="Comunicazione precedente"
-                    className="w-10 h-10 grid place-items-center rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                    className="w-10 h-10 grid place-items-center text-stage-ink-dim hover:text-stage-ink hover:bg-white/5 transition-colors"
                   >
                     <ChevronLeft size={18} aria-hidden />
                   </button>
@@ -280,7 +308,7 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
                     onClick={() => setUserPlaying((p) => !p)}
                     aria-label={userPlaying ? "Metti in pausa la rotazione" : "Avvia la rotazione"}
                     aria-pressed={userPlaying}
-                    className="w-10 h-10 grid place-items-center rounded-full bg-sun-500 text-navy-900 hover:bg-sun-400 transition-colors"
+                    className="w-10 h-10 grid place-items-center bg-accent text-[#04091c] transition-colors"
                   >
                     {/* Riflette l'INTENTO utente (userPlaying), non lo stato derivato
                         isPlaying: quest'ultimo include la pausa automatica on-hover/focus,
@@ -313,7 +341,7 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
                           aria-hidden
                           className={cn(
                             "rounded-full transition-all",
-                            i === activeIndex ? "w-5 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/40"
+                            i === activeIndex ? "w-5 h-1.5 bg-accent" : "w-1.5 h-1.5 bg-stage-faint"
                           )}
                         />
                       </button>
@@ -324,7 +352,7 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
                     type="button"
                     onClick={() => goTo(activeIndex + 1)}
                     aria-label="Comunicazione successiva"
-                    className="w-10 h-10 grid place-items-center rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                    className="w-10 h-10 grid place-items-center text-stage-ink-dim hover:text-stage-ink hover:bg-white/5 transition-colors"
                   >
                     <ChevronRight size={18} aria-hidden />
                   </button>
@@ -336,9 +364,12 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
       </section>
 
       {altre.length > 0 && (
-        <div className="max-w-[1280px] mx-auto px-6 lg:px-14">
-          <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
-            <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.1em] text-ink-muted">
+        // Hairline di separazione invece di un margine "a vuoto": su fondo stage
+        // uniforme (#030818) uno spazio senza bordo si legge come un buco, non
+        // come uno stacco voluto (regola palco: ogni confine ha un bordo).
+        <div className="max-w-[1280px] mx-auto px-6 lg:px-14 border-t border-stage-line-soft">
+          <div className="pt-4 pb-2 flex flex-col sm:flex-row sm:items-center gap-3">
+            <span className="shrink-0 apex-data text-[10.5px]">
               Altre slide in rotazione
             </span>
             <div className="flex flex-1 flex-col sm:flex-row flex-wrap gap-2">
@@ -349,15 +380,15 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
                     key={c.id}
                     type="button"
                     onClick={() => goTo(idx)}
-                    className="flex-1 min-w-[220px] text-left rounded-[var(--radius-lg)] bg-navy-900 hover:bg-navy-950 px-4 py-2.5 transition-colors"
+                    className="flex-1 min-w-[220px] text-left border border-stage-line bg-stage-surface hover:border-accent px-4 py-2.5 transition-colors"
                   >
                     {c.eyebrow && (
-                      <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-white/50">
-                        <span aria-hidden className="w-1 h-1 rounded-full bg-white/40" />
+                      <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-stage-muted">
+                        <span aria-hidden className="w-1 h-1 rounded-full bg-accent" />
                         {c.eyebrow}
                       </span>
                     )}
-                    <span className="block text-[13.5px] font-semibold text-white mt-0.5 truncate">
+                    <span className="block text-[13.5px] font-semibold text-stage-ink mt-0.5 truncate">
                       {c.titolo.replace(/\*\*/g, "")}
                     </span>
                   </button>

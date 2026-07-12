@@ -1,43 +1,49 @@
-import Link from "next/link";
-import { SectionHeader } from "@/components/ui/section-header";
-import { Button } from "@/components/ui/button";
-import { VideoBackdrop } from "@/components/ui/video-backdrop";
+import { FondaleVivo } from "@/components/apex/FondaleVivo";
+import { ApexCta } from "@/components/apex/ApexCta";
 import { getSfondoVideo, cloudinaryVideoOptimized } from "@/lib/sfondi-video";
-import { cn } from "@/lib/utils";
 
+/**
+ * CTA finale — APEX (EVO-038), livrea Racing. Riusata anche da chi-siamo e
+ * gli-amatori-triono (pagine non ancora migrate): la sezione porta il proprio
+ * fondale stage, quindi regge su qualsiasi pagina.
+ * Sfondo video gestito da Airtable (slot "home-cta") con trattamento duotone;
+ * se assente/non attivo → fondale statico (stage + floodlight). Max 1 fondale
+ * vivo per viewport: hero e CTA finale non convivono mai nello stesso viewport.
+ */
 export async function CtaFinale() {
-  // Sfondo video gestito da Airtable (slot "home-cta"). Se assente/non attivo →
-  // fallback allo sfondo statico `.photo-bg-navy` (zero regressione).
   const sfondo = await getSfondoVideo("home-cta");
 
   return (
-    <section
-      className={cn(
-        "relative text-white overflow-hidden",
-        !sfondo && "photo-bg-navy",
-      )}
-    >
-      {sfondo && (
-        <VideoBackdrop
-          videoSrc={cloudinaryVideoOptimized(sfondo.videoUrl, 1600)}
-          posterSrc={sfondo.posterUrl}
-          overlay="cta"
+    <section data-livery="racing" className="stage-scene relative overflow-hidden text-stage-ink">
+      {sfondo ? (
+        <FondaleVivo
+          src={cloudinaryVideoOptimized(sfondo.videoUrl, 1600)}
+          poster={sfondo.posterUrl}
         />
+      ) : (
+        <div className="apex-fondale" aria-hidden />
       )}
-      <div className="relative z-[1] max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32 text-center reveal">
-        <SectionHeader
-          eyebrow="Pronti a pedalare?"
-          title={<span className="text-white">In bici. Insieme. Subito.</span>}
-          subtitle={<span className="text-white/70">Inizia oggi il percorso di tuo figlio con la Scuola di Ciclismo Triono. Posti limitati per garantire qualità delle lezioni.</span>}
-          align="center"
-        />
+
+      <div
+        className="apex-wrap relative py-24 lg:py-32 text-center reveal"
+        style={{ zIndex: "var(--z-pista)" }}
+      >
+        <div className="apex-eyebrow justify-center inline-flex items-center gap-3">
+          <span className="apex-lap__num">PRONTI A PEDALARE?</span>
+        </div>
+        <h2 className="apex-display mt-4" style={{ fontSize: "var(--fs-display)" }}>
+          In bici. <span className="stroke-word">Insieme.</span>{" "}
+          <span className="accent-word">Subito.</span>
+        </h2>
+        <p className="mt-5 mx-auto max-w-[52ch] text-stage-ink-dim">
+          Inizia oggi il percorso di tuo figlio con la Scuola di Ciclismo Triono. Posti limitati
+          per garantire qualità delle lezioni.
+        </p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
-          <Button asChild size="lg" className="bg-white text-navy-900 border-white hover:bg-navy-50">
-            <Link href="/portale/iscrizioni">Iscrivi tuo figlio</Link>
-          </Button>
-          <Button asChild size="lg" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:border-white">
-            <Link href="/portale/login">Accedi all&apos;area genitori</Link>
-          </Button>
+          <ApexCta href="/portale/iscrizioni">Iscrivi tuo figlio</ApexCta>
+          <ApexCta href="/portale/login" variant="ghost">
+            Accedi all&apos;area genitori
+          </ApexCta>
         </div>
       </div>
     </section>

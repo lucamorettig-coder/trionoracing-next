@@ -10,6 +10,10 @@
 
 @import "tailwindcss";
 
+/* ===== APEX DS v2 (parte pubblica) — token scoped [data-stage] + classi componente ===== */
+@import "./apex-tokens.css";
+@import "./apex.css";
+
 @theme {
   /* ============ NAVY (primario) ============ */
   --color-navy-50:  #EEF1F8;
@@ -93,6 +97,25 @@
   /* Cambia a 'Manrope' o 'Geist' dopo la scelta del cliente. Default: Inter. */
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ===== APEX DS v2 — esposizione token semantici come utility Tailwind =====
+   `inline` = le utility referenziano la var a runtime → risolvono per-scope
+   ([data-stage] telaio, [data-livery] accenti). Prefisso --color-* obbligatorio
+   (lezione EVO-027). Usabili SOLO dentro il palco (fuori la var è vuota). */
+@theme inline {
+  --color-stage-bg: var(--stage-bg);
+  --color-stage-navy: var(--stage-navy);
+  --color-stage-surface: var(--stage-surface);
+  --color-stage-surface-2: var(--stage-surface-2);
+  --color-stage-line: var(--stage-line);
+  --color-stage-line-soft: var(--stage-line-soft);
+  --color-stage-ink: var(--stage-ink);
+  --color-stage-ink-dim: var(--stage-ink-dim);
+  --color-stage-muted: var(--stage-muted);
+  --color-stage-faint: var(--stage-faint);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
 }
 
 /* ===== Body defaults ===== */
@@ -465,12 +488,14 @@ body {
   --radius-2xl: 2px;
 }
 
-/* Display font Anton solo per heading dentro lo scope 209 */
+/* Display font Anton solo per heading dentro lo scope 209.
+   NB: la variabile è --font-anton (rinominata in EVO-038: --font-display ora
+   è il token APEX per Archivo dentro [data-stage]). */
 .theme-209 h1,
 .theme-209 h2,
 .theme-209 h3,
 .theme-209 .theme-209-display {
-  font-family: var(--font-display), Impact, "Helvetica Neue", sans-serif;
+  font-family: var(--font-anton), Impact, "Helvetica Neue", sans-serif;
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 0.95;

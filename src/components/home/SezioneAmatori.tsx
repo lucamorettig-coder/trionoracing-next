@@ -1,47 +1,68 @@
 import Image from "next/image";
-import { SectionHeader } from "@/components/ui/section-header";
-import { Card, CardContent, CardTitle, CardBody } from "@/components/ui/card";
+import { SectionLap } from "@/components/apex/SectionLap";
+import { ApexCard } from "@/components/apex/ApexCard";
+import { ApexCta } from "@/components/apex/ApexCta";
+import { StageProp } from "@/components/apex/StageProp";
+import { StageScene } from "@/components/apex/StageScene";
+import { EchoStack } from "@/components/apex/propkit/EchoStack";
 
+/**
+ * Sezione Amatori — home APEX (EVO-038), livrea Racing.
+ * Elemento firma R1 (cutout eco-scia, asset fal.ai) come prop L+1 sul bordo
+ * della sezione — nascosto su mobile (budget 1 prop/sezione).
+ */
 export function SezioneAmatori() {
   return (
-    <section className="bg-bg-soft pattern-light py-24 lg:py-32">
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
+    <StageScene className="apex-section apex-section--edge">
+      {/* L+1: cutout atleta con eco-scia, sul bordo destro della sezione */}
+      <StageProp
+        level="oggetti"
+        anchor={{ right: "-40px", top: "6%", width: "min(300px, 22vw)" }}
+        mobileHide
+        float
+      >
+        <EchoStack src="/apex/racing-road-sprint.webp" width={584} height={546} />
+      </StageProp>
+
+      <div className="apex-wrap relative" style={{ zIndex: "var(--z-pista)" }}>
         <div className="reveal">
-          <SectionHeader
-            eyebrow="La squadra"
-            title="Gli amatori Triono Racing."
-            subtitle="Una comunità di ciclisti adulti che condividono allenamenti, gare e l'orgoglio di una maglia. Rispetto reciproco, sportività, voglia di sfide vere."
-            cta={{ label: "Scopri la squadra", href: "/gli-amatori-triono" }}
+          <SectionLap
+            numero="03"
+            label="LA SQUADRA"
+            title={
+              <>
+                Gli amatori <span className="accent-word">Triono Racing.</span>
+              </>
+            }
           />
         </div>
+        <p className="reveal -mt-8 mb-12 max-w-[62ch] text-stage-muted">
+          Una comunità di ciclisti adulti che condividono allenamenti, gare e l&apos;orgoglio di
+          una maglia. Rispetto reciproco, sportività, voglia di sfide vere.
+        </p>
 
-        <div className="mt-12 grid md:grid-cols-2 gap-5">
-          <Card variant="accent" className="reveal reveal-delay-1">
-            <CardContent>
-              <div className="text-sun-500 text-[12px] font-bold uppercase tracking-[0.15em] mb-3">
-                Agonisti
-              </div>
-              <CardTitle className="text-white">Gare regionali e nazionali.</CardTitle>
-              <CardBody className="text-white/70">
-                Calendario gare, allenamenti programmati, supporto tecnico. Per chi pedala con un obiettivo agonistico.
-              </CardBody>
-            </CardContent>
-          </Card>
-          <Card variant="accent" className="reveal reveal-delay-2">
-            <CardContent>
-              <div className="text-sun-500 text-[12px] font-bold uppercase tracking-[0.15em] mb-3">
-                Amatori
-              </div>
-              <CardTitle className="text-white">Pedalare in compagnia.</CardTitle>
-              <CardBody className="text-white/70">
-                Uscite di gruppo, MTB e strada, gite, eventi. La squadra come comunità di pari, non solo come team.
-              </CardBody>
-            </CardContent>
-          </Card>
+        <div className="grid md:grid-cols-2 gap-5">
+          <div className="reveal reveal-delay-1">
+            <ApexCard index="AGONISTI" title="Gare regionali e nazionali.">
+              <p>
+                Calendario gare, allenamenti programmati, supporto tecnico. Per chi pedala con un
+                obiettivo agonistico.
+              </p>
+            </ApexCard>
+          </div>
+          <div className="reveal reveal-delay-2">
+            <ApexCard index="AMATORI" title="Pedalare in compagnia.">
+              <p>
+                Uscite di gruppo, MTB e strada, gite, eventi. La squadra come comunità di pari,
+                non solo come team.
+              </p>
+            </ApexCard>
+          </div>
         </div>
 
+        {/* Foto squadra in duotone navy freddo */}
         <div className="mt-10 reveal reveal-delay-3">
-          <div className="photo-house relative aspect-[3/2] rounded-[var(--radius-2xl)] shadow-[var(--shadow-md)]">
+          <div className="apex-duotone relative aspect-[3/2] overflow-hidden border border-stage-line">
             <Image
               src="/photos/amatori/squadra-amatori.jpg"
               alt="La squadra amatori Triono Racing in maglia ufficiale, in sella alle mountain bike lungo una strada"
@@ -51,7 +72,13 @@ export function SezioneAmatori() {
             />
           </div>
         </div>
+
+        <div className="mt-8 reveal">
+          <ApexCta href="/gli-amatori-triono" variant="ghost">
+            Scopri la squadra
+          </ApexCta>
+        </div>
       </div>
-    </section>
+    </StageScene>
   );
 }

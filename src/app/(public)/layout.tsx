@@ -1,5 +1,5 @@
-import { NavBar } from "@/components/ui/navbar";
-import { Footer } from "@/components/ui/footer";
+import { ApexNavBar } from "@/components/apex/ApexNavBar";
+import { ApexFooter } from "@/components/apex/ApexFooter";
 
 const publicLinks = [
   { label: "Scuola", href: "/la-scuola" },
@@ -9,12 +9,20 @@ const publicLinks = [
   { label: "Contatti", href: "/contatti" },
 ];
 
+/**
+ * Layout pubblico — palco APEX (EVO-038).
+ * `data-stage` attiva i token del DS v2 (scoped: il portale non li vede).
+ * Chrome (NavBar/Footer) SEMPRE in livrea Racing su tutte le pagine
+ * pubbliche; le pagine non ancora migrate restano chiare sotto il chrome
+ * dark (data-stage fornisce i token ma NON setta il background — il fondo
+ * stage lo applica ogni pagina migrata sul proprio wrapper).
+ */
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
-      <NavBar links={publicLinks} />
+    <div data-stage className="flex-1 flex flex-col">
+      <ApexNavBar links={publicLinks} />
       <main className="flex-1">{children}</main>
-      <Footer />
-    </>
+      <ApexFooter />
+    </div>
   );
 }
