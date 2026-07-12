@@ -49,7 +49,11 @@ export function useStageParallax(containerRef: React.RefObject<HTMLElement | nul
 
     const tick = () => {
       const mobile = mqMobile.matches;
-      const scrolled = window.scrollY;
+      // Scroll RELATIVO alla sezione (0 = top sezione al top viewport), non
+      // window.scrollY assoluto: lo showcase applicava lo scroll solo all'hero
+      // (che parte da 0); per le sezioni a metà pagina l'assoluto sposterebbe
+      // i prop di centinaia di px dal loro anchor.
+      const scrolled = -container.getBoundingClientRect().top;
       for (const p of props) {
         const s = state.get(p)!;
         if (killed) {

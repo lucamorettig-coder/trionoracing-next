@@ -2,6 +2,8 @@ import Image from "next/image";
 import { SectionLap } from "@/components/apex/SectionLap";
 import { ApexCard } from "@/components/apex/ApexCard";
 import { ApexCta } from "@/components/apex/ApexCta";
+import { StageProp } from "@/components/apex/StageProp";
+import { StageScene } from "@/components/apex/StageScene";
 import { HelmetIcon, WheelIcon, MedalIcon, CalendarDays, MapPin } from "@/components/ui/icons";
 
 /**
@@ -11,7 +13,7 @@ import { HelmetIcon, WheelIcon, MedalIcon, CalendarDays, MapPin } from "@/compon
  */
 export function SezioneScuola() {
   return (
-    <section data-livery="scuola" className="apex-section apex-section--edge">
+    <StageScene data-livery="scuola" className="apex-section apex-section--edge">
       <div className="apex-wrap">
         <div className="reveal">
           <SectionLap
@@ -67,8 +69,9 @@ export function SezioneScuola() {
           </div>
         </div>
 
-        {/* Foto in duotone di livrea (ambra caldo) */}
-        <div className="mt-10 reveal">
+        {/* Foto in duotone di livrea (ambra caldo) + S1: Nino sbuca dal bordo
+            della foto (L+1, overlap solo sul bordo card/foto ≤20% — mai sul testo) */}
+        <div className="mt-10 reveal relative">
           <div className="apex-duotone relative aspect-video overflow-hidden border border-stage-line">
             <Image
               src="/photos/scuola/lezione-ciclodromo.jpg"
@@ -79,6 +82,20 @@ export function SezioneScuola() {
               priority
             />
           </div>
+          <StageProp
+            level="oggetti"
+            anchor={{ right: "-18px", bottom: "-8px", width: "min(250px, 19vw)" }}
+            mobileHide
+            float
+          >
+            <Image
+              src="/nino/nino-strada.webp"
+              alt=""
+              width={781}
+              height={1000}
+              className="w-full h-auto drop-shadow-[0_16px_36px_rgba(0,0,0,0.62)]"
+            />
+          </StageProp>
         </div>
 
         <div className="mt-10 reveal">
@@ -117,6 +134,6 @@ export function SezioneScuola() {
           </ApexCard>
         </div>
       </div>
-    </section>
+    </StageScene>
   );
 }

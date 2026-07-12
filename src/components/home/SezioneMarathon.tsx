@@ -2,6 +2,7 @@ import Image from "next/image";
 import { SectionLap } from "@/components/apex/SectionLap";
 import { ApexCta } from "@/components/apex/ApexCta";
 import { StageProp } from "@/components/apex/StageProp";
+import { StageScene } from "@/components/apex/StageScene";
 import { Monolite209 } from "@/components/apex/propkit/Monolite209";
 import { MountainIcon, MapPin, CalendarDays } from "@/components/ui/icons";
 
@@ -13,7 +14,7 @@ import { MountainIcon, MapPin, CalendarDays } from "@/components/ui/icons";
  */
 export function SezioneMarathon() {
   return (
-    <section data-livery="marathon" className="apex-section apex-section--edge stage-scene">
+    <StageScene data-livery="marathon" className="apex-section apex-section--edge">
       {/* L−1: numerone 209 monolite ghost che buca il bordo */}
       <StageProp level="sceno" anchor={{ right: "-3%", top: "-6%", opacity: 0.5 }}>
         <Monolite209 />
@@ -75,6 +76,6 @@ export function SezioneMarathon() {
           </div>
         </div>
       </div>
-    </section>
+    </StageScene>
   );
 }

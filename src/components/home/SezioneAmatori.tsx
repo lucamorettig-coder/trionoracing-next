@@ -3,6 +3,7 @@ import { SectionLap } from "@/components/apex/SectionLap";
 import { ApexCard } from "@/components/apex/ApexCard";
 import { ApexCta } from "@/components/apex/ApexCta";
 import { StageProp } from "@/components/apex/StageProp";
+import { StageScene } from "@/components/apex/StageScene";
 import { EchoStack } from "@/components/apex/propkit/EchoStack";
 
 /**
@@ -12,7 +13,7 @@ import { EchoStack } from "@/components/apex/propkit/EchoStack";
  */
 export function SezioneAmatori() {
   return (
-    <section className="apex-section apex-section--edge stage-scene">
+    <StageScene className="apex-section apex-section--edge">
       {/* L+1: cutout atleta con eco-scia, sul bordo destro della sezione */}
       <StageProp
         level="oggetti"
@@ -78,6 +79,6 @@ export function SezioneAmatori() {
           </ApexCta>
         </div>
       </div>
-    </section>
+    </StageScene>
   );
 }

@@ -1,4 +1,7 @@
 import { SectionLap } from "@/components/apex/SectionLap";
+import { StageProp } from "@/components/apex/StageProp";
+import { StageScene } from "@/components/apex/StageScene";
+import { RacingLine } from "@/components/apex/propkit/RacingLine";
 import { MapPin, ArrowUpRight } from "@/components/ui/icons";
 import { MapEmbed } from "./MapEmbed";
 
@@ -14,8 +17,16 @@ const EMBED_URL = `https://www.google.com/maps?q=${LAT},${LNG}&z=16&output=embed
  */
 export function ComeRaggiungerci() {
   return (
-    <section id="come-raggiungerci" className="apex-section apex-section--edge scroll-mt-20">
-      <div className="apex-wrap">
+    <StageScene id="come-raggiungerci" className="apex-section apex-section--edge scroll-mt-20">
+      {/* L−1: racing line — la traiettoria che "legge" il percorso, dietro il contenuto */}
+      <StageProp
+        level="sceno"
+        anchor={{ right: "-4%", top: "4%", width: "min(560px, 42vw)", opacity: 0.55 }}
+      >
+        <RacingLine />
+      </StageProp>
+
+      <div className="apex-wrap relative" style={{ zIndex: "var(--z-pista)" }}>
         <div className="reveal">
           <SectionLap
             numero="02"
@@ -76,6 +87,6 @@ export function ComeRaggiungerci() {
           </div>
         </div>
       </div>
-    </section>
+    </StageScene>
   );
 }

@@ -5,6 +5,10 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FondaleVivo } from "@/components/apex/FondaleVivo";
+import { StageProp } from "@/components/apex/StageProp";
+import { useStageParallax } from "@/components/apex/StageScene";
+import { TelemetriaGhost, Waveform } from "@/components/apex/propkit/TelemetriaGhost";
+import { TargaDorsale } from "@/components/apex/propkit/TargaDorsale";
 import type { ComunicazioneHero } from "@/lib/comunicazioni-hero";
 
 /**
@@ -86,6 +90,11 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
   const reducedMotionDefault = useReducedMotionDefault();
   const dotRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
 
+  // Palco vivo: parallax scroll+mouse sui prop della hero (unico modulo JS
+  // del DS, kill-switch globale; no-op su mobile/reduced-motion).
+  const sceneRef = React.useRef<HTMLElement>(null);
+  useStageParallax(sceneRef);
+
   // Reduced-motion → niente autoplay di default (una tantum); l'utente può
   // comunque premere play. setState durante il render con bailout, non in un
   // effect (pattern EVO-020: evita cascading renders / react-hooks/set-state-in-effect).
@@ -133,6 +142,7 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
   return (
     <div>
       <section
+        ref={sceneRef}
         className="stage-scene relative overflow-hidden"
         onMouseEnter={() => setHoverPaused(true)}
         onMouseLeave={() => setHoverPaused(false)}
@@ -152,12 +162,37 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
           <div className="apex-fondale" aria-hidden />
         )}
 
+        {/* L−1 scenografia + L+1 oggetto di scena (palco a 5 livelli, DS-APEX §4).
+            zIndex ESPLICITI via anchor: la hero ha una scala z locale (fondale 0 ·
+            scenografia 2 · mascotte 4 · velo 5 · targa 6 · contenuto 10) — i token
+            di livello del DS (10/30) qui collideerebbero col contenuto. */}
+        <StageProp level="sceno" anchor={{ right: "-1%", top: "7%", opacity: 0.9, zIndex: 2 }}>
+          <TelemetriaGhost value="54 KM/H" />
+        </StageProp>
+        <StageProp
+          level="sceno"
+          anchor={{ left: "2%", bottom: "9%", width: "min(420px, 38vw)", zIndex: 2 }}
+          mobileHide
+        >
+          <Waveform />
+        </StageProp>
+        <StageProp
+          level="oggetti"
+          anchor={{ right: "3%", bottom: "13%", zIndex: 6 }}
+          mobileHide
+          float
+        >
+          <TargaDorsale numero="11" />
+        </StageProp>
+
         {/* Layer mascotte — ANCORATE AL BORDO INFERIORE (il taglio del cutout a mezza
             figura coincide col bordo della card → niente figura "appesa" a mezz'aria,
             regola NINO.md §6/§12). Wrapper = container centrato del contenuto, così su
             schermi larghi la mascotte resta verso il centro-destra e non a filo bordo.
             Una per slide, cross-fade in opacità sulla attiva. */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 z-[4]">
+        {/* apex-prop + data-par: il layer partecipa al parallax mouse come
+            oggetto di scena (profondità), senza data-depth per non toccare lo z. */}
+        <div aria-hidden className="apex-prop pointer-events-none absolute inset-0 z-[4]" data-par="oggetti">
           <div className="relative h-full max-w-[1180px] mx-auto">
             {comunicazioni.map((c, i) =>
               c.immagineUrl ? (
