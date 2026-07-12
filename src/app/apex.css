@@ -80,7 +80,7 @@
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
   border-bottom: 1px solid var(--stage-line-soft);
 }
-.apex-nav__logo { height: 26px; width: auto; filter: brightness(0) invert(1); opacity: 0.95; }
+.apex-nav__logo { height: 26px; width: auto; opacity: 0.95; }
 /* NB: display gestito qui (CSS unlayered batte le utility Tailwind — EVO-029):
    link inline solo da lg in su, sotto c'è il drawer mobile. */
 .apex-nav__links { display: none; gap: var(--space-5); margin-left: auto; }

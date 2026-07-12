@@ -46,7 +46,7 @@ export function ApexNavBar({ links }: ApexNavBarProps) {
         <nav className="apex-nav" aria-label="Navigazione principale">
           <Link href="/" className="flex items-center shrink-0">
             <Image
-              src="/assets/logo-triono-racing.png"
+              src="/assets/logo-triono-racing-white.png"
               alt="Triono Racing"
               width={140}
               height={36}
@@ -102,7 +102,7 @@ export function ApexNavBar({ links }: ApexNavBarProps) {
         >
           <div className="px-4 h-[60px] flex items-center justify-between border-b border-stage-line-soft shrink-0">
             <Image
-              src="/assets/logo-triono-racing.png"
+              src="/assets/logo-triono-racing-white.png"
               alt="Triono Racing"
               width={140}
               height={36}

@@ -33,12 +33,11 @@ export function ApexFooter({ onNewsletterSubmit }: ApexFooterProps) {
           {/* Brand */}
           <div className="lg:col-span-4">
             <Image
-              src="/assets/logo-triono-racing.png"
+              src="/assets/logo-triono-racing-white.png"
               alt="Triono Racing"
               width={180}
               height={48}
               className="h-12 w-auto"
-              style={{ filter: "brightness(0) invert(1)" }}
             />
             <p className="mt-5 text-stage-muted text-sm max-w-[320px]">
               ASD CIEMME · Triono Racing. Scuola di ciclismo, squadra amatori e Marathon MTB
