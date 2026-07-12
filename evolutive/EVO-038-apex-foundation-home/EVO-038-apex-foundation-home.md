@@ -44,3 +44,12 @@ Wave: 1 → (2 ∥ 4) → 3 → 5 → 6.
 
 ### [2026-07-12] Avvio implementazione
 Branch creato da main `d9e50b2`. Design handoff copiato in `design-handoff/`. Piano approvato dall'utente (chrome APEX ovunque; EVO-037 ombrello + EVO-038 figlia).
+
+### [2026-07-12] Implementazione MT1→MT6 completata sul branch
+- MT1 `1bbcbd5` fondazioni (token scoped, font, apex.css, Grain) — conflitto `--font-display` risolto rinominando Anton in `--font-anton`.
+- MT2 `aceb0f7` componenti core (9) — CSS-first: client solo Hud/Countdown/FondaleVivo/StageScene.
+- MT4 `7f128c6` PropKit + `public/apex/racing-road-sprint.webp` (584×546, 58KB); glitch Monolite209 reso CSS-only.
+- MT3 `808de4b` chrome APEX su tutto il pubblico.
+- MT5 `9979540` restyle home (6 sezioni, ticker, hero campagne reskin meccanica-invariata; fix overflow titolo Marathon via override locale `--fs-display`).
+- MT6 verifiche: lint/tsc/build verdi (home `○` ISR 10m) · invarianti SEO (1 h1, OG, canonical, JSON-LD, 0 iframe pre-consenso) · reduced-motion (token 1ms/0 verificati via CDP) · mobile 375 reale senza overflow (`scrollWidth=375`) · 7 pagine legacy 200 sotto chrome dark · CtaFinale APEX ok su chi-siamo.
+- **Lezione tooling**: Chrome headless ha larghezza minima finestra ~500px → `--window-size=375` produce screenshot ingannevoli (layout a 500 croppato a 375, "tutto tagliato a destra"). Verifica mobile affidabile = CDP `Emulation.setDeviceMetricsOverride` (`mobile:true`) via `--remote-debugging-port` + WebSocket nativo Node.
