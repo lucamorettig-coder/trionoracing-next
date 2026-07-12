@@ -11,18 +11,27 @@ import {
   Check,
   type LucideIcon,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { SectionLap } from "@/components/apex/SectionLap";
+import { ApexCta } from "@/components/apex/ApexCta";
+import { StageScene } from "@/components/apex/StageScene";
 
 /**
- * SezioneComeIscriversi — /la-scuola (EVO-022)
+ * SezioneComeIscriversi — /la-scuola (EVO-022, restyle APEX EVO-039)
  *
  * Sezione informativa statica "Cosa occorre per iscriversi": funnel in 4 step
  * (prova → registrati → iscrivi → paga) con mockup illustrati delle schermate
  * del portale + banda CTA finale verso l'area riservata genitori.
  *
- * Variante A del design-handoff (DirectionA/MobileA). Server Component:
- * entrata via `.reveal` (scroll-driven, reduced-motion safe), nessuno stato.
- * I mockup sono decorativi (`aria-hidden`) — disegni della UI, non screenshot.
+ * DS v2 APEX, livrea Scuola (giallo elettrico #F4E718 + arancio #FF8A3D) sul
+ * proprio <StageScene>. I mockup "schermo" (BrowserFrame e derivati) restano
+ * intenzionalmente in stile DS v0.1 chiaro: rappresentano uno screenshot del
+ * vero portale genitori (che resta un'app chiara), incorniciato da un "bezel"
+ * navy scuro — solo l'inquadratura esterna adotta i token del palco.
+ *
+ * Variante A del design-handoff (DirectionA/MobileA), meccanica invariata.
+ * Server Component: entrata via `.reveal` (scroll-driven, reduced-motion
+ * safe), nessuno stato. I mockup sono decorativi (`aria-hidden`) — disegni
+ * della UI, non screenshot.
  */
 
 type StepKind = "invito" | "mock";
@@ -80,7 +89,10 @@ const FOTO_PROVA_ALT =
 /* ============================================================
    Mockup illustrati — "disegno della UI, non screenshot"
    Frame finestra + barre al posto dei campi + 1 pulsante pieno.
-   Tutto decorativo: il contenitore mock è marcato aria-hidden.
+   Restano in DS v0.1 chiaro (rappresentano il vero portale genitori,
+   che è un'app chiara indipendente dal palco APEX) — SOLO il tray/bezel
+   esterno che li ospita nella card usa i token del palco. Decorativo:
+   il contenitore mock è marcato aria-hidden.
    ============================================================ */
 
 function Bar({ w = "100%", h = 9, navy = false }: { w?: string; h?: number; navy?: boolean }) {
@@ -219,13 +231,30 @@ function StepMock({ mock }: { mock: MockKind }) {
 }
 
 /* ============================================================
-   Link "prova" (step 01) — azione soft, non un bottone pieno
+   Bezel/tray scuro che incornicia il mockup "schermo" chiaro
+   dentro le card del palco (device mockup: bezel navy + schermo).
+   ============================================================ */
+function MockTray({ mock, padClass }: { mock: MockKind; padClass: string }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={`w-full border border-stage-line-soft bg-stage-navy transition-transform duration-300 [transform-origin:center_bottom] group-hover:scale-[1.03] ${padClass}`}
+    >
+      <StepMock mock={mock} />
+    </div>
+  );
+}
+
+/* ============================================================
+   Link "prova" (step 01) — azione soft, non un bottone pieno.
+   Vive sempre dentro la card calda (apex-card--warm, avorio/ink
+   scuro): colore esplicito ink scuro per restare leggibile lì.
    ============================================================ */
 function LinkProva({ className = "" }: { className?: string }) {
   return (
     <Link
       href="/contatti?motivo=scuola"
-      className={`inline-flex items-center gap-1.5 text-[13px] font-semibold text-navy-700 transition-colors hover:text-navy-900 ${className}`}
+      className={`inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#04091c] underline decoration-[#04091c]/25 underline-offset-2 transition-opacity hover:opacity-70 ${className}`}
     >
       Contattaci e prenota subito una prova
       <ArrowRight className="h-[14px] w-[14px]" strokeWidth={2.2} />
@@ -238,7 +267,7 @@ function LinkProva({ className = "" }: { className?: string }) {
    ============================================================ */
 function CtaBand() {
   return (
-    <div className="reveal reveal-delay-5 relative mt-12 overflow-hidden rounded-[var(--radius-2xl)] bg-navy-900 p-7 lg:mt-16 lg:px-12 lg:py-10">
+    <div className="reveal reveal-delay-5 relative mt-12 overflow-hidden border border-stage-line bg-stage-navy p-7 lg:mt-16 lg:px-12 lg:py-10">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[url('/assets/pattern.svg')] bg-repeat opacity-[0.32]"
@@ -251,42 +280,36 @@ function CtaBand() {
         }}
       />
       <div className="relative flex flex-col items-center gap-6 text-center lg:flex-row lg:gap-10 lg:text-left">
-        {/* Duo mascotte: Nino col certificato medico, Vittoria con la foto tessera */}
-        <div className="relative aspect-[101/120] w-[150px] shrink-0 self-end lg:w-[210px]">
+        {/* Duo mascotte: Nino col certificato medico, Vittoria con la foto tessera — decorativo */}
+        <div
+          aria-hidden="true"
+          className="relative aspect-[101/120] w-[150px] shrink-0 self-end lg:w-[210px]"
+        >
           <Image
             src="/scuola/duo-iscrizione.webp"
-            alt="Nino mostra il certificato medico e Vittoria la foto tessera"
+            alt=""
             fill
             sizes="(max-width: 1024px) 150px, 210px"
-            className="object-contain object-bottom drop-shadow-[0_16px_22px_rgba(0,0,0,0.30)]"
+            className="object-contain object-bottom drop-shadow-[0_16px_22px_rgba(0,0,0,0.5)]"
           />
         </div>
 
         <div className="max-w-[520px] lg:flex-1">
-          <span className="inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.1em] text-sun-500 before:inline-block before:h-[2px] before:w-7 before:bg-current before:content-['']">
+          <span className="inline-flex items-center gap-3 font-mono text-xs font-bold uppercase tracking-[0.16em] text-accent before:inline-block before:h-[2px] before:w-7 before:bg-current before:content-['']">
             Pronti a partire
           </span>
-          <h3 className="mt-3.5 text-[22px] font-bold leading-[1.15] tracking-[-0.015em] text-white lg:text-[30px] lg:leading-[1.12]">
+          <h3 className="apex-display mt-3.5 text-[26px] leading-[1.05] tracking-[-0.02em] text-stage-ink lg:text-[36px]">
             Bastano una foto e il certificato medico.
           </h3>
-          <p className="mx-auto mt-2.5 max-w-[470px] text-[14px] leading-[1.55] text-white/70 lg:mx-0 lg:text-[14.5px]">
+          <p className="mx-auto mt-2.5 max-w-[470px] text-[14px] leading-[1.55] text-stage-ink-dim lg:mx-0 lg:text-[14.5px]">
             Tieni pronti una foto di tuo figlio e il certificato medico di idoneità sportiva non
             agonistica.
           </p>
         </div>
 
         <div className="flex w-full flex-col items-center gap-3 lg:w-auto lg:shrink-0 lg:items-start">
-          <Button
-            asChild
-            size="lg"
-            className="w-full border-sun-500 bg-sun-500 text-navy-900 hover:border-sun-600 hover:bg-sun-600 lg:w-auto"
-          >
-            <Link href="/portale/iscrizioni">
-              {"Inizia l'iscrizione"}
-              <ArrowRight className="h-[18px] w-[18px]" strokeWidth={2.2} />
-            </Link>
-          </Button>
-          <span className="pl-0.5 font-mono text-[11px] tracking-[0.04em] text-white/55">
+          <ApexCta href="/portale/iscrizioni">{"Inizia l'iscrizione"}</ApexCta>
+          <span className="pl-0.5 font-mono text-[11px] tracking-[0.04em] text-stage-faint">
             → area riservata genitori
           </span>
         </div>
@@ -297,10 +320,12 @@ function CtaBand() {
 
 /* ============================================================
    Foto step 01 (placeholder finché non arriva quella reale)
+   In duotone ambra di livrea (Scuola: arancio) — coerente col
+   trattamento fotografico del resto del palco (EVO-038).
    ============================================================ */
 function FotoProva({ heightClass }: { heightClass: string }) {
   return (
-    <div className={`relative w-full overflow-hidden rounded-[14px] shadow-[var(--shadow-sm)] ${heightClass}`}>
+    <div className={`apex-duotone relative w-full overflow-hidden border border-stage-line ${heightClass}`}>
       <Image
         src={FOTO_PROVA_SRC}
         alt={FOTO_PROVA_ALT}
@@ -314,46 +339,37 @@ function FotoProva({ heightClass }: { heightClass: string }) {
 
 /* ============================================================
    Card step — desktop (griglia 4 colonne)
+   Nota: dentro .apex-card, h3/p sono governati dalla regola CSS
+   unlayered `.apex-card h3/p` (apex.css, EVO-038) — vince sempre
+   sulle utility Tailwind (lezione EVO-029: unlayered batte le
+   utility). Niente classi di spaziatura/colore in conflitto su
+   quei due elementi: font-size/peso/margini/colore arrivano dal
+   componente DS.
    ============================================================ */
 function StepCard({ step }: { step: Step }) {
   const invito = step.kind === "invito";
   const Icon = step.icon;
   return (
-    <div
-      className={`group flex h-full flex-col rounded-[var(--radius-xl)] p-[22px] shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-200 hover:-translate-y-1.5 hover:shadow-[var(--shadow-md)] ${
-        invito ? "border-[1.5px] border-[#F2E89A] bg-sun-50" : "border border-line bg-white"
-      }`}
-    >
+    <div className={`group flex h-full flex-col apex-card ${invito ? "apex-card--warm" : ""}`}>
       <div className="flex items-center justify-between">
         <span
-          className={`flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 ${
-            invito ? "bg-sun-500 text-navy-900" : "bg-navy-50 text-navy-700"
+          className={`flex h-11 w-11 items-center justify-center transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 ${
+            invito ? "bg-accent text-[#04091c]" : "bg-stage-navy text-accent"
           }`}
         >
           <Icon size={23} strokeWidth={1.9} />
         </span>
         {invito && (
-          <span className="rounded-full bg-sun-100 px-2.5 py-[5px] font-mono text-[10.5px] font-bold uppercase tracking-[0.08em] text-sun-700">
+          <span className="rounded-full bg-accent px-2.5 py-[5px] font-mono text-[10.5px] font-bold uppercase tracking-[0.08em] text-[#04091c]">
             Gratis
           </span>
         )}
       </div>
-      <h3 className="mt-4 text-[21px] font-semibold leading-[1.2] tracking-[-0.01em] text-ink transition-colors group-hover:text-navy-600">
-        {step.title}
-      </h3>
-      <p className="mt-2 text-[14px] leading-[1.5] text-ink-muted">{step.text}</p>
+      <h3>{step.title}</h3>
+      <p>{step.text}</p>
       {invito && <LinkProva className="mt-3" />}
       <div className="mt-[18px] flex flex-1 items-end">
-        {invito ? (
-          <FotoProva heightClass="h-[188px]" />
-        ) : (
-          <div
-            aria-hidden="true"
-            className="w-full rounded-[var(--radius-lg)] bg-bg-muted p-4 transition-transform duration-300 [transform-origin:center_bottom] group-hover:scale-[1.03]"
-          >
-            <StepMock mock={step.mock!} />
-          </div>
-        )}
+        {invito ? <FotoProva heightClass="h-[188px]" /> : <MockTray mock={step.mock!} padClass="p-4" />}
       </div>
     </div>
   );
@@ -361,6 +377,9 @@ function StepCard({ step }: { step: Step }) {
 
 /* ============================================================
    Riga step — mobile (rail numerato verticale)
+   Stessa struttura interna della StepCard desktop (icona → h3 →
+   p → link/mock), per restare coerente col sistema tipografico
+   di .apex-card senza dover forzare override via !important.
    ============================================================ */
 function StepRow({ step, last }: { step: Step; last: boolean }) {
   const invito = step.kind === "invito";
@@ -370,38 +389,26 @@ function StepRow({ step, last }: { step: Step; last: boolean }) {
       <div className="flex flex-col items-center">
         <span
           className={`flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full font-mono text-[15px] font-bold tracking-[0.04em] ${
-            invito ? "bg-sun-500 text-navy-900" : "bg-navy-700 text-white"
+            invito ? "bg-accent text-[#04091c]" : "border border-stage-line bg-stage-navy text-accent"
           }`}
         >
           {step.n}
         </span>
-        {!last && <span className="mt-1 min-h-[24px] w-0.5 flex-1 bg-line" />}
+        {!last && <span className="mt-1 min-h-[24px] w-0.5 flex-1 bg-stage-line" />}
       </div>
-      <div
-        className={`mb-[14px] rounded-[var(--radius-xl)] p-[18px] shadow-[var(--shadow-sm)] ${
-          invito ? "border-[1.5px] border-[#F2E89A] bg-sun-50" : "border border-line bg-white"
-        }`}
-      >
-        <div className="flex items-center gap-2.5">
-          <span
-            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] ${
-              invito ? "bg-sun-500 text-navy-900" : "bg-navy-50 text-navy-700"
-            }`}
-          >
-            <Icon size={20} strokeWidth={1.9} />
-          </span>
-          <h3 className="text-[18px] font-semibold tracking-[-0.01em] text-ink">{step.title}</h3>
-        </div>
-        <p className="mt-[11px] text-[13.5px] leading-[1.5] text-ink-muted">{step.text}</p>
+      <div className={`group mb-[14px] apex-card ${invito ? "apex-card--warm" : ""}`}>
+        <span
+          className={`flex h-9 w-9 shrink-0 items-center justify-center ${
+            invito ? "bg-accent text-[#04091c]" : "bg-stage-navy text-accent"
+          }`}
+        >
+          <Icon size={20} strokeWidth={1.9} />
+        </span>
+        <h3>{step.title}</h3>
+        <p>{step.text}</p>
         {invito && <LinkProva className="mt-3" />}
         <div className="mt-3.5">
-          {invito ? (
-            <FotoProva heightClass="h-[150px]" />
-          ) : (
-            <div aria-hidden="true" className="rounded-[var(--radius-lg)] bg-bg-muted p-[13px]">
-              <StepMock mock={step.mock!} />
-            </div>
-          )}
+          {invito ? <FotoProva heightClass="h-[150px]" /> : <MockTray mock={step.mock!} padClass="p-[13px]" />}
         </div>
       </div>
     </div>
@@ -410,36 +417,39 @@ function StepRow({ step, last }: { step: Step; last: boolean }) {
 
 export function SezioneComeIscriversi() {
   return (
-    <section className="bg-bg-soft py-20 lg:py-28">
-      <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
+    <StageScene data-livery="scuola" className="apex-section apex-section--edge">
+      <div className="apex-wrap">
         {/* Header */}
-        <div className="reveal max-w-[760px]">
-          <span className="inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.1em] text-sky-600 before:inline-block before:h-[2px] before:w-7 before:bg-current before:content-['']">
-            Iscrizione
-          </span>
-          <h2 className="mt-5 text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-ink text-balance lg:text-[48px]">
-            Iscrivere tuo figlio è semplice.{" "}
-            <span className="text-navy-500">Ecco come.</span>
-          </h2>
-          <p className="mt-5 max-w-[540px] text-[16px] leading-[1.55] text-ink-muted lg:text-[18px]">
-            Quattro passi, dal primo &ldquo;proviamo&rdquo; fino al via. Tutto online, dall&apos;area
-            riservata genitori.
-          </p>
+        <div className="reveal">
+          <SectionLap
+            numero="08"
+            label="ISCRIZIONE"
+            title={
+              <>
+                Iscrivere tuo figlio è semplice.{" "}
+                <span className="accent-word">Ecco come.</span>
+              </>
+            }
+          />
         </div>
+        <p className="reveal -mt-8 mb-12 max-w-[62ch] text-stage-muted">
+          Quattro passi, dal primo &ldquo;proviamo&rdquo; fino al via. Tutto online, dall&apos;area
+          riservata genitori.
+        </p>
 
         {/* Desktop — connettore numerato + griglia 4 colonne */}
         <div className="hidden lg:block">
           <div className="reveal reveal-delay-1 relative mb-[26px] mt-14">
             <div
               aria-hidden="true"
-              className="absolute left-[12.5%] right-[12.5%] top-[22px] z-0 h-[2px] opacity-50 bg-[linear-gradient(90deg,var(--color-grass-500),var(--color-sky-500),var(--color-ember-500),var(--color-navy-700))]"
+              className="absolute left-[12.5%] right-[12.5%] top-[22px] z-0 h-[2px] opacity-70 bg-[linear-gradient(90deg,var(--stage-line),var(--accent),var(--accent-2),var(--stage-line))]"
             />
             <div className="relative z-[1] grid grid-cols-4 gap-6">
               {STEPS.map((s, i) => (
                 <div key={s.n} className="flex justify-center">
                   <span
-                    className={`flex h-[46px] w-[46px] items-center justify-center rounded-full font-mono text-[15px] font-bold tracking-[0.04em] shadow-[0_0_0_6px_var(--color-bg-soft),var(--shadow-sm)] ${
-                      i === 0 ? "bg-sun-500 text-navy-900" : "bg-navy-700 text-white"
+                    className={`flex h-[46px] w-[46px] items-center justify-center rounded-full font-mono text-[15px] font-bold tracking-[0.04em] shadow-[0_0_0_6px_var(--stage-bg),var(--shadow-oggetti)] ${
+                      i === 0 ? "bg-accent text-[#04091c]" : "border border-stage-line bg-stage-navy text-accent"
                     }`}
                   >
                     {s.n}
@@ -466,6 +476,6 @@ export function SezioneComeIscriversi() {
 
         <CtaBand />
       </div>
-    </section>
+    </StageScene>
   );
 }
