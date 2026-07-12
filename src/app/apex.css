@@ -81,7 +81,12 @@
   border-bottom: 1px solid var(--stage-line-soft);
 }
 .apex-nav__logo { height: 26px; width: auto; filter: brightness(0) invert(1); opacity: 0.95; }
-.apex-nav__links { display: flex; gap: var(--space-5); margin-left: auto; }
+/* NB: display gestito qui (CSS unlayered batte le utility Tailwind — EVO-029):
+   link inline solo da lg in su, sotto c'è il drawer mobile. */
+.apex-nav__links { display: none; gap: var(--space-5); margin-left: auto; }
+@media (min-width: 1024px) {
+  .apex-nav__links { display: flex; }
+}
 .apex-nav__links a {
   font-family: var(--font-data); font-size: var(--fs-data);
   letter-spacing: var(--tracking-data); text-transform: uppercase;
@@ -194,6 +199,7 @@
 .apex-cta--ghost:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .apex-cta--support { background: var(--accent-2); color: #04091c; }
 .apex-cta--support:hover { transform: translateY(-2px); box-shadow: 0 0 34px -6px color-mix(in srgb, var(--accent-2) 70%, transparent); }
+.apex-cta--sm { --pad-x: 18px; padding: 10px var(--pad-x); }
 .apex-cta:disabled, .apex-cta[aria-disabled="true"] {
   background: var(--stage-surface); color: var(--stage-faint); cursor: not-allowed;
   box-shadow: none; transform: none; pointer-events: none;
