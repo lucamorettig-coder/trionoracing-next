@@ -99,11 +99,14 @@ export function SezioneSicurezza() {
                   />
                 </div>
                 <div className="apex-card__body flex flex-col">
-                  <h3 className="flex items-center gap-3">
+                  {/* font-size inline: batte la regola unlayered .apex-card h3
+                      (fs-h3 ~30px) che tagliava "OCCHIALI"/"BORRACCIA" sulla
+                      larghezza card. min-w-0 permette il wrap se serve. */}
+                  <h3 className="flex items-center gap-2.5 min-w-0" style={{ fontSize: "1.125rem", lineHeight: 1.1 }}>
                     <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full font-mono text-[12px] font-semibold bg-accent text-[#04091c]">
                       {d.n}
                     </span>
-                    {d.nome}
+                    <span className="min-w-0">{d.nome}</span>
                   </h3>
                   <p className="text-[13px] leading-relaxed">{d.desc}</p>
                 </div>
