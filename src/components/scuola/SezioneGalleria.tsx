@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SectionHeader } from "@/components/ui/section-header";
+import { SectionLap } from "@/components/apex/SectionLap";
 
 // Foto reali della Scuola di Ciclismo Triono, ospitate su Cloudinary (cartella
 // sito/immagini). Servite via next/image (host già abilitato in next.config
@@ -31,15 +31,18 @@ const photos: Array<{ id: string; orient: "l" | "p"; alt: string }> = [
 
 export function SezioneGalleria() {
   return (
-    <section className="bg-bg-soft pattern-light py-24 lg:py-32">
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
+    <section data-livery="scuola" className="apex-section apex-section--edge">
+      <div className="apex-wrap">
         <div className="reveal">
-          <SectionHeader
-            eyebrow="Le foto della Scuola"
+          <SectionLap
+            numero="07"
+            label="LE FOTO DELLA SCUOLA"
             title="La scuola, attraverso le immagini."
-            subtitle="Momenti reali tra lezioni al Ciclodromo Renato Perona di Terni e gare giovanili: bambini, maestri, divertimento e sicurezza."
           />
         </div>
+        <p className="reveal -mt-8 mb-10 max-w-[62ch] text-stage-muted">
+          Momenti reali tra lezioni al Ciclodromo Renato Perona di Terni e gare giovanili: bambini, maestri, divertimento e sicurezza.
+        </p>
 
         {/* Mobile: carosello a scroll orizzontale (le foto impilate non piacciono).
             scroll-snap + peek della successiva + hint. Keyboard-scrollabile (tabIndex). */}
@@ -51,7 +54,7 @@ export function SezioneGalleria() {
           >
             {photos.map((p) => (
               <li key={p.id} className="snap-center shrink-0 w-[82%]">
-                <div className="photo-house relative aspect-[3/4] w-full rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)]">
+                <div className="apex-duotone relative aspect-[3/4] w-full overflow-hidden border border-stage-line">
                   <Image
                     src={`${CLD}/${p.id}.jpg`}
                     alt={p.alt}
@@ -63,7 +66,7 @@ export function SezioneGalleria() {
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-center text-[12.5px] font-semibold text-ink-muted" aria-hidden>
+          <p className="mt-3 text-center text-[12.5px] font-semibold text-stage-muted" aria-hidden>
             Scorri per vedere tutte le foto →
           </p>
         </div>
@@ -76,7 +79,7 @@ export function SezioneGalleria() {
               key={p.id}
               className={`reveal ${p.orient === "l" ? "sm:col-span-2 aspect-[3/2]" : "aspect-[3/4]"}`}
             >
-              <div className="photo-house relative w-full h-full rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-200">
+              <div className="apex-duotone relative w-full h-full overflow-hidden border border-stage-line">
                 <Image
                   src={`${CLD}/${p.id}.jpg`}
                   alt={p.alt}
