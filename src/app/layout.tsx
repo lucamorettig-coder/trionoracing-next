@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Anton } from "next/font/google";
+import { Inter, Anton, Archivo, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import { ClerkProvider } from "@clerk/nextjs";
 import { itIT } from "@clerk/localizations";
@@ -12,11 +12,27 @@ const inter = Inter({
   variable: "--font-sans",
 });
 
-// Display font usato dal theme ospite Marathon 209 (.theme-209)
+// Display font usato dal theme ospite Marathon 209 (.theme-209).
+// Rinominata da --font-display a --font-anton in EVO-038: --font-display è
+// ora il token APEX (Archivo) dentro [data-stage].
 const anton = Anton({
   weight: "400",
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-anton",
+});
+
+// APEX DS v2 (EVO-038): display expanded per headline broadcast.
+// Variable font con asse wdth (usato a font-stretch: 125%, wght 800–900).
+const archivo = Archivo({
+  subsets: ["latin"],
+  axes: ["wdth"],
+  variable: "--font-archivo",
+});
+
+// APEX DS v2 (EVO-038): mono per telemetria, eyebrow, label, badge.
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
 });
 
 export const metadata: Metadata = {
@@ -51,7 +67,7 @@ export default function RootLayout({
     >
       <html
         lang="it"
-        className={`${inter.variable} ${anton.variable} h-full antialiased`}
+        className={`${inter.variable} ${anton.variable} ${archivo.variable} ${jetbrainsMono.variable} h-full antialiased`}
         suppressHydrationWarning
       >
         <body className="min-h-full flex flex-col" suppressHydrationWarning>

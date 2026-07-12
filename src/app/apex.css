@@ -1,0 +1,358 @@
+/* =============================================================================
+   APEX — VELODROMO NOTTURNO · classi componente del DS v2
+   Porting 1:1 delle classi dello showcase Claude Design
+   (`evolutive/EVO-038-apex-foundation-home/design-handoff/apex-showcase.html`).
+
+   Convenzioni:
+   • Tutte le classi usano SOLO token semantici (definiti in apex-tokens.css,
+     scope [data-stage]) → vanno usate esclusivamente dentro il palco.
+   • Le classi con nome generico nello showcase sono state prefissate
+     `apex-` (eyebrow→apex-eyebrow, display→apex-display, wrap→apex-wrap,
+     section→apex-section, float→apex-float) per non collidere col DS v0.1.
+   • Il reveal on-scroll NON è qui: si riusa il pattern `.reveal` esistente
+     in globals.css (scroll-driven, no JS — lezione EVO-022).
+   ============================================================================= */
+
+/* ---- Tipografia ----------------------------------------------------------- */
+.apex-eyebrow, .apex-data {
+  font-family: var(--font-data);
+  font-size: var(--fs-data);
+  font-weight: var(--weight-data);
+  letter-spacing: var(--tracking-data);
+  text-transform: uppercase;
+  color: var(--stage-muted);
+  line-height: var(--lh-data);
+}
+.apex-eyebrow .live, .apex-data .live { color: var(--accent); }
+.apex-display {
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-stretch: 125%;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  margin: 0;
+}
+.stroke-word {
+  color: transparent;
+  -webkit-text-stroke: var(--stroke-display) var(--accent);
+}
+.accent-word { color: var(--accent); }
+
+/* ---- Layout guscio --------------------------------------------------------- */
+.apex-wrap { max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+.apex-section { padding-block: var(--section-y); position: relative; z-index: var(--z-pista); }
+.apex-section--edge { border-top: 1px solid var(--stage-line-soft); }
+
+/* Focus ring del palco (anello accent, offset 3px) — scoped */
+[data-stage] :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* =============================================================================
+   GRAIN (telaio) — feTurbulence, fixed, animato a steps()
+   ============================================================================= */
+.apex-grain {
+  position: fixed; inset: -50%;
+  z-index: 90; pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: apex-grain-shift 0.6s steps(4) infinite;
+}
+@keyframes apex-grain-shift {
+  0%   { transform: translate(0,0); }
+  25%  { transform: translate(-6%, 4%); }
+  50%  { transform: translate(4%, -6%); }
+  75%  { transform: translate(-4%, -4%); }
+  100% { transform: translate(6%, 6%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .apex-grain { animation: none; }
+}
+
+/* =============================================================================
+   REGIA (L+2) — chrome broadcast: navbar, ticker
+   ============================================================================= */
+/* NavBar — SEMPRE livrea Racing */
+.apex-nav {
+  display: flex; align-items: center; gap: var(--space-6);
+  height: 60px; padding-inline: var(--gutter);
+  background: color-mix(in srgb, var(--stage-bg) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom: 1px solid var(--stage-line-soft);
+}
+.apex-nav__logo { height: 26px; width: auto; filter: brightness(0) invert(1); opacity: 0.95; }
+.apex-nav__links { display: flex; gap: var(--space-5); margin-left: auto; }
+.apex-nav__links a {
+  font-family: var(--font-data); font-size: var(--fs-data);
+  letter-spacing: var(--tracking-data); text-transform: uppercase;
+  color: var(--stage-ink-dim); position: relative; padding-block: 4px;
+  text-decoration: none;
+  transition: color var(--dur-quick);
+}
+.apex-nav__links a::after {
+  content: ""; position: absolute; left: 0; bottom: -2px; height: 2px; width: 0;
+  background: var(--accent); transition: width var(--dur-hover) var(--ease-out);
+}
+.apex-nav__links a:hover { color: var(--stage-ink); }
+.apex-nav__links a:hover::after { width: 100%; }
+.apex-nav__links a[aria-current="page"] { color: var(--stage-ink); }
+.apex-nav__links a[aria-current="page"]::after { width: 100%; }
+.apex-nav__live {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-data); font-size: var(--fs-data);
+  letter-spacing: var(--tracking-data); text-transform: uppercase; color: var(--accent);
+}
+.apex-live-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%;
+  box-shadow: 0 0 0 0 var(--glow); animation: apex-live-pulse 1.6s var(--ease-inout) infinite; }
+@keyframes apex-live-pulse {
+  0%   { box-shadow: 0 0 0 0 var(--glow); opacity: 1; }
+  70%  { box-shadow: 0 0 0 8px transparent; opacity: 0.7; }
+  100% { box-shadow: 0 0 0 0 transparent; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .apex-live-dot { animation: none; }
+}
+
+/* Ticker — marquee mono seamless (doppio chunk) */
+.apex-ticker {
+  overflow: hidden; white-space: nowrap;
+  border-block: 1px solid var(--stage-line-soft);
+  background: color-mix(in srgb, var(--stage-navy) 70%, var(--stage-bg));
+  height: 34px; display: flex; align-items: center;
+}
+.apex-ticker__track { display: inline-flex; will-change: transform;
+  animation: apex-ticker-run var(--dur-ticker) linear infinite; }
+.apex-ticker__chunk { display: inline-flex; }
+.apex-ticker__item {
+  font-family: var(--font-data); font-size: var(--fs-data);
+  letter-spacing: var(--tracking-data); text-transform: uppercase;
+  color: var(--stage-ink-dim); padding-inline: var(--space-5);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.apex-ticker__item b { color: var(--accent); font-weight: 700; }
+.apex-ticker__sep { color: var(--stage-faint); }
+@keyframes apex-ticker-run { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .apex-ticker__track { animation: none; }
+}
+
+/* =============================================================================
+   PALCO — livelli & prop wrapper (StageProp)
+   ============================================================================= */
+.stage-scene { position: relative; overflow: hidden; }
+.apex-prop { position: absolute; pointer-events: none; will-change: transform; }
+.apex-prop[data-depth="sceno"]   { z-index: var(--z-scenografia); }
+.apex-prop[data-depth="oggetti"] { z-index: var(--z-oggetti); }
+.apex-float { animation: apex-float var(--dur-float) var(--ease-inout) infinite; }
+@keyframes apex-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+@media (prefers-reduced-motion: reduce) {
+  .apex-float { animation: none; }
+}
+
+/* Fondale vivo (L−2) */
+.apex-fondale { position: absolute; inset: 0; z-index: var(--z-fondale); overflow: hidden;
+  background: var(--stage-bg); }
+.apex-fondale::before { content: ""; position: absolute; inset: 0; background: var(--floodlight); z-index: 2; }
+.apex-fondale::after  { content: ""; position: absolute; inset: 0; background: var(--vignette); z-index: 2; }
+.apex-fondale__video {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  transform: scale(var(--video-scale)); opacity: var(--video-opacity);
+  filter: grayscale(1) contrast(1.05);
+  mix-blend-mode: screen;
+}
+.apex-fondale__duotone { position: absolute; inset: 0; background: var(--duotone); mix-blend-mode: color; z-index: 1; }
+
+/* =============================================================================
+   SectionLap
+   ============================================================================= */
+.apex-lap { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-7); }
+.apex-lap__eyebrow { display: inline-flex; align-items: center; gap: 12px; }
+.apex-lap__num { font-family: var(--font-data); font-weight: 700; color: var(--accent);
+  letter-spacing: var(--tracking-data); }
+.apex-lap__rule { flex: 1; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); }
+.apex-lap__title { font-size: var(--fs-display); }
+
+/* =============================================================================
+   CTA
+   ============================================================================= */
+.apex-cta {
+  --pad-x: 26px;
+  display: inline-flex; align-items: center; gap: 10px; cursor: pointer;
+  font-family: var(--font-data); font-weight: 700; font-size: var(--fs-data);
+  letter-spacing: var(--tracking-data); text-transform: uppercase;
+  padding: 15px var(--pad-x); border: 0; position: relative;
+  clip-path: var(--clip-cta);
+  text-decoration: none;
+  transition: transform var(--dur-hover) var(--ease-out), box-shadow var(--dur-hover), background var(--dur-hover);
+}
+.apex-cta__arrow { transition: transform var(--dur-hover) var(--ease-out); }
+.apex-cta:hover .apex-cta__arrow { transform: translateX(4px); }
+.apex-cta--primary { background: var(--accent); color: #04091c; }
+.apex-cta--primary:hover { transform: translateY(-2px); box-shadow: 0 0 34px -6px var(--glow); }
+.apex-cta--ghost { background: transparent; color: var(--stage-ink);
+  box-shadow: inset 0 0 0 1px var(--accent); }
+.apex-cta--ghost:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.apex-cta--support { background: var(--accent-2); color: #04091c; }
+.apex-cta--support:hover { transform: translateY(-2px); box-shadow: 0 0 34px -6px color-mix(in srgb, var(--accent-2) 70%, transparent); }
+.apex-cta:disabled, .apex-cta[aria-disabled="true"] {
+  background: var(--stage-surface); color: var(--stage-faint); cursor: not-allowed;
+  box-shadow: none; transform: none; pointer-events: none;
+}
+
+/* =============================================================================
+   Card APEX
+   ============================================================================= */
+.apex-card {
+  position: relative; background: var(--stage-surface);
+  border: 1px solid var(--stage-line); padding: var(--space-6);
+  box-shadow: var(--shadow-inset-top); overflow: hidden;
+  transition: transform var(--dur-hover) var(--ease-out), border-color var(--dur-hover), box-shadow var(--dur-hover);
+}
+.apex-card::before { content: ""; position: absolute; left: 0; top: 0; height: 3px; width: 44px;
+  background: var(--accent); }
+.apex-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--accent) 50%, var(--stage-line));
+  box-shadow: var(--shadow-oggetti), 0 0 40px -14px var(--glow); }
+.apex-card h3 { font-family: var(--font-display); font-stretch: 125%; font-weight: 800;
+  text-transform: uppercase; letter-spacing: var(--tracking-display); line-height: var(--lh-heading);
+  margin: var(--space-4) 0 var(--space-3); font-size: var(--fs-h3); color: var(--stage-ink); }
+.apex-card p { color: var(--stage-muted); margin: 0; }
+.apex-card__index { font-family: var(--font-data); color: var(--accent); font-size: var(--fs-data);
+  letter-spacing: var(--tracking-data); }
+.apex-card--photo { padding: 0; }
+.apex-card--photo .apex-card__photo { position: relative; aspect-ratio: 4/3; overflow: hidden; background: var(--stage-navy); }
+.apex-card--photo .apex-card__body { padding: var(--space-5) var(--space-6) var(--space-6); }
+
+/* Foto in duotone di livrea: grayscale + tinta accent + vignetta navy.
+   Applicare .apex-duotone al wrapper (relative) dell'immagine. */
+.apex-duotone { position: relative; }
+.apex-duotone > img, .apex-duotone > video { filter: grayscale(1) contrast(1.05); }
+.apex-duotone::before { content: ""; position: absolute; inset: 0; background: var(--duotone);
+  mix-blend-mode: color; z-index: 1; pointer-events: none; }
+.apex-duotone::after { content: ""; position: absolute; inset: 0; background: var(--vignette);
+  z-index: 1; pointer-events: none; }
+
+/* =============================================================================
+   HUD
+   ============================================================================= */
+.apex-hud {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px;
+  background: var(--stage-line); border: 1px solid var(--stage-line);
+  font-family: var(--font-data);
+}
+.apex-hud__cell { background: color-mix(in srgb, var(--stage-surface) 92%, var(--stage-bg)); padding: 14px 16px; }
+.apex-hud__k { font-size: var(--fs-data-sm); letter-spacing: var(--tracking-data); color: var(--stage-muted);
+  text-transform: uppercase; display: flex; align-items: center; gap: 6px; font-weight: 500; }
+.apex-hud__v { font-size: 1.5rem; font-weight: 700; color: var(--stage-ink); margin-top: 6px;
+  font-variant-numeric: tabular-nums; }
+.apex-hud__v small { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+.apex-dot-live { width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
+  animation: apex-live-pulse 1.6s var(--ease-inout) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .apex-dot-live { animation: none; }
+}
+
+/* =============================================================================
+   Countdown
+   ============================================================================= */
+.apex-countdown { display: inline-flex; gap: var(--space-3); font-family: var(--font-data); }
+.apex-countdown__unit { text-align: center; }
+.apex-countdown__n { font-family: var(--font-display); font-stretch: 125%; font-weight: 900;
+  font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1; color: var(--stage-ink);
+  font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.apex-countdown__l { font-size: var(--fs-data-sm); letter-spacing: var(--tracking-data);
+  text-transform: uppercase; color: var(--stage-muted); margin-top: 6px; }
+.apex-countdown__sep { font-family: var(--font-display); font-weight: 900; font-size: clamp(2rem,5vw,3.5rem);
+  color: var(--accent); align-self: flex-start; line-height: 1; }
+
+/* =============================================================================
+   PropKit — elementi firma (CODE, parametrici su --accent)
+   ============================================================================= */
+/* R2 telemetria ghost */
+.apex-tel-ghost { font-family: var(--font-display); font-stretch: 125%; font-weight: 900;
+  font-size: clamp(3rem, 9vw, 5.5rem); color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--accent) 55%, transparent);
+  letter-spacing: -0.03em; line-height: 0.9; text-align: center; }
+.apex-waveform { width: 100%; height: 46px; }
+.apex-waveform path { fill: none; stroke: var(--accent); stroke-width: 2; }
+
+/* R3 targa dorsale */
+.apex-targa { background: #f4f6ff; color: #05070f; padding: 12px 14px 8px; transform: rotate(-3deg);
+  clip-path: var(--clip-tag); box-shadow: var(--shadow-oggetti); text-align: center; min-width: 150px; }
+.apex-targa__n { font-family: var(--font-display); font-stretch: 125%; font-weight: 900; font-size: 3.2rem;
+  line-height: 0.86; letter-spacing: -0.02em; }
+.apex-targa__t { font-family: var(--font-data); font-size: 8px; letter-spacing: 0.28em; margin-top: 4px; color: #1a2340; }
+
+/* R4 racing line */
+.apex-raceline { width: 100%; height: 150px; }
+.apex-raceline path { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; }
+.apex-raceline .ghost { stroke: color-mix(in srgb, var(--accent) 28%, transparent); stroke-dasharray: 3 7; }
+.apex-raceline .apex-dot { fill: var(--accent); }
+
+/* R1/M4 — meccanica eco-scia: echi monocromi accent dietro il cutout */
+.apex-echo-stack { position: relative; }
+.apex-echo-stack .apex-echo { position: absolute; inset: 0; }
+.apex-echo-stack .apex-echo--1 { transform: translateX(-26px); filter: grayscale(1) brightness(.4) sepia(1) hue-rotate(160deg) saturate(6); opacity: .35; }
+.apex-echo-stack .apex-echo--2 { transform: translateX(-13px); filter: grayscale(1) brightness(.6) sepia(1) hue-rotate(160deg) saturate(6); opacity: .55; }
+/* variante calda (209): hue ruotata sul rosso */
+.apex-echo-stack--hot .apex-echo--1 { transform: translateX(-40px); opacity: .28; filter: grayscale(1) brightness(.5) sepia(1) hue-rotate(-30deg) saturate(4); }
+.apex-echo-stack--hot .apex-echo--2 { transform: translateX(-20px); opacity: .5; filter: grayscale(1) brightness(.7) sepia(1) hue-rotate(-30deg) saturate(4); }
+
+/* S2 cartoleria Scuola (sticker / toppa / doodle) */
+.apex-sticker { background: var(--accent); color: #04091c; padding: 10px 16px; position: relative;
+  font-family: var(--font-display); font-stretch: 125%; font-weight: 900; text-transform: uppercase;
+  letter-spacing: -0.01em; transform: rotate(-4deg); box-shadow: 0 0 0 6px #fff, var(--shadow-oggetti); }
+.apex-toppa { background: var(--accent-2); color: #2a1400; padding: 6px 12px; transform: rotate(3deg);
+  font-family: var(--font-data); font-weight: 700; font-size: var(--fs-data); letter-spacing: 0.14em;
+  text-transform: uppercase; box-shadow: 0 0 0 3px #fff; border: 2px dashed rgba(0,0,0,.25); }
+.apex-doodle path { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 220; stroke-dashoffset: 220; animation: apex-draw var(--dur-draw) var(--ease-stage) forwards; }
+@keyframes apex-draw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .apex-doodle path { animation: none; stroke-dashoffset: 0; }
+}
+
+/* M1 numerone 209 monolite + glitch */
+.apex-monolite { font-family: var(--font-display); font-stretch: 125%; font-weight: 900;
+  font-size: clamp(5rem, 16vw, 11rem); color: transparent;
+  -webkit-text-stroke: 2px var(--accent); letter-spacing: -0.04em; line-height: 0.8; position: relative; }
+.apex-monolite.glitch::before, .apex-monolite.glitch::after {
+  content: attr(data-t); position: absolute; left: 0; top: 0; width: 100%;
+  -webkit-text-stroke: 2px var(--accent); color: transparent; }
+.apex-monolite.glitch::before { clip-path: inset(12% 0 60% 0); transform: translateX(-6px); opacity: .8; }
+.apex-monolite.glitch::after  { clip-path: inset(58% 0 8% 0); transform: translateX(6px); color: var(--accent-2); -webkit-text-stroke: 0; }
+
+/* M2 altimetria race-data */
+.apex-altimetria { width: 100%; height: 150px; }
+.apex-altimetria path.profile { fill: color-mix(in srgb, var(--accent) 10%, transparent); stroke: var(--accent); stroke-width: 2; }
+.apex-altimetria line { stroke: var(--stage-line); stroke-width: 1; }
+.apex-altimetria text { font-family: var(--font-data); font-size: 9px; fill: var(--stage-muted); letter-spacing: 0.08em; }
+.apex-altimetria .peak { fill: var(--accent); }
+.apex-altimetria .peaktext { fill: var(--accent); font-weight: 700; }
+
+/* M3 slash diagonali */
+.apex-slashes { position: absolute; inset: 0; z-index: var(--z-scenografia); pointer-events: none; overflow: hidden; }
+.apex-slash { position: absolute; height: 26px; width: 160%; left: -30%; background: var(--accent);
+  transform: rotate(-18deg); opacity: .85; }
+.apex-slash--grain { background:
+    linear-gradient(90deg, var(--accent), var(--accent)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='g'%3E%3CfeTurbulence baseFrequency='0.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-blend-mode: multiply; }
+.apex-slash--thin { height: 8px; opacity: .7; }
+
+/* =============================================================================
+   Utility del palco
+   ============================================================================= */
+.apex-dim-panel { background: color-mix(in srgb, var(--stage-navy) 30%, var(--stage-bg));
+  border: 1px solid var(--stage-line-soft); padding: var(--space-6); }
+.apex-note { font-family: var(--font-data); font-size: var(--fs-data-sm); letter-spacing: 0.06em;
+  color: var(--stage-faint); text-transform: uppercase; }
+.apex-badge-mono { font-family: var(--font-data); font-size: var(--fs-data-sm); letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--stage-line); color: var(--stage-ink-dim); }
+
+/* =============================================================================
+   Mobile <768px — budget densità: 1 prop L+1 per sezione, titoli ridotti
+   ============================================================================= */
+@media (max-width: 767px) {
+  .apex-prop[data-mobile="hide"] { display: none; }
+  .apex-lap__title { font-size: var(--fs-h1); }
+}
