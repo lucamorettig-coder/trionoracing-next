@@ -19,9 +19,19 @@ export type HudMetric = {
  * APEX DS v2 — HUD: griglia di celle mono (label + valore tabular-nums +
  * unità accent). Le celle con min/max "tickano" con un random-walk clampato
  * (tick ~1.4s), fermo sotto prefers-reduced-motion.
- * A11y: decorativo → aria-hidden (il dato reale, se rilevante, vive a L0).
+ * A11y: `decorative` (default) → aria-hidden, per l'HUD-chrome della regia
+ * (il dato reale, se rilevante, vive a L0). Con `decorative={false}` le celle
+ * sono contenuto vero (es. stats reali in hero) e restano esposte all'AT.
  */
-export function Hud({ metriche, className = "" }: { metriche: HudMetric[]; className?: string }) {
+export function Hud({
+  metriche,
+  decorative = true,
+  className = "",
+}: {
+  metriche: HudMetric[];
+  decorative?: boolean;
+  className?: string;
+}) {
   const [values, setValues] = useState<Record<string, number>>(() =>
     Object.fromEntries(metriche.map((m) => [m.key, m.value])),
   );
@@ -44,7 +54,7 @@ export function Hud({ metriche, className = "" }: { metriche: HudMetric[]; class
   }, [metriche]);
 
   return (
-    <div className={`apex-hud ${className}`.trim()} aria-hidden="true">
+    <div className={`apex-hud ${className}`.trim()} aria-hidden={decorative || undefined}>
       {metriche.map((m) => (
         <div key={m.key} className="apex-hud__cell">
           <div className="apex-hud__k">
