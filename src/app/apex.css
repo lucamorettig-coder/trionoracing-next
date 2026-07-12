@@ -234,6 +234,30 @@
 .apex-card--photo .apex-card__photo { position: relative; aspect-ratio: 4/3; overflow: hidden; background: var(--stage-navy); }
 .apex-card--photo .apex-card__body { padding: var(--space-5) var(--space-6) var(--space-6); }
 
+/* Card APEX — variante WARM (superficie calda, livrea-agnostica, EVO-039).
+   Linguaggio distintivo della livrea Scuola: card CHIARA che galleggia sullo
+   stage scuro. Parametrica sui token — nessun giallo/arancio Scuola
+   hardcoded qui, solo var(--accent)/var(--accent-2) per barretta/bordo, così
+   la classe resta riusabile sotto qualunque livrea. Eredita geometria
+   (radius 0, barretta accent top, hover translateY+glow) da .apex-card:
+   va sempre combinata con essa (className="apex-card apex-card--warm").
+   A11y: testo SEMPRE ink scuro fisso (#04091c), MAI var(--stage-ink) —
+   che sul palco è quasi-bianco e sparirebbe su questa superficie chiara. */
+.apex-card--warm {
+  --warm-ink: #04091c;
+  background: #f7f4ec;
+  color: var(--warm-ink);
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.apex-card--warm::before { background: var(--accent-2); }
+.apex-card--warm:hover {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  box-shadow: var(--shadow-oggetti), 0 0 40px -14px var(--glow);
+}
+.apex-card--warm h3 { color: var(--warm-ink); }
+.apex-card--warm p { color: color-mix(in srgb, var(--warm-ink) 65%, transparent); }
+.apex-card--warm .apex-card__index { color: color-mix(in srgb, var(--warm-ink) 40%, var(--accent)); }
+
 /* Foto in duotone di livrea: grayscale + tinta accent + vignetta navy.
    Applicare .apex-duotone al wrapper (relative) dell'immagine. */
 .apex-duotone { position: relative; }
@@ -316,6 +340,7 @@
 .apex-toppa { background: var(--accent-2); color: #2a1400; padding: 6px 12px; transform: rotate(3deg);
   font-family: var(--font-data); font-weight: 700; font-size: var(--fs-data); letter-spacing: 0.14em;
   text-transform: uppercase; box-shadow: 0 0 0 3px #fff; border: 2px dashed rgba(0,0,0,.25); }
+.apex-doodle { width: 90px; height: 60px; }
 .apex-doodle path { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
   stroke-dasharray: 220; stroke-dashoffset: 220; animation: apex-draw var(--dur-draw) var(--ease-stage) forwards; }
 @keyframes apex-draw { to { stroke-dashoffset: 0; } }
