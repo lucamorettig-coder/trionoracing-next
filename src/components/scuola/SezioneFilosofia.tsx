@@ -1,29 +1,49 @@
-import { SectionHeader } from "@/components/ui/section-header";
+import { SectionLap } from "@/components/apex/SectionLap";
+import { Doodle } from "@/components/apex/propkit/scuola/Doodle";
 
+/**
+ * Sezione Filosofia /la-scuola — restyle APEX (EVO-039). Livrea "scuola"
+ * ereditata dal wrapper di pagina (data-livery="scuola" sullo stage
+ * padre): niente accenti hardcoded, i token risolvono per discendenza.
+ */
 export function SezioneFilosofia() {
   return (
-    <section className="bg-bg-soft pattern-light py-24 lg:py-32">
-      <div className="max-w-[960px] mx-auto px-6 lg:px-10">
-        <div className="reveal">
-          <SectionHeader
-            eyebrow="La nostra filosofia"
-            title="La Carta dei Diritti del Bambino nello Sport."
-            subtitle="UNESCO, Ginevra 1992. È il documento che guida il nostro modo di stare in sella con i bambini, ogni martedì e ogni giovedì."
+    <section data-livery="scuola" className="apex-section apex-section--edge">
+      <div className="apex-wrap">
+        <div className="reveal relative">
+          <SectionLap
+            numero="02"
+            label="LA NOSTRA FILOSOFIA"
+            title={
+              <>
+                La Carta dei <span className="accent-word">Diritti del Bambino</span>
+                <br />
+                nello Sport.
+              </>
+            }
+          />
+          <Doodle
+            variant="stella"
+            className="hidden md:block absolute top-0 right-0 w-16 opacity-70"
           />
         </div>
+        <p className="reveal -mt-8 mb-12 max-w-[62ch] text-stage-muted">
+          UNESCO, Ginevra 1992. È il documento che guida il nostro modo di stare in sella con i
+          bambini, ogni martedì e ogni giovedì.
+        </p>
 
-        <div className="mt-12 space-y-6 text-ink text-lg leading-relaxed reveal reveal-delay-1">
+        <div className="max-w-[960px] space-y-6 text-lg leading-relaxed text-stage-ink-dim reveal reveal-delay-1">
           <p>
-            Nella nostra <strong>Scuola di Ciclismo Triono</strong>, ci impegniamo a seguire i
-            principi enunciati nella Carta dei Diritti del Bambino nello Sport, redatta
-            dall&apos;UNESCO a Ginevra nel 1992.
+            Nella nostra <strong className="text-stage-ink">Scuola di Ciclismo Triono</strong>,
+            ci impegniamo a seguire i principi enunciati nella Carta dei Diritti del Bambino
+            nello Sport, redatta dall&apos;UNESCO a Ginevra nel 1992.
           </p>
           <p>
             Questi principi ci guidano nell&apos;offrire un ambiente sano, divertente e
             inclusivo per i bambini a partire dai 4 anni di età, dove il gioco e il piacere
             dell&apos;attività sportiva sono prioritari.
           </p>
-          <p className="border-l-4 border-sun-500 pl-6 py-1 text-navy-900 font-semibold">
+          <p className="border-l-2 border-accent pl-6 py-1 text-stage-ink font-semibold">
             Crediamo fermamente nel diritto dei giovani di divertirsi e giocare, di essere
             trattati con dignità, e di beneficiare di un ambiente sicuro e positivo.
           </p>
@@ -36,7 +56,7 @@ export function SezioneFilosofia() {
             La nostra missione è quella di avvicinare i giovani al ciclismo, rispettando i loro
             tempi di crescita e di riposo, e senza imporre aspettative di eccellenza prematura.
           </p>
-          <p className="border-l-4 border-sun-500 pl-6 py-1 text-navy-900 font-semibold">
+          <p className="border-l-2 border-accent pl-6 py-1 text-stage-ink font-semibold">
             Per noi ogni bambino ha il diritto di godersi lo sport, di imparare e crescere al
             proprio ritmo, senza la pressione di diventare un campione.
           </p>
