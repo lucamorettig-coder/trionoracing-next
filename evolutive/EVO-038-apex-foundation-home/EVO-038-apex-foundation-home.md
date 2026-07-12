@@ -53,3 +53,24 @@ Branch creato da main `d9e50b2`. Design handoff copiato in `design-handoff/`. Pi
 - MT5 `9979540` restyle home (6 sezioni, ticker, hero campagne reskin meccanica-invariata; fix overflow titolo Marathon via override locale `--fs-display`).
 - MT6 verifiche: lint/tsc/build verdi (home `○` ISR 10m) · invarianti SEO (1 h1, OG, canonical, JSON-LD, 0 iframe pre-consenso) · reduced-motion (token 1ms/0 verificati via CDP) · mobile 375 reale senza overflow (`scrollWidth=375`) · 7 pagine legacy 200 sotto chrome dark · CtaFinale APEX ok su chi-siamo.
 - **Lezione tooling**: Chrome headless ha larghezza minima finestra ~500px → `--window-size=375` produce screenshot ingannevoli (layout a 500 croppato a 375, "tutto tagliato a destra"). Verifica mobile affidabile = CDP `Emulation.setDeviceMetricsOverride` (`mobile:true`) via `--remote-debugging-port` + WebSocket nativo Node.
+
+### [2026-07-12] Smoke post-branch + iterazioni (7 commit)
+Round di smoke con l'utente sulla home APEX, tutti risolti sul branch prima del merge:
+1. `352b98f` **FondaleVivo z-index**: floodlight/vignetta (`::before/::after` con z-index espliciti) coprivano il video → nessun z-index, ordine naturale ::before→video→::after.
+2. `18f82ef` **hairline gap mascotte**: margine `mt-4` su fondo stage uniforme letto come "buco" → `border-t border-stage-line-soft`.
+3. `d1058ad` **`scripts/dev-shot.mjs`**: verifica visiva affidabile (preview MCP bloccato su chrome-error).
+4. `8581a60` **trim padding trasparente** cutout iwantyou (24px sotto → gap 5-12px) — con scoperta cache `.next/dev/cache/images`.
+5. `b25b1e9` **palco vivo**: `section`→`<StageScene>` su tutte le sezioni + props in HeroCampagne (telemetria/waveform/targa/mascotte parallax) + fix scroll-parallax relativo alla sezione.
+6. `e8704bc` **mascotte su tutte le slide** (Nino balance-bike, duo iscrizione) — asset da libreria Cowork.
+7. `02c3afd` **logo bianco reale** al posto del filtro CSS.
+
+### [2026-07-12] Go-live — Fase 8
+- **PR #98** squash merge su `main` → `b6a0d93`. Branch `evo/EVO-038-apex-foundation-home` cancellato.
+- **Produzione verificata**: https://trionoracing.it/ serve la home APEX (marker `apex-nav`/`data-stage`/`data-livery="racing"`/`apex-fondale`/`logo-triono-racing-white` presenti; screenshot render OK: telemetria 54 KM/H, waveform, targa 11, Vittoria, ticker, 3 slide campagne, 8 stage props; logo bianco nitido).
+- **Comunicazioni Hero PROD** (`appszpkU1aXb3xrFM`): `IMMAGINE_URL` delle slide "Le iscrizioni sono aperte" e "Allenarsi giocando" erano `None` → PATCH ai path locali (`/scuola/duo-iscrizione.webp`, `/scuola/allenarsi-balance.webp`); visibili entro finestra ISR (~5m).
+- **Gate**: typecheck OK · 0 errori lint · build compila.
+- **verify-implementation**: skill non disponibile in sessione (pattern noto EVO-010+) → verifica inline sopra per dimensione.
+
+**Follow-up aperti:**
+- ⏳ **Video sfondo hero (esterno)**: gli asset Cloudinary `duezeronove` erano 404 per un rename accidentale del cloud (→`trionoracing`→ripristinato `duezeronove`); il rename propaga lentamente sulla CDN. Fino al recupero la home mostra il fallback statico del fondale (nessun crash). Il codice/Airtable sono corretti (puntano a `duezeronove`, asset esistenti agli stessi path). Verificare che il video torni a caricare quando la delivery Cloudinary si allinea.
+- Prossima figlia EVO-037: restyle pagina (candidata `/la-scuola`).
