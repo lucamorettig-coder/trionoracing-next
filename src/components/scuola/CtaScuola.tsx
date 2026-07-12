@@ -1,59 +1,59 @@
-import { SectionHeader } from "@/components/ui/section-header";
-import { Button } from "@/components/ui/button";
-import { VideoBackdrop } from "@/components/ui/video-backdrop";
-import { BrandBackdrop } from "@/components/ui/brand-backdrop";
+import { FondaleVivo } from "@/components/apex/FondaleVivo";
+import { ApexCta } from "@/components/apex/ApexCta";
 import { getSfondoVideo, cloudinaryVideoOptimized } from "@/lib/sfondi-video";
 import { getSiteSettings, formatPhoneIT, phoneHref } from "@/lib/site-settings";
 import { Phone } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { CONTACT_EMAIL } from "@/lib/seo";
-import Link from "next/link";
 
+/**
+ * CTA Scuola — APEX (EVO-039), livrea Scuola. Stesso pattern strutturale
+ * della CTA finale home (`CtaFinale`, EVO-038): fondale vivo da Airtable
+ * (slot "scuola-cta") con trattamento duotone di livrea, fallback al
+ * fondale statico APEX se lo slot è assente/non attivo. EVO-021.
+ */
 export async function CtaScuola() {
-  // Sfondo video gestito da Airtable (slot "scuola-cta"). Se assente/non attivo →
-  // fallback allo sfondo statico `.photo-bg-navy` (zero regressione). EVO-021.
   const sfondo = await getSfondoVideo("scuola-cta");
   // Contatto Scuola gestito da Airtable (chiave "scuola-telefono"). EVO-024.
   const settings = await getSiteSettings();
   const telefono = settings["scuola-telefono"];
 
   return (
-    <section className={cn("relative text-white overflow-hidden", !sfondo && "photo-bg-navy")}>
+    <section data-livery="scuola" className="stage-scene relative overflow-hidden text-stage-ink">
       {sfondo ? (
-        <VideoBackdrop
-          videoSrc={cloudinaryVideoOptimized(sfondo.videoUrl, 1600)}
-          posterSrc={sfondo.posterUrl}
-          overlay="cta"
+        <FondaleVivo
+          src={cloudinaryVideoOptimized(sfondo.videoUrl, 1600)}
+          poster={sfondo.posterUrl}
         />
       ) : (
-        // Senza video: backdrop animato di forme brand (wireframe) sopra il navy
-        <BrandBackdrop variant="cta" />
+        <div className="apex-fondale" aria-hidden />
       )}
-      <div className="relative z-[1] max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32 text-center reveal">
-        <SectionHeader
-          eyebrow="Iscrizioni aperte"
-          title={<span className="text-white">Inizia il percorso ciclistico di tuo figlio.</span>}
-          subtitle={
-            <span className="text-white/70">
-              Posti limitati per garantire qualità delle lezioni. Scrivici per fissare una prova
-              gratuita o per chiedere informazioni.
-            </span>
-          }
-          align="center"
-        />
+
+      <div
+        className="apex-wrap relative py-24 lg:py-32 text-center reveal"
+        style={{ zIndex: "var(--z-pista)" }}
+      >
+        <div className="apex-eyebrow justify-center inline-flex items-center gap-3">
+          <span className="apex-lap__num">ISCRIZIONI APERTE</span>
+        </div>
+        <h2 className="apex-display mt-4" style={{ fontSize: "var(--fs-display)" }}>
+          Inizia il percorso ciclistico di <span className="accent-word">tuo figlio.</span>
+        </h2>
+        <p className="mt-5 mx-auto max-w-[52ch] text-stage-ink-dim">
+          Posti limitati per garantire qualità delle lezioni. Scrivici per fissare una prova
+          gratuita o per chiedere informazioni.
+        </p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
-          <Button asChild size="lg" className="bg-white text-navy-900 border-white hover:bg-navy-50">
-            <Link href="/portale/iscrizioni">Iscrivi tuo figlio</Link>
-          </Button>
-          <Button asChild size="lg" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:border-white">
-            <a href={`mailto:${CONTACT_EMAIL}`}>Scrivici via email</a>
-          </Button>
+          <ApexCta variant="primary" href="/portale/iscrizioni">
+            Iscrivi tuo figlio
+          </ApexCta>
+          <ApexCta variant="ghost" href={`mailto:${CONTACT_EMAIL}`}>
+            Scrivici
+          </ApexCta>
           {telefono && (
-            <Button asChild size="lg" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:border-white">
-              <a href={phoneHref(telefono)}>
-                <Phone className="w-4 h-4 mr-1" /> Chiama {formatPhoneIT(telefono)}
-              </a>
-            </Button>
+            <ApexCta variant="ghost" href={phoneHref(telefono)} arrow={false}>
+              <Phone className="w-4 h-4 mr-1 inline" aria-hidden /> Chiama{" "}
+              {formatPhoneIT(telefono)}
+            </ApexCta>
           )}
         </div>
       </div>
