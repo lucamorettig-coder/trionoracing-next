@@ -329,8 +329,11 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
       </section>
 
       {altre.length > 0 && (
-        <div className="max-w-[1280px] mx-auto px-6 lg:px-14">
-          <div className="mt-4 pb-2 flex flex-col sm:flex-row sm:items-center gap-3">
+        // Hairline di separazione invece di un margine "a vuoto": su fondo stage
+        // uniforme (#030818) uno spazio senza bordo si legge come un buco, non
+        // come uno stacco voluto (regola palco: ogni confine ha un bordo).
+        <div className="max-w-[1280px] mx-auto px-6 lg:px-14 border-t border-stage-line-soft">
+          <div className="pt-4 pb-2 flex flex-col sm:flex-row sm:items-center gap-3">
             <span className="shrink-0 apex-data text-[10.5px]">
               Altre slide in rotazione
             </span>
