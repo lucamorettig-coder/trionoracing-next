@@ -3,14 +3,14 @@ import { SectionHeader } from "@/components/ui/section-header";
 
 // Foto reali della Scuola di Ciclismo Triono, ospitate su Cloudinary (cartella
 // sito/immagini). Servite via next/image (host già abilitato in next.config
-// images.remotePatterns → res.cloudinary.com/duezeronove/**).
+// images.remotePatterns → res.cloudinary.com/u5hvesvu/**).
 // Per aggiornare la galleria: carica su Cloudinary e aggiungi il public_id qui.
 //
 // Layout: CSS Grid (non columns-masonry, che non permette tile multi-colonna).
 // `orient: "l"` → foto orizzontale che occupa 2 colonne (aspect 3:2); "p" →
 // verticale su 1 colonna (aspect 3:4). Le due altezze combaciano (≈ 1.33× la
 // larghezza colonna) così le righe si impacchettano senza buchi con grid-flow-dense.
-const CLD = "https://res.cloudinary.com/duezeronove/image/upload/sito/immagini";
+const CLD = "https://res.cloudinary.com/u5hvesvu/image/upload/sito/immagini";
 
 const photos: Array<{ id: string; orient: "l" | "p"; alt: string }> = [
   { id: "scuola-01", orient: "l", alt: "Fila di giovani allievi della Scuola Triono in sella alle bici al Ciclodromo Renato Perona, luce del tramonto, maestri accanto" },
