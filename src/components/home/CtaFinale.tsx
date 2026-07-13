@@ -36,8 +36,8 @@ export async function CtaFinale() {
           <span className="accent-word">Subito.</span>
         </h2>
         <p className="mt-5 mx-auto max-w-[52ch] text-stage-ink-dim">
-          Inizia oggi il percorso di tuo figlio con la Scuola di Ciclismo Triono. Posti limitati
-          per garantire qualità delle lezioni.
+          Inizia oggi il percorso di tuo figlio con la Scuola di Ciclismo Triono. Gruppi piccoli e
+          maestri federali: ogni bambino seguito da vicino, in sicurezza.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <ApexCta href="/portale/iscrizioni">Iscrivi tuo figlio</ApexCta>

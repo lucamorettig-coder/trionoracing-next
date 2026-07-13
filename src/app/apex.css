@@ -184,6 +184,54 @@
 .apex-lap__title { font-size: var(--fs-display); }
 
 /* =============================================================================
+   SectionHead — sistema di intestazione VARIATO delle sezioni di pagina.
+   Sostituisce l'uso stampato di SectionLap ("LAP 0N" + eyebrow + riga uguale su
+   ogni sezione). `.apex-lap` resta per hero/CTA. Differenze chiave:
+     • nessun numero "LAP 0N" (la numerazione resta solo dove è una sequenza
+       reale — es. i 4 step di "Come iscriversi");
+     • kicker OPZIONALE (molte sezioni non ne hanno: photo-led, lede, h2 quieto);
+     • tick accento corto invece della riga a gradiente piena;
+     • la INTRO è parte del componente → niente più hack `-mt-8` per contrastare
+       il margine di .apex-lap: qui lo spazio titolo→intro è governato dal token.
+   ============================================================================= */
+.apex-head { display: flex; flex-direction: column; gap: var(--space-3);
+  margin-bottom: var(--space-7); }
+.apex-head__kicker {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: var(--font-data); font-size: var(--fs-data); font-weight: var(--weight-data);
+  letter-spacing: var(--tracking-data); text-transform: uppercase; color: var(--stage-muted);
+  line-height: var(--lh-data);
+}
+.apex-head__kicker::before { content: ""; flex: none; width: 26px; height: 2px; background: var(--accent); }
+.apex-head__kicker .live { color: var(--accent); }
+.apex-head__title {
+  font-family: var(--font-display); font-weight: var(--weight-display); font-stretch: 125%;
+  text-transform: uppercase; letter-spacing: var(--tracking-display); line-height: var(--lh-display);
+  margin: 0; font-size: var(--fs-display);
+}
+/* Variante quieta: sezioni utility/logistica (indirizzo, galleria) non devono
+   "gridare" quanto le sezioni-manifesto → titolo a fs-h2, non fs-display. */
+.apex-head--h2 .apex-head__title { font-size: var(--fs-h2); }
+.apex-head__intro { margin-top: var(--space-5); max-width: var(--maxw-prose); color: var(--stage-muted); }
+
+/* Modificatore di sezione DOMINANTE: più respiro verticale per il beat emotivo
+   della pagina (risuscita --section-y-lg, prima token morto). */
+.apex-section--hero { padding-block: var(--section-y-lg); }
+
+/* Lede editoriale a citazione — apertura di una sezione-manifesto SENZA eyebrow
+   e SENZA il side-stripe border (bandito): la frase-chiave È il titolo. Glifo
+   virgoletta accent decorativo, nessun bordo laterale. */
+.apex-lede { position: relative; max-width: 22ch;
+  font-family: var(--font-display); font-stretch: 110%; font-weight: 700;
+  font-size: clamp(1.75rem, 1.15rem + 2.4vw, 3rem); line-height: 1.1;
+  letter-spacing: -0.01em; color: var(--stage-ink); }
+.apex-lede__mark { font-family: var(--font-display); font-weight: 900; color: var(--accent);
+  font-size: 1.15em; line-height: 0; vertical-align: -0.05em; margin-right: 0.06em; }
+/* Riga enfatizzata a metà testo (ex side-stripe): grande, ink, nessun bordo. */
+.apex-mark { font-size: var(--fs-h3); font-weight: 600; color: var(--stage-ink); line-height: 1.3;
+  letter-spacing: -0.005em; }
+
+/* =============================================================================
    CTA
    ============================================================================= */
 .apex-cta {

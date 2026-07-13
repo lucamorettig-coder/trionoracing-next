@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SectionLap } from "@/components/apex/SectionLap";
+import { SectionHead } from "@/components/apex/SectionHead";
 import { ApexCard } from "@/components/apex/ApexCard";
 import { ApexCta } from "@/components/apex/ApexCta";
 import { StageProp } from "@/components/apex/StageProp";
@@ -25,21 +25,14 @@ export function SezioneAmatori() {
       </StageProp>
 
       <div className="apex-wrap relative" style={{ zIndex: "var(--z-pista)" }}>
-        <div className="reveal">
-          <SectionLap
-            numero="03"
-            label="LA SQUADRA"
-            title={
-              <>
-                Gli amatori <span className="accent-word">Triono Racing.</span>
-              </>
-            }
-          />
-        </div>
-        <p className="reveal -mt-8 mb-12 max-w-[62ch] text-stage-muted">
-          Una comunità di ciclisti adulti che condividono allenamenti, gare e l&apos;orgoglio di
-          una maglia. Rispetto reciproco, sportività, voglia di sfide vere.
-        </p>
+        <SectionHead
+          title={
+            <>
+              Gli amatori <span className="accent-word">Triono Racing.</span>
+            </>
+          }
+          intro="Una comunità di ciclisti adulti che condividono allenamenti, gare e l'orgoglio di una maglia. Rispetto reciproco, sportività, voglia di sfide vere."
+        />
 
         <div className="grid md:grid-cols-2 gap-5">
           <div className="reveal reveal-delay-1">

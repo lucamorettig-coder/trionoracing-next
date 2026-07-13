@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SectionLap } from "@/components/apex/SectionLap";
+import { SectionHead } from "@/components/apex/SectionHead";
 import { ApexCard } from "@/components/apex/ApexCard";
 import { ApexCta } from "@/components/apex/ApexCta";
 import { StageProp } from "@/components/apex/StageProp";
@@ -15,23 +15,17 @@ export function SezioneScuola() {
   return (
     <StageScene data-livery="scuola" className="apex-section apex-section--edge">
       <div className="apex-wrap">
-        <div className="reveal">
-          <SectionLap
-            numero="01"
-            label="SCUOLA DI CICLISMO"
-            title={
-              <>
-                Imparare in sella,
-                <br />
-                <span className="accent-word">in tutta sicurezza.</span>
-              </>
-            }
-          />
-        </div>
-        <p className="reveal -mt-8 mb-12 max-w-[62ch] text-stage-muted">
-          Seguiamo la Carta dei Diritti del Bambino nello Sport (UNESCO, 1992). Ogni bambino ha
-          il diritto di divertirsi, essere trattato con dignità e crescere al proprio ritmo.
-        </p>
+        <SectionHead
+          kicker="Scuola di ciclismo"
+          title={
+            <>
+              Imparare in sella,
+              <br />
+              <span className="accent-word">in tutta sicurezza.</span>
+            </>
+          }
+          intro="Seguiamo la Carta dei Diritti del Bambino nello Sport (UNESCO, 1992). Ogni bambino ha il diritto di divertirsi, essere trattato con dignità e crescere al proprio ritmo."
+        />
 
         <div className="grid md:grid-cols-3 gap-5">
           <div className="reveal reveal-delay-1">

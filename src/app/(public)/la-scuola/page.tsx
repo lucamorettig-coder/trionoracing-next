@@ -44,13 +44,16 @@ export default function LaScuolaPage() {
       {/* Hero invariato (EVO-021) */}
       <ScuolaHero />
 
-      {/* Corpo pagina (EVO-029) — ordine "parent journey". */}
+      {/* Corpo pagina — ordine "belief ladder" (Sicurezza → Metodo → Community →
+          Azione, PRODUCT.md): la Sicurezza sale subito dopo la Filosofia (blocco
+          fiducia), prima di Kit/merchandising, e spezza la sequenza di griglie
+          dense con l'alternanza griglia→testo→griglia→foto (layout EVO-041). */}
       <SezioneCorsi />
       <SezioneFilosofia />
+      <SezioneSicurezza />
       <SezioneMaestri />
       <SezioneKitScuola />
       <SezioneAllenarsiACasa />
-      <SezioneSicurezza />
       <SezioneGalleria />
       <SezioneComeIscriversi />
       <CtaScuola />

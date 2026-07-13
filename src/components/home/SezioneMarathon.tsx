@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SectionLap } from "@/components/apex/SectionLap";
+import { SectionHead } from "@/components/apex/SectionHead";
 import { ApexCta } from "@/components/apex/ApexCta";
 import { StageProp } from "@/components/apex/StageProp";
 import { StageScene } from "@/components/apex/StageScene";
@@ -28,9 +28,9 @@ export function SezioneMarathon() {
             // qui il titolo LAP scende a fs-h1 (override locale del token fluido)
             style={{ ["--fs-display" as string]: "var(--fs-h1)" }}
           >
-            <SectionLap
-              numero="04"
-              label="MARATHON MTB 209 · 6ª EDIZIONE"
+            <SectionHead
+              reveal={false}
+              kicker="Marathon MTB 209 · 6ª edizione"
               title={
                 <>
                   L&apos;evento MTB che
@@ -38,12 +38,10 @@ export function SezioneMarathon() {
                   organizziamo <span className="stroke-word">dal 2021.</span>
                 </>
               }
+              intro="Ogni anno ad Arrone (Terni), un percorso che celebra la resistenza, la tecnica e lo spirito di squadra del mountain biking. Aperta a tutti: atleti, amatori, appassionati."
+              introMaxWidth="58ch"
+              className="mb-6"
             />
-            <p className="-mt-2 max-w-[58ch] text-stage-muted">
-              Ogni anno ad Arrone (Terni), un percorso che celebra la resistenza, la tecnica e lo
-              spirito di squadra del mountain biking. Aperta a tutti: atleti, amatori,
-              appassionati.
-            </p>
             <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
               <span className="apex-data inline-flex items-center gap-2 text-stage-ink-dim">
                 <CalendarDays className="w-4 h-4 text-accent" aria-hidden /> 28 giugno 2026

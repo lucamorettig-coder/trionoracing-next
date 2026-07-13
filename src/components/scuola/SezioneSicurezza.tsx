@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { StageScene } from "@/components/apex/StageScene";
-import { SectionLap } from "@/components/apex/SectionLap";
+import { SectionHead } from "@/components/apex/SectionHead";
 import { Toppa } from "@/components/apex/propkit/scuola/Toppa";
 import { Doodle } from "@/components/apex/propkit/scuola/Doodle";
 
@@ -56,22 +56,17 @@ export function SezioneSicurezza() {
   return (
     <StageScene id="sicurezza" data-livery="scuola" className="apex-section apex-section--edge">
       <div className="apex-wrap">
-        <div className="reveal max-w-[780px] relative">
-          <Toppa className="absolute -top-2 right-0 hidden sm:block">Dai 4 anni</Toppa>
-          <SectionLap
-            numero="06"
-            label="SICUREZZA IN SELLA"
+        <div className="relative max-w-[820px]">
+          <Toppa className="absolute -top-2 right-0 z-10 hidden sm:block">Dai 4 anni</Toppa>
+          <SectionHead
             title={
               <>
                 Pronti a pedalare: <span className="accent-word">cosa serve per andare sicuri.</span>
               </>
             }
+            intro="Vittoria e Nino mostrano l'equipaggiamento, uno alla volta. Cinque cose semplici che rendono ogni uscita più sicura — e più divertente."
           />
         </div>
-        <p className="reveal -mt-6 mb-12 max-w-[62ch] text-stage-muted">
-          Vittoria e Nino mostrano l&apos;equipaggiamento, uno alla volta. Cinque cose semplici che
-          rendono ogni uscita più sicura — e più divertente.
-        </p>
 
         <div className="relative">
           <Doodle variant="stella" className="hidden lg:block absolute -top-8 left-[18%]" />

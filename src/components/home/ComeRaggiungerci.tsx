@@ -1,4 +1,4 @@
-import { SectionLap } from "@/components/apex/SectionLap";
+import { SectionHead } from "@/components/apex/SectionHead";
 import { StageProp } from "@/components/apex/StageProp";
 import { StageScene } from "@/components/apex/StageScene";
 import { RacingLine } from "@/components/apex/propkit/RacingLine";
@@ -27,21 +27,11 @@ export function ComeRaggiungerci() {
       </StageProp>
 
       <div className="apex-wrap relative" style={{ zIndex: "var(--z-pista)" }}>
-        <div className="reveal">
-          <SectionLap
-            numero="02"
-            label="COME RAGGIUNGERCI"
-            title={
-              <>
-                Ciclodromo <span className="stroke-word">Perona</span>, Terni.
-              </>
-            }
-          />
-        </div>
-        <p className="reveal -mt-8 mb-12 max-w-[62ch] text-stage-muted">
-          Tutte le attività della Scuola si svolgono qui. Parcheggio disponibile, ingresso
-          libero per genitori e accompagnatori durante le lezioni.
-        </p>
+        <SectionHead
+          variant="h2"
+          title={<>Ciclodromo Perona, Terni.</>}
+          intro="Tutte le attività della Scuola si svolgono qui. Parcheggio disponibile, ingresso libero per genitori e accompagnatori durante le lezioni."
+        />
 
         <div className="grid lg:grid-cols-12 gap-8 items-stretch">
           <div className="lg:col-span-7 reveal reveal-delay-1">
