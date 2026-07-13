@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { KIT_SCUOLA, cloudinaryOptimized, type CapoKit } from "@/lib/kit-scuola";
-import { SectionLap } from "@/components/apex/SectionLap";
 import { StageScene } from "@/components/apex/StageScene";
 
 /**
@@ -66,21 +65,16 @@ export function SezioneKitScuola() {
   return (
     <StageScene data-livery="scuola" className="apex-section apex-section--edge">
       <div className="apex-wrap">
-        {/* Top block — header: SectionLap + colonna meta mono */}
+        {/* Top block — header: titolo/intro + colonna meta mono (la meta-colonna
+            a destra fa da "kicker" della sezione, niente eyebrow duplicato). */}
         <div className="grid items-start gap-8 lg:grid-cols-[1fr_auto] lg:gap-12 mb-10 lg:mb-14">
           <div className="reveal">
-            <SectionLap
-              numero="04"
-              label="IL KIT DEL TEAM"
-              title={
-                <>
-                  Vesti i colori.
-                  <br />
-                  <span className="accent-word">Senti la squadra.</span>
-                </>
-              }
-            />
-            <p className="-mt-6 max-w-[52ch] text-stage-muted">
+            <h2 className="apex-head__title">
+              Vesti i colori.
+              <br />
+              <span className="accent-word">Senti la squadra.</span>
+            </h2>
+            <p className="apex-head__intro">
               Quattro capi che vanno dalla pedalata alla merenda. Il kit Triono è
               incluso nell&apos;iscrizione, riconoscibile da lontano in gruppo, come
               davanti al bar dopo la lezione.

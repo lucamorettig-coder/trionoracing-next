@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SectionLap } from "@/components/apex/SectionLap";
+import { SectionHead } from "@/components/apex/SectionHead";
 
 // Foto reali della Scuola di Ciclismo Triono, ospitate su Cloudinary (cartella
 // sito/immagini). Servite via next/image (host già abilitato in next.config
@@ -33,16 +33,11 @@ export function SezioneGalleria() {
   return (
     <section data-livery="scuola" className="apex-section apex-section--edge">
       <div className="apex-wrap">
-        <div className="reveal">
-          <SectionLap
-            numero="07"
-            label="LE FOTO DELLA SCUOLA"
-            title="La scuola, attraverso le immagini."
-          />
-        </div>
-        <p className="reveal -mt-8 mb-10 max-w-[62ch] text-stage-muted">
-          Momenti reali tra lezioni al Ciclodromo Renato Perona di Terni e gare giovanili: bambini, maestri, divertimento e sicurezza.
-        </p>
+        <SectionHead
+          variant="h2"
+          title="La scuola, attraverso le immagini."
+          intro="Momenti reali tra lezioni al Ciclodromo Renato Perona di Terni e gare giovanili: bambini, maestri, divertimento e sicurezza."
+        />
 
         {/* Mobile: carosello a scroll orizzontale (le foto impilate non piacciono).
             scroll-snap + peek della successiva + hint. Keyboard-scrollabile (tabIndex). */}

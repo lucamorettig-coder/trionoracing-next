@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SectionLap } from "@/components/apex/SectionLap";
+import { SectionHead } from "@/components/apex/SectionHead";
 import { StageScene } from "@/components/apex/StageScene";
 import { Doodle } from "@/components/apex/propkit/scuola/Doodle";
 import { TriangleAlert } from "lucide-react";
@@ -80,25 +80,25 @@ export function SezioneAllenarsiACasa() {
   return (
     <StageScene id="allenarsi" data-livery="scuola" className="apex-section apex-section--edge">
       <div className="apex-wrap">
-        <div className="reveal">
-          <SectionLap
-            numero="05"
-            label="ALLENARSI A CASA · PER I GENITORI"
-            title={
-              <>
-                Piccoli esercizi
-                <br />
-                <span className="accent-word">da fare in giardino.</span>
-              </>
-            }
-          />
-        </div>
-        <p className="reveal -mt-8 mb-6 max-w-[62ch] text-stage-muted">
-          Tra una lezione e l&apos;altra, qualche minuto in cortile o al parco fa la differenza.
-          Quattro <strong className="text-stage-ink">guide pratiche</strong> per accompagnare i
-          primi progressi di tuo figlio — passo dopo passo, senza fretta.
-        </p>
-        <Doodle variant="freccia" className="reveal mb-10 h-9 w-16" />
+        <SectionHead
+          kicker="Allenarsi a casa · per i genitori"
+          title={
+            <>
+              Piccoli esercizi
+              <br />
+              <span className="accent-word">da fare in giardino.</span>
+            </>
+          }
+          intro={
+            <>
+              Tra una lezione e l&apos;altra, qualche minuto in cortile o al parco fa la differenza.
+              Quattro <strong className="text-stage-ink">guide pratiche</strong> per accompagnare i
+              primi progressi di tuo figlio — passo dopo passo, senza fretta.
+            </>
+          }
+        >
+          <Doodle variant="freccia" className="mt-5 h-9 w-16" />
+        </SectionHead>
 
         <div className="grid md:grid-cols-2 gap-6">
           {GUIDE.map((g, i) => (

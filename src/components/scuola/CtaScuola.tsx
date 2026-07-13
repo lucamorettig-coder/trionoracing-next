@@ -39,8 +39,8 @@ export async function CtaScuola() {
           Inizia il percorso ciclistico di <span className="accent-word">tuo figlio.</span>
         </h2>
         <p className="mt-5 mx-auto max-w-[52ch] text-stage-ink-dim">
-          Posti limitati per garantire qualità delle lezioni. Scrivici per fissare una prova
-          gratuita o per chiedere informazioni.
+          Ci si iscrive tutto l&apos;anno, e prima si può provare senza impegno con un paio di
+          lezioni gratuite. Scrivici per fissare una prova o chiedere informazioni.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <ApexCta variant="primary" href="/portale/iscrizioni">

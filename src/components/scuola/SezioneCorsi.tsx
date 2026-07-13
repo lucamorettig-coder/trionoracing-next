@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SectionLap } from "@/components/apex/SectionLap";
+import { SectionHead } from "@/components/apex/SectionHead";
 import { ApexCard } from "@/components/apex/ApexCard";
 import { ApexCta } from "@/components/apex/ApexCta";
 import { StageScene } from "@/components/apex/StageScene";
@@ -50,24 +50,23 @@ export function SezioneCorsi() {
   return (
     <StageScene data-livery="scuola" className="apex-section apex-section--edge" id="corsi">
       <div className="apex-wrap">
-        <div className="reveal">
-          <SectionLap
-            numero="01"
-            label="I CORSI · DAI 4 ANNI"
-            title={
-              <>
-                Due formule, una scuola:
-                <br />
-                <span className="accent-word">imparare divertendosi.</span>
-              </>
-            }
-          />
-        </div>
-        <p className="reveal -mt-8 mb-12 max-w-[62ch] text-stage-muted">
-          Puoi scegliere il <strong className="text-stage-ink">corso completo strada e mountain bike</strong>,
-          due lezioni a settimana, oppure il <strong className="text-stage-ink">Corso MTB</strong> del giovedì.
-          Stessi maestri federali, stessi gruppi, stesso ambiente protetto al Ciclodromo Renato Perona di Terni.
-        </p>
+        <SectionHead
+          kicker="I corsi · dai 4 anni"
+          title={
+            <>
+              Due formule, una scuola:
+              <br />
+              <span className="accent-word">imparare divertendosi.</span>
+            </>
+          }
+          intro={
+            <>
+              Puoi scegliere il <strong className="text-stage-ink">corso completo strada e mountain bike</strong>,
+              due lezioni a settimana, oppure il <strong className="text-stage-ink">Corso MTB</strong> del giovedì.
+              Stessi maestri federali, stessi gruppi, stesso ambiente protetto al Ciclodromo Renato Perona di Terni.
+            </>
+          }
+        />
 
         {/* Due formule */}
         <div className="grid md:grid-cols-2 gap-5">

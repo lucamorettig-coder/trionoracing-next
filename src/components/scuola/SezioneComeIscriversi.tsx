@@ -11,7 +11,7 @@ import {
   Check,
   type LucideIcon,
 } from "lucide-react";
-import { SectionLap } from "@/components/apex/SectionLap";
+import { SectionHead } from "@/components/apex/SectionHead";
 import { ApexCta } from "@/components/apex/ApexCta";
 import { StageScene } from "@/components/apex/StageScene";
 
@@ -309,7 +309,7 @@ function CtaBand() {
 
         <div className="flex w-full flex-col items-center gap-3 lg:w-auto lg:shrink-0 lg:items-start">
           <ApexCta href="/portale/iscrizioni">{"Inizia l'iscrizione"}</ApexCta>
-          <span className="pl-0.5 font-mono text-[11px] tracking-[0.04em] text-stage-faint">
+          <span className="pl-0.5 font-mono text-[11px] tracking-[0.04em] text-stage-muted">
             → area riservata genitori
           </span>
         </div>
@@ -419,23 +419,23 @@ export function SezioneComeIscriversi() {
   return (
     <StageScene data-livery="scuola" className="apex-section apex-section--edge">
       <div className="apex-wrap">
-        {/* Header */}
-        <div className="reveal">
-          <SectionLap
-            numero="08"
-            label="ISCRIZIONE"
-            title={
-              <>
-                Iscrivere tuo figlio è semplice.{" "}
-                <span className="accent-word">Ecco come.</span>
-              </>
-            }
-          />
-        </div>
-        <p className="reveal -mt-8 mb-12 max-w-[62ch] text-stage-muted">
-          Quattro passi, dal primo &ldquo;proviamo&rdquo; fino al via. Tutto online, dall&apos;area
-          riservata genitori.
-        </p>
+        {/* Header — la numerazione reale della sezione è la sequenza dei 4 step
+            (sotto), non un marcatore "LAP 0N" nell'eyebrow. */}
+        <SectionHead
+          kicker="Iscrizione · 4 passi, tutto online"
+          title={
+            <>
+              Iscrivere tuo figlio è semplice.{" "}
+              <span className="accent-word">Ecco come.</span>
+            </>
+          }
+          intro={
+            <>
+              Quattro passi, dal primo &ldquo;proviamo&rdquo; fino al via. Tutto online,
+              dall&apos;area riservata genitori.
+            </>
+          }
+        />
 
         {/* Desktop — connettore numerato + griglia 4 colonne */}
         <div className="hidden lg:block">

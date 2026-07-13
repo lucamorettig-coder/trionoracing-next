@@ -262,7 +262,7 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
                       </div>
                     )}
                     <p
-                      className="apex-display mt-3 text-stage-ink"
+                      className="apex-display mt-3 text-stage-ink [overflow-wrap:anywhere] [text-wrap:balance]"
                       style={{ fontSize: "clamp(32px, 5vw, 64px)", lineHeight: 0.98 }}
                     >
                       {renderTitolo(c.titolo)}

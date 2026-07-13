@@ -87,7 +87,7 @@ export function NewsCard({
   categoryVariant="info"
   title="Aperte le iscrizioni alla Scuola 2026/27"
   date="2026-09-12"
-  excerpt="Posti limitati per garantire qualità delle lezioni…"
+  excerpt="Gruppi piccoli e maestri federali: ogni bambino seguito da vicino…"
   href="/news/iscrizioni-2026"
 />
 */
