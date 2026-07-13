@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SectionHeader } from "@/components/ui/section-header";
+import { SectionHead } from "@/components/apex/SectionHead";
 
 // Foto reali della squadra amatori, ospitate su Cloudinary (cartella sito/immagini).
 // Servite via next/image (host già abilitato in next.config images.remotePatterns).
@@ -9,6 +9,8 @@ import { SectionHeader } from "@/components/ui/section-header";
 // foto orizzontale che occupa 2 colonne (aspect 3:2); "p" → verticale su 1 colonna
 // (3:4). Le altezze combaciano così grid-flow-row-dense impacchetta senza buchi.
 // Attualmente tutte verticali: per una orizzontale basta impostare orient: "l".
+// Trattamento visivo: `.apex-duotone` (grayscale + tinta accento + vignetta) su
+// bordo hairline `border-stage-line`, coerente con lo stage scuro APEX.
 const CLD = "https://res.cloudinary.com/u5hvesvu/image/upload";
 
 const photos: Array<{ id: string; orient: "l" | "p"; alt: string }> = [
@@ -25,36 +27,35 @@ const photos: Array<{ id: string; orient: "l" | "p"; alt: string }> = [
 
 export function BachecaFoto() {
   return (
-    <section className="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
-      <div className="reveal">
-        <SectionHeader
-          eyebrow="La bacheca foto"
+    <section className="apex-section apex-section--edge">
+      <div className="apex-wrap">
+        <SectionHead
+          variant="h2"
+          kicker="La bacheca foto"
           title="Il mondo Triono, in immagini."
-          subtitle="Persone, gare, traguardi e la fatica condivisa: momenti reali della squadra amatori e agonisti."
+          intro="Persone, gare, traguardi e la fatica condivisa: momenti reali della squadra amatori e agonisti."
         />
-      </div>
 
-      {/* Grid con tile orizzontali su 2 colonne (foto landscape) e verticali su 1.
-          grid-flow-row-dense impacchetta riempiendo i buchi. */}
-      <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 grid-flow-row-dense">
-        {photos.map((p) => (
-          <div
-            key={p.id}
-            className={`reveal ${p.orient === "l" ? "sm:col-span-2 aspect-[3/2]" : "aspect-[3/4]"}`}
-          >
-            <div className="photo-house relative w-full h-full rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-200">
-              <Image
-                src={`${CLD}/${p.id}.jpg`}
-                alt={p.alt}
-                fill
-                className="object-cover"
-                sizes={p.orient === "l"
-                  ? "(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 66vw"
-                  : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"}
-              />
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 grid-flow-row-dense">
+          {photos.map((p) => (
+            <div
+              key={p.id}
+              className={`reveal ${p.orient === "l" ? "sm:col-span-2 aspect-[3/2]" : "aspect-[3/4]"}`}
+            >
+              <div className="apex-duotone relative w-full h-full overflow-hidden border border-stage-line hover:opacity-90 transition-opacity duration-200">
+                <Image
+                  src={`${CLD}/${p.id}.jpg`}
+                  alt={p.alt}
+                  fill
+                  className="object-cover"
+                  sizes={p.orient === "l"
+                    ? "(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 66vw"
+                    : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
