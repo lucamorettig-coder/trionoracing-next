@@ -24,31 +24,19 @@ export function ScuolaHero() {
       {/* L−2: fondale scuro statico (floodlight + vignetta, niente video/canvas) */}
       <div className="apex-fondale" aria-hidden />
 
-      {/* L+1: duo mascotte STATICO ancorato al bordo inferiore destro.
-          Vittoria dietro (più piccola), Nino davanti. Su mobile fa da backdrop
-          dietro al testo, ammorbidito da un velo scuro per leggibilità. */}
+      {/* L+1: Vittoria STATICA ancorata al bordo inferiore destro (figura
+          intera, cutout Adobe pulito — solo lei, EVO-041). Su mobile fa da
+          backdrop dietro al testo, ammorbidita dal velo scuro sotto. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[4]">
         <div className="relative mx-auto h-full max-w-[1200px]">
-          <div className="absolute bottom-0 right-0 h-[60%] w-[70%] sm:h-[82%] sm:w-[46%] lg:h-[92%] lg:w-[40%] max-w-[520px]">
-            {/* Vittoria dietro */}
-            <Image
-              src="/vittoria/vittoria-hero.webp"
-              alt=""
-              width={346}
-              height={900}
-              priority
-              className="absolute bottom-0 right-[26%] h-[92%] w-auto object-contain object-bottom drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)]"
-            />
-            {/* Nino davanti */}
-            <Image
-              src="/nino/nino-hero.webp"
-              alt=""
-              width={292}
-              height={900}
-              priority
-              className="absolute bottom-0 right-0 h-full w-auto object-contain object-bottom drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)]"
-            />
-          </div>
+          <Image
+            src="/vittoria/vittoria-hero.webp"
+            alt=""
+            width={410}
+            height={1100}
+            priority
+            className="absolute bottom-0 right-[2%] h-[62%] w-auto object-contain object-bottom drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)] sm:right-[5%] sm:h-[84%] lg:h-[92%]"
+          />
         </div>
       </div>
 

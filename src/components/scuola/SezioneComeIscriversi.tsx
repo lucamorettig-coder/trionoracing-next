@@ -268,22 +268,15 @@ function LinkProva({ className = "" }: { className?: string }) {
 function CtaBand() {
   return (
     <div className="reveal reveal-delay-5 relative mt-12 overflow-hidden border border-stage-line bg-stage-navy p-7 lg:mt-16 lg:px-12 lg:py-10">
-      {/* Sfondo con i disegni geometrici del brand (pattern.svg = navy + forme
-          confetti), ben visibile come nel resto del nuovo design — non più
-          sfumato via. Il navy del pattern coincide con bg-stage-navy → nessun
-          seam; le forme colorate danno la texture geometrica. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[url('/assets/pattern.svg')] bg-repeat opacity-80"
-        style={{ backgroundSize: "220px 220px" }}
-      />
-      {/* Floodlight accento (giallo Scuola) + velo per la leggibilità del testo */}
+      {/* Niente pattern geometrico (rimosso dal design, EVO-041): superficie
+          navy pulita con solo un floodlight accento discreto, coerente col
+          fondale APEX del resto della pagina. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(90% 120% at 12% 30%, color-mix(in srgb, var(--accent) 16%, transparent) 0%, transparent 55%), linear-gradient(100deg, transparent 0%, transparent 34%, color-mix(in srgb, var(--stage-navy) 78%, transparent) 58%, color-mix(in srgb, var(--stage-navy) 88%, transparent) 100%)",
+            "radial-gradient(80% 130% at 10% 20%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 55%)",
         }}
       />
       <div className="relative flex flex-col items-center gap-6 text-center lg:flex-row lg:gap-10 lg:text-left">
@@ -467,7 +460,7 @@ export function SezioneComeIscriversi() {
           </div>
           <div className="grid grid-cols-4 items-stretch gap-6">
             {STEPS.map((s, i) => (
-              <div key={s.n} className={`reveal reveal-delay-${i + 1}`}>
+              <div key={s.n} className={`reveal-slide reveal-delay-${i + 1}`}>
                 <StepCard step={s} />
               </div>
             ))}

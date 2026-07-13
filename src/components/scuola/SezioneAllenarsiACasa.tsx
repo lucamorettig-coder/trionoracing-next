@@ -104,18 +104,20 @@ export function SezioneAllenarsiACasa() {
           {GUIDE.map((g, i) => (
             <article
               key={g.n}
-              className={`apex-card reveal reveal-delay-${Math.min(i + 1, 6)} flex flex-col overflow-hidden`}
+              className={`apex-card reveal-slide reveal-delay-${Math.min(i + 1, 6)} flex flex-col overflow-hidden`}
               style={{ padding: 0 }}
             >
-              {/* Superficie BIANCA (non avorio) + mix-blend-multiply: le scene
-                  hanno fondo bianco → si fondono senza bordo/stacco. */}
+              {/* La scena COPRE tutto il banner (object-cover, nessun padding):
+                  niente rettangolo bianco dentro un riquadro, niente bordo
+                  (feedback EVO-041). Il crop del cover è accettabile: le scene
+                  hanno il soggetto centrato. */}
               <div className="relative aspect-[16/9] overflow-hidden bg-white">
                 <Image
                   src={g.img}
                   alt={g.alt}
                   fill
                   sizes="(max-width: 768px) 100vw, 600px"
-                  className="object-contain mix-blend-multiply p-5 lg:p-6"
+                  className="object-cover"
                 />
               </div>
               <div className="flex flex-1 flex-col gap-4 p-6 lg:p-7">

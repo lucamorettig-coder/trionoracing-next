@@ -113,7 +113,7 @@ export function SezioneCorsi() {
         {/* Bolle mascotte — card calde che galleggiano sul palco scuro */}
         <div className="mt-5 grid md:grid-cols-2 gap-5">
           {/* Nino — strada */}
-          <div className="reveal reveal-delay-2 flex items-end">
+          <div className="reveal-slide reveal-delay-2 flex items-end">
             <div className="relative w-[120px] sm:w-[160px] shrink-0 aspect-[3/4] -mr-5 z-10">
               <Image
                 src="/nino/nino-strada.webp"
@@ -136,7 +136,7 @@ export function SezioneCorsi() {
           </div>
 
           {/* Vittoria — MTB */}
-          <div className="reveal reveal-delay-3 flex items-end">
+          <div className="reveal-slide reveal-delay-3 flex items-end">
             <div className="relative w-[130px] sm:w-[170px] shrink-0 aspect-[3/4] -mr-5 z-10">
               <Image
                 src="/vittoria/vittoria-mtb.webp"
