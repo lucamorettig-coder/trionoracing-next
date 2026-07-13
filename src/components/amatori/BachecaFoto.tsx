@@ -9,7 +9,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 // foto orizzontale che occupa 2 colonne (aspect 3:2); "p" → verticale su 1 colonna
 // (3:4). Le altezze combaciano così grid-flow-row-dense impacchetta senza buchi.
 // Attualmente tutte verticali: per una orizzontale basta impostare orient: "l".
-const CLD = "https://res.cloudinary.com/duezeronove/image/upload";
+const CLD = "https://res.cloudinary.com/u5hvesvu/image/upload";
 
 const photos: Array<{ id: string; orient: "l" | "p"; alt: string }> = [
   { id: "IMG_8574_tuh701", orient: "p", alt: "Due atleti Triono Racing su un tratto sterrato baciato dal sole" },

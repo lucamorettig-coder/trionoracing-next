@@ -2,7 +2,7 @@
  * Sfondi video gestiti da Airtable per il sito pubblico.
  *
  * Mappa "slot → video" (es. `home-cta`, `home-hero`) configurabile dall'admin
- * su Airtable senza deploy. Hosting media su Cloudinary (cloud `duezeronove`).
+ * su Airtable senza deploy. Hosting media su Cloudinary (cloud `u5hvesvu`).
  *
  * Solo server-side. Usa fetch REST API Airtable senza SDK, base portale
  * (env `AIRTABLE_BASE_ID` + `AIRTABLE_TOKEN`), ISR `next: { revalidate }`.
