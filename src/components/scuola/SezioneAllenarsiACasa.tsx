@@ -107,13 +107,15 @@ export function SezioneAllenarsiACasa() {
               className={`apex-card reveal reveal-delay-${Math.min(i + 1, 6)} flex flex-col overflow-hidden`}
               style={{ padding: 0 }}
             >
-              <div className="apex-card--warm relative aspect-[16/9] overflow-hidden">
+              {/* Superficie BIANCA (non avorio) + mix-blend-multiply: le scene
+                  hanno fondo bianco → si fondono senza bordo/stacco. */}
+              <div className="relative aspect-[16/9] overflow-hidden bg-white">
                 <Image
                   src={g.img}
                   alt={g.alt}
                   fill
                   sizes="(max-width: 768px) 100vw, 600px"
-                  className="object-contain p-5 lg:p-6"
+                  className="object-contain mix-blend-multiply p-5 lg:p-6"
                 />
               </div>
               <div className="flex flex-1 flex-col gap-4 p-6 lg:p-7">

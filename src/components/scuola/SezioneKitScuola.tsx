@@ -12,9 +12,9 @@ import { StageScene } from "@/components/apex/StageScene";
 function PillNumero({ capo }: { capo: CapoKit }) {
   const numero = String(capo.numero).padStart(2, "0");
   return (
-    <div className="absolute -bottom-3 left-5 inline-flex items-center gap-2 bg-accent px-3 py-1.5 text-[#04091c] shadow-[var(--shadow-oggetti)]">
-      <span className="font-mono text-[11px] font-bold tracking-[0.08em]">{numero}</span>
-      <span className="text-xs font-semibold uppercase tracking-wide">{capo.nome}</span>
+    <div className="absolute -bottom-3 left-5 right-5 inline-flex w-fit max-w-[calc(100%-2.5rem)] items-center gap-2 bg-accent px-3 py-1.5 text-[#04091c] shadow-[var(--shadow-oggetti)]">
+      <span className="shrink-0 font-mono text-[11px] font-bold tracking-[0.08em]">{numero}</span>
+      <span className="min-w-0 text-[11px] font-semibold uppercase leading-tight tracking-wide">{capo.nome}</span>
     </div>
   );
 }
@@ -37,17 +37,18 @@ function CardCapo({
   className?: string;
 }) {
   return (
-    <div
-      className={`apex-card apex-card--warm relative ${className}`.trim()}
-      style={{ padding: 0 }}
-    >
+    // Superficie BIANCA (non avorio): i capi hanno fondo bianco puro → su bianco
+    // si fondono senza stacco/bordo. mix-blend-multiply assorbe eventuali micro
+    // ombre nel bianco della card. Barretta accento in alto per firmare la card.
+    <div className={`relative overflow-hidden bg-white ${className}`.trim()}>
+      <span className="absolute left-0 top-0 z-10 h-[3px] w-11 bg-accent" aria-hidden="true" />
       <div className="relative aspect-[3/4] w-full p-8 lg:p-10">
         <div className="relative h-full w-full">
           <Image
             src={cloudinaryOptimized(capo.imageUrl, 1000)}
             alt={capo.alt}
             fill
-            className="object-contain"
+            className="object-contain mix-blend-multiply"
             sizes={sizesAttr}
           />
         </div>
