@@ -124,7 +124,7 @@ export function SezioneCorsi() {
               />
             </div>
             <ApexCard className="apex-card--warm flex-1 self-center">
-              <span className="block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-sky-600 mb-1.5">
+              <span className="block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-sky-700 mb-1.5">
                 Nino
               </span>
               <p className="text-[15px] leading-snug">
@@ -147,7 +147,7 @@ export function SezioneCorsi() {
               />
             </div>
             <ApexCard className="apex-card--warm flex-1 self-center">
-              <span className="block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ember-600 mb-1.5">
+              <span className="block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ember-700 mb-1.5">
                 Vittoria
               </span>
               <p className="text-[15px] leading-snug">

@@ -29,7 +29,7 @@ export function SezioneScuola() {
 
         <div className="grid md:grid-cols-3 gap-5">
           <div className="reveal reveal-delay-1">
-            <ApexCard index="/ 01" title="Sicurezza prima di tutto">
+            <ApexCard title="Sicurezza prima di tutto">
               <div className="text-accent mb-3" aria-hidden>
                 <HelmetIcon className="w-7 h-7" />
               </div>
@@ -40,7 +40,7 @@ export function SezioneScuola() {
             </ApexCard>
           </div>
           <div className="reveal reveal-delay-2">
-            <ApexCard index="/ 02" title="Tecnica progressiva">
+            <ApexCard title="Tecnica progressiva">
               <div className="text-accent mb-3" aria-hidden>
                 <WheelIcon className="w-7 h-7" />
               </div>
@@ -51,7 +51,7 @@ export function SezioneScuola() {
             </ApexCard>
           </div>
           <div className="reveal reveal-delay-3">
-            <ApexCard index="/ 03" title="Spirito di squadra">
+            <ApexCard title="Spirito di squadra">
               <div className="text-accent mb-3" aria-hidden>
                 <MedalIcon className="w-7 h-7" />
               </div>
