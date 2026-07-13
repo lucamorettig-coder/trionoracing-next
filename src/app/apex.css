@@ -245,7 +245,10 @@
    che sul palco è quasi-bianco e sparirebbe su questa superficie chiara. */
 .apex-card--warm {
   --warm-ink: #04091c;
-  background: #f7f4ec;
+  /* BIANCO (non più avorio #f7f4ec): le immagini mascotte/prodotto hanno fondo
+     bianco → su bianco si fondono senza stacco, e tutte le card chiare della
+     pagina restano di un solo colore (feedback EVO-041: no bianche+avorio). */
+  background: #ffffff;
   color: var(--warm-ink);
   border-color: color-mix(in srgb, var(--accent) 25%, transparent);
 }

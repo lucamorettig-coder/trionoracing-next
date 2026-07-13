@@ -79,7 +79,7 @@ export function SezioneSicurezza() {
             {DOTAZIONI.map((d, i) => (
               <article
                 key={d.n}
-                className={`apex-card apex-card--warm apex-card--photo reveal reveal-delay-${Math.min(i + 1, 6)} flex flex-col`}
+                className={`apex-card apex-card--warm apex-card--photo reveal-slide reveal-delay-${Math.min(i + 1, 6)} flex flex-col`}
               >
                 {/* .apex-card--photo forza background: var(--stage-navy) sul box foto
                     (pensato per foto reali in duotone) — qui il cutout Vittoria ha
@@ -88,7 +88,7 @@ export function SezioneSicurezza() {
                     stesso avorio di .apex-card--warm. */}
                 <div
                   className="apex-card__photo relative"
-                  style={{ backgroundColor: "#f7f4ec" }}
+                  style={{ backgroundColor: "#ffffff" }}
                 >
                   <Image
                     src={d.img}

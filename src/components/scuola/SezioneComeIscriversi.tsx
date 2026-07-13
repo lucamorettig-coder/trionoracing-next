@@ -268,15 +268,15 @@ function LinkProva({ className = "" }: { className?: string }) {
 function CtaBand() {
   return (
     <div className="reveal reveal-delay-5 relative mt-12 overflow-hidden border border-stage-line bg-stage-navy p-7 lg:mt-16 lg:px-12 lg:py-10">
+      {/* Niente pattern geometrico (rimosso dal design, EVO-041): superficie
+          navy pulita con solo un floodlight accento discreto, coerente col
+          fondale APEX del resto della pagina. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[url('/assets/pattern.svg')] bg-repeat opacity-[0.32]"
+        className="pointer-events-none absolute inset-0"
         style={{
-          backgroundSize: "240px 240px",
-          WebkitMaskImage:
-            "linear-gradient(105deg,#000 0%,#000 28%,rgba(0,0,0,.45) 70%,transparent 100%)",
-          maskImage:
-            "linear-gradient(105deg,#000 0%,#000 28%,rgba(0,0,0,.45) 70%,transparent 100%)",
+          background:
+            "radial-gradient(80% 130% at 10% 20%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 55%)",
         }}
       />
       <div className="relative flex flex-col items-center gap-6 text-center lg:flex-row lg:gap-10 lg:text-left">
@@ -460,7 +460,7 @@ export function SezioneComeIscriversi() {
           </div>
           <div className="grid grid-cols-4 items-stretch gap-6">
             {STEPS.map((s, i) => (
-              <div key={s.n} className={`reveal reveal-delay-${i + 1}`}>
+              <div key={s.n} className={`reveal-slide reveal-delay-${i + 1}`}>
                 <StepCard step={s} />
               </div>
             ))}
