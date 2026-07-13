@@ -268,15 +268,22 @@ function LinkProva({ className = "" }: { className?: string }) {
 function CtaBand() {
   return (
     <div className="reveal reveal-delay-5 relative mt-12 overflow-hidden border border-stage-line bg-stage-navy p-7 lg:mt-16 lg:px-12 lg:py-10">
+      {/* Sfondo con i disegni geometrici del brand (pattern.svg = navy + forme
+          confetti), ben visibile come nel resto del nuovo design — non più
+          sfumato via. Il navy del pattern coincide con bg-stage-navy → nessun
+          seam; le forme colorate danno la texture geometrica. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[url('/assets/pattern.svg')] bg-repeat opacity-[0.32]"
+        className="pointer-events-none absolute inset-0 bg-[url('/assets/pattern.svg')] bg-repeat opacity-80"
+        style={{ backgroundSize: "220px 220px" }}
+      />
+      {/* Floodlight accento (giallo Scuola) + velo per la leggibilità del testo */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
         style={{
-          backgroundSize: "240px 240px",
-          WebkitMaskImage:
-            "linear-gradient(105deg,#000 0%,#000 28%,rgba(0,0,0,.45) 70%,transparent 100%)",
-          maskImage:
-            "linear-gradient(105deg,#000 0%,#000 28%,rgba(0,0,0,.45) 70%,transparent 100%)",
+          background:
+            "radial-gradient(90% 120% at 12% 30%, color-mix(in srgb, var(--accent) 16%, transparent) 0%, transparent 55%), linear-gradient(100deg, transparent 0%, transparent 34%, color-mix(in srgb, var(--stage-navy) 78%, transparent) 58%, color-mix(in srgb, var(--stage-navy) 88%, transparent) 100%)",
         }}
       />
       <div className="relative flex flex-col items-center gap-6 text-center lg:flex-row lg:gap-10 lg:text-left">
