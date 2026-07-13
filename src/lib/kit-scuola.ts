@@ -40,7 +40,7 @@ export const KIT_SCUOLA: readonly CapoKit[] = [
     nome: "Maglia tecnica",
     descrizione: "I colori che si vedono da lontano in gruppo",
     imageUrl:
-      "https://res.cloudinary.com/duezeronove/image/upload/v1779548283/hf_20260523_133738_d20ccfa0-2c67-4a5a-9d9c-2d4cafe42f4c_mgp0kb.png",
+      "https://res.cloudinary.com/u5hvesvu/image/upload/hf_20260523_133738_d20ccfa0-2c67-4a5a-9d9c-2d4cafe42f4c_mgp0kb.png",
     alt: "Maglia tecnica del kit Scuola di Ciclismo Triono — colori team, fit racing per bambini",
     campoTaglia: "TAGLIA_MAGLIA",
   },
@@ -50,7 +50,7 @@ export const KIT_SCUOLA: readonly CapoKit[] = [
     nome: "Salopette tecnica",
     descrizione: "Bretelle, fondello, ore di pedalata serena",
     imageUrl:
-      "https://res.cloudinary.com/duezeronove/image/upload/v1779548283/hf_20260523_141906_8c7b9eed-6fa7-4eea-ba78-381defaa1aba_f1ipuw.png",
+      "https://res.cloudinary.com/u5hvesvu/image/upload/hf_20260523_141906_8c7b9eed-6fa7-4eea-ba78-381defaa1aba_f1ipuw.png",
     alt: "Salopette tecnica con bretelle del kit Scuola Triono — pedalata comoda per bambini",
     campoTaglia: "TAGLIA_PANTALONCINO",
   },
@@ -60,7 +60,7 @@ export const KIT_SCUOLA: readonly CapoKit[] = [
     nome: "Felpa del team",
     descrizione: "Pre-lezione, post-lezione, sempre con la squadra",
     imageUrl:
-      "https://res.cloudinary.com/duezeronove/image/upload/v1779548283/hf_20260523_140605_d1c8de51-23de-483c-ab98-acf5c1770209_u30p52.jpg",
+      "https://res.cloudinary.com/u5hvesvu/image/upload/hf_20260523_140605_d1c8de51-23de-483c-ab98-acf5c1770209_u30p52.jpg",
     alt: "Felpa del team Triono — capo lifestyle pre/post allenamento Scuola di Ciclismo Terni",
     campoTaglia: "TAGLIA_TUTA",
   },
@@ -70,7 +70,7 @@ export const KIT_SCUOLA: readonly CapoKit[] = [
     nome: "Pantalone in felpa",
     descrizione: "Caldo e comodo, pronto per ogni stagione",
     imageUrl:
-      "https://res.cloudinary.com/duezeronove/image/upload/v1779548283/hf_20260523_134406_43e4a5fc-5deb-4e9b-b1d6-d153c7d870c2_iclqzg.png",
+      "https://res.cloudinary.com/u5hvesvu/image/upload/hf_20260523_134406_43e4a5fc-5deb-4e9b-b1d6-d153c7d870c2_iclqzg.png",
     alt: "Pantalone in felpa abbinato al kit Triono — comfort post-lezione Scuola Ciclismo",
     campoTaglia: "TAGLIA_TUTA",
   },
