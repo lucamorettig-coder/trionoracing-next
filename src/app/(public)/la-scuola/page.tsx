@@ -9,8 +9,8 @@ import { SezioneSicurezza } from "@/components/scuola/SezioneSicurezza";
 import { SezioneGalleria } from "@/components/scuola/SezioneGalleria";
 import { SezioneComeIscriversi } from "@/components/scuola/SezioneComeIscriversi";
 import { CtaScuola } from "@/components/scuola/CtaScuola";
-import { BrandBackdrop } from "@/components/ui/brand-backdrop";
 import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { Grain } from "@/components/apex/Grain";
 
 // ISR: gli sfondi video (slot "scuola-hero"/"scuola-cta") sono letti da Airtable
 // in ScuolaHero/CtaScuola → la pagina si rigenera ogni 10 min senza deploy. EVO-021.
@@ -36,30 +36,24 @@ export const metadata: Metadata = {
 
 export default function LaScuolaPage() {
   return (
-    <>
+    <div data-livery="scuola" className="bg-stage-bg text-stage-ink">
+      <Grain />
       <CourseJsonLd />
       <BreadcrumbJsonLd items={[{ name: "La Scuola", url: "/la-scuola" }]} />
 
       {/* Hero invariato (EVO-021) */}
       <ScuolaHero />
 
-      {/* Corpo pagina (EVO-029) — ordine "parent journey".
-          Sfondo "brand backdrop" ambient dietro le sezioni: quelle trasparenti
-          (Corsi, Maestri, Sicurezza) lo lasciano trasparire, le altre lo coprono. */}
-      <div className="relative">
-        <BrandBackdrop variant="page" className="z-0" />
-        <div className="relative z-[1]">
-          <SezioneCorsi />
-          <SezioneFilosofia />
-          <SezioneMaestri />
-          <SezioneKitScuola />
-          <SezioneAllenarsiACasa />
-          <SezioneSicurezza />
-          <SezioneGalleria />
-          <SezioneComeIscriversi />
-          <CtaScuola />
-        </div>
-      </div>
-    </>
+      {/* Corpo pagina (EVO-029) — ordine "parent journey". */}
+      <SezioneCorsi />
+      <SezioneFilosofia />
+      <SezioneMaestri />
+      <SezioneKitScuola />
+      <SezioneAllenarsiACasa />
+      <SezioneSicurezza />
+      <SezioneGalleria />
+      <SezioneComeIscriversi />
+      <CtaScuola />
+    </div>
   );
 }
