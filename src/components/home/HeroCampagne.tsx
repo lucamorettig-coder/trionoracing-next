@@ -234,10 +234,13 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
 
         <div className="relative z-10 min-h-[520px] lg:min-h-[640px] flex items-end">
           <div className="w-full min-w-0 max-w-[1280px] mx-auto px-6 lg:px-14 py-14 lg:py-20">
-            <h1 className="inline-flex items-center gap-2.5 text-[15px] font-semibold text-stage-ink/90">
+            {/* Riga brand = eyebrow/tagline, NON il titolo di pagina: l'<h1>
+                semantico è il titolo della campagna attiva (sotto, sullo slide
+                primario) così la gerarchia AT/SEO combacia con quella visiva. */}
+            <p className="inline-flex items-center gap-2.5 text-[15px] font-semibold text-stage-ink/90">
               In bici, sicuri, insieme.
               <span aria-hidden className="inline-block w-8 h-px bg-stage-ink/30" />
-            </h1>
+            </p>
 
             {/* Slide impilate nella stessa cella grid → cross-fade animato, container
                 dimensionato sulla slide più alta (nessun CLS). Tutte nel DOM (SEO):
@@ -245,6 +248,9 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
             <div className="mt-5 grid">
               {comunicazioni.map((c, i) => {
                 const active = i === activeIndex;
+                // Il titolo dello slide primario (SSR-attivo, i===0) è l'<h1> di
+                // pagina; gli altri restano <p> (un solo h1, gerarchia corretta).
+                const TitleTag = i === 0 ? "h1" : "p";
                 return (
                   <article
                     key={c.id}
@@ -261,12 +267,12 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
                         {c.eyebrow}
                       </div>
                     )}
-                    <p
+                    <TitleTag
                       className="apex-display mt-3 text-stage-ink [overflow-wrap:anywhere] [text-wrap:balance]"
                       style={{ fontSize: "clamp(32px, 5vw, 64px)", lineHeight: 0.98 }}
                     >
                       {renderTitolo(c.titolo)}
-                    </p>
+                    </TitleTag>
                     {c.sottotitolo && (
                       <p className="mt-4 max-w-[520px] text-[16px] leading-relaxed text-stage-ink-dim line-clamp-2">
                         {c.sottotitolo}
@@ -335,7 +341,7 @@ export function HeroCampagne({ comunicazioni, videoSrc, posterSrc }: HeroCampagn
                         tabIndex={i === activeIndex ? 0 : -1}
                         aria-label={`Vai alla comunicazione ${i + 1} di ${n}`}
                         aria-current={i === activeIndex ? "true" : undefined}
-                        className="h-8 w-8 grid place-items-center"
+                        className="h-10 w-10 grid place-items-center"
                       >
                         <span
                           aria-hidden
