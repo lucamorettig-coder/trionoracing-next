@@ -3,11 +3,11 @@
 | | |
 |---|---|
 | **ID / slug** | EVO-042 / `chi-siamo-amatori-apex` |
-| **Stato** | pianificazione |
+| **Stato** | chiusa |
 | **Aperta il** | 2026-07-13 |
-| **Chiusa il** | — |
-| **Branch / PR** | `evo/EVO-042-chi-siamo-amatori-apex` / — |
-| **URL produzione** | — |
+| **Chiusa il** | 2026-07-13 |
+| **Branch / PR** | `evo/EVO-042-chi-siamo-amatori-apex` / [#107](https://github.com/lucamorettig-coder/trionoracing-next/pull/107) |
+| **URL produzione** | https://trionoracing.it/chi-siamo · https://trionoracing.it/gli-amatori-triono |
 | **Evolutiva ombrello** | EVO-037 (restyle-apex-pubblico) |
 | **impeccable** | sì — rilevato in fase 0 (`.claude/skills/impeccable/` presente) |
 
@@ -165,7 +165,33 @@ Snapshot/score `critique` verrà prodotto **sul costruito in fase 7** (qui non c
 
 ## 7. Implementazione
 
+### Deploy: pattern del progetto
+Vercel collegato a GitHub, deploy automatico su merge `main` (branch → PR → squash merge → deploy). Confermato in AGENTS.md.
+
+### Prompt / esecuzione
+Percorso (b): implementazione diretta in sessione, executor Sonnet 5 (via `/model claude-sonnet-5`). Wave 1 (9 macro-task file-disgiunti T1-T9) delegata a 9 subagenti Sonnet in worktree isolati, modalità edit-only, lanciati in un solo messaggio parallelo. Wave 2 (T10-T11, wrapper pagina) eseguita direttamente dal planner/executor.
+
+### Log procedura A→K
+- **A** branch `evo/EVO-042-chi-siamo-amatori-apex` da `main` aggiornato
+- **B** Wave 1 (9 subagenti paralleli, edit-only) → integrata via `cp` dai worktree; Wave 2 (wrapper pagina) diretta
+- **C** gate lint/typecheck/build verdi prima di ogni commit (11 commit, uno per macro-task)
+- **D** self-review: trovati e corretti 2 bug in review (doppio `aspect-ratio` su `Fondatori`/`ApexCard photo`; `max-w-[960px]` su `.apex-wrap` unlayered senza effetto → spostato su `<ol>`). Passata `/impeccable audit` (statico, 0 issue) + verifica manuale token/contrasto (0 uso `text-stage-faint` su testo piccolo)
+- **E** smoke test: verifica visiva reale via `scripts/dev-shot.mjs` (desktop multi-scroll + mobile, entrambe le pagine); un falso positivo di overflow orizzontale mobile investigato e chiuso (pattern preesistente su `/la-scuola`, non una regressione)
+- **F** PR [#107](https://github.com/lucamorettig-coder/trionoracing-next/pull/107) aperta
+- **G** OK esplicito dell'utente ricevuto
+- **H** squash merge `e579f1b` su `main`, branch cancellato (remoto+locale)
+- **I** verifica post-deploy: entrambe le pagine 200 in produzione, contenuti nuovi presenti, canonical/OG intatti
+- **J** `verify-implementation` puntata su altro progetto (bug noto) → report manuale in [verifica.md](verifica.md): 11/11 macro-task compliant, 0 violazioni
+- **K** report finale consegnato all'utente
+
 ## 8. Verifica e go-live
+
+✅ **Esito**: tutte le evidenze raccolte, nessuno scostamento dalla WBS.
+- **PR mergiata**: [#107](https://github.com/lucamorettig-coder/trionoracing-next/pull/107), squash `e579f1b` su `main`
+- **Produzione verificata**: https://trionoracing.it/chi-siamo · https://trionoracing.it/gli-amatori-triono (200, contenuti live, SEO/ISR invariati)
+- **Report**: [verifica.md](verifica.md)
+- **Data go-live**: 2026-07-13
+- **Apprendimenti**: portati in `AGENTS.md` (sezione "Pattern appresi in EVO-042") — bug doppio aspect-ratio in `ApexCard photo`, `.apex-wrap` unlayered non sovrascrivibile con className, falso positivo screenshot `--full` su pagine con `.reveal`, falso positivo overflow mobile da layer fixed/video, pattern wave 9-subagenti edit-only con snippet incollati nel prompt.
 
 ---
 
