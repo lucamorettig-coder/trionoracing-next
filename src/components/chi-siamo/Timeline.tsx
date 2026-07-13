@@ -1,4 +1,4 @@
-import { SectionHeader } from "@/components/ui/section-header";
+import { SectionHead } from "@/components/apex/SectionHead";
 
 const milestones = [
   {
@@ -61,35 +61,37 @@ const milestones = [
 
 export function Timeline() {
   return (
-    <section className="max-w-[960px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
-      <div className="reveal">
-        <SectionHeader
-          eyebrow="Le tappe"
+    <section className="apex-section">
+      <div className="apex-wrap">
+        <SectionHead
+          kicker="Le tappe"
           title="Una storia raccontata per stagioni."
-          subtitle="Dal 2015 a oggi: i momenti che hanno costruito quello che siamo."
+          intro="Dal 2015 a oggi: i momenti che hanno costruito quello che siamo."
         />
-      </div>
 
-      <ol className="mt-16 relative border-l-2 border-navy-100 pl-8 space-y-14">
-        {milestones.map((m, i) => (
-          <li key={m.year} className={`relative reveal reveal-delay-${i + 1}`}>
-            {/* Pallino */}
-            <span
-              aria-hidden
-              className="absolute -left-[42px] top-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-sun-500 ring-4 ring-bg"
-            />
-            <div className="font-mono text-sm tracking-[0.15em] uppercase text-sky-600 mb-2">
-              {m.year}
-            </div>
-            <h3 className="text-2xl lg:text-3xl font-bold text-navy-900 leading-tight">
-              {m.title}
-            </h3>
-            <div className="mt-4 text-ink text-lg leading-relaxed">
-              {m.body}
-            </div>
-          </li>
-        ))}
-      </ol>
+        {/* max-width sull'ol (non su .apex-wrap, che è CSS unlayered e
+            batterebbe qualunque max-w-* Tailwind, pattern EVO-027/apex.css)
+            per una colonna di lettura leggibile invece della piena 1320px. */}
+        <ol className="mt-16 relative max-w-[720px] border-l-2 border-stage-line pl-8 space-y-14">
+          {milestones.map((m, i) => (
+            <li key={m.year} className={`relative reveal reveal-delay-${i + 1}`}>
+              <span
+                aria-hidden
+                className="absolute -left-[42px] top-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-accent ring-4 ring-stage-bg"
+              />
+              <div className="font-mono text-sm tracking-[0.15em] uppercase text-accent mb-2">
+                {m.year}
+              </div>
+              <h3 className="text-2xl lg:text-3xl font-bold text-stage-ink leading-tight">
+                {m.title}
+              </h3>
+              <div className="mt-4 text-stage-ink-dim text-lg leading-relaxed">
+                {m.body}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }

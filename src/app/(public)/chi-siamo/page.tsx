@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { ChiSiamoHero } from "@/components/chi-siamo/ChiSiamoHero";
 import { Timeline } from "@/components/chi-siamo/Timeline";
+import { CosaSiamoOggi } from "@/components/chi-siamo/CosaSiamoOggi";
 import { Fondatori } from "@/components/chi-siamo/Fondatori";
 import { CtaFinale } from "@/components/home/CtaFinale";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { Grain } from "@/components/apex/Grain";
 
 export const metadata: Metadata = {
   title: "Chi siamo · Triono Racing · ASD CIEMME",
@@ -23,14 +25,21 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Chi siamo — APEX v2, livrea Racing (EVO-042, figlia EVO-037).
+ * Migrazione dal DS v0.1 chiaro allo stage scuro + sezione "Cosa siamo oggi"
+ * (rende esplicito il percorso scuola → squadra → agonismo, PRODUCT.md).
+ */
 export default function ChiSiamoPage() {
   return (
-    <>
+    <div data-livery="racing" className="bg-stage-bg text-stage-ink">
+      <Grain />
       <BreadcrumbJsonLd items={[{ name: "Chi siamo", url: "/chi-siamo" }]} />
       <ChiSiamoHero />
       <Timeline />
+      <CosaSiamoOggi />
       <Fondatori />
       <CtaFinale />
-    </>
+    </div>
   );
 }

@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { AmatoriHero } from "@/components/amatori/AmatoriHero";
 import { SezioneValori } from "@/components/amatori/SezioneValori";
 import { ComeUnirsi } from "@/components/amatori/ComeUnirsi";
+import { DoveQuando } from "@/components/amatori/DoveQuando";
 import { BachecaFoto } from "@/components/amatori/BachecaFoto";
 import { CtaFinale } from "@/components/home/CtaFinale";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { Grain } from "@/components/apex/Grain";
 
 export const metadata: Metadata = {
   title: "Gli Amatori Triono Racing, squadra ciclistica a Terni · ASD CIEMME",
@@ -28,15 +30,22 @@ export const metadata: Metadata = {
 // revalidate l'admin vede il cambio entro ~10 min senza deploy. EVO-021.
 export const revalidate = 600;
 
+/**
+ * Gli Amatori Triono — APEX v2, livrea Racing (EVO-042, figlia EVO-037).
+ * Migrazione dal DS v0.1 chiaro allo stage scuro + sezione "Dove e quando"
+ * (logistica + richiamo Marathon 209). ISR/slot video hero invariati (EVO-021).
+ */
 export default function AmatoriPage() {
   return (
-    <>
+    <div data-livery="racing" className="bg-stage-bg text-stage-ink">
+      <Grain />
       <BreadcrumbJsonLd items={[{ name: "Gli Amatori", url: "/gli-amatori-triono" }]} />
       <AmatoriHero />
       <SezioneValori />
       <ComeUnirsi />
+      <DoveQuando />
       <BachecaFoto />
       <CtaFinale />
-    </>
+    </div>
   );
 }

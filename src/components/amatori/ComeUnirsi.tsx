@@ -1,6 +1,6 @@
-import { SectionHeader } from "@/components/ui/section-header";
-import { Card, CardContent, CardTitle, CardBody } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { SectionHead } from "@/components/apex/SectionHead";
+import { ApexCard } from "@/components/apex/ApexCard";
+import { ApexCta } from "@/components/apex/ApexCta";
 
 const steps = [
   {
@@ -22,34 +22,26 @@ const steps = [
 
 export function ComeUnirsi() {
   return (
-    <section className="bg-bg-soft py-24 lg:py-32">
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
-        <div className="reveal">
-          <SectionHeader
-            eyebrow="Come unirsi"
-            title="Tre passi per entrare in squadra."
-            subtitle="Niente provini, niente selezioni: solo passione per le due ruote e voglia di pedalare in compagnia."
-          />
-        </div>
+    <section className="apex-section apex-section--edge">
+      <div className="apex-wrap">
+        <SectionHead
+          kicker="Come unirsi"
+          title="Tre passi per entrare in squadra."
+          intro="Niente provini, niente selezioni: solo passione per le due ruote e voglia di pedalare in compagnia."
+        />
 
         <div className="mt-12 grid md:grid-cols-3 gap-5">
           {steps.map((s, i) => (
-            <Card key={s.n} className={`reveal reveal-delay-${i + 1}`}>
-              <CardContent>
-                <div className="font-mono text-sm tracking-[0.2em] text-sky-600 mb-3">
-                  {s.n}
-                </div>
-                <CardTitle>{s.title}</CardTitle>
-                <CardBody>{s.body}</CardBody>
-              </CardContent>
-            </Card>
+            <div key={s.n} className={`reveal reveal-delay-${i + 1}`}>
+              <ApexCard index={s.n} title={s.title}>
+                <p>{s.body}</p>
+              </ApexCard>
+            </div>
           ))}
         </div>
 
         <div className="mt-10 flex justify-center reveal">
-          <Button asChild size="lg">
-            <a href="/contatti?motivo=tesseramento">Inizia da qui</a>
-          </Button>
+          <ApexCta href="/contatti?motivo=tesseramento">Inizia da qui</ApexCta>
         </div>
       </div>
     </section>
