@@ -1,5 +1,5 @@
 import * as React from "react";
-import { SectionHeader } from "@/components/ui/section-header";
+import { SectionHead } from "@/components/apex/SectionHead";
 import {
   CalendarDays,
   MapPin,
@@ -69,41 +69,41 @@ export function InfoPratiche({ info }: Props) {
   }
 
   return (
-    <section className="bg-bg-soft py-24 lg:py-32">
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
-        <div className="reveal">
-          <SectionHeader
-            eyebrow="Informazioni pratiche"
-            title="QUANDO, DOVE E COME."
-            subtitle="L'essenziale per pianificare la trasferta. Per il programma completo, regolamento, pasta party e tutte le info di dettaglio vai sul sito ufficiale."
-          />
-        </div>
+    <section className="apex-section">
+      <div className="apex-wrap">
+        <SectionHead
+          kicker="Informazioni pratiche"
+          title="Quando, dove e come."
+          intro="L'essenziale per pianificare la trasferta. Per il programma completo, regolamento, pasta party e tutte le info di dettaglio vai sul sito ufficiale."
+        />
 
-        <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div
+          className="mt-12 grid gap-5"
+          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}
+        >
           {info.map((it, i) => {
             const IconComp = (it.icona && ICON_MAP[it.icona]) || MapPin;
             const isHighlight = it.variante === "highlight";
             return (
               <div
                 key={it.id}
-                className={`reveal reveal-delay-${(i % 6) + 1} relative overflow-hidden p-6 lg:p-8 border-2 ${
-                  isHighlight
-                    ? "photo-bg-navy text-white border-sun-500"
-                    : "bg-white text-ink border-navy-100"
+                className={`reveal reveal-delay-${(i % 6) + 1} relative overflow-hidden p-6 lg:p-8 border ${
+                  isHighlight ? "border-accent/40" : "bg-stage-surface border-stage-line"
                 }`}
+                style={
+                  isHighlight
+                    ? { backgroundColor: "color-mix(in srgb, var(--accent) 14%, var(--stage-surface))" }
+                    : undefined
+                }
               >
                 <div
                   className={`inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.15em] mb-3 ${
-                    isHighlight ? "text-sun-500" : "text-sun-700"
+                    isHighlight ? "text-accent" : "text-stage-muted"
                   }`}
                 >
                   <IconComp className="w-4 h-4" /> {it.titolo}
                 </div>
-                <div
-                  className={`text-lg leading-snug ${
-                    isHighlight ? "text-white" : "text-navy-900"
-                  }`}
-                >
+                <div className="text-lg leading-snug text-stage-ink">
                   {renderRichText(it.valoreHtml)}
                 </div>
               </div>
