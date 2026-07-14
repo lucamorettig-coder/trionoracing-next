@@ -76,8 +76,12 @@
   display: flex; align-items: center; gap: var(--space-6);
   height: 60px; padding-inline: var(--gutter);
   background: color-mix(in srgb, var(--stage-bg) 82%, transparent);
-  backdrop-filter: blur(14px) saturate(1.2);
+  /* NB: -webkit- PRIMA dello standard — Lightning CSS (build Next 16) tratta le due
+     dichiarazioni come la stessa proprietà logica e tiene solo l'ULTIMA in ordine
+     sorgente (dedup cascade-style), a prescindere da minify/browserslist. Con lo
+     standard per ultimo, quello sopravvive nel CSS di produzione (verificato). */
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
   border-bottom: 1px solid var(--stage-line-soft);
 }
 .apex-nav__logo { height: 26px; width: auto; opacity: 0.95; }
