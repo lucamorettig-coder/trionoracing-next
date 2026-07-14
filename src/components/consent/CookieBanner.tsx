@@ -49,7 +49,16 @@ export function CookieBanner() {
     : "text-stage-muted hover:text-stage-ink w-full sm:w-auto";
 
   return (
-    <div role="dialog" aria-label="Preferenze cookie" className={containerClass}>
+    <div
+      role="dialog"
+      aria-label="Preferenze cookie"
+      // `data-stage` è scoped al wrapper del layout pubblico (apex-tokens.css):
+      // questo banner è un SIBLING di quel wrapper (montato nel root layout,
+      // non annidato dentro), quindi senza l'attributo qui i token --stage-*
+      // non risolvono → sfondo/testo trasparenti sul pubblico (EVO-024 bug).
+      data-stage={isPortale ? undefined : true}
+      className={containerClass}
+    >
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <p className={`flex-1 min-w-[280px] text-sm ${textClass} leading-relaxed`}>
           <Cookie className={iconClass} aria-hidden />
