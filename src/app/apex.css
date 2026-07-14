@@ -32,6 +32,7 @@
   letter-spacing: var(--tracking-display);
   line-height: var(--lh-display);
   margin: 0;
+  overflow-wrap: break-word;
 }
 .stroke-word {
   color: transparent;
@@ -212,6 +213,7 @@
   font-family: var(--font-display); font-weight: var(--weight-display); font-stretch: 125%;
   text-transform: uppercase; letter-spacing: var(--tracking-display); line-height: var(--lh-display);
   margin: 0; font-size: var(--fs-display);
+  overflow-wrap: break-word;
 }
 /* Variante quieta: sezioni utility/logistica (indirizzo, galleria) non devono
    "gridare" quanto le sezioni-manifesto → titolo a fs-h2, non fs-display. */

@@ -29,12 +29,11 @@ function SchedRow({
     <div className="flex items-center gap-3 text-sm">
       <span className="w-[68px] shrink-0 font-mono text-[13px] font-bold text-stage-ink">{day}</span>
       <span
-        className={
-          "font-mono text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-[var(--radius-sm)] " +
-          (discTone === "strada"
-            ? "bg-sky-100 text-sky-700"
-            : "bg-grass-100 text-grass-700")
-        }
+        className="border font-mono text-[10px] font-bold uppercase tracking-[0.12em] px-2 py-0.5"
+        style={{
+          color: discTone === "strada" ? "var(--accent)" : "var(--accent-2)",
+          borderColor: discTone === "strada" ? "var(--accent)" : "var(--accent-2)",
+        }}
       >
         {disc}
       </span>
