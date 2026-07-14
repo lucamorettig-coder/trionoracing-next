@@ -164,6 +164,8 @@ Percorso (b) — implementazione diretta: planner Opus 4.8 orchestra, executor v
 
 ## 8. Verifica e go-live
 
+✅ **Esito**: PR [#110](https://github.com/lucamorettig-coder/trionoracing-next/pull/110) squash-merged (`207d1cf`), live su https://trionoracing.it (tutte e 5 le pagine 200, verificato post-deploy). Report `verify-implementation` manuale in `verifica.md` (8/8 requisiti funzionali ✅, 0 violazioni — skill puntata sul solito altro progetto). Console pulita, canonical/OG/JSON-LD invariati, 1 solo `h1` su diventa-maestro. Fix content-model "ruolo volontario" e nav link "Diventa Maestro" confermati live via curl. Cookie banner verificato in entrambi i temi (dark su pubblico, chiaro invariato su `/portale/login`). Fix overflow mobile pre-esistente su `/contatti` confermato risolto in produzione (zero offenders reali). Data go-live: 2026-07-14. **Chiude l'ombrello EVO-037: l'intero sito pubblico è ora in APEX.**
+
 ---
 
 ## Log fasi
