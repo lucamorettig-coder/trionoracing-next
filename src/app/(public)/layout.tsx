@@ -6,6 +6,7 @@ const publicLinks = [
   { label: "Amatori", href: "/gli-amatori-triono" },
   { label: "Chi siamo", href: "/chi-siamo" },
   { label: "Marathon 209", href: "/marathon-209", badge: "2026" },
+  { label: "Diventa Maestro", href: "/diventa-maestro" },
   { label: "Contatti", href: "/contatti" },
 ];
 

@@ -5,6 +5,7 @@ import { SezioneTI2 } from "@/components/diventa-maestro/SezioneTI2";
 import { SezioneCosaFarai } from "@/components/diventa-maestro/SezioneCosaFarai";
 import { CtaContattaci } from "@/components/diventa-maestro/CtaContattaci";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { Grain } from "@/components/apex/Grain";
 
 export const metadata: Metadata = {
   title: "Diventa Maestro della Scuola di Ciclismo Triono · VOGLIO TE",
@@ -32,7 +33,8 @@ export const metadata: Metadata = {
 
 export default function DiventaMaestroPage() {
   return (
-    <>
+    <div data-livery="scuola" className="bg-stage-bg text-stage-ink">
+      <Grain />
       <BreadcrumbJsonLd items={[{ name: "Diventa maestro", url: "/diventa-maestro" }]} />
 
       <HeroManifesto />
@@ -40,6 +42,6 @@ export default function DiventaMaestroPage() {
       <SezioneTI2 />
       <SezioneCosaFarai />
       <CtaContattaci />
-    </>
+    </div>
   );
 }

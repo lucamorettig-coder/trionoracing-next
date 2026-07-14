@@ -106,17 +106,17 @@ export function ContactForm() {
 
   if (status === "success") {
     return (
-      <div className="bg-grass-50 border border-grass-200 rounded-[var(--radius-lg)] p-8 text-center">
+      <div className="bg-grass-500/10 border border-grass-500/30 rounded-[var(--radius-lg)] p-8 text-center">
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-grass-500 text-white mb-4">
           <Check className="w-6 h-6" />
         </div>
-        <h2 className="text-2xl font-bold text-grass-700">Messaggio inviato!</h2>
-        <p className="mt-3 text-ink leading-relaxed">
+        <h2 className="text-2xl font-bold text-grass-500">Messaggio inviato!</h2>
+        <p className="mt-3 text-stage-ink-dim leading-relaxed">
           Abbiamo ricevuto la tua richiesta. Ti rispondiamo entro 2–3 giorni dall&apos;email
           che hai indicato. In caso di urgenze, scrivici direttamente a{" "}
           <a
             href={`mailto:${CONTACT_EMAIL}`}
-            className="font-semibold text-navy-700 underline underline-offset-4"
+            className="font-semibold text-stage-ink underline underline-offset-4"
           >
             {CONTACT_EMAIL}
           </a>
@@ -144,7 +144,7 @@ export function ContactForm() {
 
       <div className="grid md:grid-cols-2 gap-5">
         <FormField>
-          <Label htmlFor="nome" required>
+          <Label htmlFor="nome" required className="text-stage-ink">
             Nome
           </Label>
           <Input
@@ -153,19 +153,27 @@ export function ContactForm() {
             required
             autoComplete="given-name"
             error={!!fieldErrors.nome}
+            className="bg-stage-surface border-stage-line text-stage-ink placeholder:text-stage-muted focus:border-accent focus:ring-accent/15"
           />
           {fieldErrors.nome && <FormError>{fieldErrors.nome}</FormError>}
         </FormField>
 
         <FormField>
-          <Label htmlFor="cognome">Cognome</Label>
-          <Input id="cognome" name="cognome" autoComplete="family-name" />
+          <Label htmlFor="cognome" className="text-stage-ink">
+            Cognome
+          </Label>
+          <Input
+            id="cognome"
+            name="cognome"
+            autoComplete="family-name"
+            className="bg-stage-surface border-stage-line text-stage-ink placeholder:text-stage-muted focus:border-accent focus:ring-accent/15"
+          />
         </FormField>
       </div>
 
       <div className="grid md:grid-cols-2 gap-5">
         <FormField>
-          <Label htmlFor="email" required>
+          <Label htmlFor="email" required className="text-stage-ink">
             Email
           </Label>
           <Input
@@ -175,27 +183,37 @@ export function ContactForm() {
             required
             autoComplete="email"
             error={!!fieldErrors.email}
+            className="bg-stage-surface border-stage-line text-stage-ink placeholder:text-stage-muted focus:border-accent focus:ring-accent/15"
           />
           {fieldErrors.email && <FormError>{fieldErrors.email}</FormError>}
         </FormField>
 
         <FormField>
-          <Label htmlFor="telefono">Telefono</Label>
+          <Label htmlFor="telefono" className="text-stage-ink">
+            Telefono
+          </Label>
           <Input
             id="telefono"
             name="telefono"
             type="tel"
             autoComplete="tel"
             placeholder="Opzionale"
+            className="bg-stage-surface border-stage-line text-stage-ink placeholder:text-stage-muted focus:border-accent focus:ring-accent/15"
           />
         </FormField>
       </div>
 
       <FormField>
-        <Label htmlFor="motivo" required>
+        <Label htmlFor="motivo" required className="text-stage-ink">
           Motivo della richiesta
         </Label>
-        <Select id="motivo" name="motivo" required defaultValue={motivoIniziale}>
+        <Select
+          id="motivo"
+          name="motivo"
+          required
+          defaultValue={motivoIniziale}
+          className="bg-stage-surface border-stage-line text-stage-ink focus:border-accent focus:ring-accent/15"
+        >
           {MOTIVI.map((m) => (
             <option key={m} value={m}>
               {m}
@@ -205,7 +223,7 @@ export function ContactForm() {
       </FormField>
 
       <FormField>
-        <Label htmlFor="messaggio" required>
+        <Label htmlFor="messaggio" required className="text-stage-ink">
           Messaggio
         </Label>
         <Textarea
@@ -215,18 +233,19 @@ export function ContactForm() {
           rows={5}
           placeholder="Raccontaci di cosa hai bisogno: età di tuo figlio, esperienza, qualsiasi domanda…"
           error={!!fieldErrors.messaggio}
+          className="bg-stage-surface border-stage-line text-stage-ink placeholder:text-stage-muted focus:border-accent focus:ring-accent/15"
         />
         {fieldErrors.messaggio ? (
           <FormError>{fieldErrors.messaggio}</FormError>
         ) : (
-          <FormHelper>Almeno 10 caratteri.</FormHelper>
+          <FormHelper className="text-stage-muted">Almeno 10 caratteri.</FormHelper>
         )}
       </FormField>
 
       <FormField>
         <label className="flex items-start gap-3 cursor-pointer">
-          <Checkbox name="privacy_ok" required />
-          <span className="text-sm text-ink leading-relaxed">
+          <Checkbox name="privacy_ok" required className="accent-accent" />
+          <span className="text-sm text-stage-ink-dim leading-relaxed">
             Ho letto l&apos;informativa privacy e acconsento al trattamento dei miei dati per
             essere ricontattato.{" "}
             <span className="text-flag-500">*</span>
@@ -236,16 +255,21 @@ export function ContactForm() {
       </FormField>
 
       {errorMessage && (
-        <div className="bg-flag-50 border border-flag-200 text-flag-700 rounded-[var(--radius-md)] px-4 py-3 text-sm">
+        <div className="bg-flag-500/10 border border-flag-500/30 text-flag-500 rounded-[var(--radius-md)] px-4 py-3 text-sm">
           {errorMessage}
         </div>
       )}
 
       <div className="flex flex-wrap items-center gap-3 pt-2">
-        <Button type="submit" size="lg" loading={status === "submitting"}>
+        <Button
+          type="submit"
+          size="lg"
+          loading={status === "submitting"}
+          className="bg-accent text-[#04091c] border-accent hover:bg-accent/90"
+        >
           Invia richiesta
         </Button>
-        <span className="text-xs text-ink-muted">
+        <span className="text-xs text-stage-muted">
           Rispondiamo entro 2–3 giorni dall&apos;email indicata.
         </span>
       </div>

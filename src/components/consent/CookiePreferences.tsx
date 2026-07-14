@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -20,8 +21,15 @@ import { useConsent } from "./ConsentProvider";
  * Riga intera cliccabile (target ampio). X / Escape / click overlay = cancel
  * (nessun consenso implicito). Footer senza bias: Salva = primario (sun),
  * Rifiuta/Accetta = pari peso (outline).
+ *
+ * Theme-aware per path (APEX pubblico scuro vs portale DS v0.1 chiaro): su
+ * `/portale/*` le classi restano identiche al comportamento storico; sul
+ * pubblico si sostituiscono i token con quelli dello stage scuro (stesso
+ * pattern applicato a `CookieBanner.tsx`).
  */
 export function CookiePreferences() {
+  const pathname = usePathname();
+  const isPortale = pathname?.startsWith("/portale") ?? false;
   const { prefsOpen, setPrefsOpen, consent, acceptAll, rejectAll, save } = useConsent();
 
   const [analytics, setAnalytics] = React.useState(consent?.analytics ?? false);
@@ -42,10 +50,19 @@ export function CookiePreferences() {
 
   return (
     <Dialog open={prefsOpen} onOpenChange={setPrefsOpen}>
-      <DialogContent size="sm" className="p-0 overflow-hidden gap-0">
+      <DialogContent
+        size="sm"
+        className={
+          isPortale
+            ? "p-0 overflow-hidden gap-0"
+            : "p-0 overflow-hidden gap-0 bg-stage-surface border-stage-line"
+        }
+      >
         <DialogHeader className="px-6 pt-6 pb-3.5 mb-0 pr-12">
-          <DialogTitle className="text-navy-900 text-lg">Preferenze cookie</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className={isPortale ? "text-navy-900 text-lg" : "text-stage-ink text-lg"}>
+            Preferenze cookie
+          </DialogTitle>
+          <DialogDescription className={isPortale ? undefined : "text-stage-muted"}>
             Scegli quali cookie attivare. Puoi cambiare idea in ogni momento da
             &quot;Preferenze cookie&quot; nel footer.
           </DialogDescription>
@@ -57,6 +74,7 @@ export function CookiePreferences() {
           description="Sessione di login (Clerk), sicurezza e funzionamento del sito. Non richiedono consenso."
           checked
           disabled
+          isPortale={isPortale}
         />
         <CategoryRow
           title="Statistici"
@@ -64,6 +82,7 @@ export function CookiePreferences() {
           description="Misurazione anonima delle visite (IP anonimizzato) per migliorare il sito."
           checked={analytics}
           onToggle={() => setAnalytics((v) => !v)}
+          isPortale={isPortale}
         />
         <CategoryRow
           title="Mappe"
@@ -71,20 +90,41 @@ export function CookiePreferences() {
           description={'Mostra la mappa "Come raggiungerci" sulla home. Google riceve il tuo IP.'}
           checked={maps}
           onToggle={() => setMaps((v) => !v)}
+          isPortale={isPortale}
         />
 
-        {/* Footer senza bias: Rifiuta/Accetta pari peso (outline), Salva = primario (sun) */}
-        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 px-6 py-5 bg-bg-soft border-t border-line">
-          <Button size="sm" variant="outline" onClick={rejectAll}>
+        {/* Footer senza bias: Rifiuta/Accetta pari peso (outline), Salva = primario (sun/accento) */}
+        <div
+          className={
+            isPortale
+              ? "flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 px-6 py-5 bg-bg-soft border-t border-line"
+              : "flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 px-6 py-5 bg-stage-surface-2 border-t border-stage-line"
+          }
+        >
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={rejectAll}
+            className={isPortale ? undefined : "border-stage-line text-stage-ink hover:bg-white/5"}
+          >
             Rifiuta tutti
           </Button>
-          <Button size="sm" variant="outline" onClick={acceptAll}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={acceptAll}
+            className={isPortale ? undefined : "border-stage-line text-stage-ink hover:bg-white/5"}
+          >
             Accetta tutti
           </Button>
           <Button
             size="sm"
             onClick={() => save({ analytics, maps })}
-            className="bg-sun-500 text-navy-900 border-sun-500 hover:bg-sun-600 hover:border-sun-600"
+            className={
+              isPortale
+                ? "bg-sun-500 text-navy-900 border-sun-500 hover:bg-sun-600 hover:border-sun-600"
+                : "bg-accent-2 text-[#04091c] border-accent-2 hover:bg-accent-2/90"
+            }
           >
             Salva preferenze
           </Button>
@@ -101,6 +141,7 @@ function CategoryRow({
   checked,
   disabled = false,
   onToggle,
+  isPortale = false,
 }: {
   title: string;
   badge: React.ReactNode;
@@ -108,21 +149,38 @@ function CategoryRow({
   checked: boolean;
   disabled?: boolean;
   onToggle?: () => void;
+  isPortale?: boolean;
 }) {
   const labelId = React.useId();
   const descId = React.useId();
   return (
     <div
       onClick={() => !disabled && onToggle?.()}
-      className={`flex items-start gap-3.5 px-6 py-4 border-t border-line ${
-        disabled ? "" : "cursor-pointer hover:bg-bg-soft"
-      }`}
+      className={
+        isPortale
+          ? `flex items-start gap-3.5 px-6 py-4 border-t border-line ${
+              disabled ? "" : "cursor-pointer hover:bg-bg-soft"
+            }`
+          : `flex items-start gap-3.5 px-6 py-4 border-t border-stage-line ${
+              disabled ? "" : "cursor-pointer hover:bg-white/5"
+            }`
+      }
     >
       <div className="flex-1">
-        <div id={labelId} className="flex items-center gap-2 font-bold text-sm text-navy-900">
+        <div
+          id={labelId}
+          className={`flex items-center gap-2 font-bold text-sm ${
+            isPortale ? "text-navy-900" : "text-stage-ink"
+          }`}
+        >
           {title} {badge}
         </div>
-        <p id={descId} className="text-[13px] text-ink-muted mt-0.5 leading-relaxed">
+        <p
+          id={descId}
+          className={`text-[13px] mt-0.5 leading-relaxed ${
+            isPortale ? "text-ink-muted" : "text-stage-muted"
+          }`}
+        >
           {description}
         </p>
       </div>
@@ -132,6 +190,7 @@ function CategoryRow({
         onCheckedChange={() => onToggle?.()}
         aria-labelledby={labelId}
         aria-describedby={descId}
+        theme={isPortale ? "light" : "dark"}
         className="mt-0.5"
       />
     </div>
