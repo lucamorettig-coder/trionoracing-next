@@ -158,6 +158,8 @@ Percorso (b) — implementazione diretta: planner Opus 4.8 orchestra, executor v
 
 ## 8. Verifica e go-live
 
+✅ **Esito**: PR [#108](https://github.com/lucamorettig-coder/trionoracing-next/pull/108) squash-merged (`c60e037`), live su https://trionoracing.it/marathon-209 (200, verificato post-deploy). Report `verify-implementation` manuale in `verifica.md` (10/10 requisiti funzionali ✅, 0 violazioni convenzioni/design system — skill puntata sul solito altro progetto "Cycling Experience", bug noto). Console pulita, canonical/OG/JSON-LD invariati, 1 solo `h1`. I 2 bug P0 di content-model (badge "PROSSIMA" → "ULTIMA EDIZIONE", CTA "save the date" → "Missione compiuta") confermati risolti dal vivo in produzione. Data go-live: 2026-07-14.
+
 ---
 
 ## Log fasi
