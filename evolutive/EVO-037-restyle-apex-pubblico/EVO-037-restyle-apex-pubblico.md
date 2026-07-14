@@ -22,7 +22,7 @@ Il restyle si implementa **pagina per pagina** in sotto-evolutive figlie. Decisi
 | EVO-039 | **/la-scuola** (livrea Scuola, mascotte, cartoleria S2 doodle) | ✅ chiusa — live |
 | EVO-041 | Rifiniture /la-scuola (2 round fix post-feedback: hero, card, cover, band) | ✅ chiusa — live |
 | EVO-042 | **/chi-siamo + /gli-amatori-triono** (livrea Racing, + 2 sezioni nuove CosaSiamoOggi/DoveQuando) | ✅ chiusa — live |
-| EVO-0XX | /marathon-209 (livrea marathon, migrazione `.theme-209` → `[data-livery="marathon"]`, altimetria da GPX reale — **serve il GPX da Luca**) | da pianificare |
+| EVO-043 | **/marathon-209** (livrea marathon, migrazione `.theme-209` → `[data-livery="marathon"]`, nuovo `AltimetriaProfile` con profilo stilizzato — no GPX disponibile, numeri reali Airtable) | ✅ chiusa — live |
 | EVO-0XX | /diventa-maestro + /contatti + legali | da pianificare |
 
 Nota: **EVO-040** (migrazione Cloudinary, chiusa) NON è figlia di questo ombrello — è un'evolutiva infrastrutturale indipendente, nata da un incidente (quota Cloudinary esaurita) scoperto durante lo smoke di EVO-039.
@@ -30,6 +30,9 @@ Nota: **EVO-040** (migrazione Cloudinary, chiusa) NON è figlia di questo ombrel
 L'ombrello resta aperto finché tutte le figlie non sono chiuse.
 
 ## Log
+
+### [2026-07-14] EVO-043 chiusa (4ª figlia: /marathon-209)
+Migrazione della pagina evento dal DS legacy `.theme-209` allo stage scuro APEX livrea marathon. Nessun GPX reale (input mai arrivato, l'utente ha indicato di usare solo i dati già su Airtable): nuovo componente `AltimetriaProfile` con profilo SVG stilizzato + numeri reali sovrapposti. Un `/impeccable critique` sulla pagina live ha scoperto 2 bug P0 di contenuto (badge/CTA "pre-evento" su una gara già conclusa), fissati nella stessa evolutiva. PR #108 squash `c60e037`, live. Resta da pianificare solo /diventa-maestro+/contatti+legali.
 
 ### [2026-07-13] EVO-042 chiusa (3ª figlia: /chi-siamo + /gli-amatori-triono)
 Migrazione delle 2 pagine allo stage scuro APEX livrea Racing, con espansione mirata (sezioni nuove `CosaSiamoOggi` su chi-siamo, `DoveQuando` su amatori, entrambe cross-link/logistica su fatti reali, no claim inventati). PR #107 squash `e579f1b`, live. Restano da pianificare: /marathon-209 (serve GPX) e /diventa-maestro+/contatti+legali.
