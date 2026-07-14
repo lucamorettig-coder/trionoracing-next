@@ -94,72 +94,79 @@ export function ApexNavBar({ links }: ApexNavBarProps) {
         </nav>
       </header>
 
-      {/* Mobile drawer — fuori dall'<header sticky> (stacking context iOS) */}
-      {open && (
-        <div
-          className="lg:hidden fixed inset-0 z-[100] flex flex-col overflow-hidden bg-stage-bg text-stage-ink"
-          data-livery="racing"
-        >
-          <div className="px-4 h-[60px] flex items-center justify-between border-b border-stage-line-soft shrink-0">
-            <Image
-              src="/assets/logo-triono-racing-white.png"
-              alt="Triono Racing"
-              width={140}
-              height={36}
-              className="apex-nav__logo"
-            />
-            <button
-              type="button"
-              className="w-11 h-11 flex items-center justify-center bg-white/5 border border-stage-line"
-              aria-label="Chiudi menu"
-              onClick={() => setOpen(false)}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <nav className="flex-1 overflow-y-auto p-4 space-y-1">
-            {links.map((l) => {
-              const active = isActiveHref(pathname, l.href);
-              return (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  aria-current={active ? "page" : undefined}
-                  className={`flex items-center justify-between px-4 py-3.5 apex-data transition-colors ${
-                    active
-                      ? "text-stage-ink border-l-2 border-accent bg-white/5"
-                      : "text-stage-ink-dim hover:text-stage-ink hover:bg-white/5"
-                  }`}
-                >
-                  {l.label}
-                  {l.badge && (
-                    <span className="text-[9px] font-bold tracking-[0.1em] px-1 py-px bg-accent-2 text-[#04091c]">
-                      {l.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="p-4 space-y-2 border-t border-stage-line-soft shrink-0">
-            <Link
-              href="/portale/iscrizioni"
-              onClick={() => setOpen(false)}
-              className="apex-cta apex-cta--primary w-full justify-center"
-            >
-              Iscrivi tuo figlio <span className="apex-cta__arrow" aria-hidden>→</span>
-            </Link>
-            <Link
-              href={portalHref}
-              onClick={() => setOpen(false)}
-              className="apex-cta apex-cta--ghost w-full justify-center"
-            >
-              {portalLabel}
-            </Link>
-          </div>
+      {/* Mobile drawer — fuori dall'<header sticky> (stacking context iOS).
+          Sempre montato (mai {open && ...}): serve per animare SIA l'apertura
+          SIA la chiusura — con mount/unmount condizionale React smonta il nodo
+          all'istante e la transizione di chiusura non fa in tempo a giocare.
+          `inert` sostituisce l'unmount per l'a11y: link non raggiungibili da
+          tastiera/AT quando il drawer è chiuso, senza bisogno di stato/timer. */}
+      <div
+        className={`lg:hidden fixed inset-0 z-[100] flex flex-col overflow-hidden bg-stage-bg text-stage-ink transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+          open ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+        }`}
+        data-livery="racing"
+        aria-hidden={!open}
+        inert={!open ? true : undefined}
+      >
+        <div className="px-4 h-[60px] flex items-center justify-between border-b border-stage-line-soft shrink-0">
+          <Image
+            src="/assets/logo-triono-racing-white.png"
+            alt="Triono Racing"
+            width={140}
+            height={36}
+            className="apex-nav__logo"
+          />
+          <button
+            type="button"
+            className="w-11 h-11 flex items-center justify-center bg-white/5 border border-stage-line"
+            aria-label="Chiudi menu"
+            onClick={() => setOpen(false)}
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
-      )}
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+          {links.map((l) => {
+            const active = isActiveHref(pathname, l.href);
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                aria-current={active ? "page" : undefined}
+                className={`flex items-center justify-between px-4 py-3.5 apex-data transition-colors ${
+                  active
+                    ? "text-stage-ink border-l-2 border-accent bg-white/5"
+                    : "text-stage-ink-dim hover:text-stage-ink hover:bg-white/5"
+                }`}
+              >
+                {l.label}
+                {l.badge && (
+                  <span className="text-[9px] font-bold tracking-[0.1em] px-1 py-px bg-accent-2 text-[#04091c]">
+                    {l.badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="p-4 space-y-2 border-t border-stage-line-soft shrink-0">
+          <Link
+            href="/portale/iscrizioni"
+            onClick={() => setOpen(false)}
+            className="apex-cta apex-cta--primary w-full justify-center"
+          >
+            Iscrivi tuo figlio <span className="apex-cta__arrow" aria-hidden>→</span>
+          </Link>
+          <Link
+            href={portalHref}
+            onClick={() => setOpen(false)}
+            className="apex-cta apex-cta--ghost w-full justify-center"
+          >
+            {portalLabel}
+          </Link>
+        </div>
+      </div>
     </>
   );
 }

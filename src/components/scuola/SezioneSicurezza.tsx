@@ -101,7 +101,7 @@ export function SezioneSicurezza() {
                     <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full font-mono text-[12px] font-semibold bg-accent text-[#04091c]">
                       {d.n}
                     </span>
-                    <span className="min-w-0">{d.nome}</span>
+                    <span className="min-w-0 break-words">{d.nome}</span>
                   </h3>
                   <p className="text-[13px] leading-relaxed">{d.desc}</p>
                 </div>

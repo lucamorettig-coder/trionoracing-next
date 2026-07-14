@@ -267,7 +267,7 @@ function LinkProva({ className = "" }: { className?: string }) {
    ============================================================ */
 function CtaBand() {
   return (
-    <div className="reveal reveal-delay-5 relative mt-12 overflow-hidden border border-stage-line bg-stage-navy p-7 lg:mt-16 lg:px-12 lg:py-10">
+    <div className="reveal-slide reveal-delay-5 relative mt-12 overflow-hidden border border-stage-line bg-stage-navy p-7 lg:mt-16 lg:px-12 lg:py-10">
       {/* Niente pattern geometrico (rimosso dal design, EVO-041): superficie
           navy pulita con solo un floodlight accento discreto, coerente col
           fondale APEX del resto della pagina. */}
