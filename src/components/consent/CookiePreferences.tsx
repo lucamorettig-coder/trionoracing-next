@@ -52,6 +52,12 @@ export function CookiePreferences() {
     <Dialog open={prefsOpen} onOpenChange={setPrefsOpen}>
       <DialogContent
         size="sm"
+        // `data-stage` è scoped al wrapper del layout pubblico (apex-tokens.css).
+        // Radix porta questo Content in un Portal dentro <body>, fuori da
+        // quel wrapper, quindi senza l'attributo qui i token --stage-* non
+        // risolvono → dialog trasparente/illeggibile sul pubblico (stesso bug
+        // di CookieBanner).
+        data-stage={isPortale ? undefined : true}
         className={
           isPortale
             ? "p-0 overflow-hidden gap-0"
