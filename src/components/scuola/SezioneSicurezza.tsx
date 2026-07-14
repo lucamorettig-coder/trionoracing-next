@@ -70,7 +70,7 @@ export function SezioneSicurezza() {
 
         <div className="relative">
           <Doodle variant="stella" className="hidden lg:block absolute -top-8 left-[18%]" />
-          <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 xl:grid-cols-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 xl:grid-cols-5">
             {DOTAZIONI.map((d, i) => (
               <article
                 key={d.n}
