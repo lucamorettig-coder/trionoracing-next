@@ -8,9 +8,9 @@ import { MountainIcon, MapPin, CalendarDays } from "@/components/ui/icons";
 
 /**
  * Sezione Marathon — home APEX (EVO-038). Livrea "marathon" sul wrapper di
- * sezione (rosso race + giallo): primo uso del nuovo sistema [data-livery]
- * accanto al legacy .theme-209 (che resta sulla pagina /marathon-209 fino
- * alla sua evolutiva). Elemento firma M1 (numerone monolite) a L−1.
+ * sezione (rosso race + giallo), stesso sistema [data-livery] usato dalla
+ * pagina /marathon-209 (migrata in EVO-043). Elemento firma M1 (numerone
+ * monolite) a L−1.
  */
 export function SezioneMarathon() {
   return (
