@@ -1,20 +1,22 @@
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { ApexCta } from "@/components/apex/ApexCta";
 
 /**
- * Hero manifesto della pagina /diventa-maestro (EVO-035).
+ * Hero manifesto della pagina /diventa-maestro (EVO-035, migrata ad APEX
+ * livrea scuola).
  *
  * Versione web del manifesto "I Want You" della campagna social "VOGLIO TE".
- * Sfondo = immagine geometrica del brand (`sfondo-geo`) con scrim navy per la
- * leggibilità. Vittoria è ANCORATA AL BORDO INFERIORE della sezione, grande:
- * essendo un cutout a mezza figura, il taglio deve coincidere col bordo (regola
- * NINO.md §6/§12) — mai "appesa" a mezz'aria. Su mobile fa da backdrop dietro al
- * testo (velo navy per la leggibilità). Unico <h1> della pagina.
+ * Sfondo = immagine geometrica del brand (`sfondo-geo`) con scrim sul token
+ * stage per la leggibilità. Vittoria è ANCORATA AL BORDO INFERIORE della
+ * sezione, grande: essendo un cutout a mezza figura, il taglio deve coincidere
+ * col bordo (regola NINO.md §6/§12) — mai "appesa" a mezz'aria. Su mobile fa da
+ * backdrop dietro al testo (velo scuro per la leggibilità). Unico <h1> della
+ * pagina.
  */
 export function HeroManifesto() {
   return (
-    <section className="relative overflow-hidden bg-navy-900">
-      {/* Sfondo geometrico del brand + scrim navy (testo a sinistra leggibile) */}
+    <section className="stage-scene relative overflow-hidden">
+      {/* Sfondo geometrico del brand + scrim sul token stage (testo a sinistra leggibile) */}
       <Image
         src="/diventa-maestro/sfondo-geo.webp"
         alt=""
@@ -29,7 +31,7 @@ export function HeroManifesto() {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(90deg, rgba(5,14,63,0.94) 0%, rgba(5,14,63,0.82) 42%, rgba(5,14,63,0.45) 100%)",
+            "linear-gradient(90deg, var(--stage-bg) 0%, color-mix(in srgb, var(--stage-bg) 82%, transparent) 42%, color-mix(in srgb, var(--stage-bg) 45%, transparent) 100%)",
         }}
       />
 
@@ -56,34 +58,32 @@ export function HeroManifesto() {
         </div>
       </div>
 
-      {/* Velo navy solo-mobile: Vittoria backdrop dietro al testo */}
+      {/* Velo scuro solo-mobile: Vittoria backdrop dietro al testo */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 z-[5] sm:hidden"
         style={{
           background:
-            "linear-gradient(to top, rgba(5,14,63,0.92) 0%, rgba(5,14,63,0.5) 44%, rgba(5,14,63,0.05) 100%)",
+            "linear-gradient(to top, var(--stage-bg) 0%, color-mix(in srgb, var(--stage-bg) 50%, transparent) 44%, color-mix(in srgb, var(--stage-bg) 5%, transparent) 100%)",
         }}
       />
 
       <div className="relative z-10 max-w-[1280px] mx-auto px-6 lg:px-14 py-16 lg:py-24 min-h-[540px] lg:min-h-[640px] flex items-end lg:items-center">
-        <div className="min-w-0 max-w-[560px] text-white text-center sm:text-left">
-          <div className="inline-flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-[0.1em] text-sun-500 before:content-[''] before:w-6 before:h-[2px] before:bg-current before:inline-block">
+        <div className="min-w-0 max-w-[560px] text-center sm:text-left">
+          <div className="apex-eyebrow inline-flex items-center gap-2 text-accent-2 before:content-[''] before:w-6 before:h-[2px] before:bg-current before:inline-block reveal">
             Scuola Triono cerca te
           </div>
           <h1
-            className="mt-5 font-bold tracking-[-0.02em] leading-[0.95]"
+            className="apex-display mt-5 text-stage-ink tracking-[-0.02em] leading-[0.95] reveal reveal-delay-1"
             style={{ fontSize: "clamp(40px, 7vw, 88px)" }}
           >
-            VOGLIO <span className="text-sun-500">TE</span>
+            VOGLIO <span className="text-accent-2">TE</span>
           </h1>
-          <p className="mt-5 max-w-[440px] mx-auto sm:mx-0 text-[17px] leading-relaxed text-white/80">
+          <p className="mt-5 max-w-[440px] mx-auto sm:mx-0 text-[17px] leading-relaxed text-stage-ink-dim reveal reveal-delay-2">
             Diventa Maestro della nostra Scuola di Ciclismo.
           </p>
-          <div className="mt-8 flex justify-center sm:justify-start">
-            <Button asChild size="lg" className="bg-white text-navy-900 border-white hover:bg-navy-50">
-              <a href="#contatti">Contattaci</a>
-            </Button>
+          <div className="mt-8 flex justify-center sm:justify-start reveal reveal-delay-3">
+            <ApexCta href="#contatti">Contattaci</ApexCta>
           </div>
         </div>
       </div>
