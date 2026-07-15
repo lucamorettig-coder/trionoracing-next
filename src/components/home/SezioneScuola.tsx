@@ -14,7 +14,8 @@ import { HelmetIcon, WheelIcon, MedalIcon, CalendarDays, MapPin } from "@/compon
 export function SezioneScuola() {
   return (
     <StageScene data-livery="scuola" className="apex-section apex-section--edge">
-      <div className="apex-wrap">
+      <div className="apex-fondale apex-fondale--tessuto" aria-hidden />
+      <div className="apex-wrap relative" style={{ zIndex: "var(--z-pista)" }}>
         <SectionHead
           kicker="Scuola di ciclismo"
           title={

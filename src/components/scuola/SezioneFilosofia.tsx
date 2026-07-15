@@ -15,7 +15,8 @@ import { Doodle } from "@/components/apex/propkit/scuola/Doodle";
 export function SezioneFilosofia() {
   return (
     <section data-livery="scuola" className="apex-section apex-section--edge apex-section--hero">
-      <div className="apex-wrap">
+      <div className="apex-fondale apex-fondale--tessuto" aria-hidden />
+      <div className="apex-wrap relative" style={{ zIndex: "var(--z-pista)" }}>
         <div className="grid gap-x-16 gap-y-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
           {/* Colonna lede — la citazione-manifesto fa da titolo di sezione */}
           <div className="reveal relative lg:sticky lg:top-28 lg:self-start">
