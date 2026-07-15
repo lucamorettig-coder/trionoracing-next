@@ -75,9 +75,9 @@ export function SezioneKitScuola() {
               <span className="accent-word">Senti la squadra.</span>
             </h2>
             <p className="apex-head__intro">
-              Quattro capi che vanno dalla pedalata alla merenda. Il kit Triono è
-              incluso nell&apos;iscrizione, riconoscibile da lontano in gruppo, come
-              davanti al bar dopo la lezione.
+              Quattro capi che vanno dalla pedalata alla merenda. Il kit Triono
+              si riconosce da lontano in gruppo, come davanti al bar dopo la
+              lezione.
             </p>
           </div>
 
@@ -119,7 +119,7 @@ export function SezioneKitScuola() {
                   Vittoria e Nino lo portano a ogni lezione. È lo stesso kit che riceverà tuo figlio.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {["04 capi", "1 identità", "Incluso nell'iscrizione"].map((c) => (
+                  {["04 capi", "1 identità", "Colori del team"].map((c) => (
                     <span
                       key={c}
                       className="apex-data inline-flex items-center border border-stage-line-soft bg-stage-surface px-3 py-1 text-[11px] text-stage-ink-dim"
