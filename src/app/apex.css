@@ -178,6 +178,25 @@
 }
 .apex-fondale__duotone { position: absolute; inset: 0; background: var(--duotone); mix-blend-mode: color; }
 
+/* Tessuto: variante fondale con la texture reale del kit Nino/Vittoria (jersey
+   navy + confetti), per le sezioni "manifesto" sulla Scuola. Overlay lineare
+   (stessa curva di .photo-bg-navy EVO-012, non il --vignette radiale — i due
+   stack moltiplicherebbero l'oscuramento e la texture sparirebbe) per
+   restare leggibile assorbendo il pattern colorato senza spegnerlo del tutto.
+   Non i token --video-opacity/--duotone (pensati per foto <img>/<video>, qui
+   è un background-image puro sull'elemento .apex-fondale stesso). */
+.apex-fondale--tessuto {
+  background-image: url("/assets/sfondo-real.webp");
+  background-size: cover;
+  background-position: center;
+}
+.apex-fondale--tessuto::after {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--stage-bg) 55%, transparent) 0%,
+    color-mix(in srgb, var(--stage-bg) 72%, transparent) 55%,
+    color-mix(in srgb, var(--stage-bg) 88%, transparent) 100%);
+}
+
 /* =============================================================================
    SectionLap
    ============================================================================= */
