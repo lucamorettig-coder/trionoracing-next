@@ -73,7 +73,7 @@ export function renderEmail(m) {
   @media only screen and (max-width:620px) {
     .px   { padding-left:20px !important; padding-right:20px !important; }
     .h1   { font-size:32px !important; }
-    .stack{ display:block !important; width:100% !important; }
+    .stack{ display:block !important; width:100% !important; box-sizing:border-box !important; }
   }
 </style>
 <!--[if mso]>

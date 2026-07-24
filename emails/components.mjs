@@ -156,12 +156,12 @@ export const infoBlock = (rows) => {
       l.length === 1
         ? `<tr>${dataCell(l[0], false)}</tr>`
         : `<tr><td style="padding:0;">
-             <table role="presentation" width="100%" cellspacing="1" cellpadding="0" border="0" bgcolor="${C.grid}" style="background:${C.grid};table-layout:fixed;"><tr>${dataCell(l[0], true)}${dataCell(l[1], true)}</tr></table>
+             <table role="presentation" width="100%" cellspacing="1" cellpadding="0" border="0" bgcolor="${C.grid}" style="background:${C.grid};"><tr>${dataCell(l[0], true)}${dataCell(l[1], true)}</tr></table>
            </td></tr>`,
     )
     .join('');
 
-  return `<table role="presentation" width="100%" cellspacing="1" cellpadding="0" border="0" bgcolor="${C.grid}" style="background:${C.grid};table-layout:fixed;">${body}</table>`;
+  return `<table role="presentation" width="100%" cellspacing="1" cellpadding="0" border="0" bgcolor="${C.grid}" style="background:${C.grid};">${body}</table>`;
 };
 
 /* -----------------------------------------------------------------------------

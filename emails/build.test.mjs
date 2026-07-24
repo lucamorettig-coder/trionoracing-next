@@ -83,6 +83,36 @@ test('tutti i content buildano senza slop e con il titolo accentato', async () =
   }
 });
 
+test('reticolo dati: le celle affiancate su mobile non sfondano la card (fix overflow Apple Mail/iOS)', () => {
+  // Bug reale (screenshot utente, email #3): la cella "SCADUTO IL" sfondava il
+  // bordo destro della card su Apple Mail iOS. Causa verificata via misurazione
+  // geometrica (CDP): la regola mobile `.stack{ width:100% !important; }` si
+  // applica a un <td> con padding orizzontale 30px e box-sizing:content-box —
+  // il 100% calcola solo il content-box, il padding si aggiunge sopra e la
+  // cella sfonda il proprio contenitore di ~8-29px su ogni breakpoint mobile
+  // (320-600px), indipendentemente da table-layout. `table-layout:fixed` sulla
+  // tabella di affiancamento era un fattore collaterale (introdotto per un
+  // problema diverso, i placeholder Make lunghi) ma NON la causa e la sua sola
+  // rimozione non basta: senza box-sizing:border-box l'overflow resta identico.
+  const html = renderEmail(scaduto);
+
+  assert.ok(
+    !html.includes('table-layout:fixed'),
+    'niente table-layout:fixed nel reticolo dati: non è la difesa giusta contro l\'overflow e nessuna tabella del progetto lo usa più',
+  );
+
+  const stackRule = html.match(/\.stack\{[^}]*\}/);
+  assert.ok(stackRule, 'la regola mobile .stack deve esistere nel <style>');
+  assert.ok(
+    stackRule[0].includes('box-sizing:border-box'),
+    '.stack deve avere box-sizing:border-box: è l\'unica difesa verificata (via misurazione CDP) contro lo sfondamento width:100%+padding su mobile',
+  );
+
+  // sanity: il reticolo a due colonne di 03-scaduto ("Scaduto il" + "Importo")
+  // deve ancora generare celle width:50% class="stack" (pairing intatto).
+  assert.ok(html.includes('class="stack" width="50%"'), 'pairing a due colonne intatto dopo il fix');
+});
+
 test('palette: ogni colore-testo passa WCAG AA', () => {
   const AA = 4.5;
   const pairs = [
