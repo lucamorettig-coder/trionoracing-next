@@ -2,9 +2,10 @@ export default {
   status: 'critical',
   eyebrow: 'Ultimo avviso',
   title: 'Iscrizione a rischio sospensione',
+  titleAccent: 'sospensione',
   intro: [
     'Ciao {{22.NOME_GENITORE}},',
-    'il pagamento relativo all\'iscrizione di <strong style="color:#0A1024;">{{1.`NOME_BAMBINO (from ISCRIZIONE)`[]}}</strong> risulta scaduto da oltre un mese e ancora non registrato.',
+    'il pagamento relativo all\'iscrizione di <strong style="color:#04091C;">{{1.`NOME_BAMBINO (from ISCRIZIONE)`[]}}</strong> risulta scaduto da oltre un mese e ancora non registrato.',
   ],
   infoRows: [
     { label: 'Tipologia', value: '{{switch(1.TIPO_TITOLO; "prima_rata"; "Prima rata"; "rata"; "Rata"; "seconda_rata"; "Seconda rata"; "terza_rata"; "Terza rata"; "Abbigliamento"; "Abbigliamento"; "altro"; "Altro"; 1.TIPO_TITOLO)}} · {{capitalize(lower(1.SCADENZA_MESE))}}' },

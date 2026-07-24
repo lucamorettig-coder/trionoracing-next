@@ -21,9 +21,9 @@ for (const f of files) {
 
 const index = `<!doctype html><meta charset="utf-8"><title>Email scuola — anteprima</title>
 <body style="margin:0;background:#030818;font-family:system-ui;padding:24px;">
-<h1 style="color:#EAF0FF;font-size:18px;">Email scuola — anteprima (${cards.length})</h1>
-<div style="display:flex;flex-wrap:wrap;gap:20px;">
-${cards.map((c) => `<div style="width:600px;max-width:100%;"><div style="color:#8A94B8;font:12px monospace;margin-bottom:6px;">${c.out} — ${c.eyebrow}</div><iframe src="${c.out}" style="width:600px;height:760px;border:1px solid #1B2650;background:#050E3F;"></iframe></div>`).join('')}
+<h1 style="color:#EAF0FF;font-size:18px;margin:0 0 18px 0;">Email scuola — anteprima (${cards.length})</h1>
+<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;">
+${cards.map((c) => `<div style="width:620px;max-width:100%;"><div style="color:#8A94B8;font:12px monospace;margin-bottom:6px;">${c.out} — ${c.eyebrow}</div><iframe src="${c.out}" scrolling="no" onload="this.style.height=this.contentDocument.documentElement.scrollHeight+'px'" style="width:620px;height:1200px;border:0;background:#050E3F;display:block;"></iframe></div>`).join('')}
 </div></body>`;
 writeFileSync(join(distDir, 'index.html'), index, 'utf8');
 console.log('built index.html');

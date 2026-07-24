@@ -2,9 +2,10 @@ export default {
   status: 'success',
   eyebrow: 'Ricevuta',
   title: 'Pagamento ricevuto',
+  titleAccent: 'ricevuto',
   intro: [
     'Ciao {{7.NOME_GENITORE}},',
-    'ti confermiamo di aver ricevuto in data <strong style="color:#0A1024;">{{formatDate(2.data.date; "DD/MM/YYYY")}}</strong> il pagamento di <strong style="color:#0A1024;">€ {{4.IMPORTO}}</strong>, relativo all\'iscrizione di <strong style="color:#0A1024;">{{7.NOME_BAMBINO}}</strong> per l\'anno <strong style="color:#0A1024;">{{7.`ANNO_ISCRIZIONE (from TABELLA_TARIFFE)`}}</strong>.',
+    'ti confermiamo di aver ricevuto in data <strong style="color:#04091C;">{{formatDate(2.data.date; "DD/MM/YYYY")}}</strong> il pagamento di <strong style="color:#04091C;">€ {{4.IMPORTO}}</strong>, relativo all\'iscrizione di <strong style="color:#04091C;">{{7.NOME_BAMBINO}}</strong> per l\'anno <strong style="color:#04091C;">{{7.`ANNO_ISCRIZIONE (from TABELLA_TARIFFE)`}}</strong>.',
   ],
   infoRows: [
     { label: 'Data pagamento', value: '{{formatDate(2.data.date; "DD/MM/YYYY")}}' },

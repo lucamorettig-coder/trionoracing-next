@@ -2,9 +2,10 @@ export default {
   status: 'info',
   eyebrow: 'Nuovo pagamento',
   title: 'Un nuovo pagamento è disponibile',
+  titleAccent: 'disponibile',
   intro: [
     'Ciao {{22.NOME_GENITORE}},',
-    'puoi saldare comodamente online il nuovo pagamento relativo all\'iscrizione di <strong style="color:#0A1024;">{{1.`NOME_BAMBINO (from ISCRIZIONE)`[]}}</strong>.',
+    'puoi saldare comodamente online il nuovo pagamento relativo all\'iscrizione di <strong style="color:#04091C;">{{1.`NOME_BAMBINO (from ISCRIZIONE)`[]}}</strong>.',
   ],
   infoRows: [
     { label: 'Mese', value: '{{capitalize(lower(33.`mese corrente`))}}' },

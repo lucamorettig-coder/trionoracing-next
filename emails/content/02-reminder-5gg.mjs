@@ -2,9 +2,10 @@ export default {
   status: 'warning',
   eyebrow: 'In scadenza',
   title: 'La rata scade tra 5 giorni',
+  titleAccent: '5 giorni',
   intro: [
     'Ciao {{22.NOME_GENITORE}},',
-    'ti ricordiamo che la rata della quota annuale relativa all\'iscrizione di <strong style="color:#0A1024;">{{1.`NOME_BAMBINO (from ISCRIZIONE)`}}</strong> scadrà tra <strong style="color:#0A1024;">5 giorni</strong>.',
+    'ti ricordiamo che la rata della quota annuale relativa all\'iscrizione di <strong style="color:#04091C;">{{1.`NOME_BAMBINO (from ISCRIZIONE)`}}</strong> scadrà tra <strong style="color:#04091C;">5 giorni</strong>.',
   ],
   infoRows: [
     { label: 'Mese', value: '{{capitalize(lower(1.SCADENZA_MESE))}}' },

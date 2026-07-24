@@ -2,9 +2,10 @@ export default {
   status: 'danger',
   eyebrow: 'Pagamento scaduto',
   title: 'Un pagamento risulta scaduto',
+  titleAccent: 'scaduto',
   intro: [
     'Ciao {{22.NOME_GENITORE}},',
-    'un pagamento relativo all\'iscrizione di <strong style="color:#0A1024;">{{1.`NOME_BAMBINO (from ISCRIZIONE)`[]}}</strong> risulta scaduto.',
+    'un pagamento relativo all\'iscrizione di <strong style="color:#04091C;">{{1.`NOME_BAMBINO (from ISCRIZIONE)`[]}}</strong> risulta scaduto.',
   ],
   infoRows: [
     { label: 'Tipologia', value: '{{switch(1.TIPO_TITOLO; "prima_rata"; "Prima rata"; "rata"; "Rata"; "seconda_rata"; "Seconda rata"; "terza_rata"; "Terza rata"; "Abbigliamento"; "Abbigliamento"; "altro"; "Altro"; 1.TIPO_TITOLO)}} · {{capitalize(lower(1.SCADENZA_MESE))}}' },
