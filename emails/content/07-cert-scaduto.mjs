@@ -2,14 +2,13 @@ import { PORTAL_URL, SUPPORT_EMAIL } from '../tokens.mjs';
 
 export default {
   status: 'danger',
-  eyebrow: 'Certificato medico',
+  eyebrow: 'Scaduto il {{4.CERTIFICATO_MEDICO_SCADENZA}}',
   title: 'Certificato medico scaduto',
   intro: [
     'Gentile genitore,',
-    'il certificato medico di <strong style="color:#0A1024;">{{4.NOME_BAMBINO}}</strong> risulta <strong style="color:#0A1024;">scaduto</strong> (scadenza: <strong style="color:#0A1024;">{{4.CERTIFICATO_MEDICO_SCADENZA}}</strong>).',
+    'il certificato medico sportivo di <strong style="color:#0A1024;">{{4.NOME_BAMBINO}}</strong> risulta <strong style="color:#0A1024;">scaduto</strong>.',
   ],
-  banner: { tone: 'danger', text: 'Per riprendere la partecipazione alle attività è necessario rinnovare il certificato e caricare il documento aggiornato quanto prima nell\'Area Riservata.' },
-  infoRows: [{ label: 'Importante', value: 'Senza certificato valido {{4.NOME_BAMBINO}} non potrà partecipare a lezioni e allenamenti' }],
+  banner: { tone: 'danger', title: 'Partecipazione sospesa', text: 'Senza un certificato valido, {{4.NOME_BAMBINO}} non può partecipare a lezioni e allenamenti. Per riprendere l\'attività, rinnova il certificato e carica il documento aggiornato in Area Riservata.' },
   steps: [
     'Prenota il rinnovo del certificato medico sportivo.',
     'Accedi all\'Area Riservata.',
