@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { patchEmailModule } from './push-make.mjs';
+import { patchEmailModule, shouldRestoreDeactivation } from './push-make.mjs';
 
 const bp = {
   flow: [
@@ -48,4 +48,16 @@ test('patch trova il modulo email annidato dentro un router e non tocca i rami f
 test('patch rifiuta html vuoto o non-stringa', () => {
   assert.throws(() => patchEmailModule(bp, 7, { html: '' }), /html mancante o vuoto/);
   assert.throws(() => patchEmailModule(bp, 7, { html: undefined }), /html mancante o vuoto/);
+});
+
+test('shouldRestoreDeactivation: scenario in pausa (isActive:false) va ripristinato', () => {
+  assert.equal(shouldRestoreDeactivation(false), true);
+});
+
+test('shouldRestoreDeactivation: scenario già attivo (isActive:true) non va toccato', () => {
+  assert.equal(shouldRestoreDeactivation(true), false);
+});
+
+test('shouldRestoreDeactivation: stato ignoto (undefined, campo assente nella risposta) non va toccato', () => {
+  assert.equal(shouldRestoreDeactivation(undefined), false);
 });

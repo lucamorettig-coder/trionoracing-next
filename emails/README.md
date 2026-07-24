@@ -55,10 +55,10 @@ La base PROD (scenario 5102056 per pagamenti) ha **4 scenari DEV equivalenti** (
 
 | Scenario PROD | Scenario DEV | Note |
 |----------|-----------|-------|
-| 5102056 (pagamenti) | 5141784 | Da riconfermare i module-id con `make-cli scenarios get --scenario <id>` |
-| 4548450 (certificati) | 5141737 | " |
-| 3880817 (iscrizioni) | 5141717 | " |
-| 4086727 (ricevute) | 5141696 | " |
+| 5102056 (pagamenti) | 5141696 | Da riconfermare i module-id con `make-cli scenarios get --scenario <id>` |
+| 4548450 (certificati) | 5141717 | " |
+| 3880817 (iscrizioni) | 5141737 | " |
+| 4086727 (ricevute) | 5141784 | " |
 
 **Procedura riconfirma module-id DEV:**
 ```bash

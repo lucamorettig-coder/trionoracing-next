@@ -22,6 +22,13 @@ export function patchEmailModule(blueprint, moduleId, { html, connection }) {
   return bp;
 }
 
+// `make-cli scenarios update` ha il side-effect non documentato di riattivare lo scenario
+// (isActive:true) anche se era in pausa prima del push. Decisione pura: se prima dell'update
+// lo scenario era in pausa, dopo l'update va ripristinato a isActive:false.
+export function shouldRestoreDeactivation(wasActiveBefore) {
+  return wasActiveBefore === false;
+}
+
 // --- CLI ---
 if (import.meta.url === `file://${process.argv[1]}`) {
   const [scenarioId, moduleId, distFile] = process.argv.slice(2);
@@ -34,6 +41,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const got = JSON.parse(raw);
   const blueprint = got.blueprint ?? got.response?.blueprint ?? got.scenario?.blueprint;
   if (!blueprint) throw new Error('blueprint non trovato nell output di make-cli (ispeziona la shape)');
+  const wasActiveBefore = got.isActive ?? got.response?.isActive ?? got.scenario?.isActive;
 
   mkdirSync('emails/backups', { recursive: true });
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -43,4 +51,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   if (dry) { console.log('DRY: html len', html.length, 'module', moduleId); process.exit(0); }
   execFileSync('make-cli', ['scenarios', 'update', scenarioId, '--blueprint', JSON.stringify(patched)], { stdio: 'inherit', maxBuffer: 64 * 1024 * 1024 });
   console.log('updated', scenarioId, 'module', moduleId);
+
+  if (shouldRestoreDeactivation(wasActiveBefore)) {
+    execFileSync('make-cli', ['scenarios', 'deactivate', scenarioId], { stdio: 'inherit', maxBuffer: 64 * 1024 * 1024 });
+    console.log(`scenario ${scenarioId} era in pausa: ripristinato isActive:false dopo il push`);
+  }
 }
