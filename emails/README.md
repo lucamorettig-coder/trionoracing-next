@@ -1,0 +1,163 @@
+# Email Scuola Ciclismo Triono
+
+Libreria HTML branded per comunicazioni automatiche SumUp Checkout + iscrizioni scuola, integrate con Make.com (scenario 5102056 PROD + copie DEV).
+
+## Build e anteprima
+
+**Build locale:**
+```bash
+node emails/build.mjs
+```
+
+Genera file HTML in `emails/dist/` (uno per email) e anteprima navigabile in `emails/dist/index.html`.
+
+**Anteprima interattiva:**
+- Apri `emails/dist/index.html` nel browser (ogni email renderizzata in un iframe)
+- Oppure: Chrome headless per screenshot/test (`--headless=new --print-to-pdf`)
+
+> ⚠️ **Note tecniche:** Gli HTML includono CSS inline ed embedded font-face per garantire la fedeltà rendering nei client email (Gmail, Outlook, Apple Mail, non supportano `<link>` esterno). Template è responsive su mobile (media query `@media only screen and (max-width:620px)`).
+
+---
+
+## Mappa email → scenario Make → module-id
+
+Ogni email è un **modulo `mapper.html`** dentro uno scenario Make (PROD/DEV). La colonna **module-id** identifica quale modulo crea/aggiorna il payload email dentro lo scenario.
+
+### PRODUZIONE (scenario 5102056 + altri)
+
+| Email | Scenario | Module-ID | Variabili dinamiche |
+|-------|----------|-----------|-------------------|
+| **01-nuovo-titolo** | 5102056 | 31 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.TIPO_TITOLO`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `33.mese corrente`, `33.URL Area Riservata` |
+| **02-reminder-5gg** | 5102056 | 6 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `33.URL Area Riservata` |
+| **03-scaduto** | 5102056 | 7 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.TIPO_TITOLO`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `33.URL Area Riservata` |
+| **04-scaduto-10** | 5102056 | 40 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.TIPO_TITOLO`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `33.URL Area Riservata` |
+| **05-ultimo-avviso** | 5102056 | 41 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.TIPO_TITOLO`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `33.URL Area Riservata` |
+| **06-cert-scadenza** | 4548450 | 23 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.DATA_SCADENZA_CERTIFICATO`, `1.GIORNI_SCADENZA` |
+| **07-cert-scaduto** | 4548450 | 26 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.DATA_SCADENZA_CERTIFICATO`, `22.RIFERIMENTO_MEDICO` |
+| **08-iscrizione** | 3880817 | 4 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.ANNO_NASCITA`, `22.EMAIL`, `33.URL Area Riservata` |
+| **09-fci** | 3880817 | 23 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.COGNOME_BAMBINO`, `1.DATA_NASCITA_BAMBINO`, `1.CATEGORIA_FCI`, `33.URL Area Riservata` |
+| **10-pagamento-ricevuto** | 4086727 | 9 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.IMPORTO`, `1.DATA_PAGAMENTO`, `33.URL Area Riservata` |
+
+**Sintassi variabili:**
+- `{{22.CAMPO}}` → lookup modulo 22 (TABELLA_GENITORI)
+- `{{1.CAMPO}}` → lookup modulo 1 (TABELLA_ISCRIZIONI / TITOLI_PAGAMENTO)
+- `{{1.CAMPO[0]}}` / `{{1.CAMPO[]}}` → array lookups (primo elemento / tutti)
+- `{{capitalize(lower(campo))}}` → funzioni di trasformazione disponibili in Make (es. `capitalize`, `lower`, `upper`, `length`)
+- `{{switch(campo; valore1; etichetta1; valore2; etichetta2; …; default)}}` → mapping enum (es. `TIPO_TITOLO`)
+
+---
+
+## Copie DEV
+
+La base PROD (scenario 5102056 per pagamenti) ha **4 copie per i tre ambiente DEV:**
+
+| Ambiente | Scenario DEV | Note |
+|----------|-----------|-------|
+| DEV (dev.env) | 5141696 | Da riconfermare i module-id con `make-cli scenarios get --scenario <id>` |
+| DEV (dev.env) | 5141717 | " |
+| DEV (dev.env) | 5141737 | " |
+| DEV (dev.env) | 5141784 | " |
+
+**Procedura riconfirma module-id DEV:**
+```bash
+# Installa make-cli (https://www.npmjs.com/package/@make.com/sdk)
+npm install -g @make.com/sdk
+
+# Leggi scenario (substitua <ID> con il numero scenario)
+make-cli scenarios get --scenario <ID>
+
+# Visita il JSON e verifica i mapper.html → leggi il numero modulo dalle sezioni "operations"
+```
+
+Se i module-id DEV sono diversi da PROD, annoterlo nella PR: il push (`emails/push-make.mjs`) userà i valori PROD per default.
+
+---
+
+## Vincoli invariabili
+
+Quando si patcha un'email, **SOLO questi file sono modificabili:**
+- `emails/content/*.mjs` — definizioni di titolo, corpo, variabili, link CTA
+- `emails/tokens.mjs` — token colore/spacing/font (condivisi dal layout)
+- `emails/components.mjs` — componenti HTML riusabili (card, footer, etc.)
+
+**NON modificare (invariabili sui moduli Make):**
+- `subject` linea — è un campo dedicato nel modulo Make (non nel mapper.html)
+- `attachments` — gestiti da un secondo modulo Make
+- `filter` logico — è parte della configurazione scenario
+- `connection` mid (4508191, Account Airtable) — è global e aggiornato dal workflow Make
+
+**Patching via `emails/push-make.mjs`** (implementato in Task 8):
+Aggiorna SOLO il body del **modulo mapper.html** nello scenario, preservando subject/filter/connessioni.
+
+---
+
+## Come pushare su Make.com
+
+> **Implementato in Task 8.** Procedura generale qui.
+
+```bash
+# Dopo aver modificato content e buildato:
+node emails/push-make.mjs [--env prod|dev]
+```
+
+Script legge:
+- `emails/dist/*.html` — i built finali
+- Mappa scenario/module-id dalla tabella PROD (o DEV se `--env dev`)
+- Per ciascuna email: `PUT /organizations/{{orgId}}/scenarios/{{scenarioId}}/modules/{{moduleId}}` con il nuovo `mapper.html` code
+
+```bash
+# Esempio push PROD
+node emails/push-make.mjs --env prod
+
+# Esempio push DEV (richiede env DEV_SCENARIO_IDS configurate)
+node emails/push-make.mjs --env dev
+```
+
+**Credenziali:** Make API key da `.env.local` (`MAKE_API_KEY`).
+
+---
+
+## Mittente e connessione
+
+- **Mittente:** `Triono Racing Scuola <scuola@trionoracing.it>` (configurato nel modulo Make connection ID **4508191**, Airtable account)
+- **Connection ID 4508191:** connessione Airtable→Make, usata per lookup genitore/bambino e update record notifiche
+- **Non modificabile da qui** — resetta il connection ID via Make Dashboard se mai si dovesse ricablarare
+
+---
+
+## Design system
+
+Le email sono basate sullo **APEX Design System Scuola** (livrea avorio). Fonte visuale canonica: `emails/proto/A-avorio-hard.html`.
+
+**Palette:**
+- **Palco scuro** (bg): navy `#050E3F` / `#1F2D5A`
+- **Superficie card**: avorio `#F7F4EC` (warm livery)
+- **Accenti**: arancio `#FF8A3D` (accent-2), rosso flag `#C0161C` (warning), giallo `#F4E718` (CTA/highlight)
+- **Tipografia**: Archivo Expanded (display), Inter (body), JetBrains Mono (metadata/HUD)
+
+**Componenti ricorrenti:**
+- **Lockup header**: logo T + "Triono Racing" + "Scuola di ciclismo" (su navy scuro)
+- **Targa di stato** (color-coded badge): "Pagamento scaduto", "Certificato scadenza", etc.
+- **Telemetria HUD**: griglia con `cellspacing=1` sfondo divider, celle colore alternato
+- **CTA clip** (tasto giallo): lato destro tagliato a gradini (decorazione `--clip-cta`)
+- **Footer**: copyright + link Area Riservata
+
+**Rendering:** tutti gli stili sono **inline** (`style="…"`); nessuna dipendenza da CSS esterno o web font dynamic. Font face è embedded via Google Fonts CDN (`<link rel="stylesheet">`), fallback system fonts se offline.
+
+---
+
+## Sviluppo locale
+
+**Aggiungere una nuova email:**
+1. Crea `emails/content/NN-nome.mjs` con default export (vedi 01-nuovo-titolo.mjs come template)
+2. Esporta: `status`, `eyebrow`, `title`, `titleAccent`, `intro[]`, `infoRows[]`, `cta{}`, `note`, `signature`
+3. Buildare: `node emails/build.mjs`
+4. Testa rendering in `emails/dist/NN-nome.html`
+
+**Modificare layout/componenti:**
+- `layout.mjs` — renderizza il template HTML generico (card avorio, header, footer)
+- `components.mjs` — componenti riusabili
+- `tokens.mjs` — colori, spacing, font
+
+Ogni modifica rebuild locale per verificare prima di pushare su Make.
+
