@@ -147,6 +147,20 @@ emails/
   Dove possibile, un run di test in **DEV** prima di PROD.
 - **Ordine:** DEV prima, poi PROD (pattern AGENTS.md).
 
+## 7bis. Gate QA design — critique `impeccable` (anti AI-slop)
+
+Dopo la **prima build** dei 10 HTML (`emails/dist/`) e **prima** del push su Make, si esegue un
+passaggio della skill **`impeccable`** sui template renderizzati per intercettare "AI slop":
+gerarchia visiva debole, spacing incoerente, contrasto/leggibilità (soprattutto giallo `#F4E718`
+su avorio — mai come testo piccolo), copy generico, eyebrow decorativi ridondanti su ogni sezione,
+CTA poco chiare, allineamenti sballati.
+
+- Ambito: i 10 `dist/*.html` (verifica via headless / DOM, dato che il preview MCP è inaffidabile —
+  pattern già noto nel progetto).
+- I rilievi si applicano **ai sorgenti** (`layout.mjs` / `components.mjs` / `content/*`), poi si
+  ri-builda e si ri-verifica finché il critique è pulito.
+- Solo **dopo** che il design è "impeccabile" si procede al push su Make (§7).
+
 ## 8. Deliverable
 
 - **Repo:** `emails/` (build + template + dist + README) + questo spec.
@@ -160,3 +174,4 @@ emails/
 - `scenarios get` conferma html aggiornato e subject/attachments/filter invariati su tutti i moduli.
 - Anteprima headless dei 10 dist priva di regressioni; render corretto su almeno Gmail + Apple Mail
   (verifica manuale utente sul test in DEV).
+- **Critique `impeccable` superato** sui 10 dist (nessun rilievo di AI-slop residuo) prima del push.
