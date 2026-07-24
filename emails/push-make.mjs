@@ -11,6 +11,9 @@ const findModule = (node, id) => {
 };
 
 export function patchEmailModule(blueprint, moduleId, { html, connection }) {
+  if (typeof html !== 'string' || html.length === 0) {
+    throw new Error('html mancante o vuoto: rifiuto di pushare un body email vuoto');
+  }
   const bp = structuredClone(blueprint);
   const m = findModule(bp.flow ?? bp, moduleId);
   if (!m) throw new Error(`modulo email ${moduleId} non trovato`);
@@ -33,7 +36,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   if (!blueprint) throw new Error('blueprint non trovato nell output di make-cli (ispeziona la shape)');
 
   mkdirSync('emails/backups', { recursive: true });
-  writeFileSync(`emails/backups/${scenarioId}-${moduleId}.orig.json`, JSON.stringify(blueprint, null, 2));
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  writeFileSync(`emails/backups/${scenarioId}-${moduleId}.${stamp}.orig.json`, JSON.stringify(blueprint, null, 2));
 
   const patched = patchEmailModule(blueprint, Number(moduleId), { html, connection });
   if (dry) { console.log('DRY: html len', html.length, 'module', moduleId); process.exit(0); }

@@ -95,27 +95,33 @@ Aggiorna SOLO il body del **modulo mapper.html** nello scenario, preservando sub
 
 ## Come pushare su Make.com
 
-> **Implementato in Task 8.** Procedura generale qui.
+> **Implementato in Task 8.** Interfaccia reale (CLI posizionale, non flag `--env`).
 
 ```bash
-# Dopo aver modificato content e buildato:
-node emails/push-make.mjs [--env prod|dev]
+node emails/push-make.mjs <scenarioId> <moduleId> <distFile> [--connection N] [--dry]
 ```
 
-Script legge:
-- `emails/dist/*.html` — i built finali
-- Mappa scenario/module-id dalla tabella PROD (o DEV se `--env dev`)
-- Per ciascuna email: `PUT /organizations/{{orgId}}/scenarios/{{scenarioId}}/modules/{{moduleId}}` con il nuovo `mapper.html` code
+- `<scenarioId>` — id numerico dello scenario Make (es. `5102056` per PROD, vedi tabella copie DEV sopra)
+- `<moduleId>` — module-id del modulo `email:ActionSendEmail` da patchare (colonna **Module-ID** della tabella sopra)
+- `<distFile>` — path al file HTML buildato da usare come nuovo `mapper.html` (es. `emails/dist/01-nuovo-titolo.html`)
+- `--connection N` — opzionale, override del connection id SMTP (default `4508191`)
+- `--dry` — non scrive su Make: legge lo scenario, valida l'html, salva il backup e stampa `DRY: html len … module …`, poi esce
+
+**Cosa fa lo script, nell'ordine:**
+1. `make-cli scenarios get <scenarioId> --output json` (posizionale) → estrae il blueprint dalla risposta
+2. Salva un backup del blueprint **intero** pre-patch in `emails/backups/<scenarioId>-<moduleId>.<timestamp-ISO>.orig.json` (un file nuovo per ogni run, mai sovrascritto — cartella gitignored)
+3. `patchEmailModule(blueprint, moduleId, { html, connection })` — cerca il modulo per `id` scendendo **ricorsivamente** anche dentro `builtin:BasicRouter` → `routes[].flow[]` (i moduli email reali sono spesso annidati in un router), patcha **solo** `mapper.html` (+ `parameters.account` se `--connection` è passato), lascia invariati subject/filter/attachments/rami fratelli. Rifiuta un `html` vuoto o non-stringa.
+4. Se non `--dry`: `make-cli scenarios update <scenarioId> --blueprint '<json>'` — **replace completo del blueprint** (non esiste un endpoint per-modulo lato make-cli), con il solo modulo target modificato
 
 ```bash
-# Esempio push PROD
-node emails/push-make.mjs --env prod
+# Esempio: dry-run su PROD (scenario pagamenti, modulo 31 = 01-nuovo-titolo)
+node emails/push-make.mjs 5102056 31 emails/dist/01-nuovo-titolo.html --dry
 
-# Esempio push DEV (richiede env DEV_SCENARIO_IDS configurate)
-node emails/push-make.mjs --env dev
+# Esempio: push reale
+node emails/push-make.mjs 5102056 31 emails/dist/01-nuovo-titolo.html
 ```
 
-**Credenziali:** Make API key da `.env.local` (`MAKE_API_KEY`).
+**Credenziali:** `make-cli` deve essere già autenticato (nessuna env letta direttamente da questo script).
 
 ---
 

@@ -164,3 +164,6 @@ next-env.d.ts
 
 # dev-shot screenshots (scripts/dev-shot.mjs)
 .dev-shots/
+
+# Backup blueprint pre-patch di emails/push-make.mjs (copie locali, non da committare)
+emails/backups/
