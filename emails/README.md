@@ -45,18 +45,20 @@ Ogni email è un **modulo `mapper.html`** dentro uno scenario Make (PROD/DEV). L
 - `{{capitalize(lower(campo))}}` → funzioni di trasformazione disponibili in Make (es. `capitalize`, `lower`, `upper`, `length`)
 - `{{switch(campo; valore1; etichetta1; valore2; etichetta2; …; default)}}` → mapping enum (es. `TIPO_TITOLO`)
 
+> **Nota:** nella tabella sopra i nomi variabili sono semplificati. Nella sintassi Make effettiva, i campi con spazi o caratteri speciali nel nome usano backtick (es. `` `NOME_BAMBINO (from ISCRIZIONE)` ``, `` `mese corrente` ``, `` `URL Area Riservata` ``). I token esatti sono consultabili in `emails/content/*.mjs` per ogni email.
+
 ---
 
 ## Copie DEV
 
-La base PROD (scenario 5102056 per pagamenti) ha **4 copie per i tre ambiente DEV:**
+La base PROD (scenario 5102056 per pagamenti) ha **4 scenari DEV equivalenti** (stessa cartella Make "area riservata scuola DEV"):
 
-| Ambiente | Scenario DEV | Note |
+| Scenario PROD | Scenario DEV | Note |
 |----------|-----------|-------|
-| DEV (dev.env) | 5141696 | Da riconfermare i module-id con `make-cli scenarios get --scenario <id>` |
-| DEV (dev.env) | 5141717 | " |
-| DEV (dev.env) | 5141737 | " |
-| DEV (dev.env) | 5141784 | " |
+| 5102056 (pagamenti) | 5141784 | Da riconfermare i module-id con `make-cli scenarios get --scenario <id>` |
+| 4548450 (certificati) | 5141737 | " |
+| 3880817 (iscrizioni) | 5141717 | " |
+| 4086727 (ricevute) | 5141696 | " |
 
 **Procedura riconfirma module-id DEV:**
 ```bash
@@ -84,7 +86,7 @@ Quando si patcha un'email, **SOLO questi file sono modificabili:**
 - `subject` linea — è un campo dedicato nel modulo Make (non nel mapper.html)
 - `attachments` — gestiti da un secondo modulo Make
 - `filter` logico — è parte della configurazione scenario
-- `connection` mid (4508191, Account Airtable) — è global e aggiornato dal workflow Make
+- `connection` mid (4508191, SMTP email mittente) — è global e aggiornato dal workflow Make
 
 **Patching via `emails/push-make.mjs`** (implementato in Task 8):
 Aggiorna SOLO il body del **modulo mapper.html** nello scenario, preservando subject/filter/connessioni.
@@ -119,8 +121,8 @@ node emails/push-make.mjs --env dev
 
 ## Mittente e connessione
 
-- **Mittente:** `Triono Racing Scuola <scuola@trionoracing.it>` (configurato nel modulo Make connection ID **4508191**, Airtable account)
-- **Connection ID 4508191:** connessione Airtable→Make, usata per lookup genitore/bambino e update record notifiche
+- **Mittente:** `Triono Racing Scuola <segreteria.scuola@trionoracing.it>` (configurato nel modulo Make connection ID **4508191**, connessione SMTP)
+- **Connection ID 4508191:** connessione SMTP per l'invio email, mittente autorizzato `segreteria.scuola@trionoracing.it`
 - **Non modificabile da qui** — resetta il connection ID via Make Dashboard se mai si dovesse ricablarare
 
 ---
