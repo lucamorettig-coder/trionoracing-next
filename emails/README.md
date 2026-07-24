@@ -27,16 +27,16 @@ Ogni email è un **modulo `mapper.html`** dentro uno scenario Make (PROD/DEV). L
 
 | Email | Scenario | Module-ID | Variabili dinamiche |
 |-------|----------|-----------|-------------------|
-| **01-nuovo-titolo** | 5102056 | 31 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.TIPO_TITOLO`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `33.mese corrente`, `33.URL Area Riservata` |
-| **02-reminder-5gg** | 5102056 | 6 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `33.URL Area Riservata` |
-| **03-scaduto** | 5102056 | 7 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.TIPO_TITOLO`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `33.URL Area Riservata` |
-| **04-scaduto-10** | 5102056 | 40 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.TIPO_TITOLO`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `33.URL Area Riservata` |
-| **05-ultimo-avviso** | 5102056 | 41 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.TIPO_TITOLO`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `33.URL Area Riservata` |
-| **06-cert-scadenza** | 4548450 | 23 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.DATA_SCADENZA_CERTIFICATO`, `1.GIORNI_SCADENZA` |
-| **07-cert-scaduto** | 4548450 | 26 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.DATA_SCADENZA_CERTIFICATO`, `22.RIFERIMENTO_MEDICO` |
-| **08-iscrizione** | 3880817 | 4 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.ANNO_NASCITA`, `22.EMAIL`, `33.URL Area Riservata` |
-| **09-fci** | 3880817 | 23 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.COGNOME_BAMBINO`, `1.DATA_NASCITA_BAMBINO`, `1.CATEGORIA_FCI`, `33.URL Area Riservata` |
-| **10-pagamento-ricevuto** | 4086727 | 9 | `22.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.IMPORTO`, `1.DATA_PAGAMENTO`, `33.URL Area Riservata` |
+| **01-nuovo-titolo** | 5102056 | 31 | `22.NOME_GENITORE`, `` 1.`NOME_BAMBINO (from ISCRIZIONE)`[] ``, `1.TIPO_TITOLO` (via switch), `` 33.`mese corrente` ``, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `` 33.`URL Area Riservata` `` |
+| **02-reminder-5gg** | 5102056 | 6 | `22.NOME_GENITORE`, `` 1.`NOME_BAMBINO (from ISCRIZIONE)` ``, `1.SCADENZA_MESE`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `` 33.`URL Area Riservata` `` |
+| **03-scaduto** | 5102056 | 7 | `22.NOME_GENITORE`, `` 1.`NOME_BAMBINO (from ISCRIZIONE)`[] ``, `1.TIPO_TITOLO` (via switch), `1.SCADENZA_MESE`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `` 33.`URL Area Riservata` `` |
+| **04-scaduto-10** | 5102056 | 40 | `22.NOME_GENITORE`, `` 1.`NOME_BAMBINO (from ISCRIZIONE)`[] ``, `1.TIPO_TITOLO` (via switch), `1.SCADENZA_MESE`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `` 33.`URL Area Riservata` `` |
+| **05-ultimo-avviso** | 5102056 | 41 | `22.NOME_GENITORE`, `` 1.`NOME_BAMBINO (from ISCRIZIONE)`[] ``, `1.TIPO_TITOLO` (via switch), `1.SCADENZA_MESE`, `1.DATA_SCADENZA_PAGAMENTO`, `1.IMPORTO`, `` 33.`URL Area Riservata` `` |
+| **06-cert-scadenza** | 4548450 | 23 | `4.NOME_BAMBINO`, `4.CERTIFICATO_MEDICO_SCADENZA` |
+| **07-cert-scaduto** | 4548450 | 26 | `4.NOME_BAMBINO`, `4.CERTIFICATO_MEDICO_SCADENZA` |
+| **08-iscrizione** | 3880817 | 4 | `1.NOME_GENITORE`, `1.NOME_BAMBINO` |
+| **09-fci** | 3880817 | 23 | `1.NOME_GENITORE`, `1.NOME_BAMBINO`, `1.COGNOME_BAMBINO`, `` 1.`ANNO_ISCRIZIONE (from TABELLA_TARIFFE)`[] `` |
+| **10-pagamento-ricevuto** | 4086727 | 9 | `7.NOME_GENITORE`, `7.NOME_BAMBINO`, `7.ID_ISCRIZIONE`, `` 7.`ANNO_ISCRIZIONE (from TABELLA_TARIFFE)` ``, `4.TIPO_TITOLO`, `4.IMPORTO`, `` formatDate(2.data.date; "DD/MM/YYYY") `` |
 
 **Sintassi variabili:**
 - `{{22.CAMPO}}` → lookup modulo 22 (TABELLA_GENITORI)
