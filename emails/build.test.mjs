@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readdirSync } from 'node:fs';
 import { renderEmail } from './layout.mjs';
 import scaduto from './content/03-scaduto.mjs';
 
@@ -23,4 +24,15 @@ test('renderEmail: nessun leak di slop (undefined / [object Object] / ${})', () 
   assert.ok(!html.includes('undefined'), 'no undefined');
   assert.ok(!html.includes('[object Object]'), 'no object leak');
   assert.ok(!html.includes('${'), 'no template-literal leak');
+});
+
+test('tutti i content buildano senza slop', async () => {
+  const files = readdirSync(new URL('./content/', import.meta.url)).filter((f) => f.endsWith('.mjs'));
+  for (const f of files) {
+    const mod = (await import(new URL(`./content/${f}`, import.meta.url))).default;
+    const html = renderEmail(mod);
+    assert.ok(!html.includes('undefined'), `${f}: no undefined`);
+    assert.ok(!html.includes('[object Object]'), `${f}: no object`);
+    assert.ok(!html.includes('${'), `${f}: no template leak`);
+  }
 });
