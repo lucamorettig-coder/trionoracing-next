@@ -176,28 +176,26 @@ function CookieGroup({
         {badge}
       </div>
       <ApexLegalTableWrapper>
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr>
-              <ApexLegalTh>Nome</ApexLegalTh>
-              <ApexLegalTh>Origine</ApexLegalTh>
-              <ApexLegalTh>Finalità</ApexLegalTh>
-              <ApexLegalTh>Durata</ApexLegalTh>
+        <thead>
+          <tr>
+            <ApexLegalTh>Nome</ApexLegalTh>
+            <ApexLegalTh>Origine</ApexLegalTh>
+            <ApexLegalTh>Finalità</ApexLegalTh>
+            <ApexLegalTh>Durata</ApexLegalTh>
+          </tr>
+        </thead>
+        <tbody>
+          {cookies.map((c) => (
+            <tr key={c.name}>
+              <ApexLegalTd>
+                <code className="text-[13px] font-bold text-stage-ink">{c.name}</code>
+              </ApexLegalTd>
+              <ApexLegalTd>{c.origin}</ApexLegalTd>
+              <ApexLegalTd>{c.purpose}</ApexLegalTd>
+              <ApexLegalTd>{c.duration}</ApexLegalTd>
             </tr>
-          </thead>
-          <tbody>
-            {cookies.map((c) => (
-              <tr key={c.name}>
-                <ApexLegalTd>
-                  <code className="text-[13px] font-bold text-stage-ink">{c.name}</code>
-                </ApexLegalTd>
-                <ApexLegalTd>{c.origin}</ApexLegalTd>
-                <ApexLegalTd>{c.purpose}</ApexLegalTd>
-                <ApexLegalTd>{c.duration}</ApexLegalTd>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          ))}
+        </tbody>
       </ApexLegalTableWrapper>
     </div>
   );
