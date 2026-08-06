@@ -70,22 +70,43 @@ export async function HomeHero() {
           <div className="apex-wrap relative w-full" style={{ zIndex: "var(--z-pista)" }}>
             <div className="apex-eyebrow reveal">SCUOLA DI CICLISMO E SQUADRA · TERNI</div>
 
-            {/* `min(var(--fs-hero), 6vh)`: --fs-hero da solo scala solo sulla
+            {/* `min(var(--fs-hero), Nvh)`: --fs-hero da solo scala solo sulla
                 larghezza (2rem + 8vw) e ignora l'altezza disponibile — il
                 campo tipografico qui è largo 52fr, non 100vw come /prova
                 (che usa il token intatto), quindi la stessa taglia eccede
-                la piega sui viewport bassi. Il tetto in vh è un valore
-                CONTINUO (non a scalini): scende linearmente con l'altezza
-                utile. 6vh è il valore più grande che regge il caso peggiore
-                della matrice estesa (375×553) con un margine di sicurezza;
-                sopra 6.5vh il titolo torna a 3 righe su quel viewport e il
-                margine crolla in negativo (salto di wrap, non lineare) —
-                tarato misurando, non a occhio (v. report correzione in
-                task-5-report.md). Non tocca --fs-hero né /prova, che lo usa
-                invariato. */}
+                la piega sui viewport bassi. Il tetto in vh è CONTINUO (non a
+                scalini): scende linearmente con l'altezza utile.
+
+                RAMIFICATO IN LARGHEZZA (non un solo cap globale): un vh unico
+                tarato sul caso peggiore mobile (375×553) è stato verificato
+                sovradimensionato ovunque — a 1440×780 dava solo 46.8px, la
+                taglia di un h2 di sezione, con 243px di hero inutilizzati
+                sotto le porte. Sotto lg (<1024, layout impilato a colonna
+                singola) il vincolo resta il caso mobile stretto: 6vh, INVARIATO
+                dal giro precedente, stesso valore/comportamento pixel per
+                pixel. Da lg in su (≥1024, colonna testo affiancata alla
+                foto) c'è più spazio: due soglie ulteriori, tarate misurando
+                sulla matrice estesa, non a occhio.
+                  - lg (1024–1279): 7.5vh — il vincolo qui è la coppia
+                    1024×600/1024×640 (colonna testo più stretta): oltre
+                    ~7.7–8vh il margine crolla in un salto non lineare (stesso
+                    fenomeno del salto mobile, verosimilmente un a-capo in più
+                    nel titolo che spinge giù tutto il blocco sotto); 7.5vh
+                    tiene un cuscinetto di sicurezza sotto quella soglia.
+                  - xl (≥1280): 9.5vh — qui il vincolo è 1280×620 (colonna più
+                    stretta di questo scaglione): il margine resta su un
+                    plateau piatto (~22px mascotte, ~80-85px porte) da ~9vh
+                    fino quasi a 10vh, poi crolla in negativo oltre quella
+                    soglia (stesso fenomeno). 9.5vh sta dentro il plateau con
+                    margine di sicurezza dal salto, non sul suo bordo.
+                A 1440×780 il risultato è un h1 quasi triplicato rispetto al
+                singolo cap 6vh (era 46.8px, ora vedi task-5-report.md per il
+                valore esatto misurato), con margini ancora ampiamente
+                positivi su tutta la matrice estesa. Non tocca --fs-hero né
+                /prova, che lo usa invariato. */}
             <h1
-              className="apex-display mt-5 max-w-[15ch]"
-              style={{ fontSize: "min(var(--fs-hero), 6vh)", lineHeight: "var(--lh-hero)" }}
+              className="apex-display mt-5 max-w-[15ch] text-[length:min(var(--fs-hero),6vh)] lg:text-[length:min(var(--fs-hero),7.5vh)] xl:text-[length:min(var(--fs-hero),9.5vh)]"
+              style={{ lineHeight: "var(--lh-hero)" }}
             >
               <span className="reveal">In bici,</span>{" "}
               <span className="stroke-word reveal reveal-delay-1">sicuri,</span>
