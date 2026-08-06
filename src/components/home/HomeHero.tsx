@@ -68,6 +68,14 @@ export async function HomeHero() {
             ESATTAMENTE il padding di prima (verificato: padY=44 da 620 in
             su). Stessa forma del `min()` già usato in FotoHero.tsx. */}
         <div className="relative flex items-center py-6 lg:py-[min(2.75rem,calc((100vh-400px)*0.2))]">
+          {/* Il fondale sborda a destra sotto la fotografia. `.apex-fondale`
+              ha una vignetta (`::after`, var(--vignette)) che scurisce i suoi
+              bordi: col taglio dritto quel bordo scuro cadeva esattamente
+              nella cucitura e non si vedeva, col taglio obliquo ne restava
+              scoperto un cuneo, letto come una banda sporca. Estendendo il
+              fondale oltre il taglio, la vignetta torna a stare nascosta
+              sotto la foto. `!` perché `.apex-fondale { inset: 0 }` è una
+              regola unlayered e batterebbe la utility. */}
           <FondaleVivo src={videoSrc} poster={sfondo?.posterUrl} />
 
           {/* Scrim locale del campo tipografico: eyebrow e prezzi (color:
@@ -84,7 +92,7 @@ export async function HomeHero() {
               1440×900 (v. report correzione in task-5-report.md). */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0"
+            className="pointer-events-none absolute inset-0 lg:[clip-path:polygon(0_0,100%_0,calc(100%-48px)_100%,0_100%)]"
             style={{
               zIndex: "var(--z-scenografia)",
               background: "color-mix(in srgb, var(--stage-bg) 75%, transparent)",
