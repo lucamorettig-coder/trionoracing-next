@@ -481,3 +481,26 @@
   .apex-prop[data-mobile="hide"] { display: none; }
   .apex-lap__title { font-size: var(--fs-h1); }
 }
+
+/* =============================================================================
+   Home hero — titolo (EVO-046 Task 5)
+   ============================================================================= */
+/* `--fs-hero` (2rem + 8vw, fino a 9rem) è tarato per un h1 a piena larghezza
+   (vedi /prova, che lo usa invariato). La hero della home invece è a due
+   campi: il campo tipografico è largo 52fr, non 100vw — lo stesso token
+   applicato lì eccede sistematicamente la piega sui viewport bassi (altezza
+   corta, sia stretti che larghi), perché scala solo sulla larghezza e ignora
+   l'altezza disponibile. Override LOCALE (non tocca apex-tokens.css, quindi
+   /prova resta invariata) calibrato empiricamente sui 5 viewport del gate:
+   base piccola per il caso peggiore (375×667), scalini per altezza/larghezza
+   che risalgono verso --fs-hero non appena c'è spazio verticale per contenerlo. */
+.home-hero__title { font-size: 36px; }
+@media (min-height: 700px) {
+  .home-hero__title { font-size: 56px; }
+}
+@media (min-width: 1024px) {
+  .home-hero__title { font-size: 92px; }
+}
+@media (min-width: 1024px) and (min-height: 820px) {
+  .home-hero__title { font-size: var(--fs-hero); }
+}
