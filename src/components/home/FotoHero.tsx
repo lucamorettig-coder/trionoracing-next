@@ -1,14 +1,15 @@
 import Image from "next/image";
-import { StageProp } from "@/components/apex/StageProp";
 
 /**
- * Campo fotografico della hero: la fotografia reale della scuola, con le
- * mascotte come props di palco ai suoi bordi — a bordo pista, come il
- * genitore che guarda.
+ * Campo fotografico della hero: la sola fotografia reale della scuola.
  *
- * Le mascotte sono agganciate al bordo INFERIORE (regola NINO.md §6/§12:
- * il taglio del cutout coincide col bordo, mai figure che fluttuano) e non
- * coprono il bambino reale.
+ * Le mascotte (Nino e Vittoria) che affiancavano la foto sono state
+ * rimosse su decisione del committente: davanti a una fotografia vera
+ * leggevano come figurine appoggiate sopra, non come presenze nella
+ * scena — a differenza degli usi delle mascotte altrove nel sito, dove
+ * restano su fondali illustrati/testurizzati (regola NINO.md §6/§12).
+ * Le mascotte non sono state rimosse come asset: continuano a comparire
+ * in altri punti del sito, solo non qui.
  *
  * NESSUNA DIDASCALIA nomina il luogo dello scatto finché non è verificato.
  */
@@ -34,40 +35,6 @@ export function FotoHero() {
         sizes="(max-width: 1024px) 100vw, 46vw"
         className="object-cover object-center"
       />
-
-      {/* Mascotte: due su desktop, una sola su mobile (budget prop APEX).
-          Le dimensioni sono quelle REALI dei cutout, verificate con `sips`:
-          sono figure alte e strette (rapporto ~1:2,5). Passare un rapporto
-          diverso a `next/image` le schiaccia, perché con `h-auto` l'altezza
-          si deriva da width/height. */}
-      <StageProp
-        level="oggetti"
-        anchor={{ left: "2%", bottom: 0, width: "min(160px, 22%)" }}
-      >
-        <Image
-          src="/vittoria/vittoria-figura-poster.png"
-          alt=""
-          aria-hidden
-          width={744}
-          height={1902}
-          className="h-auto w-full"
-        />
-      </StageProp>
-
-      <StageProp
-        level="oggetti"
-        anchor={{ right: "2%", bottom: 0, width: "min(170px, 23%)" }}
-        mobileHide
-      >
-        <Image
-          src="/nino/nino-figura-poster.png"
-          alt=""
-          aria-hidden
-          width={708}
-          height={1734}
-          className="h-auto w-full"
-        />
-      </StageProp>
     </div>
   );
 }
