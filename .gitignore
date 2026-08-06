@@ -167,3 +167,6 @@ next-env.d.ts
 
 # Backup blueprint pre-patch di emails/push-make.mjs (copie locali, non da committare)
 emails/backups/
+
+# Scratch di esecuzione dei piani (superpowers SDD): ledger, brief, review package
+.superpowers/

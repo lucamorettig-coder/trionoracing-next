@@ -7,6 +7,7 @@ import { SITE_URL } from "@/lib/seo";
  *
  * priority è relativo (max 1.0). Convenzione adottata:
  * - Home + La Scuola = 1.0 (conversion-critical)
+ * - /prova = 0.9 (porta d'ingresso a basso attrito, destinazione diretta della hero — EVO-046)
  * - Marathon 209 = 0.9 (evento, alto interesse stagionale)
  * - Chi siamo / Amatori = 0.7
  * - Contatti = 0.6
@@ -20,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }> = [
     { path: "/", priority: 1.0, changeFrequency: "weekly" },
     { path: "/la-scuola", priority: 1.0, changeFrequency: "monthly" },
+    { path: "/prova", priority: 0.9, changeFrequency: "monthly" },
     { path: "/marathon-209", priority: 0.9, changeFrequency: "weekly" },
     { path: "/chi-siamo", priority: 0.7, changeFrequency: "yearly" },
     { path: "/gli-amatori-triono", priority: 0.7, changeFrequency: "monthly" },

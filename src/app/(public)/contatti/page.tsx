@@ -93,8 +93,16 @@ export default async function ContattiPage() {
                 <li><strong>Giovedì 17:00 – 18:30</strong> · Corso di mountain bike</li>
               </ul>
               <p className="mt-4 text-sm text-stage-ink-dim">
-                Sei il benvenuto in qualsiasi lezione per conoscere maestri, bambini e ambiente.
-                Niente prenotazione, basta presentarsi.
+                Per <strong>venire a guardare</strong> una lezione e conoscere maestri, bambini e
+                ambiente non serve prenotare: basta presentarsi.
+              </p>
+              <p className="mt-2 text-sm text-stage-ink-dim">
+                Per far <strong>provare tuo figlio in sella</strong>, invece, ci accordiamo prima sul
+                giorno:{" "}
+                <a href="/prova" className="underline underline-offset-2">
+                  ecco come prenotare la prova
+                </a>
+                .
               </p>
             </div>
 

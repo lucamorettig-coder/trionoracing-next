@@ -16,9 +16,15 @@ import { Button } from "@/components/ui/button";
 import { Check } from "@/components/ui/icons";
 import { CONTACT_EMAIL } from "@/lib/seo";
 
-type Motivo = "Scuola di Ciclismo" | "Tesseramento Amatori" | "Marathon 209" | "Altro";
+type Motivo =
+  | "Lezione di prova"
+  | "Scuola di Ciclismo"
+  | "Tesseramento Amatori"
+  | "Marathon 209"
+  | "Altro";
 
 const MOTIVI: Motivo[] = [
+  "Lezione di prova",
   "Scuola di Ciclismo",
   "Tesseramento Amatori",
   "Marathon 209",
@@ -27,6 +33,8 @@ const MOTIVI: Motivo[] = [
 
 const motivoFromKey = (key: string | null): Motivo => {
   switch (key) {
+    case "prova":
+      return "Lezione di prova";
     case "scuola":
       return "Scuola di Ciclismo";
     case "tesseramento":

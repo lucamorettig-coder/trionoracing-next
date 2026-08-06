@@ -4,6 +4,7 @@ import { ApexCard } from "@/components/apex/ApexCard";
 import { ApexCta } from "@/components/apex/ApexCta";
 import { StageProp } from "@/components/apex/StageProp";
 import { StageScene } from "@/components/apex/StageScene";
+import { CosaMettiamoNoi } from "@/components/home/CosaMettiamoNoi";
 import { HelmetIcon, WheelIcon, MedalIcon, CalendarDays, MapPin } from "@/components/ui/icons";
 
 /**
@@ -128,6 +129,8 @@ export function SezioneScuola() {
             </div>
           </ApexCard>
         </div>
+
+        <CosaMettiamoNoi />
       </div>
     </StageScene>
   );

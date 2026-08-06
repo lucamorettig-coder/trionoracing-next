@@ -40,9 +40,12 @@ export async function CtaScuola() {
         </h2>
         <p className="mt-5 mx-auto max-w-[52ch] text-stage-ink-dim">
           Ci si iscrive tutto l&apos;anno, e prima si può provare senza impegno con un paio di
-          lezioni gratuite. Scrivici per fissare una prova o chiedere informazioni.
+          lezioni gratuite. Scrivici per chiedere informazioni.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
+          <ApexCta variant="support" href="/prova">
+            Prenota una prova
+          </ApexCta>
           <ApexCta variant="primary" href="/portale/iscrizioni">
             Iscrivi tuo figlio
           </ApexCta>

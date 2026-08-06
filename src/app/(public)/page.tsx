@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { HomeHero } from "@/components/home/HomeHero";
-import { HomeTicker } from "@/components/home/HomeTicker";
+import { FasciaRegia } from "@/components/home/FasciaRegia";
 import { SezioneScuola } from "@/components/home/SezioneScuola";
 import { ComeRaggiungerci } from "@/components/home/ComeRaggiungerci";
 import { SezioneAmatori } from "@/components/home/SezioneAmatori";
@@ -49,7 +49,7 @@ export default function HomePage() {
       <Grain />
       <OrganizationJsonLd />
       <HomeHero />
-      <HomeTicker />
+      <FasciaRegia />
       <SezioneScuola />
       <ComeRaggiungerci />
       <SezioneAmatori />

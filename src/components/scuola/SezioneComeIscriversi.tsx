@@ -253,10 +253,10 @@ function MockTray({ mock, padClass }: { mock: MockKind; padClass: string }) {
 function LinkProva({ className = "" }: { className?: string }) {
   return (
     <Link
-      href="/contatti?motivo=scuola"
+      href="/prova"
       className={`inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#04091c] underline decoration-[#04091c]/25 underline-offset-2 transition-opacity hover:opacity-70 ${className}`}
     >
-      Contattaci e prenota subito una prova
+      Scopri come prenotare una prova
       <ArrowRight className="h-[14px] w-[14px]" strokeWidth={2.2} />
     </Link>
   );

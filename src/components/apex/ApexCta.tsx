@@ -23,6 +23,7 @@ export function ApexCta({
   disabled,
   className = "",
   children,
+  "aria-describedby": ariaDescribedby,
   ...rest
 }: ApexCtaProps) {
   const cls = `apex-cta apex-cta--${variant} ${className}`.trim();
@@ -39,13 +40,19 @@ export function ApexCta({
 
   if (href && !disabled) {
     return (
-      <Link href={href} className={cls}>
+      <Link href={href} className={cls} aria-describedby={ariaDescribedby}>
         {content}
       </Link>
     );
   }
   return (
-    <button type="button" className={cls} disabled={disabled} {...rest}>
+    <button
+      type="button"
+      className={cls}
+      disabled={disabled}
+      aria-describedby={ariaDescribedby}
+      {...rest}
+    >
       {content}
     </button>
   );
