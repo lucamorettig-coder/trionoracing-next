@@ -24,11 +24,13 @@ Triono Racing è l'unico club che accompagna un percorso di crescita continuo ne
 
 ## Conversion & proof
 
-- Primary CTA: Iscriviti alla scuola
-- Secondary CTA: Scopri la scuola / Chi siamo (per chi non è ancora pronto a iscriversi)
-- La riga che un visitatore deve ricordare dopo 10 secondi: *"Qui i bambini iniziano in sicurezza, e chi cresce può diventare atleta della squadra."*
+- Primary CTA: Prenota una prova (gratuita, fino a 2 lezioni)
+- Secondary CTA: Iscrivi tuo figlio — per chi ha già deciso. Sempre a un clic, sempre presente nel chrome e accanto alla porta bassa, mai la prima cosa che vede un estraneo.
+- Tertiary: Scopri la Scuola / Chi siamo.
+- Nota: l'obiettivo di business resta l'iscrizione. La prova è il primo passo del percorso verso l'iscrizione, non un obiettivo alternativo.
+- La riga che un visitatore deve ricordare dopo 10 secondi: *"Qui i bambini iniziano in sicurezza e chi cresce diventa atleta della squadra — e si può venire a provare prima di decidere."*
+- Proof on hand: la lezione di prova È la nostra prova. In assenza di testimonianze, numeri e loghi, l'esperienza diretta è l'unica evidenza che possiamo offrire, e va trattata come tale.
 - Belief ladder: Sicurezza → Metodo → Community → Azione. Prima il genitore deve credere che sia sicuro per il figlio; poi che ci sia un metodo/progressione seria; poi che dietro ci sia una vera community/famiglia; solo allora l'iscrizione diventa un passo naturale.
-- Proof on hand: nessuna prova (testimonianze, numeri, loghi partner) disponibile al momento. Da raccogliere e aggiungere quando pronta — non inventare numeri o citazioni nel frattempo.
 
 ## Brand Personality
 
