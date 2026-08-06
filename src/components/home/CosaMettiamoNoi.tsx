@@ -12,9 +12,11 @@
    testo lungo si perde. Sta in evidenza, e la spiegazione di cosa comporta
    sta piccola sotto. */
 const SERVIZI = [
-  "La bici da strada la diamo noi",
-  "Iscrizione e pagamenti online",
-  "Maestri federali, gruppi piccoli",
+  // La prima è piena: fra le tre è l'unica che un genitore non può
+  // immaginare da solo, ed è quella che gli toglie una spesa.
+  { testo: "La bici da strada la diamo noi", forte: true },
+  { testo: "Iscrizione e pagamenti online", forte: false },
+  { testo: "Maestri federali, gruppi piccoli", forte: false },
 ] as const;
 
 export function CosaMettiamoNoi() {
@@ -25,10 +27,14 @@ export function CosaMettiamoNoi() {
       <ul className="mt-5 flex flex-wrap gap-3">
         {SERVIZI.map((s) => (
           <li
-            key={s}
-            className="border border-accent/40 bg-accent/10 px-4 py-2.5 text-[15px] font-semibold text-stage-ink"
+            key={s.testo}
+            className={
+              s.forte
+                ? "bg-accent px-5 py-3 text-[16px] font-bold text-stage-bg"
+                : "border border-accent/50 px-5 py-3 text-[16px] font-semibold text-stage-ink"
+            }
           >
-            {s}
+            {s.testo}
           </li>
         ))}
       </ul>
