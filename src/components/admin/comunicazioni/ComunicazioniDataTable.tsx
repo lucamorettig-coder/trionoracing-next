@@ -231,7 +231,7 @@ export function ComunicazioniDataTable({
             </div>
           )}
           <p className="text-[13px] text-ink-muted">
-            La comunicazione smetterà subito di comparire nella rotazione della hero.
+            La comunicazione smetterà subito di comparire nella fascia sotto la hero.
           </p>
         </AdminFormDialog>
       )}

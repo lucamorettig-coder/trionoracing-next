@@ -23,10 +23,10 @@ export function PorteHero() {
             stesso elemento. Con la utility le due domande uscirebbero
             entrambe grigie, e né build né lint né typecheck lo vedono. */}
         <div className="flex flex-col items-start">
-          <p className="apex-data" style={{ color: "var(--accent)" }}>
+          <p className="apex-data" id="porta-a-domanda" style={{ color: "var(--accent)" }}>
             Tuo figlio non ha mai provato?
           </p>
-          <ApexCta href="/prova" className="mt-3">
+          <ApexCta href="/prova" className="mt-3" aria-describedby="porta-a-domanda">
             Prenota una prova
           </ApexCta>
           {/* Il prezzo eredita `--stage-muted` da `.apex-data`: nessuna
@@ -38,10 +38,15 @@ export function PorteHero() {
 
         {/* Porta B — l'iscrizione */}
         <div className="flex flex-col items-start">
-          <p className="apex-data" style={{ color: "var(--accent-2)" }}>
+          <p className="apex-data" id="porta-b-domanda" style={{ color: "var(--accent-2)" }}>
             Hai già deciso?
           </p>
-          <ApexCta href="/portale/iscrizioni" variant="support" className="mt-3">
+          <ApexCta
+            href="/portale/iscrizioni"
+            variant="support"
+            className="mt-3"
+            aria-describedby="porta-b-domanda"
+          >
             Iscrivi tuo figlio
           </ApexCta>
           {/* Sotto i 553px di altezza utile il prezzo di porta B scende per

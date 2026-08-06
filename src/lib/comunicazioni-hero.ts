@@ -1,5 +1,9 @@
 /**
- * Comunicazioni/campagne che ruotano nella hero della homepage pubblica (EVO-035).
+ * Comunicazioni/campagne mostrate nello slot "In programma" della fascia di
+ * regia sotto la hero della homepage pubblica (EVO-035, poi EVO-046: la hero
+ * è diventata deterministica e non le ospita più). Un evento alla volta: la
+ * prima per priorità va nello slot, le altre restano elencate come
+ * "Poi: …" (`src/components/home/FasciaRegia.tsx`).
  *
  * Gestite da Airtable, tabella "Comunicazioni Hero" (PROD+DEV speculari).
  * Pattern slot SAFE+ISR di `sfondi-video.ts`/`site-settings.ts`: nessun fetch/env
@@ -20,7 +24,7 @@ const REVALIDATE = 300; // 5 min — coerente col resto della fase 7 (revalidate
 export interface ComunicazioneHero {
   id: string;
   eyebrow?: string;
-  /** Può contenere `**parola**` per l'evidenza in sun-500 (vedi HeroCampagne). */
+  /** Può contenere `**parola**` per l'evidenza in accent (parser `renderTitolo` in `FasciaRegia.tsx`). */
   titolo: string;
   sottotitolo?: string;
   ctaLabel?: string;

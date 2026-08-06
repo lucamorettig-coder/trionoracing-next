@@ -22,7 +22,7 @@ export default async function ComunicazioniAdminPage() {
       <AdminPageHeader
         eyebrow="Area Admin"
         title="Comunicazioni"
-        subtitle={`${comunicazioni.length} comunicazion${comunicazioni.length === 1 ? "e" : "i"} · rotazione hero homepage`}
+        subtitle={`${comunicazioni.length} comunicazion${comunicazioni.length === 1 ? "e" : "i"} · la prima per priorità appare in "In programma" nella fascia sotto la hero, le altre in "Poi"`}
         action={<ComunicazioneFormDialogTrigger />}
       />
 

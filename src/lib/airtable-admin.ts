@@ -2277,16 +2277,19 @@ export interface ComunicazioneHeroAdmin {
   fields: ComunicazioneHeroFields;
 }
 
+/**
+ * EYEBROW, CTA2_LABEL/CTA2_URL e IMMAGINE_URL non sono qui: `FasciaRegia.tsx`
+ * (che ha sostituito `HeroCampagne`, EVO-046) non li legge da nessuna parte —
+ * mostrarli nel form sarebbe un controllo senza effetto. Restano leggibili
+ * nei record Airtable esistenti (`ComunicazioneHeroFields`), semplicemente
+ * il form non li scrive più: vedi `buildComunicazioneFields`.
+ */
 export interface ComunicazioneHeroFormData {
   nome: string;
-  eyebrow?: string;
   titolo: string;
   sottotitolo?: string;
   ctaLabel?: string;
   ctaUrl?: string;
-  cta2Label?: string;
-  cta2Url?: string;
-  immagineUrl?: string;
   attiva: boolean;
   /** YYYY-MM-DD */
   validoDa?: string;
@@ -2348,13 +2351,6 @@ function buildComunicazioneFields(data: ComunicazioneHeroFormData): Record<strin
     throw new Error("L'URL della CTA principale non è valida (usa un path relativo o un URL https).");
   }
 
-  const cta2Label = data.cta2Label?.trim() ?? "";
-  const cta2Url = data.cta2Url?.trim() ?? "";
-  if (cta2Label && !cta2Url) throw new Error("Specifica l'URL della CTA secondaria.");
-  if (cta2Url && !isValidCtaUrl(cta2Url)) {
-    throw new Error("L'URL della CTA secondaria non è valida (usa un path relativo o un URL https).");
-  }
-
   if (data.validoDa && data.validoA && data.validoA < data.validoDa) {
     throw new Error("La data di fine validità non può precedere quella di inizio.");
   }
@@ -2364,16 +2360,17 @@ function buildComunicazioneFields(data: ComunicazioneHeroFormData): Record<strin
     throw new Error("La priorità deve essere un numero intero maggiore o uguale a zero.");
   }
 
+  // EYEBROW / CTA2_LABEL / CTA2_URL / IMMAGINE_URL non compaiono qui: il form
+  // non li raccoglie più (nessun consumer li legge, vedi commento su
+  // `ComunicazioneHeroFormData`). Ometterli dal payload — invece di scriverci
+  // stringhe vuote — lascia intatti gli eventuali valori storici già presenti
+  // sul record: una PATCH Airtable tocca solo i campi passati in `fields`.
   return {
     NOME: nome,
-    EYEBROW: data.eyebrow?.trim() || "",
     TITOLO: titolo,
     SOTTOTITOLO: sottotitolo,
     CTA_LABEL: ctaLabel,
     CTA_URL: ctaUrl,
-    CTA2_LABEL: cta2Label,
-    CTA2_URL: cta2Url,
-    IMMAGINE_URL: data.immagineUrl?.trim() || "",
     ATTIVA: data.attiva,
     VALIDO_DA: data.validoDa || "",
     VALIDO_A: data.validoA || "",

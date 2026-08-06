@@ -21,14 +21,10 @@ export function ComunicazioneFormDialog({ open, onOpenChange, comunicazione }: D
   const f = comunicazione?.fields ?? {};
 
   const [nome, setNome] = React.useState(f.NOME ?? "");
-  const [eyebrow, setEyebrow] = React.useState(f.EYEBROW ?? "");
   const [titolo, setTitolo] = React.useState(f.TITOLO ?? "");
   const [sottotitolo, setSottotitolo] = React.useState(f.SOTTOTITOLO ?? "");
   const [ctaLabel, setCtaLabel] = React.useState(f.CTA_LABEL ?? "");
   const [ctaUrl, setCtaUrl] = React.useState(f.CTA_URL ?? "");
-  const [cta2Label, setCta2Label] = React.useState(f.CTA2_LABEL ?? "");
-  const [cta2Url, setCta2Url] = React.useState(f.CTA2_URL ?? "");
-  const [immagineUrl, setImmagineUrl] = React.useState(f.IMMAGINE_URL ?? "");
   const [attiva, setAttiva] = React.useState(f.ATTIVA ?? true);
   const [validoDa, setValidoDa] = React.useState(f.VALIDO_DA ?? "");
   const [validoA, setValidoA] = React.useState(f.VALIDO_A ?? "");
@@ -40,14 +36,10 @@ export function ComunicazioneFormDialog({ open, onOpenChange, comunicazione }: D
     setErrore(null);
     const data: ComunicazioneHeroFormData = {
       nome: nome.trim(),
-      eyebrow: eyebrow.trim() || undefined,
       titolo: titolo.trim(),
       sottotitolo: sottotitolo.trim() || undefined,
       ctaLabel: ctaLabel.trim() || undefined,
       ctaUrl: ctaUrl.trim() || undefined,
-      cta2Label: cta2Label.trim() || undefined,
-      cta2Url: cta2Url.trim() || undefined,
-      immagineUrl: immagineUrl.trim() || undefined,
       attiva,
       validoDa: validoDa || undefined,
       validoA: validoA || undefined,
@@ -70,13 +62,15 @@ export function ComunicazioneFormDialog({ open, onOpenChange, comunicazione }: D
       onOpenChange={onOpenChange}
       title={editing ? "Modifica comunicazione" : "Nuova comunicazione"}
       description={
-        editing ? f.NOME ?? "" : "Crea una comunicazione da ruotare nella hero della homepage."
+        editing
+          ? f.NOME ?? ""
+          : 'Crea una comunicazione per lo slot "In programma" della fascia sotto la hero.'
       }
       icon={<Megaphone size={18} />}
       iconTone="navy"
       size="lg"
       submitLabel={editing ? "Salva modifiche" : "Crea comunicazione"}
-      footerHint="Le comunicazioni attive e nel periodo di validità ruotano nella hero della homepage."
+      footerHint='Tra le comunicazioni attive e nel periodo di validità, quella con priorità più bassa appare in "In programma"; le altre restano elencate in "Poi: …".'
       onSubmit={handleSubmit}
     >
       {errore && (
@@ -96,17 +90,6 @@ export function ComunicazioneFormDialog({ open, onOpenChange, comunicazione }: D
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           placeholder="Voglio Te — reclutamento maestri"
-          className={inputCls}
-        />
-      </Field>
-
-      <Field label="Eyebrow (opzionale)" htmlFor="com-eyebrow">
-        <input
-          id="com-eyebrow"
-          type="text"
-          value={eyebrow}
-          onChange={(e) => setEyebrow(e.target.value)}
-          placeholder="Scuola Triono cerca te"
           className={inputCls}
         />
       </Field>
@@ -161,38 +144,6 @@ export function ComunicazioneFormDialog({ open, onOpenChange, comunicazione }: D
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <Field label="CTA secondaria — etichetta (opz.)" htmlFor="com-cta2-label">
-          <input
-            id="com-cta2-label"
-            type="text"
-            value={cta2Label}
-            onChange={(e) => setCta2Label(e.target.value)}
-            className={inputCls}
-          />
-        </Field>
-        <Field label="CTA secondaria — URL (opz.)" htmlFor="com-cta2-url">
-          <input
-            id="com-cta2-url"
-            type="text"
-            value={cta2Url}
-            onChange={(e) => setCta2Url(e.target.value)}
-            className={inputCls}
-          />
-        </Field>
-      </div>
-
-      <Field label="Immagine / cutout (URL, opzionale)" htmlFor="com-immagine">
-        <input
-          id="com-immagine"
-          type="text"
-          value={immagineUrl}
-          onChange={(e) => setImmagineUrl(e.target.value)}
-          placeholder="/vittoria/vittoria-iwantyou.webp"
-          className={inputCls}
-        />
-      </Field>
-
-      <div className="grid grid-cols-2 gap-3">
         <Field label="Valido dal (opz.)" htmlFor="com-valido-da">
           <input
             id="com-valido-da"
@@ -213,7 +164,11 @@ export function ComunicazioneFormDialog({ open, onOpenChange, comunicazione }: D
         </Field>
       </div>
 
-      <Field label="Priorità" htmlFor="com-priorita" helper="Ordine di rotazione, crescente">
+      <Field
+        label="Priorità"
+        htmlFor="com-priorita"
+        helper='La più bassa appare in "In programma", le altre in "Poi", in ordine crescente'
+      >
         <input
           id="com-priorita"
           type="number"
@@ -245,7 +200,8 @@ export function ComunicazioneFormDialog({ open, onOpenChange, comunicazione }: D
         <div>
           <p className="text-[13px] font-semibold text-ink">Comunicazione attiva</p>
           <p className="text-[11.5px] text-ink-muted mt-0.5">
-            Solo le comunicazioni attive e nel periodo di validità ruotano nella hero.
+            Solo le comunicazioni attive e nel periodo di validità compaiono nella fascia sotto la
+            hero.
           </p>
         </div>
       </label>
