@@ -310,7 +310,7 @@ slot ①   LA PROVA · SUBITO
 slot ②   IN PROGRAMMA                                        ← da Airtable, un evento alla volta
          12 set · Giovanissimi su strada
          Ciclodromo Renato Perona, Terni · iscrizioni tramite le società, sui canali FCI
-         POI: 26 SET · GIOVANISSIMI IN MTB                    ← generata, max 1 riga
+         POI: 3 OTT · GIOVANISSIMI IN MTB                     ← generata, max 1 riga
 
 slot ③   ALLENAMENTI
          Martedì strada · Giovedì MTB
@@ -383,7 +383,12 @@ Ciclismo*, *Tesseramento Amatori*, *Marathon 209*, *Altro*.
 |---|---|---|
 | Gara Giovanissimi su strada | 12 set 2026 | Annuncio nello slot ② |
 | **Narni Sport Night** | 19 set 2026 | **Si sovrappone allo slot ①** |
-| Gara Giovanissimi MTB | 26 set 2026 | Annuncio nello slot ② |
+| Gara Giovanissimi MTB | **3 ott 2026** | Annuncio nello slot ② |
+
+> **La gara MTB è stata spostata dal 26 settembre al 3 ottobre** (comunicato il 6 agosto 2026, a
+> disegno già approvato). **Nessuna modifica al codice**: le date vivono nei record Airtable dello
+> slot ②, non nei componenti. È la prima verifica pratica del principio "il codice garantisce la
+> presenza, Airtable modula l'enfasi" — ed è arrivata prima ancora che il codice esistesse.
 
 Le due gare al Ciclodromo Renato Perona vanno **solo annunciate**: le iscrizioni passano dai canali
 federali FCI tra società. **Nessun flusso di iscrizione da costruire**, nessuna pagina evento, nessuna
@@ -427,7 +432,8 @@ comparirebbe in fondo alla pagina Amatori. Se in futuro si vuole differenziarlo,
 
 ## 10 · Degrado
 
-Il 27 settembre, a eventi passati, **nessuno deve toccare niente**.
+Il giorno dopo l'ultimo evento — qualunque sia la data, e le date si spostano — **nessuno deve
+toccare niente**.
 
 - Slot ② vuoto → la fascia torna a due slot, senza buchi visibili.
 - Slot ① rientra da solo alla forma permanente il 20 settembre.
