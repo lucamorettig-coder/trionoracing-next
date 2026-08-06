@@ -1,3 +1,4 @@
+import * as React from "react";
 import { getComunicazioniHeroAttive } from "@/lib/comunicazioni-hero";
 import { getSiteSettings } from "@/lib/site-settings";
 import { whatsappHref, MESSAGGIO_PROVA } from "@/lib/whatsapp";
@@ -17,6 +18,30 @@ import { whatsappHref, MESSAGGIO_PROVA } from "@/lib/whatsapp";
  * della hero, e ripeterla produrrebbe quattro CTA con due sole etichette
  * nel primo viewport desktop.
  */
+
+/**
+ * `**parola**` → evidenza accent di livrea. Stesso identico trattamento di
+ * `renderTitolo` in `HeroCampagne.tsx` (colore/classe `accent-word`, `<em>`
+ * non-italic solo per lo stile). Dopo il prossimo task `HeroCampagne.tsx`
+ * viene rimosso e questa fascia resta l'unico consumatore del campo
+ * `titolo` — un solo consumatore non giustifica estrarre un modulo
+ * condiviso, quindi il parser vive qui, non in `comunicazioni-hero.ts`.
+ */
+function renderTitolo(titolo: string): React.ReactNode {
+  const parts = titolo.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
+  return parts.map((part, i) => {
+    const m = part.match(/^\*\*([^*]+)\*\*$/);
+    if (m) {
+      return (
+        <em key={i} className="not-italic accent-word">
+          {m[1]}
+        </em>
+      );
+    }
+    return <React.Fragment key={i}>{part}</React.Fragment>;
+  });
+}
+
 export async function FasciaRegia() {
   const [comunicazioni, settings] = await Promise.all([
     getComunicazioniHeroAttive(),
@@ -68,7 +93,9 @@ export async function FasciaRegia() {
           <p className="apex-eyebrow">In programma</p>
           {primo ? (
             <>
-              <p className="mt-2 text-[15px] font-semibold leading-snug">{primo.titolo}</p>
+              <p className="mt-2 text-[15px] font-semibold leading-snug">
+                {renderTitolo(primo.titolo)}
+              </p>
               {primo.sottotitolo ? (
                 <p className="mt-1 text-[14px] leading-relaxed text-stage-muted">
                   {primo.sottotitolo}
@@ -84,8 +111,17 @@ export async function FasciaRegia() {
                 </a>
               ) : null}
               {altri.length > 0 ? (
-                <p className="apex-data mt-3 text-stage-muted">
-                  Poi: {altri.map((c) => c.titolo).join(" · ")}
+                // Generata, max 1 riga (specifica di design): con 3+ comunicazioni
+                // attive `line-clamp-1` tronca con ellissi invece di andare a capo
+                // e sbilanciare l'altezza delle tre colonne della fascia.
+                <p className="apex-data mt-3 text-stage-muted line-clamp-1">
+                  Poi:{" "}
+                  {altri.map((c, i) => (
+                    <React.Fragment key={c.id}>
+                      {i > 0 && " · "}
+                      {renderTitolo(c.titolo)}
+                    </React.Fragment>
+                  ))}
                 </p>
               ) : null}
             </>
