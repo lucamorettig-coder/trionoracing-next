@@ -1,0 +1,310 @@
+{
+  "projectId": "1cb02c47-0aba-4ab4-962a-8f084e7815e4",
+  "shape": "package",
+  "pkg": "trionoracing-next",
+  "globalName": "APEX",
+  "buildCmd": "node .design-sync/build-css.mjs && node .design-sync/build-types.mjs",
+  "entry": ".design-sync/entry.tsx",
+  "srcDir": "src/components",
+  "tsconfig": ".design-sync/tsconfig.ds.json",
+  "cssEntry": ".design-sync/.cache/apex-compiled.css",
+  "provider": {
+    "component": "ApexStage",
+    "props": {
+      "livery": "racing"
+    }
+  },
+  "componentSrcMap": {
+    "AltimetriaProfile": "src/components/apex/propkit/marathon/AltimetriaProfile.tsx",
+    "ApexCard": "src/components/apex/ApexCard.tsx",
+    "ApexCta": "src/components/apex/ApexCta.tsx",
+    "ApexFooter": "src/components/apex/ApexFooter.tsx",
+    "ApexLegalSection": "src/components/apex/legal/ApexLegalSection.tsx",
+    "ApexLegalTableWrapper": "src/components/apex/legal/ApexLegalTable.tsx",
+    "ApexLegalTd": "src/components/apex/legal/ApexLegalTable.tsx",
+    "ApexLegalTh": "src/components/apex/legal/ApexLegalTable.tsx",
+    "ApexNavBar": "src/components/apex/ApexNavBar.tsx",
+    "BachecaFoto": "src/components/amatori/BachecaFoto.tsx",
+    "ChiSiamoHero": "src/components/chi-siamo/ChiSiamoHero.tsx",
+    "ComeRaggiungerci": "src/components/home/ComeRaggiungerci.tsx",
+    "ComeUnirsi": "src/components/amatori/ComeUnirsi.tsx",
+    "ConsentProvider": "src/components/consent/ConsentProvider.tsx",
+    "ContactForm": "src/components/contatti/ContactForm.tsx",
+    "CosaEla209": "src/components/marathon-209/CosaEla209.tsx",
+    "CosaSiamoOggi": "src/components/chi-siamo/CosaSiamoOggi.tsx",
+    "Countdown": "src/components/apex/Countdown.tsx",
+    "CtaContattaci": "src/components/diventa-maestro/CtaContattaci.tsx",
+    "CtaMarathon": "src/components/marathon-209/CtaMarathon.tsx",
+    "Doodle": "src/components/apex/propkit/scuola/Doodle.tsx",
+    "DoveQuando": "src/components/amatori/DoveQuando.tsx",
+    "EchoStack": "src/components/apex/propkit/EchoStack.tsx",
+    "Edizioni": "src/components/marathon-209/Edizioni.tsx",
+    "FondaleVivo": "src/components/apex/FondaleVivo.tsx",
+    "FondamentaAtomi": ".design-sync/fondamenta/FondamentaAtomi.tsx",
+    "FondamentaColori": ".design-sync/fondamenta/FondamentaColori.tsx",
+    "FondamentaSpaziature": ".design-sync/fondamenta/FondamentaSpaziature.tsx",
+    "FondamentaTipografia": ".design-sync/fondamenta/FondamentaTipografia.tsx",
+    "Fondatori": "src/components/chi-siamo/Fondatori.tsx",
+    "Grain": "src/components/apex/Grain.tsx",
+    "HeroCampagne": "src/components/home/HeroCampagne.tsx",
+    "HeroManifesto": "src/components/diventa-maestro/HeroManifesto.tsx",
+    "HomeTicker": "src/components/home/HomeTicker.tsx",
+    "Hud": "src/components/apex/Hud.tsx",
+    "InfoPratiche": "src/components/marathon-209/InfoPratiche.tsx",
+    "MapEmbed": "src/components/home/MapEmbed.tsx",
+    "MarathonHero": "src/components/marathon-209/MarathonHero.tsx",
+    "Monolite209": "src/components/apex/propkit/Monolite209.tsx",
+    "Percorso": "src/components/marathon-209/Percorso.tsx",
+    "PhotoPlaceholder": "src/components/home/PhotoPlaceholder.tsx",
+    "RacingLine": "src/components/apex/propkit/RacingLine.tsx",
+    "ScuolaHero": "src/components/scuola/ScuolaHero.tsx",
+    "SectionHead": "src/components/apex/SectionHead.tsx",
+    "SezioneAllenarsiACasa": "src/components/scuola/SezioneAllenarsiACasa.tsx",
+    "SezioneAmatori": "src/components/home/SezioneAmatori.tsx",
+    "SezioneChiCerchiamo": "src/components/diventa-maestro/SezioneChiCerchiamo.tsx",
+    "SezioneComeIscriversi": "src/components/scuola/SezioneComeIscriversi.tsx",
+    "SezioneCorsi": "src/components/scuola/SezioneCorsi.tsx",
+    "SezioneCosaFarai": "src/components/diventa-maestro/SezioneCosaFarai.tsx",
+    "SezioneFilosofia": "src/components/scuola/SezioneFilosofia.tsx",
+    "SezioneGalleria": "src/components/scuola/SezioneGalleria.tsx",
+    "SezioneKitScuola": "src/components/scuola/SezioneKitScuola.tsx",
+    "SezioneMaestri": "src/components/scuola/SezioneMaestri.tsx",
+    "SezioneMarathon": "src/components/home/SezioneMarathon.tsx",
+    "SezioneScuola": "src/components/home/SezioneScuola.tsx",
+    "SezioneSicurezza": "src/components/scuola/SezioneSicurezza.tsx",
+    "SezioneTI2": "src/components/diventa-maestro/SezioneTI2.tsx",
+    "SezioneValori": "src/components/amatori/SezioneValori.tsx",
+    "StageProp": "src/components/apex/StageProp.tsx",
+    "StageScene": "src/components/apex/StageScene.tsx",
+    "Sticker": "src/components/apex/propkit/scuola/Sticker.tsx",
+    "Switch": "src/components/consent/Switch.tsx",
+    "TargaDorsale": "src/components/apex/propkit/TargaDorsale.tsx",
+    "TelemetriaGhost": "src/components/apex/propkit/TelemetriaGhost.tsx",
+    "Ticker": "src/components/apex/Ticker.tsx",
+    "Timeline": "src/components/chi-siamo/Timeline.tsx",
+    "Toppa": "src/components/apex/propkit/scuola/Toppa.tsx",
+    "Waveform": "src/components/apex/propkit/TelemetriaGhost.tsx"
+  },
+  "extraFonts": [
+    ".design-sync/fonts/fonts.css"
+  ],
+  "guidelinesGlob": [],
+  "overrides": {
+    "ApexNavBar": {
+      "cardMode": "column",
+      "viewport": "1280x520"
+    },
+    "ApexFooter": {
+      "cardMode": "column",
+      "viewport": "1280x1000"
+    },
+    "BachecaFoto": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "ChiSiamoHero": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "ComeRaggiungerci": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "ComeUnirsi": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "ContactForm": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "CosaEla209": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "CosaSiamoOggi": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "CtaContattaci": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "CtaMarathon": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "DoveQuando": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "Edizioni": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "Fondatori": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "HeroCampagne": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "HeroManifesto": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "InfoPratiche": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "MarathonHero": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "Percorso": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "ScuolaHero": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneAllenarsiACasa": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneAmatori": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneChiCerchiamo": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneComeIscriversi": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneCorsi": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneCosaFarai": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneFilosofia": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneGalleria": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneKitScuola": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneMaestri": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneMarathon": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneScuola": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneSicurezza": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneTI2": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "SezioneValori": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "Timeline": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "Countdown": {
+      "cardMode": "column"
+    },
+    "EchoStack": {
+      "cardMode": "column"
+    },
+    "Monolite209": {
+      "cardMode": "column"
+    },
+    "TargaDorsale": {
+      "cardMode": "column"
+    },
+    "Doodle": {
+      "cardMode": "column"
+    },
+    "Sticker": {
+      "cardMode": "column"
+    },
+    "Toppa": {
+      "cardMode": "column"
+    },
+    "Grain": {
+      "cardMode": "single",
+      "primaryStory": "Confronto"
+    },
+    "ConsentProvider": {
+      "cardMode": "single",
+      "primaryStory": "BannerPrimoAccesso",
+      "viewport": "1100x800"
+    },
+    "FondamentaTipografia": {
+      "cardMode": "single",
+      "viewport": "1000x2000"
+    },
+    "FondamentaColori": {
+      "cardMode": "single",
+      "viewport": "1000x1700"
+    },
+    "FondamentaSpaziature": {
+      "cardMode": "single",
+      "viewport": "1000x1300"
+    },
+    "FondamentaAtomi": {
+      "cardMode": "single",
+      "viewport": "1100x1100"
+    }
+  },
+  "dtsPropsFor": {
+    "ApexLegalTableWrapper": "children: React.ReactNode;",
+    "ApexLegalTd": "children: React.ReactNode;\nclassName?: string;",
+    "ApexLegalTh": "children: React.ReactNode;",
+    "ConsentProvider": "children: React.ReactNode;",
+    "CosaEla209": "edizione: {\nnumero: number;\nanno: number;\nnome: string;\nclaim: string;\nsottotitolo: string;\ndescrizione: string;\ndataGara: string;\nstatoIscrizioni: \"aperte\" | \"early\" | \"in chiusura\" | \"chiuse\" | \"sold out\" | string;\nurlIscrizione: string;\niscrittiTarget?: number;\niscrittiAttuali?: number;\ndataChiusura?: string;\ndataChiusuraEarly?: string;\nfotoHero?: string;\nfotoHeroAlt?: string;\nfotoCtaFinale?: string;\nfotoCtaFinaleAlt?: string;\nmetaTitle?: string;\nmetaDescription?: string;\nogImage?: string;\n};",
+    "Countdown": "target: string;\nclassName?: string;",
+    "CtaMarathon": "edizione: {\nnumero: number;\nanno: number;\nnome: string;\nclaim: string;\nsottotitolo: string;\ndescrizione: string;\ndataGara: string;\nstatoIscrizioni: \"aperte\" | \"early\" | \"in chiusura\" | \"chiuse\" | \"sold out\" | string;\nurlIscrizione: string;\niscrittiTarget?: number;\niscrittiAttuali?: number;\ndataChiusura?: string;\ndataChiusuraEarly?: string;\nfotoHero?: string;\nfotoHeroAlt?: string;\nfotoCtaFinale?: string;\nfotoCtaFinaleAlt?: string;\nmetaTitle?: string;\nmetaDescription?: string;\nogImage?: string;\n};",
+    "Doodle": "variant?: \"freccia\" | \"stella\" | \"scia\";\nclassName?: string;\n/** false se il doodle veicola informazione reale (raro: di norma resta decorativo) */\ndecorative?: boolean;",
+    "Edizioni": "edizione: {\nnumero: number;\nanno: number;\nnome: string;\nclaim: string;\nsottotitolo: string;\ndescrizione: string;\ndataGara: string;\nstatoIscrizioni: \"aperte\" | \"early\" | \"in chiusura\" | \"chiuse\" | \"sold out\" | string;\nurlIscrizione: string;\niscrittiTarget?: number;\niscrittiAttuali?: number;\ndataChiusura?: string;\ndataChiusuraEarly?: string;\nfotoHero?: string;\nfotoHeroAlt?: string;\nfotoCtaFinale?: string;\nfotoCtaFinaleAlt?: string;\nmetaTitle?: string;\nmetaDescription?: string;\nogImage?: string;\n};",
+    "Hud": "metriche: {\nkey: string;\nlabel: string;\n/** Valore iniziale (SSR) */\nvalue: number;\nunit?: string;\n/** Range del random-walk; se assenti la cella è statica */\nmin?: number;\nmax?: number;\n/** Mostra il dot LIVE pulsante accanto alla label */\nlive?: boolean;\n}[];\ndecorative?: boolean;\nclassName?: string;",
+    "InfoPratiche": "info: {\nid: string;\ntitolo: string;\nvaloreHtml: string;\nicona?: string;\nvariante: \"standard\" | \"highlight\";\nordine: number;\n}[];",
+    "MapEmbed": "embedUrl: string;",
+    "MarathonHero": "edizione: {\nnumero: number;\nanno: number;\nnome: string;\nclaim: string;\nsottotitolo: string;\ndescrizione: string;\ndataGara: string;\nstatoIscrizioni: \"aperte\" | \"early\" | \"in chiusura\" | \"chiuse\" | \"sold out\" | string;\nurlIscrizione: string;\niscrittiTarget?: number;\niscrittiAttuali?: number;\ndataChiusura?: string;\ndataChiusuraEarly?: string;\nfotoHero?: string;\nfotoHeroAlt?: string;\nfotoCtaFinale?: string;\nfotoCtaFinaleAlt?: string;\nmetaTitle?: string;\nmetaDescription?: string;\nogImage?: string;\n};",
+    "Monolite209": "text?: string;\nclassName?: string;",
+    "Percorso": "percorsi: {\nid: string;\nnome: string;\nslug: string;\ndistanzaKm: number;\ndislivelloM: number;\noraPartenza: string;\ncoloreHex: string;\ncoloreToken?: string;\ndescrizione: string;\ncategorieLabel?: string;\nquotaEarly?: number;\nquotaLate?: number;\ncancello?: string;\nristori?: string;\nordine: number;\n}[];",
+    "RacingLine": "className?: string;",
+    "StageScene": "className?: string;\nchildren?: React.ReactNode;\n/** Livrea della sezione: sovrascrive l'accento ereditato dal palco. */\n\"data-livery\"?: \"racing\" | \"scuola\" | \"marathon\" | \"ciclocross\";\n/** Ogni altro attributo HTML valido viene inoltrato alla <section>. */\n[attr: string]: unknown;",
+    "Sticker": "children: React.ReactNode;\nclassName?: string;\ndecorative?: boolean;",
+    "TargaDorsale": "numero: string;\ntesto?: string;\nclassName?: string;",
+    "TelemetriaGhost": "value: string;\nclassName?: string;",
+    "Ticker": "items: {\nlabel: string;\nvalue: string;\n}[];",
+    "Toppa": "children: React.ReactNode;\nclassName?: string;\ndecorative?: boolean;",
+    "Waveform": "seed?: number;\nclassName?: string;"
+  },
+  "readmeHeader": ".design-sync/conventions.md"
+}
