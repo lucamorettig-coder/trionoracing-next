@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { ConsegnaWhatsApp } from "@/components/prova/ConsegnaWhatsApp";
 import { Grain } from "@/components/apex/Grain";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
@@ -165,15 +166,40 @@ export default function ProvaPage() {
                 quello in mountain bike. Iscriversi non c&apos;entra: si decide dopo, con calma.
               </p>
 
-              <p className="mt-8 max-w-[60ch] text-[14px] text-stage-muted">
-                Una cosa che le famiglie non si aspettano: chi poi si iscrive al corso che comprende
-                la strada riceve la <strong className="text-stage-ink">bici da corsa in comodato
-                d&apos;uso gratuito</strong>. Alla prova, invece, il bambino viene sempre con la sua.
-              </p>
+              {/* In evidenza il fatto, piccola sotto la spiegazione: dentro un
+                  paragrafo lungo questo argomento si perdeva del tutto. */}
+              <div className="mt-10 border-l-[3px] border-accent bg-stage-surface p-5">
+                <p className="text-[18px] font-semibold leading-snug">
+                  E la bici da strada, dopo, la diamo noi.
+                </p>
+                <p className="mt-2 max-w-[60ch] text-[13px] leading-relaxed text-stage-muted">
+                  A chi si iscrive al corso che comprende la strada.{" "}
+                  <strong className="font-semibold text-stage-ink">
+                    Comodato d&apos;uso gratuito
+                  </strong>{" "}
+                  vuol dire che la bici resta di proprietà della scuola: si usa senza pagare nulla e
+                  si restituisce quando non serve più. Alla prova, invece, il bambino viene sempre
+                  con la sua.
+                </p>
+              </div>
             </div>
 
             <div className="lg:col-span-5">
-              <ConsegnaWhatsApp />
+              {/* Una foto vera della scuola: senza, la colonna resta un muro di
+                  testo e la pagina non ha volto. È la stessa immagine già usata
+                  nello step "Vieni a provare" di /la-scuola. */}
+              <div className="relative aspect-[4/3] w-full overflow-hidden">
+                <Image
+                  src="/photos/scuola/lezione-ciclodromo.jpg"
+                  alt="Bambini in bici al ciclodromo durante una lezione della scuola di ciclismo Triono."
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="object-cover"
+                />
+              </div>
+              <div className="mt-6">
+                <ConsegnaWhatsApp />
+              </div>
             </div>
           </div>
         </div>

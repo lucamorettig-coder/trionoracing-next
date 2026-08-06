@@ -10,14 +10,12 @@ import { ApexCta } from "@/components/apex/ApexCta";
 export async function ConsegnaWhatsApp() {
   const settings = await getSiteSettings();
   const telefono = settings["scuola-telefono"];
-  const referente = settings["scuola-referente"];
   const wa = whatsappHref(telefono, MESSAGGIO_PROVA);
 
   return (
     <div className="apex-card apex-card--warm p-6 lg:p-8">
       <p className="text-[15px] leading-relaxed">
-        Ci scrivi, concordiamo insieme il giorno, e vieni. Risponde
-        {referente ? ` ${referente}` : " una persona della scuola"}, non un centralino.
+        Ci scrivi, concordiamo insieme il giorno, e vieni.
       </p>
 
       {wa ? (

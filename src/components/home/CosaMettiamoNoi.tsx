@@ -7,35 +7,39 @@
  * viene sempre con la propria bici. Non modificare questo copy senza
  * riverificare il perimetro: è un impegno che la scuola deve mantenere.
  */
+/* Etichette, non paragrafi: il fatto che la bici da strada la fornisca la
+   scuola è l'argomento più forte che abbiamo verso un genitore, e dentro un
+   testo lungo si perde. Sta in evidenza, e la spiegazione di cosa comporta
+   sta piccola sotto. */
 const SERVIZI = [
-  {
-    titolo: "La bici da corsa",
-    testo:
-      "Chi si iscrive al corso che comprende la strada riceve la bici da corsa in comodato d'uso gratuito. Non serve comprarla per capire se piace.",
-  },
-  {
-    titolo: "L'area riservata",
-    testo:
-      "Iscrizione, rinnovo del certificato medico, quote e rate mensili: tutto online, in un'unica area riservata.",
-  },
-  {
-    titolo: "I maestri",
-    testo: "Maestri federali e gruppi piccoli, divisi per età.",
-  },
+  "La bici da strada la diamo noi",
+  "Iscrizione e pagamenti online",
+  "Maestri federali, gruppi piccoli",
 ] as const;
 
 export function CosaMettiamoNoi() {
   return (
     <div className="mt-16">
-      <h3 className="apex-eyebrow text-stage-muted">Cosa mettiamo noi</h3>
-      <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
+      <h3 className="apex-eyebrow">Cosa mettiamo noi</h3>
+
+      <ul className="mt-5 flex flex-wrap gap-3">
         {SERVIZI.map((s) => (
-          <div key={s.titolo}>
-            <p className="text-[15px] font-semibold">{s.titolo}</p>
-            <p className="mt-2 text-[14px] leading-relaxed text-stage-muted">{s.testo}</p>
-          </div>
+          <li
+            key={s}
+            className="border border-accent/40 bg-accent/10 px-4 py-2.5 text-[15px] font-semibold text-stage-ink"
+          >
+            {s}
+          </li>
         ))}
-      </div>
+      </ul>
+
+      <p className="mt-5 max-w-[72ch] text-[13px] leading-relaxed text-stage-muted">
+        La bici da corsa è data in{" "}
+        <strong className="font-semibold text-stage-ink">comodato d&apos;uso gratuito</strong> a chi
+        si iscrive al corso che comprende la strada: resta di proprietà della scuola, si usa senza
+        pagare nulla e si restituisce quando non serve più. Alla lezione di prova, invece, il bambino
+        viene sempre con la propria bici.
+      </p>
     </div>
   );
 }
