@@ -23,6 +23,7 @@ const contattoSchema = z.object({
   email: z.string().trim().email("Email non valida").max(120),
   telefono: z.string().trim().max(40).optional().or(z.literal("")),
   motivo: z.enum([
+    "Lezione di prova",
     "Scuola di Ciclismo",
     "Tesseramento Amatori",
     "Marathon 209",
