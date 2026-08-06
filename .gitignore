@@ -167,3 +167,9 @@ next-env.d.ts
 
 # Backup blueprint pre-patch di emails/push-make.mjs (copie locali, non da committare)
 emails/backups/
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules
+dist/

@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "@/components/consent/CookiePreferencesButton": [
+        "./.design-sync/shims/CookiePreferencesButton"
+      ],
+      "@/*": ["./src/*"],
+      "next/image": ["./.design-sync/shims/next-image"],
+      "next/link": ["./.design-sync/shims/next-link"],
+      "next/script": ["./.design-sync/shims/next-script"],
+      "next/navigation": ["./.design-sync/shims/next-navigation"],
+      "@clerk/nextjs": ["./.design-sync/shims/clerk-nextjs"]
+    }
+  }
+}
