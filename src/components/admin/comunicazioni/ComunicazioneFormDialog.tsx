@@ -28,6 +28,7 @@ export function ComunicazioneFormDialog({ open, onOpenChange, comunicazione }: D
   const [attiva, setAttiva] = React.useState(f.ATTIVA ?? true);
   const [validoDa, setValidoDa] = React.useState(f.VALIDO_DA ?? "");
   const [validoA, setValidoA] = React.useState(f.VALIDO_A ?? "");
+  const [dataEvento, setDataEvento] = React.useState(f.DATA_EVENTO ?? "");
   const [priorita, setPriorita] = React.useState(f.PRIORITA ?? 0);
   const [note, setNote] = React.useState(f.NOTE ?? "");
   const [errore, setErrore] = React.useState<string | null>(null);
@@ -43,6 +44,7 @@ export function ComunicazioneFormDialog({ open, onOpenChange, comunicazione }: D
       attiva,
       validoDa: validoDa || undefined,
       validoA: validoA || undefined,
+      dataEvento: dataEvento || undefined,
       priorita: Number(priorita) || 0,
       note: note.trim() || undefined,
     };
@@ -163,6 +165,22 @@ export function ComunicazioneFormDialog({ open, onOpenChange, comunicazione }: D
           />
         </Field>
       </div>
+
+      <Field label="Data dell'appuntamento (opz.)" htmlFor="com-data-evento">
+        <input
+          id="com-data-evento"
+          type="date"
+          value={dataEvento}
+          onChange={(e) => setDataEvento(e.target.value)}
+          className={inputCls}
+        />
+        <p className="mt-1.5 text-[12px] leading-relaxed text-ink-muted">
+          Compilala solo se questa comunicazione è un <strong>appuntamento</strong> — una gara, una
+          manifestazione, una data da segnare. Comparirà in home sotto «In programma», in ordine di
+          data, e sparirà da sola il giorno dopo. Lasciala vuota per le comunicazioni che non hanno
+          una data.
+        </p>
+      </Field>
 
       <Field
         label="Priorità"

@@ -1,5 +1,9 @@
 import * as React from "react";
-import { getComunicazioniHeroAttive } from "@/lib/comunicazioni-hero";
+import {
+  getComunicazioniHeroAttive,
+  soloAppuntamenti,
+  formatDataEvento,
+} from "@/lib/comunicazioni-hero";
 import { getSiteSettings } from "@/lib/site-settings";
 import { whatsappHref, MESSAGGIO_PROVA } from "@/lib/whatsapp";
 
@@ -49,7 +53,9 @@ export async function FasciaRegia() {
   ]);
 
   const wa = whatsappHref(settings["scuola-telefono"], MESSAGGIO_PROVA);
-  const [primo, ...altri] = comunicazioni;
+  // Solo gli appuntamenti, in ordine di data: lo slot annuncia date, e una
+  // campagna senza data sotto "In programma" non è un appuntamento.
+  const [primo, ...altri] = soloAppuntamenti(comunicazioni);
 
   return (
     <section className="border-y border-stage-line bg-stage-surface">
@@ -94,6 +100,9 @@ export async function FasciaRegia() {
           {primo ? (
             <>
               <p className="mt-2 text-[15px] font-semibold leading-snug">
+                {primo.dataEvento ? (
+                  <span className="text-accent">{formatDataEvento(primo.dataEvento)} · </span>
+                ) : null}
                 {renderTitolo(primo.titolo)}
               </p>
               {primo.sottotitolo ? (
@@ -119,6 +128,7 @@ export async function FasciaRegia() {
                   {altri.map((c, i) => (
                     <React.Fragment key={c.id}>
                       {i > 0 && " · "}
+                      {c.dataEvento ? `${formatDataEvento(c.dataEvento)} ` : ""}
                       {renderTitolo(c.titolo)}
                     </React.Fragment>
                   ))}

@@ -2295,6 +2295,12 @@ export interface ComunicazioneHeroFormData {
   validoDa?: string;
   /** YYYY-MM-DD */
   validoA?: string;
+  /**
+   * YYYY-MM-DD. Valorizzata = **appuntamento**: compare nello slot "In
+   * programma" della fascia home, ordinato per data, e sparisce da solo il
+   * giorno dopo. Vuota = campagna, che lì non compare.
+   */
+  dataEvento?: string;
   priorita: number;
   note?: string;
 }
@@ -2374,6 +2380,7 @@ function buildComunicazioneFields(data: ComunicazioneHeroFormData): Record<strin
     ATTIVA: data.attiva,
     VALIDO_DA: data.validoDa || "",
     VALIDO_A: data.validoA || "",
+    DATA_EVENTO: data.dataEvento || "",
     PRIORITA: priorita,
     NOTE: data.note?.trim() || "",
   };

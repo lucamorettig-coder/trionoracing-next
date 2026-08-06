@@ -33,6 +33,13 @@ export interface ComunicazioneHero {
   cta2Url?: string;
   immagineUrl?: string;
   priorita: number;
+  /**
+   * YYYY-MM-DD. Se valorizzata, questa comunicazione è un **appuntamento** e
+   * compare nello slot "In programma" della fascia home, ordinata per data.
+   * Se vuota è una campagna, e lì non compare: la fascia annuncia date, non
+   * messaggi generici.
+   */
+  dataEvento?: string;
 }
 
 export interface ComunicazioneHeroFields {
@@ -52,6 +59,8 @@ export interface ComunicazioneHeroFields {
   VALIDO_A?: string;
   PRIORITA?: number;
   NOTE?: string;
+  /** YYYY-MM-DD. Valorizzata = appuntamento; vuota = campagna. */
+  DATA_EVENTO?: string;
 }
 
 interface ComunicazioneHeroRecord {
@@ -69,6 +78,10 @@ export function isComunicazioneInCorso(fields: ComunicazioneHeroFields, oggi: st
   if (!fields.ATTIVA) return false;
   if (fields.VALIDO_DA && oggi < fields.VALIDO_DA) return false;
   if (fields.VALIDO_A && oggi > fields.VALIDO_A) return false;
+  // Un appuntamento scade da solo il giorno dopo: chi lo inserisce non deve
+  // ricordarsi di spegnerlo, ed è tutto il punto della fascia (il ticker che
+  // ha sostituito annunciava una gara passata da sei settimane).
+  if (fields.DATA_EVENTO && oggi > fields.DATA_EVENTO) return false;
   return true;
 }
 
@@ -88,7 +101,27 @@ function toComunicazioneHero(record: ComunicazioneHeroRecord): ComunicazioneHero
     cta2Url: f.CTA2_URL?.trim() || undefined,
     immagineUrl: f.IMMAGINE_URL?.trim() || undefined,
     priorita: f.PRIORITA ?? 0,
+    dataEvento: f.DATA_EVENTO?.trim() || undefined,
   };
+}
+
+/**
+ * Gli **appuntamenti**: le comunicazioni con una data, ordinate cronologicamente.
+ * Sono ciò che la fascia annuncia sotto "In programma". Le campagne (senza data)
+ * restano fuori: uno slot che promette date non deve mostrare messaggi generici.
+ */
+export function soloAppuntamenti(comunicazioni: ComunicazioneHero[]): ComunicazioneHero[] {
+  return comunicazioni
+    .filter((c) => c.dataEvento)
+    .sort((a, b) => (a.dataEvento ?? "").localeCompare(b.dataEvento ?? ""));
+}
+
+/** "2026-09-12" → "12 set". Deterministica: nessuna dipendenza da `oggi`. */
+export function formatDataEvento(iso: string): string {
+  const [anno, mese, giorno] = iso.split("-").map(Number);
+  if (!anno || !mese || !giorno) return iso;
+  const MESI = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
+  return `${giorno} ${MESI[mese - 1] ?? ""}`.trim();
 }
 
 /**
