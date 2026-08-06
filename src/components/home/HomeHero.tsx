@@ -70,42 +70,49 @@ export async function HomeHero() {
           <div className="apex-wrap relative w-full" style={{ zIndex: "var(--z-pista)" }}>
             <div className="apex-eyebrow reveal">SCUOLA DI CICLISMO E SQUADRA · TERNI</div>
 
-            {/* `min(var(--fs-hero), Nvh)`: --fs-hero da solo scala solo sulla
-                larghezza (2rem + 8vw) e ignora l'altezza disponibile — il
-                campo tipografico qui è largo 52fr, non 100vw come /prova
-                (che usa il token intatto), quindi la stessa taglia eccede
-                la piega sui viewport bassi. Il tetto in vh è CONTINUO (non a
-                scalini): scende linearmente con l'altezza utile.
+            {/* GIRO 3 — cap continuo, non più a scalini. I tre scaglioni
+                Tailwind (base/lg/xl) del giro precedente compravano
+                monumentalità a 1440×780 (74.1px) pagandola con due difetti
+                misurabili: (a) inversione di gerarchia — 74.1px restava
+                sotto i 96px dell'h2 di sezione, che a sua volta non varia
+                con l'altezza; (b) un salto NUDO al breakpoint xl (1280px):
+                a parità di altezza 800, 60px a 1279px e 76px a 1280px, con
+                lo stesso numero di righe che cambiava da un pixel di
+                larghezza all'altro.
 
-                RAMIFICATO IN LARGHEZZA (non un solo cap globale): un vh unico
-                tarato sul caso peggiore mobile (375×553) è stato verificato
-                sovradimensionato ovunque — a 1440×780 dava solo 46.8px, la
-                taglia di un h2 di sezione, con 243px di hero inutilizzati
-                sotto le porte. Sotto lg (<1024, layout impilato a colonna
-                singola) il vincolo resta il caso mobile stretto: 6vh, INVARIATO
-                dal giro precedente, stesso valore/comportamento pixel per
-                pixel. Da lg in su (≥1024, colonna testo affiancata alla
-                foto) c'è più spazio: due soglie ulteriori, tarate misurando
-                sulla matrice estesa, non a occhio.
-                  - lg (1024–1279): 7.5vh — il vincolo qui è la coppia
-                    1024×600/1024×640 (colonna testo più stretta): oltre
-                    ~7.7–8vh il margine crolla in un salto non lineare (stesso
-                    fenomeno del salto mobile, verosimilmente un a-capo in più
-                    nel titolo che spinge giù tutto il blocco sotto); 7.5vh
-                    tiene un cuscinetto di sicurezza sotto quella soglia.
-                  - xl (≥1280): 9.5vh — qui il vincolo è 1280×620 (colonna più
-                    stretta di questo scaglione): il margine resta su un
-                    plateau piatto (~22px mascotte, ~80-85px porte) da ~9vh
-                    fino quasi a 10vh, poi crolla in negativo oltre quella
-                    soglia (stesso fenomeno). 9.5vh sta dentro il plateau con
-                    margine di sicurezza dal salto, non sul suo bordo.
-                A 1440×780 il risultato è un h1 quasi triplicato rispetto al
-                singolo cap 6vh (era 46.8px, ora vedi task-5-report.md per il
-                valore esatto misurato), con margini ancora ampiamente
-                positivi su tutta la matrice estesa. Non tocca --fs-hero né
-                /prova, che lo usa invariato. */}
+                Sostituito con UNA sola espressione continua in altezza,
+                sopra il breakpoint a due colonne (`lg`, ≥1024px — sotto
+                resta il layout impilato a colonna singola, formula mobile
+                INVARIATA): `min(var(--fs-hero), calc((100vh-Kpx)*C))`.
+                Cresce linearmente con l'altezza residua invece che a
+                gradini, e per costruzione NON dipende dalla larghezza — zero
+                salto in qualunque punto ≥1024px, senza bisogno di
+                verificarlo caso per caso (verificato comunque a 1279×800 vs
+                1280×800: stesso identico font-size, stessa identica altezza
+                dell'h1, 0px di differenza).
+
+                K=480, C=0.27, ricavati MISURANDO (non dalla coppia
+                1280×620/1440×780 suggerita in partenza, che dà una retta
+                troppo ripida — vedi sotto) il vincolo reale è la colonna
+                testo più STRETTA della matrice estesa, cioè 1024px di
+                larghezza, non l'altezza più bassa: a 1024×640 il margine
+                mascotte crolla da +22 a 0 fra 50px e 51px di font (salto non
+                lineare, un a-capo in più nel titolo), mentre a 1024×600 lo
+                stesso salto è fra 48px e 49px. Una retta tarata sulla coppia
+                (1280×620≈61px sicuro) e (1440×780≈116px sicuro) suggerita
+                come punto di partenza dà pendenza ≈0.34 e vale ≈68px già a
+                640 di altezza — quasi 20px oltre la soglia di rottura
+                MISURATA a quella riga (50px), quindi avrebbe rotto
+                esattamente la riga più stretta della matrice. La retta
+                giusta passa invece vicino al vincolo reale (1024×640,
+                soglia 50px, scelto un cuscinetto a 43.2px) con pendenza
+                0.27, che resta ampiamente sotto soglia su tutte le altre
+                righe (dettaglio soglie/cuscinetti in task-5-report.md, Giro
+                3) e supera comunque i 96px dell'h2 a 1440×900 (113.4px, con
+                margine). Non tocca --fs-hero né /prova, che lo usa
+                invariato. */}
             <h1
-              className="apex-display mt-5 max-w-[15ch] text-[length:min(var(--fs-hero),6vh)] lg:text-[length:min(var(--fs-hero),7.5vh)] xl:text-[length:min(var(--fs-hero),9.5vh)]"
+              className="apex-display mt-5 max-w-[15ch] text-[length:min(var(--fs-hero),6vh)] lg:text-[length:min(var(--fs-hero),calc((100vh-480px)*0.27))]"
               style={{ lineHeight: "var(--lh-hero)" }}
             >
               <span className="reveal">In bici,</span>{" "}
