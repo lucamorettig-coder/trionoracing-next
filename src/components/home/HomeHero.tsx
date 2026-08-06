@@ -30,20 +30,44 @@ export async function HomeHero() {
           grande non si comprime sotto la sua parola più larga), rubando
           spazio alla colonna fotografica — stessa famiglia di bug EVO-044.
           Con minmax(0,…) il rapporto 52/46 è onorato davvero. */}
-      <div className="grid h-full grid-cols-1 lg:grid-cols-[minmax(0,52fr)_minmax(0,46fr)]">
+      {/* `h-full` qui era CODICE MORTO: `height:100%` su un figlio di un
+          elemento ad altezza `auto` (la sezione ha solo `min-height`) si
+          risolve in `auto`, quindi la griglia non riempiva mai la sezione.
+          Finché il titolo era sovradimensionato la colonna testo sforava da
+          sola e il difetto non si vedeva; con il titolo a misura la griglia
+          si ferma all'altezza del campo fotografico e sotto resta una banda
+          di palco vuoto — misurata 369px a 1920×1080 (griglia 560, sezione
+          929). Sostituito con un min-height vero, con lo stesso guard-rail
+          già usato in FotoHero.tsx (80 = 60px di navbar + 20 di sicurezza)
+          così l'altezza dichiarata non spinge mai le mascotte sotto la
+          piega sui viewport bassi: sopra 571px di altezza utile la griglia
+          riempie gli 86vh e la banda sparisce, sotto segue il viewport. */}
+      <div className="grid min-h-[min(86vh,calc(100vh-80px))] grid-cols-1 lg:grid-cols-[minmax(0,52fr)_minmax(0,46fr)]">
         {/* Campo tipografico.
             Padding verticale ridotto sia su mobile (py-6, non py-20) sia su
-            desktop (lg:py-11, non lg:py-24): il campo fotografico ha
-            `h-full` e segue l'altezza della riga della grid, che la colonna
-            testo determina col suo stack di contenuto. Sui viewport più
+            desktop (lg:py-11, non lg:py-24): il campo fotografico si stira
+            sull'altezza della riga della grid, che la colonna testo
+            determina col suo stack di contenuto. Sui viewport più
             bassi della matrice estesa (375×553 su mobile, 1280×620 su
             desktop) il padding pieno lasciava il prezzo di Porta B sotto la
             piega anche con l'h1 ridotto al minimo utile — misurato: a
             375×553 anche con h1→0 il margine restava appena positivo,
             perché il costo fisso (padding + paragrafo + blocco porte) da
             solo eccede il viewport. Valori tarati misurando sulla matrice
-            estesa (v. report correzione in task-5-report.md). */}
-        <div className="relative flex items-center py-6 lg:py-11">
+            estesa (v. report correzione in task-5-report.md).
+
+            Su desktop il 2.75rem (py-11) è ora un TETTO, non un valore
+            fisso: sotto i 620px di altezza utile scende linearmente. Serve
+            perché l'h1 ha un pavimento (v. commento sull'<h1>) e alle
+            altezze estreme il costo fisso della colonna + quel pavimento
+            supera il viewport: misurato a 1280×460, con py-11 pieno e h1 al
+            pavimento la colonna testo esce 449px contro i 400px disponibili
+            (mascotte a −89). Con la rampa il padding lì vale 12px per lato
+            e la colonna rientra a 385px. Sopra 620px di altezza il valore è
+            saturo a 2.75rem, quindi tutte le righe alte della matrice hanno
+            ESATTAMENTE il padding di prima (verificato: padY=44 da 620 in
+            su). Stessa forma del `min()` già usato in FotoHero.tsx. */}
+        <div className="relative flex items-center py-6 lg:py-[min(2.75rem,calc((100vh-400px)*0.2))]">
           <FondaleVivo src={videoSrc} poster={sfondo?.posterUrl} />
 
           {/* Scrim locale del campo tipografico: eyebrow e prezzi (color:
@@ -70,49 +94,78 @@ export async function HomeHero() {
           <div className="apex-wrap relative w-full" style={{ zIndex: "var(--z-pista)" }}>
             <div className="apex-eyebrow reveal">SCUOLA DI CICLISMO E SQUADRA · TERNI</div>
 
-            {/* GIRO 3 — cap continuo, non più a scalini. I tre scaglioni
-                Tailwind (base/lg/xl) del giro precedente compravano
-                monumentalità a 1440×780 (74.1px) pagandola con due difetti
-                misurabili: (a) inversione di gerarchia — 74.1px restava
-                sotto i 96px dell'h2 di sezione, che a sua volta non varia
-                con l'altezza; (b) un salto NUDO al breakpoint xl (1280px):
-                a parità di altezza 800, 60px a 1279px e 76px a 1280px, con
-                lo stesso numero di righe che cambiava da un pixel di
-                larghezza all'altro.
+            {/* La taglia del claim è vincolata su DUE assi, più un
+                pavimento. Le versioni precedenti guardavano solo l'altezza
+                (`min(--fs-hero, (100vh-480px)*0.27)`) e su ogni finestra
+                alta il titolo cresceva oltre la larghezza della colonna:
+                a 1280×950 usciva a 126.9px e `.apex-display` (che ha
+                `overflow-wrap:break-word`) lo spezzava in cinque righe,
+                "INSIEM / E." compreso, spingendo porte (−43) e mascotte
+                (−77) sotto la piega.
 
-                Sostituito con UNA sola espressione continua in altezza,
-                sopra il breakpoint a due colonne (`lg`, ≥1024px — sotto
-                resta il layout impilato a colonna singola, formula mobile
-                INVARIATA): `min(var(--fs-hero), calc((100vh-Kpx)*C))`.
-                Cresce linearmente con l'altezza residua invece che a
-                gradini, e per costruzione NON dipende dalla larghezza — zero
-                salto in qualunque punto ≥1024px, senza bisogno di
-                verificarlo caso per caso (verificato comunque a 1279×800 vs
-                1280×800: stesso identico font-size, stessa identica altezza
-                dell'h1, 0px di differenza).
+                Il claim ha un <br/> d'autore: è scritto per stare su DUE
+                righe. La riga lunga è "IN BICI, SICURI," e — misurata su
+                Archivo wdth 125 / uppercase / tracking −0.02em — vale
+                R = 9.40 × font-size (752px a font-size 80px). Sta su una
+                riga sola finché font-size ≤ larghezza disponibile / R.
+                Il `max-w-[15ch]` sull'h1 non c'entra: 15ch = 11.79em > R,
+                quindi non è mai lui a mandare a capo.
 
-                K=480, C=0.27, ricavati MISURANDO (non dalla coppia
-                1280×620/1440×780 suggerita in partenza, che dà una retta
-                troppo ripida — vedi sotto) il vincolo reale è la colonna
-                testo più STRETTA della matrice estesa, cioè 1024px di
-                larghezza, non l'altezza più bassa: a 1024×640 il margine
-                mascotte crolla da +22 a 0 fra 50px e 51px di font (salto non
-                lineare, un a-capo in più nel titolo), mentre a 1024×600 lo
-                stesso salto è fra 48px e 49px. Una retta tarata sulla coppia
-                (1280×620≈61px sicuro) e (1440×780≈116px sicuro) suggerita
-                come punto di partenza dà pendenza ≈0.34 e vale ≈68px già a
-                640 di altezza — quasi 20px oltre la soglia di rottura
-                MISURATA a quella riga (50px), quindi avrebbe rotto
-                esattamente la riga più stretta della matrice. La retta
-                giusta passa invece vicino al vincolo reale (1024×640,
-                soglia 50px, scelto un cuscinetto a 43.2px) con pendenza
-                0.27, che resta ampiamente sotto soglia su tutte le altre
-                righe (dettaglio soglie/cuscinetti in task-5-report.md, Giro
-                3) e supera comunque i 96px dell'h2 a 1440×900 (113.4px, con
-                margine). Non tocca --fs-hero né /prova, che lo usa
-                invariato. */}
+                (a) TETTO DI LARGHEZZA — la colonna testo è 52/98 del
+                    viewport meno due gutter `clamp(1.25rem,0.5rem+3vw,3rem)`.
+                    Rimettendo insieme i due regimi del clamp, la larghezza
+                    disponibile è ≥ 0.4706×100vw − 24px per ogni larghezza
+                    ≥1024px (la funzione vera è convessa: quella retta la
+                    tocca sotto 1333px e le resta sotto sopra). Diviso per
+                    R con un 4-5% di cuscinetto (9.82, non 9.40: il font può
+                    misurare diverso fuori da Chrome) → `(100vw−51px)*0.0479`.
+                    Misurato contro la soglia reale: 46.6 contro 48.7 a 1024,
+                    58.9/61.5 a 1280, 66.5/70.2 a 1440, 89.5/97.3 a 1920.
+                    Oltre ~2500px la colonna smette di crescere perché
+                    `.apex-wrap` si ferma a `--maxw`: da lì il tetto è la
+                    costante `(--maxw − 96px)/9.82`, che tiene le due righe
+                    anche su ultrawide e 4K (dove `--fs-hero` da solo, 144px,
+                    le romperebbe).
+
+                (b) TETTO DI ALTEZZA — `(100vh−392px)*0.333`. Vincolo reale
+                    misurato: sono le MASCOTTE, non le porte (il fondo delle
+                    porte sta sempre (grid−wrap)/2 px più in alto del fondo
+                    del campo fotografico, quindi se le mascotte stanno,
+                    stanno anche le porte). La colonna testo costa
+                    C0 + 1.8×font-size, con C0 = 310px misurati da 1280 in su
+                    (356px a 1024, dove il paragrafo va a capo prima), e deve
+                    stare in 100vh − 60px di navbar − padding. La retta è la
+                    linea di supporto della funzione, presa dal ramo in cui
+                    anche il padding scala (sotto 620px di altezza): sopra
+                    resta conservativa, e comunque lì comanda il tetto di
+                    larghezza. Sotto ~560px di altezza è questo il termine
+                    attivo; sopra comanda (a).
+
+                (c) PAVIMENTO — `var(--fs-body-lg) * 1.5` (28.5px). Prima non
+                    c'era: a 1280×500 il titolo usciva a 5.4px e a 1280×460
+                    a 0px, cioè il claim spariva. Legarlo al token del
+                    sottotitolo rende vero per costruzione il vincolo
+                    "l'h1 non scende mai sotto la taglia del sottotitolo".
+
+                `var(--fs-hero)` resta il primo termine del `min()`: è il
+                tetto della scala DS, la garanzia che il claim non possa mai
+                uscire dalla scala tipografica anche se i due termini
+                geometrici venissero ritarati. Sulla matrice non è mai lui a
+                comandare — con le due righe da rispettare i tetti geometrici
+                sono sempre più stretti (a 1024 vale 113.9px contro i 46.6
+                della larghezza) — ed è esattamente il punto: prima comandava
+                lui, a 1280×1024, e non bastava.
+
+                Sotto `lg` (layout impilato a colonna singola) il termine
+                `6vh` NON è toccato: i tre viewport mobile della matrice
+                danno gli stessi identici numeri di prima. Accanto ha il
+                pavimento e un tetto di larghezza tarato sulla colonna piena
+                (`(100vw−40px)*0.1567`, cioè la parola più larga con il 6% di
+                cuscinetto), entrambi non vincolanti lì — servono per i casi
+                stretti-e-alti (es. 375×1000, dove 6vh da solo spezzerebbe
+                "INSIEME." a metà). */}
             <h1
-              className="apex-display mt-5 max-w-[15ch] text-[length:min(var(--fs-hero),6vh)] lg:text-[length:min(var(--fs-hero),calc((100vh-480px)*0.27))]"
+              className="apex-display mt-5 max-w-[15ch] text-[length:max(calc(var(--fs-body-lg)*1.5),min(var(--fs-hero),6vh,calc((100vw-40px)*0.1567)))] lg:text-[length:max(calc(var(--fs-body-lg)*1.5),min(var(--fs-hero),calc((var(--maxw)-96px)/9.82),calc((100vw-51px)*0.0479),calc((100vh-392px)*0.333)))]"
               style={{ lineHeight: "var(--lh-hero)" }}
             >
               <span className="reveal">In bici,</span>{" "}
