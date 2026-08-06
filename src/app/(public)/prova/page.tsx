@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { SectionHead } from "@/components/apex/SectionHead";
 import { ConsegnaWhatsApp } from "@/components/prova/ConsegnaWhatsApp";
 import { Grain } from "@/components/apex/Grain";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
@@ -21,11 +20,20 @@ export default function ProvaPage() {
 
       <section className="apex-section--hero">
         <div className="apex-wrap">
-          <SectionHead
-            kicker="SCUOLA DI CICLISMO · TERNI"
-            title="Venite a provare, prima di decidere."
-            intro="Fino a due lezioni gratuite, senza iscriversi. Si concorda il giorno e si viene: nessun impegno, né prima né dopo."
-          />
+          {/* Intestazione di pagina. NON usare SectionHead qui: rende sempre
+              <h2> (SectionHead.tsx:59), e questa pagina ha bisogno del suo
+              <h1>. SectionHead resta corretta per gli <h2> di sezione. */}
+          <div className="apex-eyebrow">SCUOLA DI CICLISMO · TERNI</div>
+          <h1
+            className="apex-display mt-5 max-w-[18ch]"
+            style={{ fontSize: "var(--fs-hero)", lineHeight: "var(--lh-hero)" }}
+          >
+            Venite a provare, prima di decidere.
+          </h1>
+          <p className="mt-6 max-w-[56ch] text-stage-ink-dim" style={{ fontSize: "var(--fs-body-lg)" }}>
+            Fino a due lezioni gratuite, senza iscriversi. Si concorda il giorno e si viene: nessun
+            impegno, né prima né dopo.
+          </p>
 
           <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-12">
             <div className="lg:col-span-7">

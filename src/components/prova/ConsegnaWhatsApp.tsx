@@ -1,5 +1,6 @@
 import { getSiteSettings, formatPhoneIT, phoneHref } from "@/lib/site-settings";
 import { whatsappHref, MESSAGGIO_PROVA } from "@/lib/whatsapp";
+import { ApexCta } from "@/components/apex/ApexCta";
 
 /**
  * Il momento di uscita dal sito. Non è un bottone e basta: dice chi
@@ -20,12 +21,9 @@ export async function ConsegnaWhatsApp() {
       </p>
 
       {wa ? (
-        <a href={wa} className="apex-cta apex-cta--primary mt-6 inline-flex">
+        <ApexCta href={wa} className="mt-6">
           Scrivi su WhatsApp
-          <span className="apex-cta__arrow" aria-hidden="true">
-            →
-          </span>
-        </a>
+        </ApexCta>
       ) : null}
 
       {/* Dentro .apex-card--warm il colore dei <p> lo decide la card
