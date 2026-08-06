@@ -15,14 +15,23 @@ export function whatsappHref(
   const trimmed = raw.trim();
   if (!trimmed) return null;
 
-  // wa.me vuole il numero in formato internazionale senza "+", spazi o simboli.
-  const digits = trimmed.startsWith("+")
-    ? trimmed.replace(/[^\d]/g, "")
-    : `39${trimmed.replace(/[^\d]/g, "")}`;
+  // wa.me vuole il numero internazionale in sole cifre. Il campo Airtable è
+  // scritto a mano e arriva in forme diverse: "+39 329 204 0821",
+  // "0039 329...", "39 329...", "329...".
+  let digits = trimmed.replace(/[^\d]/g, "");
 
-  // Un numero italiano in E.164 ha 12 cifre (39 + 10). Sotto le 11 è
-  // certamente malformato: meglio nessun link che un link rotto.
-  if (digits.length < 11) return null;
+  // Prefisso internazionale in forma "00" → via.
+  if (digits.startsWith("00")) digits = digits.slice(2);
+
+  // Disambiguazione per LUNGHEZZA, non per prefisso: i cellulari italiani
+  // hanno prefissi 391/392/393, quindi "inizia per 39" NON significa
+  // "ha il country code". Dieci cifre = numero nazionale, va prefissato.
+  if (digits.length === 10) digits = `39${digits}`;
+
+  // Un numero italiano in E.164 ha 12 cifre e comincia per 39. Tutto il
+  // resto è malformato o straniero: meglio nessun link che un link che
+  // manda un genitore nella chat di uno sconosciuto.
+  if (digits.length !== 12 || !digits.startsWith("39")) return null;
 
   const base = `https://wa.me/${digits}`;
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
