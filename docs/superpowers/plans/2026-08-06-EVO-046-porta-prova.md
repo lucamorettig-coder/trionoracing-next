@@ -91,19 +91,26 @@ git switch -c evo/EVO-046-porta-prova origin/main
 `sips` è preinstallato su macOS e legge HEIC nativamente. La foto è verticale: si conserva l'orientamento e si limita il lato lungo.
 
 ```bash
-sips -s format jpeg -s formatOptions 82 -Z 1867 \
+sips -s format jpeg -s formatOptions 90 -Z 1867 \
   "/Users/luca/Downloads/IMG_4560.heic" \
   --out public/photos/scuola/prima-partenza.jpg
 ```
 
-- [ ] **Step 3: Verificare dimensioni e peso**
+> **Nessun tetto di peso sulla sorgente, ed è deliberato.** Questo file **non viene mai servito**:
+> `next/image` lo ri-codifica in WebP alla dimensione richiesta da ogni breakpoint. Il peso della
+> sorgente non arriva all'utente, mentre la sua qualità è il **tetto** di tutte le varianti servite.
+> Comprimerla per rientrare in un limite inchioda gli artefatti in ogni versione che raggiunge il
+> browser, senza far risparmiare un byte a nessuno. Qualità alta alla sorgente, ottimizzazione
+> delegata a `next/image`.
+
+- [ ] **Step 3: Verificare dimensioni e orientamento**
 
 ```bash
 sips -g pixelWidth -g pixelHeight public/photos/scuola/prima-partenza.jpg
 ls -lh public/photos/scuola/prima-partenza.jpg
 ```
 
-Atteso: verticale (altezza > larghezza), lato lungo 1867px, peso sotto i 600 KB. Se supera 600 KB, riabbassare `formatOptions` a 75 e ripetere.
+Atteso: verticale (altezza > larghezza), lato lungo 1867px. Il peso si annota, non si vincola.
 
 - [ ] **Step 4: Commit**
 
@@ -142,14 +149,23 @@ export function whatsappHref(raw: string | undefined, message?: string): string 
   const trimmed = raw.trim();
   if (!trimmed) return null;
 
-  // wa.me vuole il numero in formato internazionale senza "+", spazi o simboli.
-  const digits = trimmed.startsWith("+")
-    ? trimmed.replace(/[^\d]/g, "")
-    : `39${trimmed.replace(/[^\d]/g, "")}`;
+  // wa.me vuole il numero internazionale in sole cifre. Il campo Airtable è
+  // scritto a mano e arriva in forme diverse: "+39 329 204 0821",
+  // "0039 329...", "39 329...", "329...".
+  let digits = trimmed.replace(/[^\d]/g, "");
 
-  // Un numero italiano in E.164 ha 12 cifre (39 + 10). Sotto le 11 è
-  // certamente malformato: meglio nessun link che un link rotto.
-  if (digits.length < 11) return null;
+  // Prefisso internazionale in forma "00" → via.
+  if (digits.startsWith("00")) digits = digits.slice(2);
+
+  // Disambiguazione per LUNGHEZZA, non per prefisso: i cellulari italiani
+  // hanno prefissi 391/392/393, quindi "inizia per 39" NON significa
+  // "ha il country code". Dieci cifre = numero nazionale, va prefissato.
+  if (digits.length === 10) digits = `39${digits}`;
+
+  // Un numero italiano in E.164 ha 12 cifre e comincia per 39. Tutto il
+  // resto è malformato o straniero: meglio nessun link che un link che
+  // manda un genitore nella chat di uno sconosciuto.
+  if (digits.length !== 12 || !digits.startsWith("39")) return null;
 
   const base = `https://wa.me/${digits}`;
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
@@ -276,11 +292,20 @@ export default function ProvaPage() {
 
       <section className="apex-section--hero">
         <div className="apex-wrap">
-          <SectionHead
-            kicker="SCUOLA DI CICLISMO · TERNI"
-            title="Venite a provare, prima di decidere."
-            intro="Fino a due lezioni gratuite, senza iscriversi. Si concorda il giorno e si viene: nessun impegno, né prima né dopo."
-          />
+          {/* Intestazione di pagina. NON usare SectionHead qui: rende sempre
+              <h2> (SectionHead.tsx:59), e questa pagina ha bisogno del suo
+              <h1>. SectionHead resta corretta per gli <h2> di sezione. */}
+          <div className="apex-eyebrow">SCUOLA DI CICLISMO · TERNI</div>
+          <h1
+            className="apex-display mt-5 max-w-[18ch]"
+            style={{ fontSize: "var(--fs-hero)", lineHeight: "var(--lh-hero)" }}
+          >
+            Venite a provare, prima di decidere.
+          </h1>
+          <p className="mt-6 max-w-[56ch] text-stage-ink-dim" style={{ fontSize: "var(--fs-body-lg)" }}>
+            Fino a due lezioni gratuite, senza iscriversi. Si concorda il giorno e si viene: nessun
+            impegno, né prima né dopo.
+          </p>
 
           <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-12">
             <div className="lg:col-span-7">
@@ -435,27 +460,38 @@ export function PorteHero() {
       <p className="apex-eyebrow text-stage-muted">Due modi per cominciare.</p>
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-        {/* Porta A — la prova */}
+        {/* Porta A — la prova.
+            Il colore della domanda va in `style`, NON con `text-accent`:
+            `.apex-data` in apex.css è una regola unlayered che imposta
+            `color: var(--stage-muted)` e batte le utility Tailwind sullo
+            stesso elemento. Con la utility le due domande uscirebbero
+            entrambe grigie, e né build né lint né typecheck lo vedono. */}
         <div className="flex flex-col items-start">
-          <p className="apex-data text-accent">Tuo figlio non ha mai provato?</p>
+          <p className="apex-data" style={{ color: "var(--accent)" }}>
+            Tuo figlio non ha mai provato?
+          </p>
           <ApexCta href="/prova" className="mt-3">
             Prenota una prova
           </ApexCta>
-          <p className="apex-data mt-3 text-stage-muted">
+          {/* Il prezzo eredita `--stage-muted` da `.apex-data`: nessuna
+              utility di colore, sarebbe ridondante e neutralizzata. */}
+          <p className="apex-data mt-3">
             Fino a 2 lezioni, gratis · basta una bici qualsiasi e il casco
           </p>
         </div>
 
         {/* Porta B — l'iscrizione */}
         <div className="flex flex-col items-start">
-          <p className="apex-data text-accent-2">Hai già deciso?</p>
+          <p className="apex-data" style={{ color: "var(--accent-2)" }}>
+            Hai già deciso?
+          </p>
           <ApexCta href="/portale/iscrizioni" variant="support" className="mt-3">
             Iscrivi tuo figlio
           </ApexCta>
           {/* Sotto i 553px di altezza utile il prezzo di porta B scende per
               progetto: è una riga da 11px per chi ha già deciso, e quei pixel
               servono a tenere entrambe le porte sopra la piega su iPhone SE. */}
-          <p className="apex-data mt-3 hidden text-stage-muted [@media(min-height:554px)]:block">
+          <p className="apex-data mt-3 hidden [@media(min-height:554px)]:block">
             Tutto online · foto e certificato medico
           </p>
         </div>
@@ -532,7 +568,11 @@ export function FotoHero() {
         className="object-cover object-center"
       />
 
-      {/* Mascotte: due su desktop, una sola su mobile (budget prop APEX). */}
+      {/* Mascotte: due su desktop, una sola su mobile (budget prop APEX).
+          Le dimensioni sono quelle REALI dei cutout, verificate con `sips`:
+          sono figure alte e strette (rapporto ~1:2,5). Passare un rapporto
+          diverso a `next/image` le schiaccia, perché con `h-auto` l'altezza
+          si deriva da width/height. */}
       <StageProp
         level="oggetti"
         anchor={{ left: "2%", bottom: 0, width: "min(160px, 22%)" }}
@@ -541,9 +581,9 @@ export function FotoHero() {
           src="/vittoria/vittoria-figura-poster.png"
           alt=""
           aria-hidden
-          width={420}
-          height={640}
-          className="h-auto w-full object-bottom"
+          width={744}
+          height={1902}
+          className="h-auto w-full"
         />
       </StageProp>
 
@@ -556,9 +596,9 @@ export function FotoHero() {
           src="/nino/nino-figura-poster.png"
           alt=""
           aria-hidden
-          width={420}
-          height={640}
-          className="h-auto w-full object-bottom"
+          width={708}
+          height={1734}
+          className="h-auto w-full"
         />
       </StageProp>
     </div>
@@ -598,7 +638,11 @@ export async function HomeHero() {
 
   return (
     <StageScene className="min-h-[86vh]">
-      <div className="grid h-full grid-cols-1 lg:grid-cols-[52fr_46fr]">
+      {/* `minmax(0, …)` su entrambe le colonne è obbligatorio: un track `fr`
+          nudo ha `min-width: auto`, quindi si allarga sul min-content del
+          titolo e la colonna della fotografia si restringe (misurato:
+          912/513 invece di 764/676). Stessa famiglia del bug EVO-044. */}
+      <div className="grid h-full grid-cols-1 lg:grid-cols-[minmax(0,52fr)_minmax(0,46fr)]">
         {/* Campo tipografico */}
         <div className="relative flex items-center py-20 lg:py-24">
           <FondaleVivo src={videoSrc} poster={sfondo?.posterUrl} />
@@ -757,9 +801,16 @@ export async function FasciaRegia() {
   return (
     <section className="border-y border-stage-line bg-stage-surface">
       <div className="apex-wrap grid grid-cols-1 gap-8 py-10 md:grid-cols-3 md:gap-10">
-        {/* ① La prova */}
+        {/* ① La prova.
+            Colore in `style`, NON con `text-accent`: `.apex-eyebrow` è una
+            regola unlayered che fissa `color: var(--stage-muted)` e batte le
+            utility Tailwind sullo stesso elemento — il titolo uscirebbe
+            grigio come gli altri due, perdendo l'unico accento della fascia.
+            Stessa trappola documentata in PorteHero. */}
         <div>
-          <p className="apex-eyebrow text-accent">La prova · subito</p>
+          <p className="apex-eyebrow" style={{ color: "var(--accent)" }}>
+            La prova · subito
+          </p>
           <p className="mt-2 text-[15px] leading-relaxed">
             Due lezioni gratuite, senza iscriversi.
           </p>
@@ -784,7 +835,9 @@ export async function FasciaRegia() {
 
         {/* ② In programma — da Airtable, un evento alla volta */}
         <div>
-          <p className="apex-eyebrow text-stage-muted">In programma</p>
+          {/* Nessuna utility di colore: `.apex-eyebrow` fissa già
+              `--stage-muted`, e la utility sarebbe morta. */}
+          <p className="apex-eyebrow">In programma</p>
           {primo ? (
             <>
               <p className="mt-2 text-[15px] font-semibold leading-snug">{primo.titolo}</p>
@@ -817,7 +870,7 @@ export async function FasciaRegia() {
 
         {/* ③ Allenamenti */}
         <div>
-          <p className="apex-eyebrow text-stage-muted">Allenamenti</p>
+          <p className="apex-eyebrow">Allenamenti</p>
           <p className="mt-2 text-[15px] leading-relaxed">
             Martedì strada · Giovedì MTB
             <br />
