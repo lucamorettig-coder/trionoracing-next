@@ -3,7 +3,6 @@ import { ApexCta } from "@/components/apex/ApexCta";
 import { getSfondoVideo, cloudinaryVideoOptimized } from "@/lib/sfondi-video";
 import { getSiteSettings, formatPhoneIT, phoneHref } from "@/lib/site-settings";
 import { Phone } from "lucide-react";
-import { CONTACT_EMAIL } from "@/lib/seo";
 
 /**
  * CTA Scuola — APEX (EVO-039), livrea Scuola. Stesso pattern strutturale
@@ -49,7 +48,7 @@ export async function CtaScuola() {
           <ApexCta variant="primary" href="/portale/iscrizioni">
             Iscrivi tuo figlio
           </ApexCta>
-          <ApexCta variant="ghost" href={`mailto:${CONTACT_EMAIL}`}>
+          <ApexCta variant="ghost" href="/contatti?motivo=scuola">
             Scrivici
           </ApexCta>
           {telefono && (

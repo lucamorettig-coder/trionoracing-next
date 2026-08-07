@@ -91,7 +91,7 @@ export function HeroManifesto() {
             Diventa Maestro della nostra Scuola di Ciclismo.
           </p>
           <div className="mt-8 flex justify-center sm:justify-start reveal reveal-delay-3">
-            <ApexCta href="#contatti">Contattaci</ApexCta>
+            <ApexCta href="/contatti">Contattaci</ApexCta>
           </div>
         </div>
       </div>
