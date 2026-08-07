@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { CONTACT_EMAIL } from "@/lib/seo";
+import { sendTelegramMessage } from "@/lib/telegram";
+import {
+  buildAirtableRecordUrl,
+  formatContattoTelegram,
+} from "@/lib/notifiche-contatti";
 
 /**
  * POST /api/contatti
@@ -101,6 +106,10 @@ export async function POST(req: Request) {
   const userAgent = req.headers.get("user-agent") || undefined;
   const referer = req.headers.get("referer") || undefined;
 
+  // Un solo timestamp per il record e per la notifica: due `new Date()` a
+  // distanza di millisecondi mostrerebbero orari diversi per lo stesso evento.
+  const ricevutoIl = new Date().toISOString();
+
   const payload: AirtableRecordPayload = {
     fields: {
       NOME: data.nome,
@@ -109,7 +118,7 @@ export async function POST(req: Request) {
       MESSAGGIO: data.messaggio,
       PRIVACY_OK: data.privacy_ok,
       STATO: "Nuovo",
-      RICEVUTO_IL: new Date().toISOString(),
+      RICEVUTO_IL: ricevutoIl,
       ...(data.cognome ? { COGNOME: data.cognome } : {}),
       ...(data.telefono ? { TELEFONO: data.telefono } : {}),
       ...(userAgent ? { USER_AGENT: userAgent } : {}),
@@ -135,6 +144,38 @@ export async function POST(req: Request) {
       { error: "Salvataggio fallito. Riprova tra qualche minuto." },
       { status: 502 },
     );
+  }
+
+  // Notifica Telegram — best effort. Il contatto è già salvato: qualunque cosa
+  // succeda qui, il visitatore riceve comunque 201. Un fallimento resta nei log
+  // Vercel insieme al recordId, così è rintracciabile su Airtable.
+  let recordId: string | undefined;
+  try {
+    const creato = (await airtableRes.json()) as { id?: string };
+    recordId = creato.id;
+
+    const testo = formatContattoTelegram(
+      {
+        nome: data.nome,
+        cognome: data.cognome || undefined,
+        email: data.email,
+        telefono: data.telefono || undefined,
+        motivo: data.motivo,
+        messaggio: data.messaggio,
+      },
+      {
+        ricevutoIl,
+        recordUrl: buildAirtableRecordUrl(
+          AIRTABLE_BASE_ID,
+          process.env.AIRTABLE_CONTATTI_TABLE_ID,
+          recordId,
+        ),
+      },
+    );
+
+    await sendTelegramMessage(testo);
+  } catch (err) {
+    console.error("[contatti] notifica Telegram non inviata", recordId, err);
   }
 
   return NextResponse.json({ ok: true }, { status: 201 });
