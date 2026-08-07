@@ -21,12 +21,19 @@ export function SezioneMarathon() {
       </StageProp>
 
       <div className="apex-wrap relative" style={{ zIndex: "var(--z-pista)" }}>
-        <div className="grid lg:grid-cols-12 gap-10 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <div
-            className="lg:col-span-7 reveal"
-            // "ORGANIZZIAMO" a fs-display espanso trabocca la colonna 7/12:
-            // qui il titolo LAP scende a fs-h1 (override locale del token fluido)
-            style={{ ["--fs-display" as string]: "var(--fs-h1)" }}
+            className="lg:col-span-7 reveal [--fs-display:clamp(1.65rem,1rem_+_3vw,2.5rem)] lg:[--fs-display:var(--fs-h1)]"
+            // "ORGANIZZIAMO" a fs-display espanso trabocca la colonna 7/12 da
+            // `lg` in su: qui il titolo scende a fs-h1 (override locale del
+            // token fluido). Sotto `lg` (colonna singola impilata, niente
+            // vincolo di 7/12) fs-h1 resta comunque troppo largo per la
+            // singola parola "organizziamo" sui viewport stretti — misurato
+            // 367px di parola contro una colonna di 335px a 375px di
+            // viewport: va a capo a metà parola ("ORGANIZZIAM/O"), invisibile
+            // a build/lint/typecheck. Floor più basso sotto `lg` (clamp
+            // 1.65rem→2.5rem) verificato a 320/375/414/639px: la parola
+            // resta sempre sotto la larghezza colonna disponibile.
           >
             <SectionHead
               reveal={false}
@@ -44,7 +51,7 @@ export function SezioneMarathon() {
             />
             <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
               <span className="apex-data inline-flex items-center gap-2 text-stage-ink-dim">
-                <CalendarDays className="w-4 h-4 text-accent" aria-hidden /> 28 giugno 2026
+                <CalendarDays className="w-4 h-4 text-accent" aria-hidden /> 2027 · data da definire
               </span>
               <span className="apex-data inline-flex items-center gap-2 text-stage-ink-dim">
                 <MapPin className="w-4 h-4 text-accent" aria-hidden /> Arrone (TR)

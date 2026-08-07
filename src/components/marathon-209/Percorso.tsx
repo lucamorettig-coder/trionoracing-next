@@ -18,7 +18,7 @@ export function Percorso({ percorsi }: Props) {
           <SectionHead
             kicker="I percorsi"
             title="Calendario percorsi in aggiornamento."
-            intro="Stiamo finalizzando il setup dei percorsi 2026. Per i dettagli aggiornati visita il sito ufficiale."
+            intro="Stiamo finalizzando il setup dei percorsi per la prossima edizione (2027). Per i dettagli aggiornati visita il sito ufficiale."
           />
           <div className="mt-8">
             <a

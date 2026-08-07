@@ -53,7 +53,7 @@ const milestones = [
       <p>
         Oggi la Scuola opera con due lezioni settimanali al Ciclodromo Renato Perona di Terni:
         bici da strada il martedì, mountain bike il giovedì. La squadra amatori continua a
-        crescere, la Marathon 209 prepara la sua sesta edizione il 28 giugno 2026 ad Arrone.
+        crescere, la Marathon 209 prepara la sua sesta edizione nel 2027 ad Arrone.
       </p>
     ),
   },

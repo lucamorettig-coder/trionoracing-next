@@ -5,7 +5,7 @@ const publicLinks = [
   { label: "Scuola", href: "/la-scuola" },
   { label: "Amatori", href: "/gli-amatori-triono" },
   { label: "Chi siamo", href: "/chi-siamo" },
-  { label: "Marathon 209", href: "/marathon-209", badge: "2026" },
+  { label: "Marathon 209", href: "/marathon-209", badge: "2027" },
   { label: "Diventa Maestro", href: "/diventa-maestro" },
   { label: "Contatti", href: "/contatti" },
 ];
