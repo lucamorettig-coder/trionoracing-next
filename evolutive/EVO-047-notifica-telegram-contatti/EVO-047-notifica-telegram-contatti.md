@@ -100,17 +100,11 @@ Il punto di innesto della notifica è **dopo** l'ultimo `if (!airtableRes.ok)`: 
 
 `CONTATTI` esiste **solo sulla base PROD** `appszpkU1aXb3xrFM` (`tbluCORj8zJjtWMC6`): `NOME`, `COGNOME`, `EMAIL`, `TELEFONO`, `MOTIVO` (singleSelect: Scuola di Ciclismo · Tesseramento Amatori · Marathon 209 · Altro · Lezione di prova), `MESSAGGIO`, `PRIVACY_OK`, `STATO` (Nuovo · Letto · In lavorazione · Risposto · Chiuso), `RICEVUTO_IL`, `USER_AGENT`, `REFERER`. Sulla base DEV `app7FOqBdmmW0jBf5` **la tabella non c'è** — il consueto disallineamento DEV/PROD già segnalato in `AGENTS.md` (EVO-016/019/020).
 
-### Env su Vercel — due buchi che condizionano il collaudo
+### Env su Vercel
 
-Verificato con `vercel env ls` + `vercel env pull --environment=preview`:
+> **⚠️ Correzione (post-chiusura, 2026-08-07).** Questa sezione affermava che su Preview `AIRTABLE_BASE_ID` e `AIRTABLE_TOKEN` fossero **vuote** e che quindi il form contatti rispondesse `503` su ogni deploy di preview. **Era sbagliato.** Quelle env sono marcate *Sensitive* e `vercel env pull` non ne restituisce il valore: scrive `"[SENSITIVE]"` (CLI recente) o **stringa vuota** (CLI ≤54.x, quello usato qui). Il "valore vuoto" letto era un placeholder, non un dato. Il form in preview non è mai stato testato — e non è testabile senza autenticazione, perché i deploy di preview rispondono `401` per la Deployment Protection. L'affermazione era una deduzione da un dato inaffidabile, non un fatto verificato.
 
-| Env | Production | Preview | Development |
-|---|---|---|---|
-| `AIRTABLE_BASE_ID` | valorizzata | **vuota (`""`)** | valorizzata |
-| `AIRTABLE_TOKEN` | valorizzata | **vuota (`""`)** | valorizzata |
-| `SUMUP_*`, `MAKE_SUMUP_RETURN_URL` | valorizzate | valorizzate | valorizzate |
-
-Conseguenza: **sui deploy di preview il form contatti risponde già oggi `503`**, perché il guard iniziale della route scatta su env vuote. Non è una regressione di questa evolutiva, ma ne condiziona il piano di collaudo: o si valorizzano le due env di Preview (con la base DEV, dopo averci creato `CONTATTI`), oppure il collaudo va fatto in produzione con un contatto di test da cancellare. Da decidere in fase 4.
+Quel che resta valido: le env server-side di questa evolutiva (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `AIRTABLE_CONTATTI_TABLE_ID`) vanno impostate **per ambiente**, e `AIRTABLE_CONTATTI_TABLE_ID` deve avere valori diversi tra Production (`tbluCORj8zJjtWMC6`) e Preview (`tblceBbZLrTGnR7vA`, la tabella creata su DEV). Il valore di una env sensitive non è leggibile da nessuno, nemmeno dalla dashboard: l'unico modo per esserne certi è riscriverlo.
 
 ### Privacy e legale
 

@@ -66,7 +66,9 @@ Non applicabile in senso stretto: l'evolutiva non produce UI. L'unica modifica r
 1. **Correggere `ELEGRAM_BOT_TOKEN` → `TELEGRAM_BOT_TOKEN`** su Vercel (Production e Preview). Senza, in produzione la notifica non parte e non se ne accorge nessuno.
 2. **Test end-to-end in produzione** dopo il fix: un contatto di test dal form reale, verifica della notifica, cancellazione del record da `CONTATTI`.
 
-**Azioni consigliate (non bloccanti):**
+**Azioni consigliate (non bloccanti):** — _aggiornate il 2026-08-07, dopo la chiusura_
 
-- Su Preview, `AIRTABLE_CONTATTI_TABLE_ID` dovrebbe valere `tblceBbZLrTGnR7vA` (tabella DEV) e non l'ID di PROD, altrimenti il link "Apri su Airtable" delle notifiche di preview punta alla tabella sbagliata.
-- `AIRTABLE_BASE_ID` e `AIRTABLE_TOKEN` su Preview restano stringhe vuote: finché è così il form contatti in preview risponde `503` (problema pre-esistente, non introdotto qui).
+- **Fatto**: su Preview sono stati riscritti `AIRTABLE_BASE_ID` (`app7FOqBdmmW0jBf5`, base DEV), `AIRTABLE_CONTATTI_TABLE_ID` (`tblceBbZLrTGnR7vA`, tabella DEV) e `TELEGRAM_CHAT_ID`.
+- **Resta all'utente**: riscrivere `AIRTABLE_TOKEN` su Preview se vuole la certezza che sia valorizzato — il valore non è leggibile perché la variabile è *sensitive*.
+
+> **⚠️ Correzione a questo report.** La versione precedente affermava che `AIRTABLE_BASE_ID` e `AIRTABLE_TOKEN` fossero "stringhe vuote" su Preview e che il form lì rispondesse `503`. **Non era vero**: `vercel env pull` non legge le variabili *sensitive* e restituisce un placeholder (`"[SENSITIVE]"`, o stringa vuota sui CLI ≤54.x). Il form in preview non è mai stato testato e non è testabile senza autenticazione (Deployment Protection → `401`).
