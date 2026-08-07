@@ -71,7 +71,25 @@ export function SezioneCorsi() {
         <div className="grid md:grid-cols-2 gap-5">
           {/* Corso MTB-BDC — più completo */}
           <div className="reveal reveal-delay-1">
-            <ApexCard index="/ 01" title="Corso MTB · BDC">
+            <ApexCard
+              index="/ 01"
+              title="Corso MTB · BDC"
+              /* Foto reale della lezione su strada in testa alla card: la
+                 formula completa si capisce prima dalle bici da corsa dei
+                 bambini che da qualunque riga di testo. `<Image fill>` va
+                 passato NUDO — il riquadro 4:3 e l'overflow li fissa già
+                 `.apex-card--photo .apex-card__photo` (un secondo
+                 aspect-ratio annidato verrebbe tagliato, lezione EVO-042). */
+              photo={
+                <Image
+                  src="/photos/scuola/gruppo-strada-ciclodromo.webp"
+                  alt="Tre allievi della Scuola Triono in sella alle bici da strada ascoltano la maestra sulla pista del ciclodromo"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 45vw"
+                  className="object-cover [object-position:50%_42%]"
+                />
+              }
+            >
               <Toppa className="absolute top-4 right-4" decorative={false}>
                 Più completo
               </Toppa>
@@ -92,7 +110,19 @@ export function SezioneCorsi() {
 
           {/* Corso MTB */}
           <div className="reveal reveal-delay-2">
-            <ApexCard index="/ 02" title="Corso MTB">
+            <ApexCard
+              index="/ 02"
+              title="Corso MTB"
+              photo={
+                <Image
+                  src="/photos/scuola/salita-mtb-prato.webp"
+                  alt="Due allievi in mountain bike affrontano una salita sul prato durante la lezione del giovedì"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 45vw"
+                  className="object-cover [object-position:50%_38%]"
+                />
+              }
+            >
               <div className="font-mono text-[11px] font-bold uppercase tracking-wide text-accent mb-3">
                 1 lezione / settimana
               </div>

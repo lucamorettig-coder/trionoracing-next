@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Doodle } from "@/components/apex/propkit/scuola/Doodle";
 
 /**
@@ -36,6 +37,26 @@ export function SezioneFilosofia() {
               <br />
               UNESCO · Ginevra, 1992
             </p>
+
+            {/* La prova che la Carta non è un manifesto appeso al muro: un
+                bambino che si diverte davvero, in una sera qualunque di
+                lezione. Sotto la citazione, nella colonna sticky, così
+                accompagna la lettura del testo lungo accanto. Duotone di
+                livrea come ogni altra fotografia del sistema APEX. */}
+            {/* Su mobile la foto sta in un 4:3 (a piena larghezza un 3:4
+                occuperebbe mezzo schermo in una sezione già lunga); da lg
+                torna verticale, formato nativo dello scatto. */}
+            <figure className="mt-8">
+              <div className="apex-duotone relative aspect-[4/3] lg:aspect-[3/4] w-full overflow-hidden border border-stage-line">
+                <Image
+                  src="/photos/scuola/sorriso-tra-i-coni.webp"
+                  alt="Un allievo della Scuola Triono sorride in sella alla bici durante un esercizio tra i coni, al tramonto"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="object-cover [object-position:50%_35%]"
+                />
+              </div>
+            </figure>
           </div>
 
           {/* Colonna testo — il documento che guida la scuola */}

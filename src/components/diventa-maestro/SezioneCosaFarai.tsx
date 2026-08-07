@@ -41,34 +41,56 @@ export function SezioneCosaFarai() {
           className="max-w-[720px]"
         />
 
-        <div className="reveal reveal-delay-1 mt-8 flex flex-wrap gap-3">
-          {GIORNI.map((g) => (
-            <span
-              key={g}
-              className="inline-flex items-center rounded-[var(--radius-lg)] border border-stage-line bg-stage-surface px-4 py-2 text-[13.5px] font-semibold text-stage-ink"
-            >
-              {g}
-            </span>
-          ))}
+        {/* Giorni + promessa al candidato a sinistra, e accanto la foto che
+            mostra esattamente quella promessa: un maestro a fianco dell'allievo
+            in gara. La griglia parte da qui (non dal solo paragrafo finale):
+            così la colonna di testo copre l'altezza della foto verticale invece
+            di lasciare mezza colonna vuota. Su mobile la foto va in fondo — il
+            testo è ciò che il candidato deve leggere per primo. */}
+        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)] lg:items-start">
+          <div>
+            <div className="reveal reveal-delay-1 flex flex-wrap gap-3">
+              {GIORNI.map((g) => (
+                <span
+                  key={g}
+                  className="inline-flex items-center rounded-[var(--radius-lg)] border border-stage-line bg-stage-surface px-4 py-2 text-[13.5px] font-semibold text-stage-ink"
+                >
+                  {g}
+                </span>
+              ))}
+            </div>
+
+            <p className="reveal reveal-delay-2 mt-4 max-w-[60ch] text-[14px] leading-relaxed text-stage-ink-dim">
+              Sono i pomeriggi in cui la Scuola è attiva, e restano questi anche dopo l&rsquo;anno di
+              formazione.
+            </p>
+
+            {/* Tutela dei minori detta in forma pratica: la stessa frase protegge i
+                bambini E risponde al "mi buttano nella mischia?" del candidato.
+                Volutamente nessun accenno esplicito ad abusi — su una pagina di
+                reclutamento introdurrebbe un'ombra fuori luogo. */}
+            <p className="reveal reveal-delay-3 mt-8 max-w-[62ch] text-lg leading-relaxed text-stage-ink">
+              Non sarai mai solo con il gruppo: al ciclodromo si lavora sempre in almeno due, e per
+              tutto l&rsquo;anno di formazione sei affiancato da un maestro esperto.
+            </p>
+            <p className="reveal reveal-delay-3 mt-3 max-w-[62ch] text-[14px] leading-relaxed text-stage-ink-dim">
+              La Scuola ha un responsabile per la tutela dei minori, come prevede la normativa
+              sportiva.
+            </p>
+          </div>
+
+          <figure className="reveal reveal-delay-4">
+            <div className="apex-duotone relative aspect-[4/3] lg:aspect-[3/4] w-full overflow-hidden border border-stage-line">
+              <Image
+                src="/photos/scuola/maestri-in-campo.webp"
+                alt="Un maestro della Scuola Triono accompagna a piedi un allievo in mountain bike lungo il percorso di gara"
+                fill
+                sizes="(max-width: 1024px) 100vw, 320px"
+                className="object-cover [object-position:50%_35%]"
+              />
+            </div>
+          </figure>
         </div>
-
-        <p className="reveal reveal-delay-2 mt-4 max-w-[60ch] text-[14px] leading-relaxed text-stage-ink-dim">
-          Sono i pomeriggi in cui la Scuola è attiva, e restano questi anche dopo l&rsquo;anno di
-          formazione.
-        </p>
-
-        {/* Tutela dei minori detta in forma pratica: la stessa frase protegge i
-            bambini E risponde al "mi buttano nella mischia?" del candidato.
-            Volutamente nessun accenno esplicito ad abusi — su una pagina di
-            reclutamento introdurrebbe un'ombra fuori luogo. */}
-        <p className="reveal reveal-delay-3 mt-8 max-w-[62ch] text-lg leading-relaxed text-stage-ink">
-          Non sarai mai solo con il gruppo: al ciclodromo si lavora sempre in almeno due, e per
-          tutto l&rsquo;anno di formazione sei affiancato da un maestro esperto.
-        </p>
-        <p className="reveal reveal-delay-3 mt-3 max-w-[62ch] text-[14px] leading-relaxed text-stage-ink-dim">
-          La Scuola ha un responsabile per la tutela dei minori, come prevede la normativa
-          sportiva.
-        </p>
 
         <ul className="reveal reveal-delay-4 mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
           {FOTO.map((f) => (
