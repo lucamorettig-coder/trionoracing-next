@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { ApexCta } from "@/components/apex/ApexCta";
-import { CONTACT_EMAIL } from "@/lib/seo";
 
 /**
  * Hero della Scuola — APEX livrea Scuola (EVO-041, ridisegno).
@@ -71,7 +70,7 @@ export function ScuolaHero() {
 
             <div className="mt-7 flex flex-wrap gap-3 reveal reveal-delay-3">
               <ApexCta href="/portale/iscrizioni">Iscrivi tuo figlio</ApexCta>
-              <ApexCta href={`mailto:${CONTACT_EMAIL}`} variant="ghost">
+              <ApexCta href="/contatti?motivo=scuola" variant="ghost">
                 Scrivici
               </ApexCta>
             </div>

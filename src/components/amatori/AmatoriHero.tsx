@@ -1,7 +1,6 @@
 import { FondaleVivo } from "@/components/apex/FondaleVivo";
 import { ApexCta } from "@/components/apex/ApexCta";
 import { getSfondoVideo, cloudinaryVideoOptimized } from "@/lib/sfondi-video";
-import { CONTACT_EMAIL } from "@/lib/seo";
 
 /**
  * Hero-palco APEX (livrea Racing) per /gli-amatori-triono.
@@ -42,7 +41,7 @@ export async function AmatoriHero() {
             </p>
             <div className="mt-7 flex flex-wrap gap-3 reveal reveal-delay-3">
               <ApexCta href="/contatti?motivo=tesseramento">Unisciti alla squadra</ApexCta>
-              <ApexCta href={`mailto:${CONTACT_EMAIL}`} variant="ghost">
+              <ApexCta href="/contatti?motivo=tesseramento" variant="ghost">
                 Scrivici
               </ApexCta>
             </div>

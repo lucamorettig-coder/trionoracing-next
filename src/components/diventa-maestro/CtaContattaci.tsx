@@ -4,8 +4,6 @@ import { Phone, Mail } from "lucide-react";
 
 const TELEFONO = "329 2040821";
 const TELEFONO_HREF = "tel:+393292040821";
-const EMAIL = "segreteria.scuola@trionoracing.it";
-const MAILTO_HREF = `mailto:${EMAIL}?subject=${encodeURIComponent("Voglio diventare Maestro della Scuola")}&body=${encodeURIComponent("Ciao,\n\nsono interessato/a a diventare Maestro della Scuola di Ciclismo Triono. Vi lascio i miei contatti:\n\nNome:\nTelefono:\nDisponibilità (giorni/orari):\n\nGrazie!")}`;
 
 /**
  * CTA finale "Contattaci" — chiude il cerchio con l'hero manifesto usando
@@ -62,14 +60,14 @@ export function CtaContattaci() {
               <Phone size={17} aria-hidden />
               <span className="font-mono">{TELEFONO}</span>
             </a>
-            <a href={MAILTO_HREF} className="apex-cta apex-cta--ghost">
+            <Link href="/contatti" className="apex-cta apex-cta--ghost">
               <Mail size={17} aria-hidden />
-              {EMAIL}
-            </a>
+              Scrivici dal form
+            </Link>
           </div>
 
           <p className="mt-6 text-[14px] leading-relaxed text-stage-ink-dim">
-            Una telefonata o due righe via mail: ci conosciamo con calma, senza impegno.
+            Una telefonata o due righe nel form: ci conosciamo con calma, senza impegno.
           </p>
 
           <p className="mt-3 text-[14px] leading-relaxed text-stage-ink-dim">
