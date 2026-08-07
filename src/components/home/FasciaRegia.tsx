@@ -6,6 +6,7 @@ import {
 } from "@/lib/comunicazioni-hero";
 import { getSiteSettings } from "@/lib/site-settings";
 import { whatsappHref, MESSAGGIO_PROVA } from "@/lib/whatsapp";
+import { CalendarDays, Clock } from "@/components/ui/icons";
 
 /**
  * Fascia di regia — il livello operativo della home (EVO-046).
@@ -60,14 +61,16 @@ export async function FasciaRegia() {
   return (
     <section className="border-y border-stage-line bg-stage-surface">
       <div className="apex-wrap grid grid-cols-1 gap-8 py-10 md:grid-cols-3 md:gap-10">
-        {/* ① La prova.
-            Colore in `style`, NON con `text-accent`: `.apex-eyebrow` è una
-            regola unlayered che fissa `color: var(--stage-muted)` e batte le
-            utility Tailwind sullo stesso elemento — il titolo uscirebbe
-            grigio come gli altri due, perdendo l'unico accento della fascia.
-            Stessa trappola documentata in PorteHero. */}
+        {/* ① La prova — "subito" è per definizione l'unico slot sempre live:
+            riusa il pattern nav__live/live-dot già pronto in apex.css per lo
+            stato "live" (mai consumato finora, stesso pattern di attivazione
+            scaffolding-non-usato di EVO-043/impeccable /prova). Nessun
+            `text-accent`: `.apex-nav__live` fissa già `color: var(--accent)`
+            in CSS non-layered, stessa ragione per cui slot 1 non usava
+            `text-accent` prima (`.apex-eyebrow` batteva la utility). */}
         <div>
-          <p className="apex-eyebrow" style={{ color: "var(--accent)" }}>
+          <p className="apex-nav__live">
+            <span className="apex-live-dot" aria-hidden />
             La prova · subito
           </p>
           <p className="mt-2 text-[15px] leading-relaxed">
@@ -92,11 +95,18 @@ export async function FasciaRegia() {
           )}
         </div>
 
-        {/* ② In programma — da Airtable, un evento alla volta */}
-        <div>
-          {/* Nessuna utility di colore: `.apex-eyebrow` fissa già
-              `--stage-muted`, e la utility sarebbe morta. */}
-          <p className="apex-eyebrow">In programma</p>
+        {/* ② In programma — da Airtable, un evento alla volta.
+            Divisore verticale (hairline esistente, `border-stage-line-soft`,
+            stesso token usato altrove per i separatori) per dare alla fascia
+            la struttura di un vero pannello dati invece di tre paragrafi
+            fluttuanti. L'icona porta `text-accent` DIRETTAMENTE su di sé
+            (non sul wrapper `.apex-eyebrow`): stessa trappola color della
+            nota sopra, la utility sull'icona non ha nulla contro cui perdere
+            perché non è `.apex-eyebrow`/`.apex-data` a portarla. */}
+        <div className="md:border-l md:border-stage-line-soft md:pl-8">
+          <p className="apex-eyebrow inline-flex items-center gap-2">
+            <CalendarDays className="w-4 h-4 text-accent" aria-hidden /> In programma
+          </p>
           {primo ? (
             <>
               <p className="mt-2 text-[15px] font-semibold leading-snug">
@@ -143,8 +153,10 @@ export async function FasciaRegia() {
         </div>
 
         {/* ③ Allenamenti */}
-        <div>
-          <p className="apex-eyebrow">Allenamenti</p>
+        <div className="md:border-l md:border-stage-line-soft md:pl-8">
+          <p className="apex-eyebrow inline-flex items-center gap-2">
+            <Clock className="w-4 h-4 text-accent" aria-hidden /> Allenamenti
+          </p>
           <p className="mt-2 text-[15px] leading-relaxed">
             Martedì strada · Giovedì MTB
             <br />
