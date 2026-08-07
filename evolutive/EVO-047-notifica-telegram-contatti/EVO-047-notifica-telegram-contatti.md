@@ -3,11 +3,11 @@
 | | |
 |---|---|
 | **ID / slug** | EVO-047 / `notifica-telegram-contatti` |
-| **Stato** | pianificazione |
+| **Stato** | chiusa |
 | **Aperta il** | 2026-08-07 |
-| **Chiusa il** | — |
-| **Branch / PR** | `evo/EVO-047-notifica-telegram-contatti` / — |
-| **URL produzione** | — |
+| **Chiusa il** | 2026-08-07 |
+| **Branch / PR** | `evo/EVO-047-notifica-telegram-contatti` / [#123](https://github.com/lucamorettig-coder/trionoracing-next/pull/123) (+ [#124](https://github.com/lucamorettig-coder/trionoracing-next/pull/124) docs) |
+| **URL produzione** | https://trionoracing.it/contatti |
 | **Evolutiva ombrello** | — |
 | **impeccable** | sì (rilevato in fase 0) |
 
@@ -216,7 +216,7 @@ L'unico artefatto che una persona guarderà davvero è **il messaggio Telegram**
 | F PR | ✅ | [#123](https://github.com/lucamorettig-coder/trionoracing-next/pull/123), 5 commit. Il worktree ha impedito a `gh` il passo locale, ma il merge lato GitHub è avvenuto. |
 | G OK utente | ✅ | OK esplicito dell'utente in chat. |
 | H squash merge | ✅ | `6feff31` su `main`. Branch remoto cancellato a mano (`gh --delete-branch` non ha potuto: `'main' is already used by worktree`). |
-| I post-deploy | ⚠️ **parziale** | Privacy live su https://trionoracing.it/privacy (Telegram in §6, "Emirati Arabi Uniti" in §7). **Notifica NON verificabile in produzione**: `TELEGRAM_BOT_TOKEN` assente su Vercel Production. |
+| I post-deploy | ✅ | Privacy live (Telegram in §6, "Emirati Arabi Uniti" in §7). Notifica verificata in produzione con due contatti di test dal form reale: **entrambe ricevute su Telegram**. Prima serviva correggere il refuso `ELEGRAM_BOT_TOKEN` su Vercel e rifare un deploy. Record di test rimossi da `CONTATTI` PROD. |
 | J verify-implementation | ✅ | Skill puntata su un altro progetto → report manuale: [`verifica.md`](./verifica.md). 12/13 check superati. |
 | K report finale | ✅ | Consegnato in chat; pattern consolidati in `AGENTS.md`. |
 
@@ -246,22 +246,17 @@ Verifica aggiuntiva della funzione pura (compilata in una dir temporanea ed eseg
 
 ## 8. Verifica e go-live
 
-**Esito: ⚠️ mergeata e deployata, NON ancora chiusa.** La chiusura richiede tre evidenze; due ci sono, la terza no.
+**Esito: ✅ chiusa.** Le tre evidenze richieste ci sono tutte.
 
 | Evidenza | Stato |
 |---|---|
-| PR mergeata | ✅ [#123](https://github.com/lucamorettig-coder/trionoracing-next/pull/123), squash `6feff31` su `main` |
+| PR mergeata | ✅ [#123](https://github.com/lucamorettig-coder/trionoracing-next/pull/123), squash `6feff31` su `main` (+ [#124](https://github.com/lucamorettig-coder/trionoracing-next/pull/124) docs, squash `2c4afc5`) |
+| Produzione verificata | ✅ due contatti di test inviati dal form reale di https://trionoracing.it/contatti → **entrambe le notifiche ricevute su Telegram**, confermate dall'utente. Privacy live con Telegram in §6 e "Emirati Arabi Uniti" in §7. Record di test rimossi da `CONTATTI` (PROD). |
 | Report di verifica | ✅ [`verifica.md`](./verifica.md) — 12/13 check superati |
-| **Produzione verificata** | ⚠️ **parziale** — il codice è live e la privacy aggiornata è visibile, ma la notifica non è stata provata in produzione perché `TELEGRAM_BOT_TOKEN` non è presente su Vercel |
 
-**Cosa manca, esattamente**
+**Intoppo risolto in chiusura**: la variabile su Vercel era stata creata come `ELEGRAM_BOT_TOKEN` (senza la `T`). Poiché il codice degrada in silenzio quando l'env manca, il sintomo sarebbe stato "non arriva mai niente" senza alcun errore visibile. Individuato rileggendo l'elenco dei nomi con `vercel env ls`, corretto dall'utente, applicato con un redeploy di produzione (le env non sono retroattive sui deployment già creati).
 
-1. Aggiungere `TELEGRAM_BOT_TOKEN` su Vercel **Production** (ed eventualmente Preview). Era stata creata con un refuso — `ELEGRAM_BOT_TOKEN`, senza la `T` — poi rimossa; al momento la variabile corretta non esiste. Finché è così, in produzione la notifica viene saltata con un `console.warn`, in silenzio: il degrado non bloccante è voluto, ma qui maschera un errore di configurazione.
-2. Test end-to-end dal form reale di `/contatti`, verifica della notifica ricevuta, cancellazione del record di test dalla tabella `CONTATTI` di PROD.
-
-Fatti questi due passi, lo stato passa a `verificata` e poi a `chiusa`.
-
-**URL produzione**: https://trionoracing.it/contatti (form) · https://trionoracing.it/privacy (§6 aggiornato) · data deploy 2026-08-07.
+**URL produzione**: https://trionoracing.it/contatti (form) · https://trionoracing.it/privacy (§6 aggiornato) · **go-live 2026-08-07**.
 
 **Apprendimenti portati in `AGENTS.md`** (sezione "Pattern appresi in EVO-047"): separazione trasporto/contenuto per le notifiche · quando *non* replicare la catena Make di Cycling Experience · `await` invece di fire-and-forget su Vercel · il timeout come budget di UX · il degrado silenzioso che maschera i refusi nei nomi delle env · log puliti che non provano quale codice sta girando (verifica del `cwd` del processo) · il preview MCP che avvia il server dal repo principale · i limiti di scrittura di una sessione isolata in worktree · `gh pr merge` nei worktree · ID tabella Airtable per-base · l'obbligo di dichiarare un nuovo destinatario nell'informativa privacy · env di Preview vuote · verifica di funzioni pure senza test runner.
 
