@@ -164,7 +164,8 @@ export default function PrivacyPage() {
 
           <ApexLegalSection title="7. Trasferimento dei dati fuori dall'Unione Europea">
             <p>
-              Alcuni fornitori hanno sede negli Stati Uniti. I trasferimenti avvengono in presenza
+              Alcuni fornitori hanno sede fuori dall&apos;Unione Europea (Stati Uniti, Emirati Arabi
+              Uniti). I trasferimenti avvengono in presenza
               di garanzie adeguate ai sensi del Capo V del GDPR: certificazione{" "}
               <strong>EU-US Data Privacy Framework</strong> del soggetto importatore e/o{" "}
               <strong>Clausole Contrattuali Standard</strong> approvate dalla Commissione europea,
@@ -319,6 +320,7 @@ const PROCESSORS: Array<{ name: string; role: string; place: string; transfer: s
   { name: "Cloudflare Inc. (R2)", role: "Storage documenti e foto", place: "USA / UE", transfer: "DPF e/o SCC" },
   { name: "Cloudinary Ltd", role: "Hosting e ottimizzazione immagini", place: "Israele / USA", transfer: "Decisione di adeguatezza (Israele) e/o SCC" },
   { name: "Make (Celonis)", role: "Automazioni amministrative", place: "UE", transfer: "Trattamento nell'UE" },
+  { name: "Telegram FZ-LLC", role: "Notifiche interne al gestore delle richieste dal form contatti", place: "Emirati Arabi Uniti", transfer: "Clausole Contrattuali Standard (SCC)" },
   { name: "Google LLC", role: "Google Maps e Google Analytics", place: "USA", transfer: "EU-US Data Privacy Framework (DPF)" },
   { name: "F.C.I. — Federazione Ciclistica Italiana", role: "Tesseramento federale", place: "Italia", transfer: "—" },
 ];
