@@ -9,7 +9,7 @@ export function SezioneCosaFarai() {
         <SectionHead
           variant="h2"
           kicker="Cosa farai"
-          title="Affiancherai i nostri giovani atleti durante le lezioni, al ciclodromo."
+          title="Affiancherai i nostri giovani atleti durante le lezioni, al Ciclodromo Renato Perona di Terni."
           intro="Sicurezza, divertimento e crescita al centro di ogni uscita in bici."
           className="max-w-[720px]"
         />
@@ -24,6 +24,11 @@ export function SezioneCosaFarai() {
             </span>
           ))}
         </div>
+
+        <p className="reveal reveal-delay-2 mt-4 max-w-[60ch] text-[14px] leading-relaxed text-stage-ink-dim">
+          Sono i pomeriggi in cui la Scuola è attiva, e restano questi anche dopo l&rsquo;anno di
+          formazione.
+        </p>
       </div>
     </section>
   );
