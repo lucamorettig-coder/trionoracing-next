@@ -57,7 +57,20 @@ export function SezioneCosaFarai() {
           formazione.
         </p>
 
-        <ul className="reveal reveal-delay-3 mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+        {/* Tutela dei minori detta in forma pratica: la stessa frase protegge i
+            bambini E risponde al "mi buttano nella mischia?" del candidato.
+            Volutamente nessun accenno esplicito ad abusi — su una pagina di
+            reclutamento introdurrebbe un'ombra fuori luogo. */}
+        <p className="reveal reveal-delay-3 mt-8 max-w-[62ch] text-lg leading-relaxed text-stage-ink">
+          Non sarai mai solo con il gruppo: al ciclodromo si lavora sempre in almeno due, e per
+          tutto l&rsquo;anno di formazione sei affiancato da un maestro esperto.
+        </p>
+        <p className="reveal reveal-delay-3 mt-3 max-w-[62ch] text-[14px] leading-relaxed text-stage-ink-dim">
+          La Scuola ha un responsabile per la tutela dei minori, come prevede la normativa
+          sportiva.
+        </p>
+
+        <ul className="reveal reveal-delay-4 mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
           {FOTO.map((f) => (
             <li key={f.src} className={"wide" in f && f.wide ? "col-span-2 sm:col-span-1" : ""}>
               <div className="apex-duotone relative aspect-[4/3] overflow-hidden border border-stage-line">
