@@ -252,20 +252,27 @@ export default function ProvaPage() {
 
             <div className="reveal-slide reveal-delay-1 lg:col-span-5">
               {/* Una foto vera della scuola: senza, la colonna resta un muro di
-                  testo e la pagina non ha volto. È la stessa immagine già usata
-                  nello step "Vieni a provare" di /la-scuola. */}
-              <div className="relative aspect-[4/3] w-full overflow-hidden">
+                  testo e la pagina non ha volto. Era la stessa immagine dello
+                  step "Vieni a provare" di /la-scuola; ora è lo scatto della
+                  prova vera — il maestro che controlla la bici del bambino
+                  prima di iniziare, che è letteralmente ciò che la pagina
+                  promette. Verticale: il 4:3 diventa 4:5 così i due volti e la
+                  bici ci stanno senza tagliare le teste. */}
+              <div className="relative aspect-[4/5] w-full overflow-hidden">
                 <Image
-                  src="/photos/scuola/lezione-ciclodromo.jpg"
-                  alt="Bambini in bici al ciclodromo durante una lezione della scuola di ciclismo Triono."
+                  src="/photos/scuola/maestro-controlla-bici.webp"
+                  alt="Un maestro della scuola controlla la bici di un allievo insieme a un genitore, prima della lezione di prova."
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="object-cover"
+                  className="object-cover [object-position:50%_35%]"
                 />
                 {/* Wrapper posizionato: .apex-sticker fissa position:relative (CSS
                     non-layered, batte l'utility "absolute" — stesso pattern
-                    EVO-027/EVO-029), quindi il posizionamento va sul wrapper. */}
-                <div className="absolute top-4 right-4 z-10 hidden sm:block">
+                    EVO-027/EVO-029), quindi il posizionamento va sul wrapper.
+                    In basso a sinistra e non più in alto a destra: nella foto
+                    nuova quell'angolo è occupato dalla testa del maestro, qui
+                    sotto c'è solo asfalto. */}
+                <div className="absolute bottom-4 left-4 z-10 hidden sm:block">
                   <Sticker>Gratis</Sticker>
                 </div>
               </div>
