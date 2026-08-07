@@ -213,12 +213,12 @@ L'unico artefatto che una persona guarderà davvero è **il messaggio Telegram**
 | A workspace + branch | ✅ | Worktree isolato `.claude/worktrees/EVO-047-notifica-telegram-contatti`, branch `evo/EVO-047-notifica-telegram-contatti` da `origin/main` (`36b5f25`). Baseline verde (lint 0 errori / 16 warning preesistenti, typecheck pulito). Il worktree non ha `node_modules` né `.env.local`: symlink + copia dal repo principale. |
 | B-D implementazione | ✅ | **Scostamento dichiarato**: eseguita in sequenza dal coordinatore, non con `subagent-driven-development`, su decisione esplicita dell'utente (la sessione richiede il suo via libera per lanciare subagenti). 4 task, 4 commit, i tre gate verdi prima di ognuno. `445134a` client · `12fc28f` messaggio · `2a83aa9` aggancio route · `556c703` privacy. |
 | E smoke test dev | ✅ | v. sotto — con un falso positivo intercettato. |
-| F PR | | |
-| G OK utente | | |
-| H squash merge | | |
-| I post-deploy | | |
-| J verify-implementation | | |
-| K report finale | | |
+| F PR | ✅ | [#123](https://github.com/lucamorettig-coder/trionoracing-next/pull/123), 5 commit. Il worktree ha impedito a `gh` il passo locale, ma il merge lato GitHub è avvenuto. |
+| G OK utente | ✅ | OK esplicito dell'utente in chat. |
+| H squash merge | ✅ | `6feff31` su `main`. Branch remoto cancellato a mano (`gh --delete-branch` non ha potuto: `'main' is already used by worktree`). |
+| I post-deploy | ⚠️ **parziale** | Privacy live su https://trionoracing.it/privacy (Telegram in §6, "Emirati Arabi Uniti" in §7). **Notifica NON verificabile in produzione**: `TELEGRAM_BOT_TOKEN` assente su Vercel Production. |
+| J verify-implementation | ✅ | Skill puntata su un altro progetto → report manuale: [`verifica.md`](./verifica.md). 12/13 check superati. |
+| K report finale | ✅ | Consegnato in chat; pattern consolidati in `AGENTS.md`. |
 
 ### Prerequisiti operativi — stato
 
@@ -245,6 +245,25 @@ L'unico artefatto che una persona guarderà davvero è **il messaggio Telegram**
 Verifica aggiuntiva della funzione pura (compilata in una dir temporanea ed eseguita davvero, non solo riletta): fuso `Europe/Rome` corretto (08:43 UTC → 10:43), numero normalizzato in `wa.me/393292040821`, HTML dell'input escapato (`<b>Hacker</b> & Co` → `&lt;b&gt;…&amp;`), numero malformato `12345` → nessun link WhatsApp, troncamento oltre 600 caratteri effettivo, e con `telefono`/`recordUrl` assenti restano solo le righe valide più il `mailto`.
 
 ## 8. Verifica e go-live
+
+**Esito: ⚠️ mergeata e deployata, NON ancora chiusa.** La chiusura richiede tre evidenze; due ci sono, la terza no.
+
+| Evidenza | Stato |
+|---|---|
+| PR mergeata | ✅ [#123](https://github.com/lucamorettig-coder/trionoracing-next/pull/123), squash `6feff31` su `main` |
+| Report di verifica | ✅ [`verifica.md`](./verifica.md) — 12/13 check superati |
+| **Produzione verificata** | ⚠️ **parziale** — il codice è live e la privacy aggiornata è visibile, ma la notifica non è stata provata in produzione perché `TELEGRAM_BOT_TOKEN` non è presente su Vercel |
+
+**Cosa manca, esattamente**
+
+1. Aggiungere `TELEGRAM_BOT_TOKEN` su Vercel **Production** (ed eventualmente Preview). Era stata creata con un refuso — `ELEGRAM_BOT_TOKEN`, senza la `T` — poi rimossa; al momento la variabile corretta non esiste. Finché è così, in produzione la notifica viene saltata con un `console.warn`, in silenzio: il degrado non bloccante è voluto, ma qui maschera un errore di configurazione.
+2. Test end-to-end dal form reale di `/contatti`, verifica della notifica ricevuta, cancellazione del record di test dalla tabella `CONTATTI` di PROD.
+
+Fatti questi due passi, lo stato passa a `verificata` e poi a `chiusa`.
+
+**URL produzione**: https://trionoracing.it/contatti (form) · https://trionoracing.it/privacy (§6 aggiornato) · data deploy 2026-08-07.
+
+**Apprendimenti portati in `AGENTS.md`** (sezione "Pattern appresi in EVO-047"): separazione trasporto/contenuto per le notifiche · quando *non* replicare la catena Make di Cycling Experience · `await` invece di fire-and-forget su Vercel · il timeout come budget di UX · il degrado silenzioso che maschera i refusi nei nomi delle env · log puliti che non provano quale codice sta girando (verifica del `cwd` del processo) · il preview MCP che avvia il server dal repo principale · i limiti di scrittura di una sessione isolata in worktree · `gh pr merge` nei worktree · ID tabella Airtable per-base · l'obbligo di dichiarare un nuovo destinatario nell'informativa privacy · env di Preview vuote · verifica di funzioni pure senza test runner.
 
 ---
 
