@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Phone, Mail } from "lucide-react";
 
 const TELEFONO = "329 2040821";
@@ -66,6 +67,20 @@ export function CtaContattaci() {
               {EMAIL}
             </a>
           </div>
+
+          <p className="mt-6 text-[14px] leading-relaxed text-stage-ink-dim">
+            Una telefonata o due righe via mail: ci conosciamo con calma, senza impegno.
+          </p>
+
+          <p className="mt-3 text-[14px] leading-relaxed text-stage-ink-dim">
+            Non conosci ancora la Scuola?{" "}
+            <Link
+              href="/la-scuola"
+              className="text-accent underline underline-offset-2 hover:opacity-80"
+            >
+              Scopri come lavoriamo <span aria-hidden>→</span>
+            </Link>
+          </p>
         </div>
       </div>
     </section>

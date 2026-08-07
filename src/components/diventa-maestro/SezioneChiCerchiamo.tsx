@@ -14,6 +14,7 @@ export function SezioneChiCerchiamo() {
           variant="h2"
           kicker="Chi cerchiamo"
           title="Persone appassionate di ciclismo che vogliono trasmettere sicurezza e passione ai più giovani."
+          intro="Non serve un passato agonistico: basta saper andare in bici, avere voglia di stare con i ragazzi e la pazienza di insegnare. Al resto pensa la formazione TI2."
           introMaxWidth="60ch"
           className="max-w-[720px]"
         />
