@@ -3,6 +3,7 @@ import { HeroManifesto } from "@/components/diventa-maestro/HeroManifesto";
 import { SezioneChiCerchiamo } from "@/components/diventa-maestro/SezioneChiCerchiamo";
 import { SezioneTI2 } from "@/components/diventa-maestro/SezioneTI2";
 import { SezioneCosaFarai } from "@/components/diventa-maestro/SezioneCosaFarai";
+import { SezioneFilosofia } from "@/components/diventa-maestro/SezioneFilosofia";
 import { CtaContattaci } from "@/components/diventa-maestro/CtaContattaci";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { Grain } from "@/components/apex/Grain";
@@ -41,6 +42,7 @@ export default function DiventaMaestroPage() {
       <SezioneChiCerchiamo />
       <SezioneTI2 />
       <SezioneCosaFarai />
+      <SezioneFilosofia />
       <CtaContattaci />
     </div>
   );
