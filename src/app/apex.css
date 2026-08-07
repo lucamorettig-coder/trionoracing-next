@@ -285,6 +285,35 @@
 }
 
 /* =============================================================================
+   PORTE HERO — il fork "due modi per cominciare" (EVO-046 "la porta della
+   prova"). Non è un reveal generico: ogni porta si apre dal proprio cardine
+   ESTERNO verso il centro (A da sinistra, B da destra), come un vero doppio
+   infisso — un wipe direzionale via clip-path, zero elementi visivi nuovi
+   (il contenuto resta lo stesso testo piano). Animazione a tempo (non
+   scroll-timeline: le porte stanno sempre nel primo viewport, stesso
+   trattamento delle altre .reveal della hero). Al passaggio del mouse su
+   una porta, l'altra si attenua via :has() — zero JS — per leggere la
+   scelta come UNA tra due, non due offerte indipendenti. */
+.apex-porta { transition: opacity var(--dur-hover) var(--ease-out); }
+.apex-porta--a { animation: apex-porta-open-l 650ms cubic-bezier(0.16, 1, 0.3, 1) 0.32s both; }
+.apex-porta--b { animation: apex-porta-open-r 650ms cubic-bezier(0.16, 1, 0.3, 1) 0.40s both; }
+@keyframes apex-porta-open-l {
+  from { clip-path: inset(0 100% 0 0); opacity: 0; }
+  to   { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+@keyframes apex-porta-open-r {
+  from { clip-path: inset(0 0 0 100%); opacity: 0; }
+  to   { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+.apex-porte-grid:has(.apex-porta--a:hover) .apex-porta--b,
+.apex-porte-grid:has(.apex-porta--b:hover) .apex-porta--a {
+  opacity: 0.5;
+}
+@media (prefers-reduced-motion: reduce) {
+  .apex-porta--a, .apex-porta--b { animation: none; }
+}
+
+/* =============================================================================
    Card APEX
    ============================================================================= */
 .apex-card {

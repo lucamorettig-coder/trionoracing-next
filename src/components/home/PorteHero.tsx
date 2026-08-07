@@ -13,16 +13,19 @@ import { ApexCta } from "@/components/apex/ApexCta";
 export function PorteHero() {
   return (
     <div className="mt-8">
-      <p className="apex-eyebrow text-stage-muted">Due modi per cominciare.</p>
+      <p className="apex-eyebrow reveal reveal-delay-3 text-stage-muted">Due modi per cominciare.</p>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+      {/* .apex-porte-grid abilita il dimming reciproco via :has() (vedi
+          apex.css): passare sopra una porta attenua l'altra, per leggere il
+          fork come UNA scelta tra due, non due offerte indipendenti. */}
+      <div className="apex-porte-grid mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
         {/* Porta A — la prova.
             Il colore della domanda va in `style`, NON con `text-accent`:
             `.apex-data` in apex.css è una regola unlayered che imposta
             `color: var(--stage-muted)` e batte le utility Tailwind sullo
             stesso elemento. Con la utility le due domande uscirebbero
             entrambe grigie, e né build né lint né typecheck lo vedono. */}
-        <div className="flex flex-col items-start">
+        <div className="apex-porta apex-porta--a flex flex-col items-start">
           <p className="apex-data" id="porta-a-domanda" style={{ color: "var(--accent)" }}>
             Tuo figlio non ha mai provato?
           </p>
@@ -37,7 +40,7 @@ export function PorteHero() {
         </div>
 
         {/* Porta B — l'iscrizione */}
-        <div className="flex flex-col items-start">
+        <div className="apex-porta apex-porta--b flex flex-col items-start">
           <p className="apex-data" id="porta-b-domanda" style={{ color: "var(--accent-2)" }}>
             Hai già deciso?
           </p>

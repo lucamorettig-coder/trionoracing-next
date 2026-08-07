@@ -193,9 +193,7 @@ export async function HomeHero() {
               </span>
             </p>
 
-            <div className="reveal reveal-delay-3">
-              <PorteHero />
-            </div>
+            <PorteHero />
           </div>
         </div>
 
