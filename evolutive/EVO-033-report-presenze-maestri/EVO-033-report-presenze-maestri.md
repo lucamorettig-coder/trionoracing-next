@@ -3,8 +3,8 @@
 - **ID**: EVO-033
 - **Slug**: report-presenze-maestri
 - **Data inizio**: 2026-07-08
-- **Data fine**: _da compilare a chiusura_
-- **Stato**: in pianificazione
+- **Data fine**: 2026-08-08
+- **Stato**: chiusa
 - **Tipo**: nuova feature
 - **Area**: area admin (portale, autenticata)
 - **Priorità**: alta
@@ -181,29 +181,32 @@ Vedi [`prompt-claude-code.md`](prompt-claude-code.md). Il prompt copre l'intero 
 
 ## 8. Verifica e go-live
 
-_Da compilare in fase 8 dopo che Claude Code ha completato l'intero ciclo._
+**Esito: ✅ chiusa.** Il codice è in produzione dal 2026-07-09; la chiusura formale è stata completata il 2026-08-08 (la scheda era rimasta ferma allo stato "in pianificazione" mentre feature e report di verifica erano già su `main`).
 
-- **URL produzione**: _{url}_
-- **Pull Request**: _{link}_
-- **Commit di merge**: _{hash}_
-- **Data go-live**: _{YYYY-MM-DD}_
+- **URL produzione**: https://trionoracing.it/portale/admin/presenze-maestri (auth-gated, ruolo ADMIN)
+- **Pull Request**: [#89](https://github.com/lucamorettig-coder/trionoracing-next/pull/89) (feature) · [#90](https://github.com/lucamorettig-coder/trionoracing-next/pull/90) (report di verifica)
+- **Commit di merge**: `c13128f` (squash #89) · `5f8c9fb` (squash #90)
+- **Data go-live**: 2026-07-09
 - **Report verifica**: [`verifica.md`](verifica.md)
 
 ### Esito sintetico
 
 | Dimensione | Stato | Note |
 |------------|-------|------|
-| Design system | ✅ / ⚠️ / ❌ | _..._ |
-| Localizzazione (i18n) | ✅ / ⚠️ / ❌ / n/a | _..._ |
-| SEO | ✅ / ⚠️ / ❌ / n/a | _..._ |
-| Fedeltà ai visual | ✅ / ⚠️ / ❌ | _..._ |
-| Criteri di accettazione | ✅ / ⚠️ / ❌ | _..._ |
-| Smoke test dev | ✅ / ❌ | _..._ |
-| Smoke test produzione | ✅ / ❌ | _..._ |
+| Design system | ✅ | Token DS ufficiali (`navy-900`, `sky-300`) al posto degli hex del PNG di riferimento; nessun token globale nuovo; trigger coerente con `ExportCSVButton` |
+| Localizzazione (i18n) | n/a | Progetto monolingua italiano |
+| SEO | n/a | Area admin autenticata, fuori dall'indice |
+| Fedeltà ai visual | ✅ | Corrisponde alla spec `DS-NOTES`; confermato su PNG reale scaricato in smoke dev |
+| Criteri di accettazione | ✅ | 8/8 requisiti funzionali, 0 violazioni di convenzione |
+| Smoke test dev | ✅ | Confermato dall'utente |
+| Smoke test produzione | ✅ | Route live (`401` da non autenticato, `404` sulla pagina admin — pattern Clerk atteso) **e** generazione reale dei report confermata dall'utente in uso su produzione |
 
-### Apprendimenti riusabili (riportati anche in CLAUDE.md)
+### Apprendimenti riusabili (riportati anche in AGENTS.md)
 
-_Pattern, regole, decisioni emerse che valgono per future evolutive._
+- Generazione immagini server-side con `ImageResponse` / `next/og`: vincoli satori (niente `<table>`, flexbox riga-per-riga, font da embeddare esplicitamente) → il template è una ricostruzione fedele, non un porting 1:1 di un HTML esistente.
+- Download di un output binario generato server-side: `<a href download>` diretto sull'endpoint, non un blob costruito lato client come negli export CSV.
+- Breakdown MTB/Strada senza modifiche di schema: si risale `PRESENZE_MAESTRI.LEZIONE` → `TABELLA_LEZIONI.TIPO_SESSIONE` con batch fetch.
+- **Lezione di processo**: feature e report di verifica erano su `main` da un mese, ma scheda e `memory.md` dichiaravano ancora "in pianificazione" / "in implementazione". Lo stato va aggiornato nello stesso giro in cui si merge, altrimenti l'evolutiva risulta appesa pur essendo finita.
 
 ---
 
@@ -219,3 +222,15 @@ _Compila questa sezione SOLO se l'evolutiva è un'ombrello con sotto-evolutive, 
 ## Log fasi
 
 > Append automatico a fine di ogni fase, con timestamp.
+
+### [2026-08-08] Fase 8 — Chiusura completata
+
+Chiusura formale eseguita a distanza dal go-live: il codice era in produzione dal 2026-07-09 (PR #89) e il report di verifica su `main` dal medesimo giorno (PR #90), ma la scheda e `memory.md` non erano stati aggiornati.
+
+Evidenze verificate freshly il 2026-08-08:
+
+- PR #89 `MERGED`, squash `c13128f`, confermato ancestor di `main`; `src/app/api/admin/report-presenze-maestri/route.ts` e `ReportPresenzeTemplate.tsx` tracciati su `main`.
+- Produzione: `https://trionoracing.it/` → `200`; `/api/admin/report-presenze-maestri` → `401` (route esistente, auth-gated); `/portale/admin/presenze-maestri` → `404` da non autenticato (pattern Clerk atteso). Generazione reale dei due PNG confermata dall'utente in uso su produzione.
+- `verifica.md` presente su `main`.
+
+Pulizia: rimossi il worktree `.claude/worktrees/stoic-swartz-0def7b` e il branch locale `docs/evo-033-close` — il suo unico commit (`cbf25a3`) era il duplicato mai pushato di quello già mergeato con #90, basato su un `main` di un mese prima.
